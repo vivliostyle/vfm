@@ -207,9 +207,9 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ｜Text《Ruby》 # avoid Unicode character
 ```
 
-#### Positional Image
+### Positional Image
 
-##### Two-column images
+#### Two-column images
 
 ```markdown
 ![Column 1](./image1.png)![Column 2](./image2.png)
