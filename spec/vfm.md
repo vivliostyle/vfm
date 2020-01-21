@@ -134,8 +134,7 @@ This also cannot be used
 ### Code
 
 ````md
-```
-javascript:app.js
+```javascript:app.js
 function main() {}
 ```
 ````
@@ -152,8 +151,7 @@ function main() {}
 ```
 
 ````md
-```
-javascript:title=app.js
+```javascript:title=app.js
 function main() {}
 ```
 ````
