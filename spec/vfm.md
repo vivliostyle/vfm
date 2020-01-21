@@ -14,15 +14,12 @@ Draft of Vivliostyle Flavored Markdown (VFM), a custom Markdown syntax specializ
 ### HTML
 
 - Follows [WCAG 2.1](https://www.w3.org/TR/WCAG21/).
-- Rules on semantics and class names when converting VFM notation to HTML.
-- Also used when exporting from Vivliostyle Pub.
-- CSS theme compliant to this specification can be applied to other compliant HTML.
 
 ## Spec
 
 ### Caveats
 
-- `position` is omitted.
+- `position` is omitted in `mdast`.
 
 ### Sentence
 
