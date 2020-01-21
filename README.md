@@ -7,4 +7,4 @@
 
 ## Spec
 
-- [VFM](./spec/vfm.md)
+- [VFM - Draft](./spec/vfm.md)
