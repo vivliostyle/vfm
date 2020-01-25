@@ -1,4 +1,4 @@
-# Vivliostyle Flavoured Markdown Draft
+# Vivliostyle Flavoured Markdown: Working Draft
 
 Draft of Vivliostyle Flavored Markdown (VFM), a custom Markdown syntax specialized in book authoring.
 
@@ -26,6 +26,8 @@ Draft of Vivliostyle Flavored Markdown (VFM), a custom Markdown syntax specializ
 - A newline puts `<br/>` to the end of a line.
 - Consecutive 2 newlines creates new sentence block.
 
+**VFM**
+
 ```md
 はじめまして。
 
@@ -33,38 +35,39 @@ Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
 VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliostyle プロジェクトのために策定・実装されました。
 ```
 
+**mdast**
+
 ```json
-{
-  "type": "root",
-  "children": [
-    {
-      "type": "paragraph",
-      "children": [
-        {
-          "type": "text",
-          "value": "はじめまして。"
-        }
-      ]
-    },
-    {
-      "type": "paragraph",
-      "children": [
-        {
-          "type": "text",
-          "value": "Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。"
-        },
-        {
-          "type": "break"
-        },
-        {
-          "type": "text",
-          "value": "VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliostyle プロジェクトのために策定・実装されました。"
-        }
-      ]
-    }
-  ]
-}
+[
+  {
+    "type": "paragraph",
+    "children": [
+      {
+        "type": "text",
+        "value": "はじめまして。"
+      }
+    ]
+  },
+  {
+    "type": "paragraph",
+    "children": [
+      {
+        "type": "text",
+        "value": "Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。"
+      },
+      {
+        "type": "break"
+      },
+      {
+        "type": "text",
+        "value": "VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliostyle プロジェクトのために策定・実装されました。"
+      }
+    ]
+  }
+]
 ```
+
+**HTML**
 
 ```html
 <p>はじめまして。</p>
@@ -76,6 +79,8 @@ VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliosty
 ```
 
 ### Heading
+
+**VFM**
 
 ```md
 # Heading 1
@@ -91,6 +96,8 @@ VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliosty
 ###### Heading 6
 ```
 
+**mdast**
+
 ```json
 {
   "type": "heading",
@@ -103,23 +110,31 @@ VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliosty
   ]
 }
 
+...
+
 {
   "type": "heading",
-  "depth": 2,
+  "depth": 6,
   "children": [
     {
       "type": "text",
-      "value": "Heading 2"
+      "value": "Heading 6"
     }
   ]
 }
 ```
 
+**HTML**
+
 ```html
 <h1>Heading 1</h1>
+...
+<h6>Heading 6</h6>
 ```
 
 ### Code
+
+**VFM**
 
 ````md
 ```javascript:app.js
@@ -127,6 +142,8 @@ function main() {}
 ```
 ````
 
+**mdast**
+
 ```json
 {
   "type": "code",
@@ -137,6 +154,20 @@ function main() {}
   "value": "function main() {}"
 }
 ```
+
+**HTML**
+
+```html
+<pre>
+  <code class="language-javascript">
+    function main() {}
+  </code>
+</pre>
+```
+
+#### Dictionary-style metadata
+
+**VFM**
 
 ````md
 ```javascript:title=app.js
@@ -144,6 +175,8 @@ function main() {}
 ```
 ````
 
+**mdast**
+
 ```json
 {
   "type": "code",
@@ -154,6 +187,8 @@ function main() {}
   "value": "function main() {}"
 }
 ```
+
+**HTML**
 
 ```html
 <pre>
@@ -165,9 +200,13 @@ function main() {}
 
 ### Ruby
 
+**VFM**
+
 ```
 This is [Ruby]{ルビ}
 ```
+
+**mdast**
 
 ```json
 {
@@ -181,6 +220,8 @@ This is [Ruby]{ルビ}
   ]
 }
 ```
+
+**HTML**
 
 ```html
 This is <ruby>Ruby<rt>ルビ</rt></ruby>
@@ -203,57 +244,78 @@ The notation from [なろう](https://syosetu.com/man/ruby/).
 ##### `[Text]<Ruby>`
 
 - 🔻disambiguate with `<URL>`
+
+### Image
+
+**VFM**
+
+```md
+![Figure 1](./fig1.png)
 ```
 
-### Positional Image
+**mdast**
+
+```json
+{
+  "type": "image",
+  "title": null,
+  "url": "./fig1.png",
+  "alt": "Figure 1"
+}
+```
+
+**HTML**
+
+```html
+<img src="./fig1.png" alt="Figure 1" />
+```
 
 #### Two-column images
+
+**VFM**
 
 ```markdown
 ![Column 1](./image1.png)![Column 2](./image2.png)
 ```
 
+**mdast**
 
-
-```markdown
+```json
+{
+  "type": "ruby",
+  "rubyText": "ルビ",
+  "children": [
+    {
+      "type": "text",
+      "value": "Ruby"
+    }
+  ]
+}
 ```
 
-### Page Layout
-
-```md
----
-layout: base
----
-```
-
-- title: Title of the book
-- content: Rendered VFM
+**HTML**
 
 ```html
-<!DOCTYPE html>
-<html lang="{{lang}}">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width={{width}}, initial-scale=1.0" />
-    <title>{{title}}</title>
-  </head>
-  <body>
-    {{content}}
-  </body>
-</html>
+<div class="column">
+  <img src="./image1.png" alt="Column 1" />
+  <img src="./image2.png" alt="Column 2" />
+</div>
 ```
 
 ### Walled block
 
 - Walled block populates a class labeled `<div>` element with its contents.
 - Inner contents will be parsed as VFM.
-- Notation candidates: `===`, `~~~`
+- Notation candidates: `===`, `~~~`, `:::`
+  **VFM**
 
 ```md
 ===section-author
 uetchy
 ===
 ```
+
+**mdast**
 
 ```json
 {
@@ -273,6 +335,8 @@ uetchy
 }
 ```
 
+**HTML**
+
 ```html
 <div class="section-author">
   <p>uetchy</p>
@@ -280,6 +344,8 @@ uetchy
 ```
 
 #### Nested walled block
+
+**VFM**
 
 ```md
 ===section-author
@@ -289,6 +355,8 @@ uetchy
 ====
 ===
 ```
+
+**mdast**
 
 ```json
 {
@@ -325,6 +393,8 @@ uetchy
 }
 ```
 
+**HTML**
+
 ```html
 <div class="section-author">
   <p>uetchy</p>
@@ -336,9 +406,28 @@ uetchy
 
 #### Custom HTML
 
+**VFM**
+
 ```markdown
 <div class="custom">
-...
+  <p>Hey</p>
+</div>
+```
+
+**mdast**
+
+```json
+{
+  "type": "html",
+  "value": "<div class="custom">\n<p>Hey</p>\n</div>"
+}
+```
+
+**HTML**
+
+```html
+<div class="custom">
+  <p>Hey</p>
 </div>
 ```
 
@@ -367,6 +456,8 @@ title: Introduction to VFM
 - [GitHub Flavored Markdown Spec](https://github.github.com/gfm/)
 - [CommonMark Spec](https://spec.commonmark.org/)
 - [PHP Markdown Extra](https://michelf.ca/projects/php-markdown/extra/)
+- [Pandoc's Markdown](https://pandoc.org/MANUAL.html#pandocs-markdown)
+- [でんでんマークダウン](https://conv.denshochan.com/markdown)
 - [remark](https://github.com/remarkjs/remark)
 - [remark-rehype](https://github.com/remarkjs/remark-rehype)
 - [env-create-book](https://github.com/akabekobeko/env-create-book)
