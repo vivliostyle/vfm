@@ -1,0 +1,41 @@
+{
+  "name": "revive-parse",
+  "description": "vfm to mdast parser",
+  "version": "0.0.0",
+  "author": "Vivliostyle Foundation <mail@vivliostyle.org>",
+  "scripts": {
+    "build": "babel -d lib src",
+    "dev": "babel -d lib src -w",
+    "test": "jest"
+  },
+  "dependencies": {
+    "is-whitespace-character": "^1.0.3",
+    "rehype-stringify": "^6.0.0",
+    "remark-parse": "^7.0.1",
+    "unified": "^8.4.1",
+    "unist-builder": "^1.0.4"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0"
+  },
+  "main": "lib/index.js",
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vibranthq/vfm.git"
+  },
+  "license": "Aapche-2.0",
+  "bugs": {
+    "url": "https://github.com/vibranthq/vfm/issues"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "homepage": "https://github.com/vibranthq/vfm#readme",
+  "keywords": [
+    "remark"
+  ]
+}
