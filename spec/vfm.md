@@ -213,17 +213,9 @@ The notation from [なろう](https://syosetu.com/man/ruby/).
 ![Column 1](./image1.png)![Column 2](./image2.png)
 ```
 
-### Frontmatter
 
-- `title`, `layout` are **reserved metatags**.
-- `title` SHOULD be treated as section title and MAY be used in ToC.
-- metatags other than reserved metatags can be used for arbitorary usage.
 
 ```markdown
----
-title: Introduction to VFM
-layout: base
----
 ```
 
 ### Page Layout
@@ -349,6 +341,25 @@ uetchy
 ...
 </div>
 ```
+
+### Frontmatter
+
+Frontmatter is a way of defining metadata in Markdown (file) units.
+
+```yaml
+---
+title: Introduction to VFM
+---
+
+```
+
+#### Reserved words
+
+| Property | Type   | Description                                                                                                                                                                                    |
+| -------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| title    | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
+| author   | String | Author of the document.                                                                                                                                                                        |
+| layout   | String | Custom css file for the document.                                                                                                                                                              |
 
 ## References
 
