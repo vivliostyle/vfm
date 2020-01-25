@@ -419,7 +419,7 @@ uetchy
 ```json
 {
   "type": "html",
-  "value": "<div class="custom">\n<p>Hey</p>\n</div>"
+  "value": "<div class=\"custom\">\n<p>Hey</p>\n</div>"
 }
 ```
 
