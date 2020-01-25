@@ -32,7 +32,7 @@ Draft of Vivliostyle Flavored Markdown (VFM), a custom Markdown syntax specializ
 はじめまして。
 
 Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
-VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliostyle プロジェクトのために策定・実装されました。
+VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
 ```
 
 **mdast**
@@ -60,7 +60,7 @@ VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliosty
       },
       {
         "type": "text",
-        "value": "VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliostyle プロジェクトのために策定・実装されました。"
+        "value": "VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。"
       }
     ]
   }
@@ -73,7 +73,7 @@ VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliosty
 <p>はじめまして。</p>
 <p>
   Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。<br />
-  VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliostyle
+  VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle
   プロジェクトのために策定・実装されました。
 </p>
 ```
