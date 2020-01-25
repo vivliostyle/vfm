@@ -117,18 +117,6 @@ VFM は日本語の執筆に特化した Markdown の亜種であり、Vivliosty
 
 ```html
 <h1>Heading 1</h1>
-
-<h2>Heading 2</h2>
-```
-
-The underline styled header is disabled in VFM.
-
-```
-This cannot be used
-===================
-
-This also cannot be used
-------------------------
 ```
 
 ### Code
