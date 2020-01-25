@@ -270,38 +270,6 @@ The notation from [なろう](https://syosetu.com/man/ruby/).
 <img src="./fig1.png" alt="Figure 1" />
 ```
 
-#### Two-column images
-
-**VFM**
-
-```markdown
-![Column 1](./image1.png)![Column 2](./image2.png)
-```
-
-**mdast**
-
-```json
-{
-  "type": "ruby",
-  "rubyText": "ルビ",
-  "children": [
-    {
-      "type": "text",
-      "value": "Ruby"
-    }
-  ]
-}
-```
-
-**HTML**
-
-```html
-<div class="column">
-  <img src="./image1.png" alt="Column 1" />
-  <img src="./image2.png" alt="Column 2" />
-</div>
-```
-
 ### Walled block
 
 - Walled block populates a class labeled `<div>` element with its contents.
