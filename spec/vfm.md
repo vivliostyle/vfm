@@ -188,9 +188,21 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 
 #### Other candidates
 
-```
-[Text]<Ruby> # disambiguate with <URL>
-｜Text《Ruby》 # avoid Unicode character
+##### `{電子出版|でんししゅっぱん}`
+
+The notation from [Denden Markdown](https://conv.denshochan.com/markdown#ruby).
+
+- `More comments needed`
+
+##### `｜Text《Ruby》`
+
+The notation from [なろう](https://syosetu.com/man/ruby/).
+
+- 🔻 avoid Unicode character
+
+##### `[Text]<Ruby>`
+
+- 🔻disambiguate with `<URL>`
 ```
 
 ### Positional Image
