@@ -1,4 +1,4 @@
-# Vivliostyle Flavoured Markdown: Working Draft
+# Vivliostyle Flavored Markdown: Working Draft
 
 Draft of Vivliostyle Flavored Markdown (VFM), a custom Markdown syntax specialized in book authoring.
 
