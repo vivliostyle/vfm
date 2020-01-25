@@ -307,7 +307,8 @@ The notation from [なろう](https://syosetu.com/man/ruby/).
 - Walled block populates a class labeled `<div>` element with its contents.
 - Inner contents will be parsed as VFM.
 - Notation candidates: `===`, `~~~`, `:::`
-  **VFM**
+
+**VFM**
 
 ```md
 ===section-author
