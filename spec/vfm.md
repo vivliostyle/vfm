@@ -234,13 +234,13 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 
 ##### `{電子出版|でんししゅっぱん}`
 
-The notation from [Denden Markdown](https://conv.denshochan.com/markdown#ruby).
+The notation is derived from [でんでんマークダウン](https://conv.denshochan.com/markdown#ruby).
 
 - `More comments needed`
 
 ##### `｜Text《Ruby》`
 
-The notation from [なろう](https://syosetu.com/man/ruby/).
+The notation is derived from [視覚障碍者読書支援協会 (BBA)「原文入力ルール」](https://www.jstage.jst.go.jp/article/jsda/2/2/2_87/_pdf/-char/ja).
 
 - 🔻 avoid Unicode character
 
