@@ -1,13 +1,16 @@
 # Vivliostyle Flavored Markdown: Working Draft
 
-Draft of Vivliostyle Flavored Markdown (VFM), a custom Markdown syntax specialized in book authoring.
+Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book authoring. It is standardized and published for Vivliostyle and its sibling projects.
 
 ## Principles
 
+1. Open discussion - steadily improving through open discussions and feedback from the vast community.
+1. Provides reference implementation for parsing and converting VFM to HTML, allowing other non-Vivliostyle projects to use this syntax for their own purposes.
+
 ### VFM
 
-1. Rule of least surprise.
-   1. Should be lined and matched to another Markdown syntax.
+1. Rule of least surprise
+   - Should be lined and matched to another Markdown syntax.
 1. **Not intended** to be a superset/subset of either CommonMark or GFM.
 1. Backward compatible syntax (should not be incorrectly rendered in Markdown editor like Typora).
 
@@ -32,7 +35,7 @@ Draft of Vivliostyle Flavored Markdown (VFM), a custom Markdown syntax specializ
 はじめまして。
 
 Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
-VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
+VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
 ```
 
 **mdast**
@@ -60,7 +63,7 @@ VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle プロ
       },
       {
         "type": "text",
-        "value": "VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。"
+        "value": "VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。"
       }
     ]
   }
@@ -73,7 +76,7 @@ VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle プロ
 <p>はじめまして。</p>
 <p>
   Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。<br />
-  VFM は本の執筆に特化した Markdown 方言であり、Vivliostyle
+  VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle
   プロジェクトのために策定・実装されました。
 </p>
 ```
