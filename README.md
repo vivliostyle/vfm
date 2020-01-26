@@ -1,10 +1,10 @@
 # Vivliostyle Flavored Markdown
 
-Vivliostyle Flavored Markdown (VFM), a Markdown syntax specialized in book authoring. It is standardized and published for Vivliostyle and its sibling projects.
+Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book authoring. It is standardized and published for Vivliostyle and its sibling projects.
 
 ## Principles
 
-1. Open discussion - steadily improving through open discussions and feedback from the vast community.
+1. Open discussion - steadily improving through open discussion and feedback from the vast community.
 1. Provides reference implementation for parsing and converting VFM to HTML, allowing other non-Vivliostyle projects to use this syntax for their own purposes.
 
 ### VFM
