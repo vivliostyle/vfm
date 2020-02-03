@@ -206,7 +206,7 @@ function main() {}
 **VFM**
 
 ```
-This is [Ruby]{ルビ}
+This is {Ruby|ルビ}
 ```
 
 **mdast**
@@ -230,7 +230,11 @@ This is [Ruby]{ルビ}
 This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ```
 
-#### Other candidates
+#### Candidates
+
+##### `[Text]{Ruby}`
+
+- 🔻 Conflicted with fenced inline block.
 
 ##### `{電子出版|でんししゅっぱん}`
 
@@ -273,25 +277,25 @@ The notation is derived from [視覚障碍者読書支援協会 (BBA)「原文�
 <img src="./fig1.png" alt="Figure 1" />
 ```
 
-### Walled block
+### Fenced block
 
-- Walled block populates a class labeled `<div>` element with its contents.
+- Fenced block populates a class labeled `<div>` element with its contents.
 - Inner contents will be parsed as VFM.
 - Notation candidates: `===`, `~~~`, `:::`
 
 **VFM**
 
 ```md
-===section-author
+:::section-author
 uetchy
-===
+:::
 ```
 
 **mdast**
 
 ```json
 {
-  "type": "walledBlock",
+  "type": "fencedBlock",
   "className": "section-author",
   "children": [
     {
@@ -315,24 +319,24 @@ uetchy
 </div>
 ```
 
-#### Nested walled block
+#### Nested fenced block
 
 **VFM**
 
 ```md
-===section-author
+:::section-author
 uetchy
-====author-homepage
+::::author-homepage
 <https://uechi.io>
-====
-===
+::::
+:::
 ```
 
 **mdast**
 
 ```json
 {
-  "type": "walledBlock",
+  "type": "fencedBlock",
   "className": "section-author",
   "children": [
     {
@@ -345,7 +349,7 @@ uetchy
       ]
     },
     {
-      "type": "walledBlock",
+      "type": "fencedBlock",
       "className": "author-homepage",
       "children": [
         {
