@@ -12,8 +12,9 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 1. Rule of least surprise
    1. Should be lined and matched to another Markdown syntax.
    1. Minimize incompatible syntax.
-1. Not necessarily needed to inherit all syntax from CommonMark and GFM.
-   1. Should pick one for its needs, not for its historical reasons.
+1. Based on CommonMark specifications.
+   1. Not necessary to inherit all syntax from CommonMark.
+   1. Choose according to its needs, not for historical reasons.
 
 ### HTML
 
