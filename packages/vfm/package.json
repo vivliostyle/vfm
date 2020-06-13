@@ -40,7 +40,13 @@
   "publishConfig": {
     "access": "public"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/vfm"
+  },
   "license": "Apache-2.0",
+  "homepage": "https://github.com/vivliostyle/vfm",
   "keywords": [
     "markdown",
     "vfm",
