@@ -5,14 +5,13 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 ## Principles
 
 1. Open discussion - steadily improving through open discussion and feedback from the vast community.
-1. Provides reference implementation for parsing and converting VFM to HTML, allowing other non-Vivliostyle projects to use this syntax for their own purposes.
+1. Provides reference implementation for parsing and converting VFM to HTML, allowing other non-Vivliostyle projects to use this syntax for their purposes.
 
 ### VFM
 
 1. Rule of least surprise
    - Should be lined and matched to another Markdown syntax.
-1. **Not intended** to be a superset/subset of either CommonMark or GFM.
-1. Backward compatible syntax (should not be incorrectly rendered in Markdown editor like Typora).
+1. (Mostly) backward-compatible syntax. should not be incorrectly rendered in Markdown editor like Typora.
 
 ### HTML
 
@@ -27,7 +26,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 ### Sentence
 
 - A newline puts `<br/>` to the end of a line.
-- Consecutive 2 newlines creates new sentence block.
+- Consecutive 2 newlines creates a new sentence block.
 
 **VFM**
 
@@ -230,28 +229,6 @@ This is {Ruby|ルビ}
 This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ```
 
-#### Candidates
-
-##### `[Text]{Ruby}`
-
-- 🔻 Conflicted with fenced inline block.
-
-##### `{電子出版|でんししゅっぱん}`
-
-The notation is derived from [でんでんマークダウン](https://conv.denshochan.com/markdown#ruby).
-
-- `More comments needed`
-
-##### `｜Text《Ruby》`
-
-The notation is derived from [視覚障碍者読書支援協会 (BBA)「原文入力ルール」](https://www.jstage.jst.go.jp/article/jsda/2/2/2_87/_pdf/-char/ja).
-
-- 🔻 avoid Unicode character
-
-##### `[Text]<Ruby>`
-
-- 🔻disambiguate with `<URL>`
-
 ### Image
 
 **VFM**
@@ -279,7 +256,7 @@ The notation is derived from [視覚障碍者読書支援協会 (BBA)「原文�
 
 ### Fenced block
 
-- Fenced block populates a class labeled `<div>` element with its contents.
+- Fenced block populates a class labelled `<div>` element with its contents.
 - Inner contents will be parsed as VFM.
 - Notation candidates: `===`, `~~~`, `:::`
 
@@ -424,7 +401,7 @@ title: Introduction to VFM
 | -------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | title    | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
 | author   | String | Author of the document.                                                                                                                                                                        |
-| layout   | String | Custom css file for the document.                                                                                                                                                              |
+| layout   | String | Custom CSS file for the document.                                                                                                                                                              |
 
 ## References
 
