@@ -12,6 +12,7 @@
     "test": "ts-node src/cli.ts example.md"
   },
   "devDependencies": {
+    "mdast-util-to-hast": "^9.1.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
   }
