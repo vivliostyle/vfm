@@ -9,7 +9,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 
 ## Packages
 
-### [`@vivliostyle/vfm`](https://github.com/vivliostyle/vfm/tree/master/packages/vfm) ![npm version](https://badgen.net/npm/v/@vivliostyle/vfm) ![types](https://badgen.net/npm/types/@vivliostyle/vfm)
+### [`@vivliostyle/vfm`](https://github.com/vivliostyle/vfm/tree/master/packages/vfm) [![npm version](https://badgen.net/npm/v/@vivliostyle/vfm)](https://www.npmjs.com/package/@vivliostyle/vfm) ![types](https://badgen.net/npm/types/@vivliostyle/vfm)
 
 Node.js library for parsing & converting VFM.
 
