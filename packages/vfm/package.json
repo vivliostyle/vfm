@@ -5,7 +5,8 @@
   "author": "Yasuaki Uechi <y@uechi.io>",
   "scripts": {
     "build": "shx rm -rf lib && tsc",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "build"
   },
   "dependencies": {
     "mdast-util-to-hast": "^9.1.0",
@@ -25,7 +26,8 @@
     "jest": "^26.0.1",
     "shx": "^0.3.2",
     "ts-jest": "^26.1.0",
-    "typescript": "^3.9.5"
+    "typescript": "^3.9.5",
+    "unist-util-inspect": "^6.0.0"
   },
   "types": "lib/index.d.ts",
   "main": "lib/index.js",

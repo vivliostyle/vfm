@@ -7503,6 +7503,11 @@ unist-util-generated@^1.0.0:
   resolved "https://registry.yarnpkg.com/unist-util-generated/-/unist-util-generated-1.1.5.tgz#1e903e68467931ebfaea386dae9ea253628acd42"
   integrity sha512-1TC+NxQa4N9pNdayCYA1EGUOCAO0Le3fVp7Jzns6lnua/mYgwHo0tz5WUAfrdpNch1RZLHc61VZ1SDgrtNXLSw==
 
+unist-util-inspect@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/unist-util-inspect/-/unist-util-inspect-6.0.0.tgz#56866c2170aacdb8e5199f8dae9c40b4a3b3629d"
+  integrity sha512-mwdQMGuDCIlsNpi48s4wSknJympqmROAc+oMjyNNmAfeU7ynytukfqjvEjEASnPdHrS2f4WMThly40rI8UCyzQ==
+
 unist-util-is@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/unist-util-is/-/unist-util-is-3.0.0.tgz#d9e84381c2468e82629e4a5be9d7d05a2dd324cd"
