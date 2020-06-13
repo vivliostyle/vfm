@@ -1,9 +1,11 @@
 import unified from 'unified';
 import markdown from 'remark-parse';
+import math from 'remark-math';
 
 import {rubyParser} from './plugins/ruby';
 
 export default [
   [markdown, {commonmark: true}],
-  [rubyParser],
+  rubyParser,
+  math,
 ] as unified.PluggableList<unified.Settings>;
