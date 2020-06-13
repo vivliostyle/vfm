@@ -6,7 +6,7 @@ import mathjax from 'rehype-mathjax';
 import {rubyHandler} from './plugins/ruby';
 
 export default [
-  [remark2rehype, {handlers: {allowDangerousHtml: true, ruby: rubyHandler}}],
-  mathjax,
+  [remark2rehype, {allowDangerousHtml: true, handlers: {ruby: rubyHandler}}],
   raw,
+  mathjax,
 ] as unified.PluggableList<unified.Settings>;
