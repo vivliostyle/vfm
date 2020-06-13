@@ -1,27 +1,26 @@
 {
-  "name": "@vivliostyle/vfm",
+  "name": "vfm",
   "description": "Custom Markdown syntax specialized in book authoring.",
   "version": "0.0.0",
   "author": "Vivliostyle Foundation <mail@vivliostyle.org>",
   "scripts": {
     "build": "lerna run build",
-    "dev": "lerna run dev"
+    "dev": "lerna run dev",
+    "test": "lerna run test"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.7",
-    "@babel/preset-env": "^7.8.7",
-    "@types/node": "^13.9.1",
-    "@types/unist": "^2.0.3",
     "husky": "^4.2.3",
     "lerna": "^3.20.2",
-    "prettier": "^1.19.1",
-    "pretty-quick": "^2.0.1",
-    "remark-cli": "^7.0.1",
-    "typescript": "^3.8.3",
-    "unist-util-inspect": "^5.0.1"
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1"
   },
   "main": "index.js",
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged",
+      "pre-push": "npm test"
+    }
+  },
   "license": "Apache-2.0",
   "private": true,
   "workspaces": [

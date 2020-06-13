@@ -1,7 +1,6 @@
 {
   "name": "@vivliostyle/vfm",
   "version": "0.0.0",
-  "private": true,
   "packages": ["packages/*"],
   "useWorkspaces": true,
   "npmClient": "yarn"
