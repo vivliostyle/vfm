@@ -1,23 +1,22 @@
-import visit from 'unist-util-visit';
 import {Plugin} from 'unified';
-import {Node} from 'unist';
+import {Node, Parent} from 'unist';
 import h from 'hastscript';
 import is from 'hast-util-is-element';
+import visit from 'unist-util-visit';
 
-interface HastNode extends Node {
-  tagName: string;
-  children: HastNode[];
+interface HastNode extends Parent {
+  properties: {[key: string]: any};
 }
 
-export default imageHandler;
-
-function imageHandler(options = {}) {
-  function transformer(tree: Node, file: any) {
-    return visit(tree, 'element', (node, index, parent) => {
+export default function figureHandler(options = {}) {
+  function transformer(tree: Node) {
+    return visit<HastNode>(tree, 'element', (node, index, parent) => {
       if (!is(node, 'img')) return;
-      const {alt} = node.properties as any;
+
+      const {alt} = node.properties;
       if (!alt) return;
-      (parent as HastNode).children[index] = h(
+
+      (parent as Parent).children[index] = h(
         'figure',
         node,
         h('figcaption', alt),

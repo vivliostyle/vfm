@@ -3,7 +3,7 @@ import doc from 'rehype-document';
 import stringify from 'rehype-stringify';
 
 import markdown from './revive-parse';
-import revive2rehype from './revive-rehype';
+import html from './revive-rehype';
 
 const debugMode = process.env.DEBUG;
 
@@ -16,7 +16,7 @@ export function stringifyMarkdown(
   markdownString: string,
   {stylesheet = undefined, partial = false}: StringifyMarkdownOptions = {},
 ): string {
-  const processor = unified().use(markdown).use(revive2rehype);
+  const processor = unified().use(markdown).use(html);
 
   if (!partial) {
     processor.use(doc, {language: 'ja', css: stylesheet});

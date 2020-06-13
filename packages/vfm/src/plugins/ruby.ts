@@ -1,9 +1,9 @@
-import all from 'mdast-util-to-hast/lib/all';
-import u from 'unist-builder';
-import {Parent, Point, Node} from 'unist';
 import {Processor} from 'unified';
+import {Parent, Point, Node} from 'unist';
+import u from 'unist-builder';
 import {Eat, Locator} from 'remark-parse';
 import {H} from 'mdast-util-to-hast';
+import all from 'mdast-util-to-hast/lib/all';
 
 type TokenizerInstance = {
   tokenizeBlock: (value: string) => Node | void;
