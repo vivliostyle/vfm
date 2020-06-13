@@ -2,18 +2,18 @@
   "name": "example",
   "version": "1.0.0-alpha.1",
   "author": "Yasuaki Uechi <y@uechi.io> (https://uechi.io)",
-  "dependencies": {
-    "@vivliostyle/vfm": "^1.0.0-alpha.1"
-  },
-  "license": "Apache-2.0",
-  "private": true,
   "scripts": {
     "build": "tsc",
     "test": "ts-node src/cli.ts example.md"
+  },
+  "dependencies": {
+    "@vivliostyle/vfm": "^1.0.0-alpha.1"
   },
   "devDependencies": {
     "mdast-util-to-hast": "^9.1.0",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.5"
-  }
+  },
+  "license": "Apache-2.0",
+  "private": true
 }

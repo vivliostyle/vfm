@@ -1,11 +1,11 @@
 {
   "name": "vfm",
   "description": "Custom Markdown syntax specialized in book authoring.",
-  "version": "0.0.0",
   "author": "Vivliostyle Foundation <mail@vivliostyle.org>",
   "scripts": {
     "build": "lerna run build",
     "dev": "lerna run dev",
+    "ship": "lerna publish from-package",
     "test": "lerna run test"
   },
   "devDependencies": {
