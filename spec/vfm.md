@@ -4,18 +4,9 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 
 ## Principles
 
-1. Open discussion - steadily improving through open discussion and feedback from the vast community.
-1. Provides reference implementation for parsing and converting VFM to HTML, allowing other non-Vivliostyle projects to use this syntax for their purposes.
-
-### VFM
-
 1. Rule of least surprise
    - Should be lined and matched to another Markdown syntax.
 1. (Mostly) backward-compatible syntax. should not be incorrectly rendered in Markdown editor like Typora.
-
-### HTML
-
-- Follows [WCAG 2.1](https://www.w3.org/TR/WCAG21/).
 
 ## Spec
 
