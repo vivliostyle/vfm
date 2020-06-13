@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "test": "ts-node cli.ts example.md"
+    "test": "ts-node src/cli.ts example.md"
   },
   "devDependencies": {
     "ts-node": "^8.10.2",

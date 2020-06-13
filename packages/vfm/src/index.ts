@@ -12,7 +12,7 @@ export interface StringifyMarkdownOptions {
 
 export function stringifyMarkdown(
   markdownString: string,
-  {stylesheet = '', partial = false}: StringifyMarkdownOptions = {},
+  {stylesheet = undefined, partial = false}: StringifyMarkdownOptions = {},
 ): string {
   const processor = unified().use(markdown).use(revive2rehype);
 

@@ -27,4 +27,7 @@ declare module 'rehype-stringify' {
   export default plugin;
 }
 
+declare module 'remark-math';
+declare module 'rehype-mathjax';
+
 declare module 'mdast-util-to-hast/lib/all';
