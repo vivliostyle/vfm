@@ -29,5 +29,8 @@ declare module 'rehype-stringify' {
 
 declare module 'remark-math';
 declare module 'rehype-mathjax';
+declare module 'hast-util-find-and-replace';
+declare module 'hastscript';
+declare module 'hast-util-is-element';
 
 declare module 'mdast-util-to-hast/lib/all';

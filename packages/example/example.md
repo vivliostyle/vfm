@@ -2,6 +2,6 @@
 
 {Vivliostyle|ビブリオスタイル}の世界へようこそ。
 
-$$
-\sum
-$$
+![Sample Image](./sample.png)
+
+![](./sample.png)
