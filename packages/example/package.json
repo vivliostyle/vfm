@@ -1,9 +1,9 @@
 {
   "name": "example",
-  "version": "0.0.0",
+  "version": "1.0.0-alpha.0",
   "author": "Yasuaki Uechi <y@uechi.io> (https://uechi.io)",
   "dependencies": {
-    "@vivliostyle/vfm": "^0.0.0"
+    "@vivliostyle/vfm": "^1.0.0-alpha.0"
   },
   "license": "Apache-2.0",
   "private": true,
