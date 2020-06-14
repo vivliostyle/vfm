@@ -1,9 +1,9 @@
 import fs from 'fs';
-import {stringifyMarkdown} from '@vivliostyle/vfm';
+import {stringify} from '@vivliostyle/vfm';
 
 function convert(filepath: string) {
   const input = fs.readFileSync(filepath).toString();
-  return stringifyMarkdown(input);
+  return stringify(input);
 }
 
 if (process.argv.length < 3) {

@@ -10,11 +10,9 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 
 ## Spec
 
-### Caveats
+- Implemented top on CommonMark and GFM.
 
-- `position` is omitted in `mdast`.
-
-### Sentence
+### Hard new line
 
 - A newline puts `<br/>` to the end of a line.
 - Consecutive 2 newlines creates a new sentence block.
@@ -26,38 +24,6 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 
 Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
 VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
-```
-
-**mdast**
-
-```json
-[
-  {
-    "type": "paragraph",
-    "children": [
-      {
-        "type": "text",
-        "value": "はじめまして。"
-      }
-    ]
-  },
-  {
-    "type": "paragraph",
-    "children": [
-      {
-        "type": "text",
-        "value": "Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。"
-      },
-      {
-        "type": "break"
-      },
-      {
-        "type": "text",
-        "value": "VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。"
-      }
-    ]
-  }
-]
 ```
 
 **HTML**
@@ -89,34 +55,6 @@ VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プ
 ###### Heading 6
 ```
 
-**mdast**
-
-```json
-{
-  "type": "heading",
-  "depth": 1,
-  "children": [
-    {
-      "type": "text",
-      "value": "Heading 1"
-    }
-  ]
-}
-
-...
-
-{
-  "type": "heading",
-  "depth": 6,
-  "children": [
-    {
-      "type": "text",
-      "value": "Heading 6"
-    }
-  ]
-}
-```
-
 **HTML**
 
 ```html
@@ -134,19 +72,6 @@ VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プ
 function main() {}
 ```
 ````
-
-**mdast**
-
-```json
-{
-  "type": "code",
-  "lang": "javascript",
-  "meta": {
-    "title": "app.js"
-  },
-  "value": "function main() {}"
-}
-```
 
 **HTML**
 
@@ -168,19 +93,6 @@ function main() {}
 ```
 ````
 
-**mdast**
-
-```json
-{
-  "type": "code",
-  "lang": "javascript",
-  "meta": {
-    "title": "app.js"
-  },
-  "value": "function main() {}"
-}
-```
-
 **HTML**
 
 ```html
@@ -199,21 +111,6 @@ function main() {}
 This is {Ruby|ルビ}
 ```
 
-**mdast**
-
-```json
-{
-  "type": "ruby",
-  "rubyText": "ルビ",
-  "children": [
-    {
-      "type": "text",
-      "value": "Ruby"
-    }
-  ]
-}
-```
-
 **HTML**
 
 ```html
@@ -228,21 +125,27 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ![Figure 1](./fig1.png)
 ```
 
-**mdast**
+**HTML**
 
-```json
-{
-  "type": "image",
-  "title": null,
-  "url": "./fig1.png",
-  "alt": "Figure 1"
-}
+```html
+<figure>
+  <img src="./fig1.png" alt="Figure 1" />
+  <figcaption>Figure 1</figcaption>
+</figure>
+```
+
+#### without caption
+
+**VFM**
+
+```md
+![](./fig1.png)
 ```
 
 **HTML**
 
 ```html
-<img src="./fig1.png" alt="Figure 1" />
+<img src="./fig1.png" />
 ```
 
 ### Fenced block
@@ -254,35 +157,15 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 **VFM**
 
 ```md
-:::section-author
+:::author
 uetchy
 :::
-```
-
-**mdast**
-
-```json
-{
-  "type": "fencedBlock",
-  "className": "section-author",
-  "children": [
-    {
-      "type": "paragraph",
-      "children": [
-        {
-          "type": "text",
-          "value": "uetchy"
-        }
-      ]
-    }
-  ]
-}
 ```
 
 **HTML**
 
 ```html
-<div class="section-author">
+<div class="author">
   <p>uetchy</p>
 </div>
 ```
@@ -294,47 +177,11 @@ uetchy
 ```md
 :::section-author
 uetchy
+
 ::::author-homepage
 <https://uechi.io>
 ::::
 :::
-```
-
-**mdast**
-
-```json
-{
-  "type": "fencedBlock",
-  "className": "section-author",
-  "children": [
-    {
-      "type": "paragraph",
-      "children": [
-        {
-          "type": "text",
-          "value": "uetchy"
-        }
-      ]
-    },
-    {
-      "type": "fencedBlock",
-      "className": "author-homepage",
-      "children": [
-        {
-          "type": "link",
-          "title": null,
-          "url": "https://uechi.io",
-          "children": [
-            {
-              "type": "text",
-              "value": "https://uechi.io"
-            }
-          ]
-        }
-      ]
-    }
-  ]
-}
 ```
 
 **HTML**
@@ -348,7 +195,33 @@ uetchy
 </div>
 ```
 
-#### Custom HTML
+#### WAI-ARIA `role`
+
+**VFM**
+
+```md
+:::@appendix
+
+# Appendix
+
+:::
+
+:::@tip
+
+# Tips
+
+:::
+```
+
+**HTML**
+
+```html
+<section role="doc-appendix"><h1>Appendix</h1></section>
+
+<aside role="doc-tip"><h1>Tips</h1></aside>
+```
+
+### Raw HTML
 
 **VFM**
 
@@ -358,21 +231,52 @@ uetchy
 </div>
 ```
 
-**mdast**
-
-```json
-{
-  "type": "html",
-  "value": "<div class=\"custom\">\n<p>Hey</p>\n</div>"
-}
-```
-
 **HTML**
 
 ```html
 <div class="custom">
   <p>Hey</p>
 </div>
+```
+
+#### with Markdown
+
+**VFM**
+
+```markdown
+<div class="custom">
+
+# Heading
+
+</div>
+```
+
+**HTML**
+
+```html
+<div class="custom">
+  <h1>Heading</h1>
+</div>
+```
+
+### Math equation
+
+**VFM**
+
+```markdown
+$$ \sum $$
+```
+
+**HTML**
+
+```html
+<p>
+  <span class="math math-inline">
+    <mjx-container class="MathJax" jax="SVG"
+      ><!-- SVG --></svg></mjx-container
+  ></span>
+</p>
+<!-- MathJax style -->
 ```
 
 ### Frontmatter
@@ -393,16 +297,3 @@ title: Introduction to VFM
 | title    | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
 | author   | String | Author of the document.                                                                                                                                                                        |
 | layout   | String | Custom CSS file for the document.                                                                                                                                                              |
-
-## References
-
-- [mdast](https://github.com/syntax-tree/mdast)
-- [GitHub Flavored Markdown Spec](https://github.github.com/gfm/)
-- [CommonMark Spec](https://spec.commonmark.org/)
-- [PHP Markdown Extra](https://michelf.ca/projects/php-markdown/extra/)
-- [Pandoc's Markdown](https://pandoc.org/MANUAL.html#pandocs-markdown)
-- [でんでんマークダウン](https://conv.denshochan.com/markdown)
-- [remark](https://github.com/remarkjs/remark)
-- [remark-rehype](https://github.com/remarkjs/remark-rehype)
-- [env-create-book](https://github.com/akabekobeko/env-create-book)
-- [dewriteful](https://github.com/pentapod/dewriteful)

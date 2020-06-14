@@ -1,18 +1,17 @@
 import unified from 'unified';
 import doc from 'rehype-document';
-import stringify from 'rehype-stringify';
+import rehypeStringify from 'rehype-stringify';
 
 import markdown from './revive-parse';
 import html from './revive-rehype';
-
-const debugMode = process.env.DEBUG;
+import {debug} from './utils/debug';
 
 export interface StringifyMarkdownOptions {
   stylesheet?: string;
   partial?: boolean;
 }
 
-export function stringifyMarkdown(
+export function stringify(
   markdownString: string,
   {stylesheet = undefined, partial = false}: StringifyMarkdownOptions = {},
 ): string {
@@ -22,11 +21,11 @@ export function stringifyMarkdown(
     processor.use(doc, {language: 'ja', css: stylesheet});
   }
 
-  processor.use(stringify);
+  processor.use(rehypeStringify);
 
-  if (debugMode) {
+  if (debug.enabled) {
     const inspect = require('unist-util-inspect');
-    console.log(inspect(processor.parse(markdownString)));
+    debug(inspect(processor.parse(markdownString)));
   }
 
   return String(processor.processSync(markdownString));

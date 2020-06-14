@@ -1,84 +1,50 @@
-import {Processor} from 'unified';
-import {Parent, Point, Node} from 'unist';
+import {Plugin} from 'unified';
+import {Parent} from 'unist';
 import u from 'unist-builder';
-import {Eat, Locator} from 'remark-parse';
-import {H} from 'mdast-util-to-hast';
+import {H, Handler} from 'mdast-util-to-hast';
 import all from 'mdast-util-to-hast/lib/all';
-
-type TokenizerInstance = {
-  tokenizeBlock: (value: string) => Node | void;
-  tokenizeInline: (value: string, location: Point) => Node | void;
-};
-
-interface RubyTokenizer {
-  (
-    this: TokenizerInstance,
-    eat: Eat & {now: () => Point},
-    value: string,
-    silent?: boolean,
-  ): boolean | Node | void;
-  locator?: Locator;
-  onlyAtStart?: boolean;
-  notInBlock?: boolean;
-  notInList?: boolean;
-  notInLink?: boolean;
-}
-
-interface RubyParser {
-  (this: Processor): void;
-}
-
-interface RubyNode extends Parent {
-  rubyText: string;
-}
-
-interface RubyHandler {
-  (h: H, node: RubyNode): any;
-}
 
 // remark
 function locateRuby(value: string, fromIndex: number) {
   return value.indexOf('{', fromIndex);
 }
 
-const tokenizeRuby: RubyTokenizer = function (eat, value, silent) {
+const tokenizer: Tokenizer = function (eat, value, silent) {
+  const now = eat.now();
   const match = /^{(.+?)\|(.+?)}/.exec(value);
+  if (!match) return;
 
-  if (match) {
-    if (silent) {
-      return true;
-    }
+  const [eaten, inlineContent, rubyText] = match;
 
-    const now = eat.now();
-    now.column += 1;
-    now.offset! += 1;
+  if (silent) return true;
 
-    return eat(match[0])({
-      type: 'ruby',
-      rubyText: match[2],
-      children: this.tokenizeInline(match[1], now),
-      data: {hName: 'ruby'},
-    });
-  }
+  now.column += 1;
+  now.offset! += 1;
+
+  return eat(eaten)({
+    type: 'ruby',
+    children: this.tokenizeInline(inlineContent, now),
+    data: {hName: 'ruby', rubyText},
+  });
 };
 
-tokenizeRuby.notInLink = true;
-tokenizeRuby.locator = locateRuby;
+tokenizer.notInLink = true;
+tokenizer.locator = locateRuby;
 
-export const rubyParser: RubyParser = function () {
-  if (!this.Parser) {
-    return;
-  }
+export const attacher: Plugin = function () {
+  if (!this.Parser) return;
+
   const {inlineTokenizers, inlineMethods} = this.Parser.prototype;
-  inlineTokenizers.ruby = tokenizeRuby;
+  inlineTokenizers.ruby = tokenizer;
   inlineMethods.splice(inlineMethods.indexOf('text'), 0, 'ruby');
 };
 
 // rehype
-export const rubyHandler: RubyHandler = (h, node) => {
+export const handler: Handler = (h, node) => {
   const rtStart =
-    node.children.length > 0
-      ? node.children[node.children.length - 1].position!.end
+    (node as Parent).children.length > 0
+      ? (node as Parent).children[(node as Parent).children.length - 1]
+          .position!.end
       : node.position!.start;
 
   const rtNode = h(
@@ -88,7 +54,7 @@ export const rubyHandler: RubyHandler = (h, node) => {
       end: node.position!.end,
     },
     'rt',
-    [u('text', node.rubyText)],
+    [u('text', node.data!.rubyText as string)],
   );
 
   return h(node, 'ruby', [...all(h, node), rtNode]);
