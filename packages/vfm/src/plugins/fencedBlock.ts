@@ -4,7 +4,11 @@ import u from 'unist-builder';
 import {H, Handler} from 'mdast-util-to-hast';
 import all from 'mdast-util-to-hast/lib/all';
 
+import {roleMappingTable} from '../utils/wai-aria';
+
 const FENCE = ':';
+const ROLE_SYMBOL = '@';
+const FALLBACK_TAG = 'div';
 
 let DEPTH = 0;
 
@@ -18,7 +22,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 
   const fenceSymbol = FENCE.repeat(DEPTH + 3);
   const match = new RegExp(
-    `^${fenceSymbol}(.*?)\\n([\\w\\W]+?)\\n${fenceSymbol}$`,
+    `^${fenceSymbol}\s*(.*?)\s*\\n([\\w\\W]+?)\\n${fenceSymbol}$`,
     'm',
   ).exec(value);
   if (!match) return;
@@ -28,6 +32,11 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 
   if (silent) return true;
 
+  const isRole = blockType.startsWith(ROLE_SYMBOL);
+  const role = isRole ? 'doc-' + blockType.substring(1) : undefined;
+  const type = (role && roleMappingTable[role]?.[0]) || FALLBACK_TAG;
+  const className = !isRole && blockType ? [blockType] : undefined;
+
   const add = eat(eaten);
 
   DEPTH += 1;
@@ -36,15 +45,14 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
   exit();
   DEPTH -= 1;
 
-  const type = 'div';
-
   return add({
     type,
     children,
     data: {
       hName: type,
       hProperties: {
-        className: blockType ? [blockType] : undefined,
+        className,
+        role,
       },
     },
   });

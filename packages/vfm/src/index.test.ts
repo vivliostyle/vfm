@@ -21,6 +21,24 @@ it.skip('handle custom attributes', () => {
   ).toBe(`<h1 id="introduction">Introduction</h1>`);
 });
 
+it('handle role', () => {
+  expect(
+    partial(`
+:::@tip
+# Tips
+:::
+`),
+  ).toBe(`<aside role="doc-tip"><h1>Tips</h1></aside>`);
+
+  expect(
+    partial(`
+:::@appendix
+# Appendix
+:::
+`),
+  ).toBe(`<section role="doc-appendix"><h1>Appendix</h1></section>`);
+});
+
 it('reject incorrect fences', () => {
   expect(
     partial(`
