@@ -8,7 +8,7 @@ interface HastNode extends Parent {
   properties: {[key: string]: any};
 }
 
-export default function handler(options = {}) {
+export function handler(options = {}) {
   function transformer(tree: Node) {
     return visit<HastNode>(tree, 'element', (node, index, parent) => {
       if (!is(node, 'img')) return;

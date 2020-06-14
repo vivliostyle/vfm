@@ -4,7 +4,7 @@ import raw from 'rehype-raw';
 import mathjax from 'rehype-mathjax';
 
 import {handler as ruby} from './plugins/ruby';
-import figure from './plugins/figure';
+import {handler as figure} from './plugins/figure';
 
 export default [
   [remark2rehype, {allowDangerousHtml: true, handlers: {ruby}}],
