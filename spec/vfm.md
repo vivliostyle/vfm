@@ -134,6 +134,20 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 </figure>
 ```
 
+#### without caption
+
+**VFM**
+
+```md
+![](./fig1.png)
+```
+
+**HTML**
+
+```html
+<img src="./fig1.png" />
+```
+
 ### Fenced block
 
 - Fenced block populates a class labelled `<div>` element with its contents.
@@ -179,6 +193,32 @@ uetchy
     <a href="https://uechi.io">https://uechi.io</a>
   </div>
 </div>
+```
+
+#### WAI-ARIA `role`
+
+**VFM**
+
+```md
+:::@appendix
+
+# Appendix
+
+:::
+
+:::@tip
+
+# Tips
+
+:::
+```
+
+**HTML**
+
+```html
+<section role="doc-appendix"><h1>Appendix</h1></section>
+
+<aside role="doc-tip"><h1>Tips</h1></aside>
 ```
 
 ### Raw HTML
