@@ -1,47 +1,15 @@
-import {Processor} from 'unified';
-import {Parent, Point, Node} from 'unist';
+import {Plugin} from 'unified';
+import {Parent} from 'unist';
 import u from 'unist-builder';
-import {Eat, Locator} from 'remark-parse';
-import {H} from 'mdast-util-to-hast';
+import {H, Handler} from 'mdast-util-to-hast';
 import all from 'mdast-util-to-hast/lib/all';
-
-type TokenizerInstance = {
-  tokenizeBlock: (value: string) => Node | void;
-  tokenizeInline: (value: string, location: Point) => Node | void;
-};
-
-interface RubyTokenizer {
-  (
-    this: TokenizerInstance,
-    eat: Eat & {now: () => Point},
-    value: string,
-    silent?: boolean,
-  ): boolean | Node | void;
-  locator?: Locator;
-  onlyAtStart?: boolean;
-  notInBlock?: boolean;
-  notInList?: boolean;
-  notInLink?: boolean;
-}
-
-interface RubyParser {
-  (this: Processor): void;
-}
-
-interface RubyNode extends Parent {
-  rubyText: string;
-}
-
-interface RubyHandler {
-  (h: H, node: RubyNode): any;
-}
 
 // remark
 function locateRuby(value: string, fromIndex: number) {
   return value.indexOf('{', fromIndex);
 }
 
-const tokenizeRuby: RubyTokenizer = function (eat, value, silent) {
+const tokenizeRuby: Tokenizer = function (eat, value, silent) {
   const match = /^{(.+?)\|(.+?)}/.exec(value);
 
   if (match) {
@@ -55,9 +23,8 @@ const tokenizeRuby: RubyTokenizer = function (eat, value, silent) {
 
     return eat(match[0])({
       type: 'ruby',
-      rubyText: match[2],
       children: this.tokenizeInline(match[1], now),
-      data: {hName: 'ruby'},
+      data: {hName: 'ruby', rubyText: match[2]},
     });
   }
 };
@@ -65,7 +32,7 @@ const tokenizeRuby: RubyTokenizer = function (eat, value, silent) {
 tokenizeRuby.notInLink = true;
 tokenizeRuby.locator = locateRuby;
 
-export const rubyParser: RubyParser = function () {
+export const rubyParser: Plugin = function () {
   if (!this.Parser) {
     return;
   }
@@ -75,10 +42,11 @@ export const rubyParser: RubyParser = function () {
 };
 
 // rehype
-export const rubyHandler: RubyHandler = (h, node) => {
+export const rubyHandler: Handler = (h, node) => {
   const rtStart =
-    node.children.length > 0
-      ? node.children[node.children.length - 1].position!.end
+    (node as Parent).children.length > 0
+      ? (node as Parent).children[(node as Parent).children.length - 1]
+          .position!.end
       : node.position!.start;
 
   const rtNode = h(
@@ -88,7 +56,7 @@ export const rubyHandler: RubyHandler = (h, node) => {
       end: node.position!.end,
     },
     'rt',
-    [u('text', node.rubyText)],
+    [u('text', node.data!.rubyText as string)],
   );
 
   return h(node, 'ruby', [...all(h, node), rtNode]);

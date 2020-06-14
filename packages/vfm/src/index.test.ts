@@ -1,6 +1,6 @@
 import * as lib from './index';
 
-it.only('stringify math equation', () => {
+it('handle hard line break', () => {
   const result = lib.stringify(
     `a
 b`,
@@ -10,11 +10,16 @@ b`,
 b</p>`);
 });
 
-it('stringify math equation', () => {
+it('stringify math', () => {
   const result = lib.stringify('$$sum$$', {partial: true});
   expect(result).toContain(
     `<p><span class="math math-inline"><mjx-container class="MathJax" jax="SVG">`,
   );
+});
+
+it('stringify ruby', () => {
+  const result = lib.stringify('{A|B}', {partial: true});
+  expect(result).toBe(`<p><ruby>A<rt>B</rt></ruby></p>`);
 });
 
 it('convert img to figure', () => {
