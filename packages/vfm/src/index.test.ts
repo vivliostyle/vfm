@@ -5,9 +5,18 @@ function partial(body: string) {
 }
 
 it.skip('handle custom attributes', () => {
+  // MEMO:
+  // https://github.com/sethvincent/remark-bracketed-spans
+  // https://github.com/Paperist/remark-crossref/
   expect(
     partial(`
 # Introduction {#introduction}
+`),
+  ).toBe(`<h1 id="introduction">Introduction</h1>`);
+
+  expect(
+    partial(`
+[text in the span]{.class .other-class key=val another=example}
 `),
   ).toBe(`<h1 id="introduction">Introduction</h1>`);
 });
