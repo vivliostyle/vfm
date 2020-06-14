@@ -9,40 +9,38 @@ function locateRuby(value: string, fromIndex: number) {
   return value.indexOf('{', fromIndex);
 }
 
-const tokenizeRuby: Tokenizer = function (eat, value, silent) {
+const tokenizer: Tokenizer = function (eat, value, silent) {
+  const now = eat.now();
   const match = /^{(.+?)\|(.+?)}/.exec(value);
+  if (!match) return;
 
-  if (match) {
-    if (silent) {
-      return true;
-    }
+  const [eaten, inlineContent, rubyText] = match;
 
-    const now = eat.now();
-    now.column += 1;
-    now.offset! += 1;
+  if (silent) return true;
 
-    return eat(match[0])({
-      type: 'ruby',
-      children: this.tokenizeInline(match[1], now),
-      data: {hName: 'ruby', rubyText: match[2]},
-    });
-  }
+  now.column += 1;
+  now.offset! += 1;
+
+  return eat(eaten)({
+    type: 'ruby',
+    children: this.tokenizeInline(inlineContent, now),
+    data: {hName: 'ruby', rubyText},
+  });
 };
 
-tokenizeRuby.notInLink = true;
-tokenizeRuby.locator = locateRuby;
+tokenizer.notInLink = true;
+tokenizer.locator = locateRuby;
 
-export const rubyParser: Plugin = function () {
-  if (!this.Parser) {
-    return;
-  }
+export const parser: Plugin = function () {
+  if (!this.Parser) return;
+
   const {inlineTokenizers, inlineMethods} = this.Parser.prototype;
-  inlineTokenizers.ruby = tokenizeRuby;
+  inlineTokenizers.ruby = tokenizer;
   inlineMethods.splice(inlineMethods.indexOf('text'), 0, 'ruby');
 };
 
 // rehype
-export const rubyHandler: Handler = (h, node) => {
+export const handler: Handler = (h, node) => {
   const rtStart =
     (node as Parent).children.length > 0
       ? (node as Parent).children[(node as Parent).children.length - 1]

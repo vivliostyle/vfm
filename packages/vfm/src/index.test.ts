@@ -4,7 +4,7 @@ function partial(body: string) {
   return lib.stringify(body, {partial: true});
 }
 
-it.only('handle fenced block', () => {
+it('handle fenced block', () => {
   expect(
     partial(`
 :::appendix

@@ -19,8 +19,6 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 
   if (silent) return true;
 
-  console.log(match);
-
   const add = eat(eaten);
 
   const exit = this.enterBlock();

@@ -3,7 +3,7 @@ import remark2rehype from 'remark-rehype';
 import raw from 'rehype-raw';
 import mathjax from 'rehype-mathjax';
 
-import {rubyHandler as ruby} from './plugins/ruby';
+import {handler as ruby} from './plugins/ruby';
 import figure from './plugins/figure';
 
 export default [
