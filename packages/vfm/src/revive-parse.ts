@@ -3,8 +3,8 @@ import markdown from 'remark-parse';
 import math from 'remark-math';
 import breaks from 'remark-breaks';
 
-import {parser as ruby} from './plugins/ruby';
-import {parser as fencedBlock} from './plugins/fencedBlock';
+import {attacher as ruby} from './plugins/ruby';
+import {attacher as fencedBlock} from './plugins/fencedBlock';
 
 export default [
   [markdown, {commonmark: true}],

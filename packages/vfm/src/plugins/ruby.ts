@@ -31,7 +31,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 tokenizer.notInLink = true;
 tokenizer.locator = locateRuby;
 
-export const parser: Plugin = function () {
+export const attacher: Plugin = function () {
   if (!this.Parser) return;
 
   const {inlineTokenizers, inlineMethods} = this.Parser.prototype;
