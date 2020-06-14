@@ -4,6 +4,44 @@ function partial(body: string) {
   return lib.stringify(body, {partial: true});
 }
 
+it.skip('handle custom attributes', () => {
+  expect(
+    partial(`
+# Introduction {#introduction}
+`),
+  ).toBe(`<h1 id="introduction">Introduction</h1>`);
+});
+
+it('reject incorrect fences', () => {
+  expect(
+    partial(`
+::::appendix
+:::::nested
+# Title
+:::::
+::::
+`),
+  ).toBe(
+    `<p>::::appendix<br>
+:::::nested</p>
+<h1>Title</h1>
+<p>:::::<br>
+::::</p>`,
+  );
+
+  expect(
+    partial(`
+:::appendix
+:::::nested
+# Title
+:::::
+:::
+`),
+  ).toBe(
+    `<div class="appendix"><p>:::::nested</p><h1>Title</h1><p>:::::</p></div>`,
+  );
+});
+
 it('handle fenced block', () => {
   expect(
     partial(`
@@ -19,8 +57,32 @@ test
 :::
 # Plain block
 :::
+
+---
+
+:::another
+Another block
+:::
 `),
-  ).toBe(`<div><h1>Plain block</h1></div>`);
+  ).toBe(
+    `<div><h1>Plain block</h1></div>
+<hr>
+<div class="another"><p>Another block</p></div>`,
+  );
+
+  expect(
+    partial(`
+:::appendix
+A
+
+::::nested
+# Title
+::::
+:::
+`),
+  ).toBe(
+    `<div class="appendix"><p>A</p><div class="nested"><h1>Title</h1></div></div>`,
+  );
 });
 
 it('handle hard line break', () => {

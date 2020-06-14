@@ -4,6 +4,10 @@ import u from 'unist-builder';
 import {H, Handler} from 'mdast-util-to-hast';
 import all from 'mdast-util-to-hast/lib/all';
 
+const FENCE = ':';
+
+let DEPTH = 0;
+
 // remark
 function locator(value: string, fromIndex: number) {
   return value.indexOf(':::', fromIndex);
@@ -11,7 +15,12 @@ function locator(value: string, fromIndex: number) {
 
 const tokenizer: Tokenizer = function (eat, value, silent) {
   const now = eat.now();
-  const match = /^:::(.*?)\n([\w\W]+?)\n:::$/m.exec(value);
+
+  const fenceSymbol = FENCE.repeat(DEPTH + 3);
+  const match = new RegExp(
+    `^${fenceSymbol}(.*?)\\n([\\w\\W]+?)\\n${fenceSymbol}$`,
+    'm',
+  ).exec(value);
   if (!match) return;
   if (match.index !== 0) return;
 
@@ -21,15 +30,19 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 
   const add = eat(eaten);
 
+  DEPTH += 1;
   const exit = this.enterBlock();
-  const contents = this.tokenizeBlock(contentString, now);
+  const children = this.tokenizeBlock(contentString, now);
   exit();
+  DEPTH -= 1;
+
+  const type = 'div';
 
   return add({
-    type: 'div',
-    children: contents,
+    type,
+    children,
     data: {
-      hName: 'div',
+      hName: type,
       hProperties: {
         className: blockType ? [blockType] : undefined,
       },
@@ -40,7 +53,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 tokenizer.notInLink = true;
 tokenizer.locator = locator;
 
-export const parser: Plugin = function () {
+export const attacher: Plugin = function () {
   if (!this.Parser) return;
 
   const {blockTokenizers, blockMethods} = this.Parser.prototype;
