@@ -1,37 +1,55 @@
 import * as lib from './index';
 
+function partial(body: string) {
+  return lib.stringify(body, {partial: true});
+}
+
+it.only('handle fenced block', () => {
+  expect(
+    partial(`
+:::appendix
+# Appendix
+test
+:::
+`),
+  ).toBe(`<div class="appendix"><h1>Appendix</h1><p>test</p></div>`);
+
+  expect(
+    partial(`
+:::
+# Plain block
+:::
+`),
+  ).toBe(`<div><h1>Plain block</h1></div>`);
+});
+
 it('handle hard line break', () => {
-  const result = lib.stringify(
-    `a
-b`,
-    {partial: true},
-  );
-  expect(result).toBe(`<p>a<br>
+  expect(
+    partial(`
+a
+b`),
+  ).toBe(`<p>a<br>
 b</p>`);
 });
 
 it('stringify math', () => {
-  const result = lib.stringify('$$sum$$', {partial: true});
-  expect(result).toContain(
+  expect(partial('$$sum$$')).toContain(
     `<p><span class="math math-inline"><mjx-container class="MathJax" jax="SVG">`,
   );
 });
 
 it('stringify ruby', () => {
-  const result = lib.stringify('{A|B}', {partial: true});
-  expect(result).toBe(`<p><ruby>A<rt>B</rt></ruby></p>`);
+  expect(partial('{A|B}')).toBe(`<p><ruby>A<rt>B</rt></ruby></p>`);
 });
 
 it('convert img to figure', () => {
-  const result = lib.stringify('![fig](image.png)', {partial: true});
-  expect(result).toBe(
+  expect(partial('![fig](image.png)')).toBe(
     `<p><figure><img src="image.png" alt="fig"><figcaption>fig</figcaption></figure></p>`,
   );
 });
 
 it('stringify markdown string into html document', () => {
-  const result = lib.stringify('# hello');
-  expect(result).toBe(`<!doctype html>
+  expect(lib.stringify('# hello')).toBe(`<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">

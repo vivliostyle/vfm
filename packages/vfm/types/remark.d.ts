@@ -38,6 +38,7 @@ interface Tokenizer {
 }
 
 type TokenizerInstance = {
-  tokenizeBlock: (value: string) => Node | void;
+  tokenizeBlock: (value: string, location: Point) => Node | void;
   tokenizeInline: (value: string, location: Point) => Node | void;
+  enterBlock: () => () => void;
 };
