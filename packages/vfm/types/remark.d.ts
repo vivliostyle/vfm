@@ -32,5 +32,6 @@ declare module 'rehype-mathjax';
 declare module 'hast-util-find-and-replace';
 declare module 'hastscript';
 declare module 'hast-util-is-element';
+declare module 'remark-breaks';
 
 declare module 'mdast-util-to-hast/lib/all';

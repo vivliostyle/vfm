@@ -1,5 +1,15 @@
 import * as lib from './index';
 
+it.only('stringify math equation', () => {
+  const result = lib.stringify(
+    `a
+b`,
+    {partial: true},
+  );
+  expect(result).toBe(`<p>a<br>
+b</p>`);
+});
+
 it('stringify math equation', () => {
   const result = lib.stringify('$$sum$$', {partial: true});
   expect(result).toContain(
