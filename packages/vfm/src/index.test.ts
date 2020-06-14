@@ -1,7 +1,21 @@
 import * as lib from './index';
 
-it('should stringify markdown string into html document', () => {
-  const result = lib.stringifyMarkdown('# hello');
+it('stringify math equation', () => {
+  const result = lib.stringify('$$sum$$', {partial: true});
+  expect(result).toContain(
+    `<p><span class="math math-inline"><mjx-container class="MathJax" jax="SVG">`,
+  );
+});
+
+it('convert img to figure', () => {
+  const result = lib.stringify('![fig](image.png)', {partial: true});
+  expect(result).toBe(
+    `<p><figure><img src="image.png" alt="fig"><figcaption>fig</figcaption></figure></p>`,
+  );
+});
+
+it('stringify markdown string into html document', () => {
+  const result = lib.stringify('# hello');
   expect(result).toBe(`<!doctype html>
 <html lang="ja">
 <head>
@@ -13,11 +27,4 @@ it('should stringify markdown string into html document', () => {
 </body>
 </html>
 `);
-});
-
-it('should stringify math equation', () => {
-  const result = lib.stringifyMarkdown('$$sum$$', {partial: true});
-  expect(result).toContain(
-    `<p><span class="math math-inline"><mjx-container class="MathJax" jax="SVG">`,
-  );
 });
