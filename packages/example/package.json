@@ -1,13 +1,13 @@
 {
   "name": "example",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "author": "Yasuaki Uechi <y@uechi.io> (https://uechi.io)",
   "scripts": {
     "build": "tsc",
     "test": "ts-node src/cli.ts example.md"
   },
   "dependencies": {
-    "@vivliostyle/vfm": "^1.0.0-alpha.2"
+    "@vivliostyle/vfm": "^1.0.0-alpha.3"
   },
   "devDependencies": {
     "mdast-util-to-hast": "^9.1.0",

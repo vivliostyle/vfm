@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.3](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.2...v1.0.0-alpha.3) (2020-06-15)
+
+### Features
+
+- add vfm cli ([5733e64](https://github.com/vivliostyle/vfm/commit/5733e64b10ab796c77b2912e3f3b0f458bcf8e84))
+
 # [1.0.0-alpha.2](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.1...v1.0.0-alpha.2) (2020-06-14)
 
 ### Bug Fixes
