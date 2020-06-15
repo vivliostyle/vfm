@@ -1,18 +1,8 @@
 # Vivliostyle Flavored Markdown: Working Draft
 
-Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book authoring. It is standardized and published for Vivliostyle and its sibling projects.
+Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book authoring. It is standardized and published for Vivliostyle and its sibling projects. VFM is implemented top on CommonMark and GFM.
 
-## Principles
-
-1. Rule of least surprise
-   - Should be lined and matched to another Markdown syntax.
-1. (Mostly) backward-compatible syntax. should not be incorrectly rendered in Markdown editor like Typora.
-
-## Spec
-
-- Implemented top on CommonMark and GFM.
-
-### Hard new line
+## Hard new line
 
 - A newline puts `<br/>` to the end of a line.
 - Consecutive 2 newlines creates a new sentence block.
@@ -37,7 +27,7 @@ VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プ
 </p>
 ```
 
-### Heading
+## Heading
 
 **VFM**
 
@@ -63,7 +53,7 @@ VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プ
 <h6>Heading 6</h6>
 ```
 
-### Code
+## Code
 
 **VFM**
 
@@ -83,7 +73,7 @@ function main() {}
 </pre>
 ```
 
-#### Dictionary-style metadata
+### Dictionary-style metadata
 
 **VFM**
 
@@ -103,7 +93,7 @@ function main() {}
 </pre>
 ```
 
-### Ruby
+## Ruby
 
 **VFM**
 
@@ -117,7 +107,7 @@ This is {Ruby|ルビ}
 This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ```
 
-### Image
+## Image
 
 **VFM**
 
@@ -134,7 +124,7 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 </figure>
 ```
 
-#### without caption
+### without caption
 
 **VFM**
 
@@ -148,7 +138,7 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 <img src="./fig1.png" />
 ```
 
-### Fenced block
+## Fenced block
 
 - Fenced block populates a class labelled `<div>` element with its contents.
 - Inner contents will be parsed as VFM.
@@ -170,7 +160,7 @@ uetchy
 </div>
 ```
 
-#### Nested fenced block
+### Nested fenced block
 
 **VFM**
 
@@ -195,7 +185,7 @@ uetchy
 </div>
 ```
 
-#### WAI-ARIA `role`
+### WAI-ARIA `role`
 
 **VFM**
 
@@ -221,7 +211,7 @@ uetchy
 <aside role="doc-tip"><h1>Tips</h1></aside>
 ```
 
-### Raw HTML
+## Raw HTML
 
 **VFM**
 
@@ -239,7 +229,7 @@ uetchy
 </div>
 ```
 
-#### with Markdown
+### with Markdown
 
 **VFM**
 
@@ -259,7 +249,7 @@ uetchy
 </div>
 ```
 
-### Math equation
+## Math equation
 
 **VFM**
 
@@ -279,7 +269,7 @@ $$ \sum $$
 <!-- MathJax style -->
 ```
 
-### Frontmatter
+## Frontmatter
 
 Frontmatter is a way of defining metadata in Markdown (file) units.
 

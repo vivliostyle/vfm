@@ -13,8 +13,9 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 ## Spec
 
 - [Discussion](https://github.com/vivliostyle/vfm/issues/1)
-- [Vivliostyle Flavored Markdown: Working Draft](https://github.com/vivliostyle/vfm/blob/master/spec/vfm.md)
-- [VFM-complaiant HTML structure](https://github.com/vivliostyle/vfm/blob/master/spec/html.md)
+- [Vivliostyle Flavored Markdown: Working Draft](https://vivliostyle.github.io/vfm/#/vfm)
+- [VFM-complaiant HTML structure](https://vivliostyle.github.io/vfm/#/html)
+- [Theming Guideline](https://vivliostyle.github.io/vfm/#/theme)
 
 ## Packages
 
