@@ -18,6 +18,7 @@ declare module 'rehype-stringify' {
   export default plugin;
 }
 declare module 'rehype-mathjax';
+declare module 'rehype-slug';
 declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all';
 declare module 'hast-util-find-and-replace';

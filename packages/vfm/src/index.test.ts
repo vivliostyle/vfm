@@ -8,6 +8,7 @@ it.skip('handle custom attributes', () => {
   // MEMO:
   // https://github.com/sethvincent/remark-bracketed-spans
   // https://github.com/Paperist/remark-crossref/
+  // https://github.com/mrzmmr/remark-behead
   expect(
     partial(`
 # Introduction {#introduction}
@@ -28,7 +29,7 @@ it('handle role', () => {
 # Tips
 :::
 `),
-  ).toBe(`<aside role="doc-tip"><h1>Tips</h1></aside>`);
+  ).toBe(`<aside role="doc-tip"><h1 id="tips">Tips</h1></aside>`);
 
   expect(
     partial(`
@@ -36,7 +37,9 @@ it('handle role', () => {
 # Appendix
 :::
 `),
-  ).toBe(`<section role="doc-appendix"><h1>Appendix</h1></section>`);
+  ).toBe(
+    `<section role="doc-appendix"><h1 id="appendix">Appendix</h1></section>`,
+  );
 });
 
 it('reject incorrect fences', () => {
@@ -51,7 +54,7 @@ it('reject incorrect fences', () => {
   ).toBe(
     `<p>::::appendix<br>
 :::::nested</p>
-<h1>Title</h1>
+<h1 id="title">Title</h1>
 <p>:::::<br>
 ::::</p>`,
   );
@@ -65,7 +68,7 @@ it('reject incorrect fences', () => {
 :::
 `),
   ).toBe(
-    `<div class="appendix"><p>:::::nested</p><h1>Title</h1><p>:::::</p></div>`,
+    `<div class="appendix"><p>:::::nested</p><h1 id="title">Title</h1><p>:::::</p></div>`,
   );
 });
 
@@ -77,7 +80,9 @@ it('handle fenced block', () => {
 test
 :::
 `),
-  ).toBe(`<div class="appendix"><h1>Appendix</h1><p>test</p></div>`);
+  ).toBe(
+    `<div class="appendix"><h1 id="appendix">Appendix</h1><p>test</p></div>`,
+  );
 
   expect(
     partial(`
@@ -92,7 +97,7 @@ Another block
 :::
 `),
   ).toBe(
-    `<div><h1>Plain block</h1></div>
+    `<div><h1 id="plain-block">Plain block</h1></div>
 <hr>
 <div class="another"><p>Another block</p></div>`,
   );
@@ -108,7 +113,7 @@ A
 :::
 `),
   ).toBe(
-    `<div class="appendix"><p>A</p><div class="nested"><h1>Title</h1></div></div>`,
+    `<div class="appendix"><p>A</p><div class="nested"><h1 id="title">Title</h1></div></div>`,
   );
 });
 
@@ -138,14 +143,14 @@ it('convert img to figure', () => {
 });
 
 it('stringify markdown string into html document', () => {
-  expect(lib.stringify('# hello')).toBe(`<!doctype html>
+  expect(lib.stringify('# こんにちは')).toBe(`<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<h1>hello</h1>
+<h1 id="こんにちは">こんにちは</h1>
 </body>
 </html>
 `);

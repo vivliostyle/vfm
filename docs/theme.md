@@ -4,13 +4,13 @@
 
 ```js
 module.exports = {
+  entrypoint: './articles/index.md',
   theme: '<theme>',
+  vfm: true, // automatically set `true` when `entrypoint` points to .md file.
 };
 ```
 
-## `theme`
-
-### Source
+### `theme`
 
 #### npm
 
@@ -29,11 +29,19 @@ module.exports = {
 };
 ```
 
+#### single-source CSS
+
+```js
+module.exports = {
+  theme: 'https://example.com/theme.css',
+};
+```
+
 #### local
 
 ```js
 module.exports = {
-  theme: './theme-package',
+  theme: './vivliostyle-theme-academic',
 };
 ```
 
@@ -52,7 +60,9 @@ vivliostyle-theme-academic
   "name": "vivliostyle-theme-academic",
   "vivliostyle": {
     "theme": {
-      "stylesheet": "./theme.css"
+      "stylesheet": "./theme.css", // required
+      "title": "Academic", // optional
+      "author": "John Doe <john@example.com>" // optional
     }
   }
 }
@@ -94,45 +104,45 @@ If these roles would not satisfy your use cases, now then consider using custom 
 
 #### Available roles
 
-- `doc-abstract` (Abstract / Summary)
-- `doc-acknowledgements` (Acknowledgements)
+- `doc-abstract` (Abstract; 概要)
+- `doc-acknowledgements` (Acknowledgements; 免責事項)
 - `doc-afterword`
-- `doc-appendix` (Appendix)
+- `doc-appendix` (Appendix; 補遺)
 - `doc-backlink` (Back link)
 - `doc-biblioentry`
 - `doc-bibliography`
 - `doc-biblioref`
-- `doc-chapter` (Chapter)
-- `doc-colophon`
-- `doc-conclusion` (Conclusion)
-- `doc-cover` (Cover)
+- `doc-chapter` (Chapter; 章)
+- `doc-colophon` (Colophon; 奥付)
+- `doc-conclusion` (Conclusion; 総括)
+- `doc-cover` (Cover; 表紙)
 - `doc-credit` (Credit list item)
 - `doc-credits` (Credits)
 - `doc-dedication`
 - `doc-endnote`
 - `doc-endnotes`
 - `doc-epigraph`
-- `doc-epilogue` (Epilogue)
-- `doc-errata` (Errata)
-- `doc-example` (Example)
-- `doc-footnote` (Foot note)
+- `doc-epilogue` (Epilogue; 結文)
+- `doc-errata` (Errata; 正誤表)
+- `doc-example` (Example; 例)
+- `doc-footnote` (Foot note; フットノート)
 - `doc-foreword`
-- `doc-glossary` (Glossary)
+- `doc-glossary` (Glossary; 用語集)
 - `doc-glossref`
 - `doc-index`
-- `doc-introduction` (Introductory section)
+- `doc-introduction` (Introductory section; はじめに)
 - `doc-noteref`
-- `doc-notice` (Notice)
+- `doc-notice` (Notice; 注意)
 - `doc-pagebreak`
 - `doc-pagelist`
 - `doc-part`
-- `doc-preface` (Preface)
-- `doc-prologue` (Prologue)
+- `doc-preface` (Preface; まえがき)
+- `doc-prologue` (Prologue; 序文)
 - `doc-pullquote`
 - `doc-qna` (Q&A)
-- `doc-subtitle` (Sub title)
+- `doc-subtitle` (Sub title; サブタイトル)
 - `doc-tip` (Tips)
-- `doc-toc` (Table of Contents)
+- `doc-toc` (Table of Contents; 目次)
 
 ### `<figure>` for captioned image
 
