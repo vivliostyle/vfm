@@ -12,6 +12,13 @@ npm i -g @vivliostyle/vfm
 vfm input.md
 ```
 
+### In tandem with `vivliostyle` command
+
+```bash
+npx @vivliostyle/vfm README.md --stylesheet https://raw.githubusercontent.com/jagat-xpub/cosmology/gh-pages/css/scholarly.css > book.html
+npx @vivliostyle/cli build book.html -s A4
+```
+
 ## Usage (API)
 
 ```bash
