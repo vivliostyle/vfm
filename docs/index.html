@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Vivliostyle Flavored Markdown</title>
+    <!-- <link rel="icon" href="images/vivliostyle-icon.png" /> -->
+    <link rel="stylesheet" href="https://unpkg.com/docute@4/dist/docute.css" />
+  </head>
+  <body>
+    <div id="docute"></div>
+    <script src="https://unpkg.com/docute@4/dist/docute.js"></script>
+    <script>
+      if (location.hash.indexOf('%23')) {
+        // fix %-encoded '#' in hash
+        location.hash = location.hash.replace('%23', '#');
+      }
+
+      new Docute({
+        title: 'VFM: Vivliostyle Flavored Markdown',
+        target: '#docute',
+        plugins: [],
+        nav: [
+          {
+            title: 'Home',
+            link: '/',
+          },
+          {
+            title: 'Vivliostyle',
+            link: 'https://vivliostyle.org',
+          },
+          {
+            title: 'GitHub',
+            link: 'https://github.com/vivliostyle/vfm',
+          },
+        ],
+        sidebar: [
+          {
+            title: 'Spec',
+            children: [
+              {title: 'VFM', link: '/vfm'},
+              {title: 'HTML', link: '/html'},
+              {title: 'Theme', link: '/theme'},
+            ],
+          },
+          {
+            title: 'Community',
+            children: [
+              {
+                title: 'GitHub',
+                link: 'https://github.com/vivliostyle',
+              },
+              {
+                title: 'Twitter',
+                link: 'https://twitter.com/vivliostyle',
+              },
+              {
+                title: 'Slack',
+                link:
+                  'https://join.slack.com/t/vivliostyle/shared_invite/enQtNzc1NjE4ODk1ODI5LWQxZjM4YTZjMmQ0ZTUyNmUyOGZlMzIwZjQ5OWYwYjkyZDZmOTIwNGMwOWU5NDc0NjE5OTAyMmVhZTRhYTAyNWQ',
+              },
+            ],
+          },
+        ],
+      });
+    </script>
+  </body>
+</html>

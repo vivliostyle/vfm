@@ -1,5 +1,5 @@
 # example
 
 ```shell
-ts-node cli.ts example.md
+vivliostyle build -c vivliostyle.config.js
 ```
