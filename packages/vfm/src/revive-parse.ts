@@ -4,7 +4,7 @@ import math from 'remark-math';
 import breaks from 'remark-breaks';
 
 import {attacher as ruby} from './plugins/ruby';
-import {attacher as fencedBlock} from './plugins/fencedBlock';
+import {attacher as fencedBlock} from './plugins/fenced-block';
 
 export default [
   [markdown, {commonmark: true}],

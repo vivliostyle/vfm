@@ -1,8 +1,4 @@
 import {Plugin} from 'unified';
-import {Parent} from 'unist';
-import u from 'unist-builder';
-import {H, Handler} from 'mdast-util-to-hast';
-import all from 'mdast-util-to-hast/lib/all';
 
 import {roleMappingTable} from '../utils/wai-aria';
 
@@ -14,7 +10,7 @@ let DEPTH = 0;
 
 // remark
 function locator(value: string, fromIndex: number) {
-  return value.indexOf(':::', fromIndex);
+  return value.indexOf(FENCE.repeat(3), fromIndex);
 }
 
 const tokenizer: Tokenizer = function (eat, value, silent) {
