@@ -1,12 +1,22 @@
 # @vivliostyle/vfm
 
-## Install
+## Usage (CLI)
 
-```shell
-yarn add @vivliostyle/vfm
+```bash
+npx @vivliostyle/vfm --help
+npx @vivliostyle/vfm input.md
+echo "# Hello" | npx @vivliostyle/vfm
+
+# or install it globally
+npm i -g @vivliostyle/vfm
+vfm input.md
 ```
 
-## Usage
+## Usage (API)
+
+```bash
+yarn add @vivliostyle/vfm
+```
 
 ```js
 const {stringify} = require('@vivliostyle/vfm');
