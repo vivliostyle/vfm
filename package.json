@@ -4,7 +4,7 @@
   "author": "Vivliostyle Foundation <mail@vivliostyle.org>",
   "scripts": {
     "build": "lerna run build",
-    "bump": "lerna version --conventional-commits",
+    "bump": "lerna version --conventional-commits --create-release github",
     "dev": "lerna run dev",
     "prepublish": "yarn build",
     "ship": "lerna publish from-package",

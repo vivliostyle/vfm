@@ -3,5 +3,11 @@
   "version": "1.0.0-alpha.2",
   "packages": ["packages/*"],
   "useWorkspaces": true,
-  "npmClient": "yarn"
+  "npmClient": "yarn",
+  "command": {
+    "version": {
+      "message": "chore(release): publish %s",
+      "conventionalCommits": true
+    }
+  }
 }
