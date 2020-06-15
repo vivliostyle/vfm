@@ -15,8 +15,9 @@ vfm input.md
 ### In tandem with `vivliostyle` command
 
 ```bash
-npx @vivliostyle/vfm README.md --stylesheet https://raw.githubusercontent.com/jagat-xpub/cosmology/gh-pages/css/scholarly.css > book.html
-npx @vivliostyle/cli build book.html -s A4
+npm i -g @vivliostyle/vfm @vivliostyle/cli
+vfm README.md --stylesheet https://raw.githubusercontent.com/jagat-xpub/cosmology/gh-pages/css/scholarly.css > book.html
+vivliostyle build book.html -s A4
 ```
 
 ## Usage (API)
