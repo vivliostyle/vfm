@@ -1,10 +1,10 @@
 {
   "folders": [
-    {"name": "root", "path": "."},
     {
       "path": "packages/example"
     },
-    {"name": "@vivliostyle/vfm", "path": "packages/vfm"}
+    {"name": "@vivliostyle/vfm", "path": "packages/vfm"},
+    {"name": "root", "path": "."}
   ],
   "settings": {
     "jest.disabledWorkspaceFolders": ["root", "example"]
