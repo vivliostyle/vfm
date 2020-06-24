@@ -1,4 +1,5 @@
 import unified from 'unified';
+import {VFile} from 'vfile';
 import doc from 'rehype-document';
 import rehypeStringify from 'rehype-stringify';
 
@@ -11,16 +12,14 @@ export interface StringifyMarkdownOptions {
   partial?: boolean;
 }
 
-export function stringify(
+export function process(
   markdownString: string,
   {stylesheet = undefined, partial = false}: StringifyMarkdownOptions = {},
-): string {
+): VFile {
   const processor = unified().use(markdown).use(html);
-
   if (!partial) {
     processor.use(doc, {language: 'ja', css: stylesheet});
   }
-
   processor.use(rehypeStringify);
 
   if (debug.enabled) {
@@ -28,5 +27,12 @@ export function stringify(
     debug(inspect(processor.parse(markdownString)));
   }
 
-  return String(processor.processSync(markdownString));
+  return processor.processSync(markdownString);
+}
+
+export function stringify(
+  markdownString: string,
+  options: StringifyMarkdownOptions = {},
+): string {
+  return String(process(markdownString, options));
 }

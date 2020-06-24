@@ -21,8 +21,11 @@ declare module 'rehype-mathjax';
 declare module 'rehype-slug';
 declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all';
+declare module 'mdast-util-to-string';
 declare module 'hast-util-find-and-replace';
 declare module 'hast-util-is-element';
+
+declare module 'to-vfile';
 
 interface Tokenizer {
   (
