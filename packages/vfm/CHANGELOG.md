@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.4](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2020-06-24)
+
+### Bug Fixes
+
+- add plugins ([d62b838](https://github.com/vivliostyle/vfm/commit/d62b8386e213bd8f81294fa4d6f963a236853357))
+
+### Features
+
+- auto-generate id for headings ([c2b3433](https://github.com/vivliostyle/vfm/commit/c2b34336552f8c715a0bf1d3322be73f6701a592))
+
 # [1.0.0-alpha.3](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.2...v1.0.0-alpha.3) (2020-06-15)
 
 ### Features
