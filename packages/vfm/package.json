@@ -5,6 +5,7 @@
   "author": "Yasuaki Uechi <y@uechi.io>",
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
+    "prepublish": "yarn build",
     "test": "jest"
   },
   "dependencies": {
