@@ -38,9 +38,9 @@
   },
   "types": "lib/index.d.ts",
   "main": "lib/index.js",
+  "bin": "lib/cli.js",
   "files": [
-    "lib/*.js",
-    "lib/*.d.ts"
+    "lib"
   ],
   "publishConfig": {
     "access": "public"
@@ -50,12 +50,14 @@
     "url": "https://github.com/vivliostyle/vfm.git",
     "directory": "packages/vfm"
   },
-  "license": "Apache-2.0",
-  "bin": "lib/cli.js",
+  "bugs": {
+    "url": "https://github.com/vivliostyle/vfm/issues"
+  },
   "homepage": "https://github.com/vivliostyle/vfm",
   "keywords": [
     "markdown",
     "vfm",
     "vivliostyle"
-  ]
+  ],
+  "license": "Apache-2.0"
 }
