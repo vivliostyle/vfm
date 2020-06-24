@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.0.0-alpha.5](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.4...v1.0.0-alpha.5) (2020-06-24)
+
+
+### Bug Fixes
+
+* export parser ([c78c800](https://github.com/vivliostyle/vfm/commit/c78c800d2f8e4721271d5ddb900ef5b2b6396034))
+* remove theme ([c1d22f7](https://github.com/vivliostyle/vfm/commit/c1d22f7d5d9e196f0d2ceb7861644561cae41b17))
+
+
+### Features
+
+* aggregate frontmatter ([e970720](https://github.com/vivliostyle/vfm/commit/e970720737e1eb65cd3d756f0a13d442457fbcff))
+
+
+
+
+
 # [1.0.0-alpha.4](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.3...v1.0.0-alpha.4) (2020-06-24)
 
 ### Bug Fixes

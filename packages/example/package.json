@@ -1,11 +1,11 @@
 {
   "name": "example",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "author": "Yasuaki Uechi <y@uechi.io> (https://uechi.io)",
   "scripts": {},
   "dependencies": {
     "@vivliostyle/cli": "^2.0.0",
-    "@vivliostyle/vfm": "^1.0.0-alpha.4"
+    "@vivliostyle/vfm": "^1.0.0-alpha.5"
   },
   "license": "Apache-2.0",
   "private": true

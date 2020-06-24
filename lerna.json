@@ -1,7 +1,9 @@
 {
   "name": "@vivliostyle/vfm",
-  "version": "1.0.0-alpha.4",
-  "packages": ["packages/*"],
+  "version": "1.0.0-alpha.5",
+  "packages": [
+    "packages/*"
+  ],
   "useWorkspaces": true,
   "npmClient": "yarn",
   "command": {
