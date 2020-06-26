@@ -6,6 +6,8 @@
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "prepublish": "yarn build",
+    "prerelease": "np prerelease --tag next",
+    "release": "np",
     "test": "jest"
   },
   "dependencies": {
