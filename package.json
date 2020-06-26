@@ -8,12 +8,6 @@
     "prepublish": "yarn build",
     "test": "jest"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "doctoc README.md docs/vfm.md && git add README.md docs/vfm.md && pretty-quick --staged",
-      "pre-push": "npm test"
-    }
-  },
   "dependencies": {
     "debug": "^4.1.1",
     "hast-util-is-element": "^1.0.4",
@@ -62,13 +56,18 @@
   "files": [
     "lib"
   ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "doctoc README.md docs/vfm.md && git add README.md docs/vfm.md && pretty-quick --staged",
+      "pre-push": "npm test"
+    }
+  },
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/vivliostyle/vfm.git",
-    "directory": "packages/vfm"
+    "url": "https://github.com/vivliostyle/vfm.git"
   },
   "bugs": {
     "url": "https://github.com/vivliostyle/vfm/issues"
