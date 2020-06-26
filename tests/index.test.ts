@@ -1,4 +1,4 @@
-import * as lib from './index';
+import * as lib from '../src';
 
 function partial(body: string) {
   return lib.stringify(body, {partial: true});
@@ -143,10 +143,11 @@ it('convert img to figure', () => {
 });
 
 it('stringify markdown string into html document', () => {
-  expect(lib.stringify('# こんにちは')).toBe(`<!doctype html>
+  expect(lib.stringify('# こんにちは', {title: 'Custom'})).toBe(`<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
+<title>Custom</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>

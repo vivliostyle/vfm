@@ -8,15 +8,17 @@ import {debug} from './utils/debug';
 export interface StringifyMarkdownOptions {
   stylesheet?: string;
   partial?: boolean;
+  title?: string;
 }
 
 export function VFM({
   stylesheet = undefined,
   partial = false,
+  title = undefined,
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified().use(markdown).use(html);
   if (!partial) {
-    processor.use(doc, {language: 'ja', css: stylesheet});
+    processor.use(doc, {language: 'ja', css: stylesheet, title});
   }
   processor.use(rehypeStringify);
 
