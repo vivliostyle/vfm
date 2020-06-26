@@ -1,8 +1,8 @@
-import visit from 'unist-util-visit';
-import {select} from 'unist-util-select';
-import toString from 'mdast-util-to-string';
 import {safeLoad as yaml} from 'js-yaml';
+import toString from 'mdast-util-to-string';
 import {Node} from 'unist';
+import {select} from 'unist-util-select';
+import visit from 'unist-util-visit';
 import {VFile} from 'vfile';
 
 interface CFile extends VFile {

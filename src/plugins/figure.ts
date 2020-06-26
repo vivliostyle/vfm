@@ -1,7 +1,7 @@
+import is from 'hast-util-is-element';
+import h from 'hastscript';
 import {Plugin} from 'unified';
 import {Node, Parent} from 'unist';
-import h from 'hastscript';
-import is from 'hast-util-is-element';
 import visit from 'unist-util-visit';
 
 interface HastNode extends Parent {

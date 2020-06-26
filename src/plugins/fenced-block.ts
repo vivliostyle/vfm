@@ -1,5 +1,4 @@
 import {Plugin} from 'unified';
-
 import {roleMappingTable} from '../utils/wai-aria';
 
 const FENCE = ':';

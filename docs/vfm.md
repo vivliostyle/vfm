@@ -2,6 +2,31 @@
 
 Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book authoring. It is standardized and published for Vivliostyle and its sibling projects. VFM is implemented top on CommonMark and GFM.
 
+## Table of contents
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+- [Hard new line](#hard-new-line)
+- [Heading](#heading)
+- [Code](#code)
+  - [Dictionary-style metadata](#dictionary-style-metadata)
+- [Ruby](#ruby)
+- [Image](#image)
+  - [without caption](#without-caption)
+- [Fenced block](#fenced-block)
+  - [Nested fenced block](#nested-fenced-block)
+  - [WAI-ARIA `role`](#wai-aria-role)
+- [Raw HTML](#raw-html)
+  - [with Markdown](#with-markdown)
+- [Math equation](#math-equation)
+- [Frontmatter](#frontmatter)
+  - [Reserved words](#reserved-words)
+- [Full HTML document](#full-html-document)
+- [Page Layout](#page-layout)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Hard new line
 
 - A newline puts `<br/>` to the end of a line.

@@ -1,7 +1,6 @@
-import unified, {Processor} from 'unified';
 import doc from 'rehype-document';
 import rehypeStringify from 'rehype-stringify';
-
+import unified, {Processor} from 'unified';
 import markdown from './revive-parse';
 import html from './revive-rehype';
 import {debug} from './utils/debug';

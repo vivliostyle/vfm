@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
-import readline from 'readline';
 import meow from 'meow';
+import readline from 'readline';
 import {stringify} from '.';
 
 const cli = meow(

@@ -1,8 +1,8 @@
+import {Handler} from 'mdast-util-to-hast';
+import all from 'mdast-util-to-hast/lib/all';
 import {Plugin} from 'unified';
 import {Parent} from 'unist';
 import u from 'unist-builder';
-import {Handler} from 'mdast-util-to-hast';
-import all from 'mdast-util-to-hast/lib/all';
 
 // remark
 function locateRuby(value: string, fromIndex: number) {
