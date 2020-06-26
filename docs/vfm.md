@@ -8,12 +8,11 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 - [Hard new line](#hard-new-line)
-- [Heading](#heading)
 - [Code](#code)
-  - [Dictionary-style metadata](#dictionary-style-metadata)
+  - [with caption](#with-caption)
 - [Ruby](#ruby)
 - [Image](#image)
-  - [without caption](#without-caption)
+  - [with caption](#with-caption-1)
 - [Fenced block](#fenced-block)
   - [Nested fenced block](#nested-fenced-block)
   - [WAI-ARIA `role`](#wai-aria-role)
@@ -41,44 +40,27 @@ Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
 VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
 ```
 
-**HTML**
-
-```html
-<p>はじめまして。</p>
-<p>
-  Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。<br />
-  VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle
-  プロジェクトのために策定・実装されました。
-</p>
-```
-
-## Heading
+## Code
 
 **VFM**
 
-```md
-# Heading 1
-
-## Heading 2
-
-### Heading 3
-
-#### Heading 4
-
-##### Heading 5
-
-###### Heading 6
+````md
+```javascript
+function main() {}
 ```
+````
 
 **HTML**
 
 ```html
-<h1>Heading 1</h1>
-...
-<h6>Heading 6</h6>
+<pre>
+  <code class="language-javascript">
+    function main() {}
+  </code>
+</pre>
 ```
 
-## Code
+### with caption
 
 **VFM**
 
@@ -91,31 +73,14 @@ function main() {}
 **HTML**
 
 ```html
-<pre>
-  <code class="language-javascript">
-    function main() {}
-  </code>
-</pre>
-```
-
-### Dictionary-style metadata
-
-**VFM**
-
-````md
-```javascript:title=app.js
-function main() {}
-```
-````
-
-**HTML**
-
-```html
-<pre>
-  <code class="language-javascript">
-    function main() {}
-  </code>
-</pre>
+<figure>
+  <figcaption>app.js</figcaption>
+  <pre>
+    <code class="language-javascript">
+      function main() {}
+    </code>
+  </pre>
+</figure>
 ```
 
 ## Ruby
@@ -137,6 +102,20 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 **VFM**
 
 ```md
+![](./fig1.png)
+```
+
+**HTML**
+
+```html
+<img src="./fig1.png" />
+```
+
+### with caption
+
+**VFM**
+
+```md
 ![Figure 1](./fig1.png)
 ```
 
@@ -147,20 +126,6 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
   <img src="./fig1.png" alt="Figure 1" />
   <figcaption>Figure 1</figcaption>
 </figure>
-```
-
-### without caption
-
-**VFM**
-
-```md
-![](./fig1.png)
-```
-
-**HTML**
-
-```html
-<img src="./fig1.png" />
 ```
 
 ## Fenced block
@@ -231,9 +196,13 @@ uetchy
 **HTML**
 
 ```html
-<section role="doc-appendix"><h1>Appendix</h1></section>
+<section role="doc-appendix">
+  <h1>Appendix</h1>
+</section>
 
-<aside role="doc-tip"><h1>Tips</h1></aside>
+<aside role="doc-tip">
+  <h1>Tips</h1>
+</aside>
 ```
 
 ## Raw HTML
@@ -311,7 +280,7 @@ title: Introduction to VFM
 | -------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | title    | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
 | author   | String | Author of the document.                                                                                                                                                                        |
-| layout   | String | Custom CSS file for the document.                                                                                                                                                              |
+| theme    | String | Vivliostyle Theme package or bare CSS file for the document.                                                                                                                                   |
 
 ## Full HTML document
 
@@ -321,9 +290,10 @@ title: Introduction to VFM
 
 ```html
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="{{language}}">
   <head>
     <meta charset="utf-8" />
+    <title>{{title}}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="{{stylesheet URL}}" />
   </head>
