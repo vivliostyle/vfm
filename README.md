@@ -13,6 +13,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
   - [Options](#options)
     - [`stylesheet` (default: `undefined`)](#stylesheet-default-undefined)
     - [`partial` (default: `false`)](#partial-default-false)
+    - [`title` (default: `undefined`)](#title-default-undefined)
   - [Advanced usage](#advanced-usage)
     - [Integrate into Unified.js pipeline](#integrate-into-unifiedjs-pipeline)
 - [Spec](#spec)
@@ -112,6 +113,28 @@ will generates:
 
 ```html
 <p><h1>Hello</h1></p>
+```
+
+#### `title` (default: `undefined`)
+
+```js
+stringify('# Hello', {title: 'Hello'});
+```
+
+will generates:
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hello</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <p><h1>Hello</h1></p>
+  </body>
+</html>
 ```
 
 ### Advanced usage
