@@ -1,0 +1,20 @@
+import findAndReplace from 'hast-util-find-and-replace';
+import h from 'hastscript';
+import {Node} from 'unist';
+
+export interface ReplaceRule {
+  test: RegExp;
+  match: (result: RegExpMatchArray, h: any) => Node | string;
+}
+
+export function replace({rules}: {rules?: ReplaceRule[]} = {}) {
+  if (!rules) return;
+  const search = rules.map(
+    (rule) =>
+      [
+        rule.test,
+        (...result: RegExpMatchArray) => rule.match(result, h),
+      ] as const,
+  );
+  return (tree: Node) => findAndReplace(tree, search);
+}

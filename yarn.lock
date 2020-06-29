@@ -1956,6 +1956,15 @@ hast-to-hyperscript@^7.0.0:
     unist-util-is "^3.0.0"
     web-namespaces "^1.1.2"
 
+hast-util-find-and-replace@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/hast-util-find-and-replace/-/hast-util-find-and-replace-3.0.0.tgz#04422e781be807661768f4796332a3f17cdd987e"
+  integrity sha512-7LBMKYj4BbqKlrktm/ikU/iNFvdQfgqTxmjwiXHoDSoKNcuFj5OXX4/tV42nSTGhK1BhgafcymW6jVuPNhxJvQ==
+  dependencies:
+    escape-string-regexp "^2.0.0"
+    hast-util-is-element "^1.0.0"
+    unist-util-visit-parents "^3.0.0"
+
 hast-util-from-dom@^2.0.0:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/hast-util-from-dom/-/hast-util-from-dom-2.0.5.tgz#410ce6e8ffd7cc06c5d651a46cb2204c97a36820"
