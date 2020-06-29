@@ -42,6 +42,13 @@ Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
 VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
 ```
 
+**CSS**
+
+```css
+p {
+}
+```
+
 ## Code
 
 <Badge type="warning">PRE-RELEASE</Badge>
@@ -62,6 +69,15 @@ function main() {}
     function main() {}
   </code>
 </pre>
+```
+
+**CSS**
+
+```css
+pre {
+}
+pre code {
+}
 ```
 
 ### with caption
@@ -97,6 +113,19 @@ function main() {}
 </figure>
 ```
 
+**CSS**
+
+```css
+figure[class^='language-'] {
+}
+figure[class^='language-'] figcaption {
+}
+figure[class^='language-'] pre {
+}
+figure[class^='language-'] pre code {
+}
+```
+
 ## Image
 
 <Badge type="warning">PRE-RELEASE</Badge>
@@ -111,6 +140,13 @@ function main() {}
 
 ```html
 <img src="./fig1.png" />
+```
+
+**CSS**
+
+```css
+img {
+}
 ```
 
 ### with caption
@@ -132,6 +168,15 @@ function main() {}
 </figure>
 ```
 
+**CSS**
+
+```css
+figure img {
+}
+figure figcaption {
+}
+```
+
 ## Ruby
 
 <Badge type="warning">PRE-RELEASE</Badge>
@@ -146,6 +191,15 @@ This is {Ruby|ルビ}
 
 ```html
 This is <ruby>Ruby<rt>ルビ</rt></ruby>
+```
+
+**CSS**
+
+```css
+ruby {
+}
+ruby rt {
+}
 ```
 
 ## Fenced block
@@ -172,15 +226,27 @@ uetchy
 </div>
 ```
 
+**CSS**
+
+```css
+/* All fenced blocks */
+div {
+}
+
+/* Custom block (author) */
+div.author {
+}
+```
+
 ### Nested fenced block
 
 **VFM**
 
 ```md
-:::section-author
+:::author
 uetchy
 
-::::author-homepage
+::::homepage
 <https://uechi.io>
 ::::
 :::
@@ -189,12 +255,19 @@ uetchy
 **HTML**
 
 ```html
-<div class="section-author">
+<div class="author">
   <p>uetchy</p>
-  <div class="author-homepage">
+  <div class="homepage">
     <a href="https://uechi.io">https://uechi.io</a>
   </div>
 </div>
+```
+
+**CSS**
+
+```css
+div.author div.homepage {
+}
 ```
 
 ### WAI-ARIA `role`
@@ -227,6 +300,19 @@ uetchy
 <aside role="doc-tip">
   <h1>Tips</h1>
 </aside>
+```
+
+**CSS**
+
+```css
+[role='doc-appendix'] {
+}
+[role='doc-appendix'] h1 {
+}
+[role='doc-toc'] {
+}
+[role='doc-toc'] h1 {
+}
 ```
 
 ## Raw HTML
@@ -289,6 +375,15 @@ $$ \sum $$
   ></span>
 </p>
 <!-- MathJax style -->
+```
+
+**CSS**
+
+```css
+span.math {
+}
+span.math.math-inline {
+}
 ```
 
 ## Frontmatter
