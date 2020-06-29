@@ -156,3 +156,18 @@ it('stringify markdown string into html document', () => {
 </html>
 `);
 });
+
+it('code', () => {
+  expect(
+    partial(`
+\`\`\`javascript
+function() {
+  console.log("Hello")
+}
+\`\`\`
+`),
+  ).toBe(`<pre><code class="language-javascript">function() {
+  console.log("Hello")
+}
+</code></pre>`);
+});
