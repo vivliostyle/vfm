@@ -28,6 +28,8 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 
 ## Hard new line
 
+<Badge type="warning">PRE-RELEASE</Badge>
+
 - A newline puts `<br/>` to the end of a line.
 - Consecutive 2 newlines creates a new sentence block.
 
@@ -41,6 +43,8 @@ VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プ
 ```
 
 ## Code
+
+<Badge type="warning">PRE-RELEASE</Badge>
 
 **VFM**
 
@@ -61,6 +65,8 @@ function main() {}
 ```
 
 ### with caption
+
+<Badge type="danger">UNIMPLEMENTED</Badge>
 
 **VFM**
 
@@ -85,6 +91,8 @@ function main() {}
 
 ## Ruby
 
+<Badge type="warning">PRE-RELEASE</Badge>
+
 **VFM**
 
 ```
@@ -98,6 +106,8 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ```
 
 ## Image
+
+<Badge type="warning">PRE-RELEASE</Badge>
 
 **VFM**
 
@@ -129,6 +139,8 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ```
 
 ## Fenced block
+
+<Badge type="warning">PRE-RELEASE</Badge>
 
 - Fenced block populates a class labelled `<div>` element with its contents.
 - Inner contents will be parsed as VFM.
@@ -177,6 +189,8 @@ uetchy
 
 ### WAI-ARIA `role`
 
+<Badge type="warning">PRE-RELEASE</Badge>
+
 **VFM**
 
 ```md
@@ -206,6 +220,8 @@ uetchy
 ```
 
 ## Raw HTML
+
+<Badge type="warning">PRE-RELEASE</Badge>
 
 **VFM**
 
@@ -245,6 +261,8 @@ uetchy
 
 ## Math equation
 
+<Badge type="warning">PRE-RELEASE</Badge>
+
 **VFM**
 
 ```markdown
@@ -265,6 +283,8 @@ $$ \sum $$
 
 ## Frontmatter
 
+<Badge type="warning">PRE-RELEASE</Badge>
+
 Frontmatter is a way of defining metadata in Markdown (file) units.
 
 ```yaml
@@ -276,17 +296,22 @@ title: Introduction to VFM
 
 #### Reserved words
 
-| Property | Type   | Description                                                                                                                                                                                    |
-| -------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| title    | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
-| author   | String | Author of the document.                                                                                                                                                                        |
-| theme    | String | Vivliostyle Theme package or bare CSS file for the document.                                                                                                                                   |
+| Property                                         | Type   | Description                                                                                                                                                                                    |
+| ------------------------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| title                                            | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
+| author                                           | String | Author of the document.                                                                                                                                                                        |
+| theme                                            | String | Vivliostyle Theme package or bare CSS file for the document.                                                                                                                                   |
+| class <Badge type="danger">UNIMPLEMENTED</Badge> | String | Custom class applied to `<body>`                                                                                                                                                               |
 
 ## Full HTML document
+
+<Badge type="warning">PRE-RELEASE</Badge>
 
 - Should follows [DPUB-ARIA](https://www.w3.org/TR/dpub-aria/) and [WCAG 2.1](https://www.w3.org/TR/WCAG21/).
 
 ## Page Layout
+
+<Badge type="warning">PRE-RELEASE</Badge>
 
 ```html
 <!DOCTYPE html>
@@ -297,7 +322,7 @@ title: Introduction to VFM
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="{{stylesheet URL}}" />
   </head>
-  <body>
+  <body class="{{class}}">
     {{HTML string}}
   </body>
 </html>
