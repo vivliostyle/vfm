@@ -171,3 +171,39 @@ function() {
 }
 </code></pre>`);
 });
+
+it('code with title', () => {
+  expect(
+    partial(`
+\`\`\`javascript:app.js
+function() {
+  console.log("Hello")
+}
+\`\`\`
+
+\`\`\`javascript title=app.js highlight-line="2"
+function() {
+  console.log("Hello2")
+}
+\`\`\`
+
+\`\`\`javascript:app.js highlight-line="2"
+function() {
+  console.log("Hello2")
+}
+\`\`\`
+`),
+  )
+    .toBe(`<figure class="language-javascript"><figcaption>app.js</figcaption><pre><code class="language-javascript">function() {
+  console.log("Hello")
+}
+</code></pre></figure>
+<figure class="language-javascript"><figcaption>app.js</figcaption><pre><code class="language-javascript">function() {
+  console.log("Hello2")
+}
+</code></pre></figure>
+<figure class="language-javascript"><figcaption>app.js</figcaption><pre><code class="language-javascript">function() {
+  console.log("Hello2")
+}
+</code></pre></figure>`);
+});

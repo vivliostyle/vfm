@@ -3,7 +3,6 @@ import rehypeStringify from 'rehype-stringify';
 import unified, {Processor} from 'unified';
 import markdown from './revive-parse';
 import html from './revive-rehype';
-import {debug} from './utils/debug';
 
 export interface StringifyMarkdownOptions {
   stylesheet?: string;
@@ -30,11 +29,6 @@ export function stringify(
   options: StringifyMarkdownOptions = {},
 ): string {
   const processor = VFM(options);
-
-  if (debug.enabled) {
-    const inspect = require('unist-util-inspect');
-    debug(inspect(processor.parse(markdownString)));
-  }
 
   return String(processor.processSync(markdownString));
 }

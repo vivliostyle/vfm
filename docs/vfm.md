@@ -10,9 +10,9 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 - [Hard new line](#hard-new-line)
 - [Code](#code)
   - [with caption](#with-caption)
-- [Ruby](#ruby)
 - [Image](#image)
   - [with caption](#with-caption-1)
+- [Ruby](#ruby)
 - [Fenced block](#fenced-block)
   - [Nested fenced block](#nested-fenced-block)
   - [WAI-ARIA `role`](#wai-aria-role)
@@ -66,7 +66,7 @@ function main() {}
 
 ### with caption
 
-<Badge type="danger">UNIMPLEMENTED</Badge>
+<Badge type="warning">PRE-RELEASE</Badge>
 
 **VFM**
 
@@ -76,10 +76,18 @@ function main() {}
 ```
 ````
 
+or
+
+````md
+```javascript title=app.js
+function main() {}
+```
+````
+
 **HTML**
 
 ```html
-<figure>
+<figure class="language-javascript">
   <figcaption>app.js</figcaption>
   <pre>
     <code class="language-javascript">
@@ -87,22 +95,6 @@ function main() {}
     </code>
   </pre>
 </figure>
-```
-
-## Ruby
-
-<Badge type="warning">PRE-RELEASE</Badge>
-
-**VFM**
-
-```
-This is {Ruby|ルビ}
-```
-
-**HTML**
-
-```html
-This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ```
 
 ## Image
@@ -123,6 +115,8 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 
 ### with caption
 
+<Badge type="warning">PRE-RELEASE</Badge>
+
 **VFM**
 
 ```md
@@ -136,6 +130,22 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
   <img src="./fig1.png" alt="Figure 1" />
   <figcaption>Figure 1</figcaption>
 </figure>
+```
+
+## Ruby
+
+<Badge type="warning">PRE-RELEASE</Badge>
+
+**VFM**
+
+```
+This is {Ruby|ルビ}
+```
+
+**HTML**
+
+```html
+This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ```
 
 ## Fenced block
