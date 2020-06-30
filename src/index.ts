@@ -9,6 +9,7 @@ export interface StringifyMarkdownOptions {
   style?: string | string[];
   partial?: boolean;
   title?: string;
+  language?: string;
   replace?: ReplaceRule[];
 }
 
@@ -20,6 +21,7 @@ export function VFM({
   style = undefined,
   partial = false,
   title = undefined,
+  language = 'en',
   replace = [],
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified().use(markdown).use(html);
@@ -27,7 +29,7 @@ export function VFM({
     processor.use(handleReplace, {rules: replace});
   }
   if (!partial) {
-    processor.use(doc, {language: 'ja', css: stylesheet, title});
+    processor.use(doc, {language, css: style, title});
   }
   processor.use(rehypeStringify);
 

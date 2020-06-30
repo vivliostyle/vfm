@@ -145,7 +145,7 @@ it('convert img to figure', () => {
 
 it('stringify markdown string into html document', () => {
   expect(lib.stringify('# こんにちは', {title: 'Custom'})).toBe(`<!doctype html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>Custom</title>
