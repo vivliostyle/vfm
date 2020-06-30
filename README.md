@@ -11,11 +11,13 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
   - [Usage with `vivliostyle` command](#usage-with-vivliostyle-command)
 - [API](#api)
   - [Options](#options)
-    - [`stylesheet` (default: `undefined`)](#stylesheet-default-undefined)
+    - [`style` (default: `undefined`)](#style-default-undefined)
     - [`partial` (default: `false`)](#partial-default-false)
     - [`title` (default: `undefined`)](#title-default-undefined)
+    - [`language` (default: `en`)](#language-default-en)
   - [Advanced usage](#advanced-usage)
-    - [Integrate into Unified.js pipeline](#integrate-into-unifiedjs-pipeline)
+    - [Unified processor](#unified-processor)
+    - [Unified plugin](#unified-plugin)
 - [Spec](#spec)
   - [Principles](#principles)
   - [Links](#links)
@@ -65,7 +67,7 @@ This snippet will generates:
 
 ```html
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -82,21 +84,46 @@ This snippet will generates:
 
 ### Options
 
-#### `stylesheet` (default: `undefined`)
+#### `style` (default: `undefined`)
 
 ```js
-stringify('# Hello', {stylesheet: 'https://example.com/book.css'});
+stringify('# Hello', {style: 'https://example.com/book.css'});
 ```
 
 will generates:
 
 ```html
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="https://example.com/book.css" />
+  </head>
+  <body>
+    <p><h1>Hello</h1></p>
+  </body>
+</html>
+```
+
+`style` can be an array of styles.
+
+```js
+stringify('# Hello', {
+  style: ['https://example.com/book.css', 'https://example.com/extra.css'],
+});
+```
+
+will generates:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://example.com/book.css" />
+    <link rel="stylesheet" href="https://example.com/extra.css" />
   </head>
   <body>
     <p><h1>Hello</h1></p>
@@ -126,7 +153,7 @@ will generates:
 
 ```html
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Hello</title>
@@ -138,9 +165,39 @@ will generates:
 </html>
 ```
 
+#### `language` (default: `en`)
+
+```js
+stringify('# Hello', {language: 'ja'});
+```
+
+will generates:
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <p><h1>Hello</h1></p>
+  </body>
+</html>
+```
+
 ### Advanced usage
 
-#### Integrate into Unified.js pipeline
+#### Unified processor
+
+```js
+import {VFM} from '@vivliostyle/vfm';
+
+const processor = VFM({partial: true});
+const html = processor.processSync('# Hello').toString();
+```
+
+#### Unified plugin
 
 ```js
 import unified from 'unified';
