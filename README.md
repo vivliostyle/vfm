@@ -46,7 +46,7 @@ echo "# Hello" | vfm
 
 ```bash
 npm i -g @vivliostyle/cli
-vfm README.md --stylesheet https://raw.githubusercontent.com/jagat-xpub/cosmology/gh-pages/css/scholarly.css > book.html
+vfm README.md --style https://raw.githubusercontent.com/jagat-xpub/cosmology/gh-pages/css/scholarly.css > book.html
 vivliostyle build book.html -s A4
 ```
 
