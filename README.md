@@ -30,6 +30,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
   - [Principles](#principles)
   - [Links](#links)
 - [Contribution](#contribution)
+  - [Maintainers](#maintainers)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -246,3 +247,7 @@ function main() {
 - Implement [alpha-stage specs](https://github.com/vivliostyle/vfm/issues?q=is%3Aissue+is%3Aopen+label%3Astage%3Aalpha)
 
 [![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/0)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/0)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/1)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/1)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/2)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/2)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/3)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/3)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/4)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/4)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/5)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/5)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/6)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/6)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/7)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/7)
+
+### Maintainers
+
+- [Yasuaki Uechi](https://github.com/uetchy)
