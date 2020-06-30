@@ -6,7 +6,7 @@ import markdown from './revive-parse';
 import html from './revive-rehype';
 
 export interface StringifyMarkdownOptions {
-  stylesheet?: string;
+  style?: string | string[];
   partial?: boolean;
   title?: string;
   replace?: ReplaceRule[];
@@ -17,7 +17,7 @@ export interface Hooks {
 }
 
 export function VFM({
-  stylesheet = undefined,
+  style = undefined,
   partial = false,
   title = undefined,
   replace = [],
