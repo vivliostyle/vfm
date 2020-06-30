@@ -1,9 +1,10 @@
 ![Vivliostyle Flavored Markdown](https://raw.githubusercontent.com/vivliostyle/vfm/master/assets/cover.png)
 
+[![Actions Status: test](https://github.com/vivliostyle/vfm/workflows/CI/badge.svg)](https://github.com/vivliostyle/vfm/actions?query=CI)
 [![npm-badge](https://flat.badgen.net/npm/v/@vivliostyle/vfm)][npm-url]
 [![npm: version (tag)](https://flat.badgen.net/npm/v/@vivliostyle/vfm/next)][npm-url]
-![npm: license](https://flat.badgen.net/npm/license/@vivliostyle/vfm)
 [![npm: total downloads](https://flat.badgen.net/npm/dt/@vivliostyle/vfm)][npm-url]
+![npm: license](https://flat.badgen.net/npm/license/@vivliostyle/vfm)
 
 [npm-url]: https://npmjs.org/package/@vivliostyle/vfm
 
