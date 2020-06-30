@@ -7,6 +7,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+- [Install](#install)
 - [Use](#use)
   - [Usage with `vivliostyle` command](#usage-with-vivliostyle-command)
 - [API](#api)
@@ -25,22 +26,26 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
+## Install
+
+```bash
+npm install -g @vivliostyle/vfm
+```
+
+If you want to test latest spec, run `npm install -g @vivliostyle/vfm@next` instead.
+
 ## Use
 
 ```bash
-npx @vivliostyle/vfm --help
-npx @vivliostyle/vfm input.md
-echo "# Hello" | npx @vivliostyle/vfm
-
-# or install it globally
-npm i -g @vivliostyle/vfm
-vfm input.md
+vfm --help
+vfm README.md
+echo "# Hello" | vfm
 ```
 
 ### Usage with `vivliostyle` command
 
 ```bash
-npm i -g @vivliostyle/vfm @vivliostyle/cli
+npm i -g @vivliostyle/cli
 vfm README.md --stylesheet https://raw.githubusercontent.com/jagat-xpub/cosmology/gh-pages/css/scholarly.css > book.html
 vivliostyle build book.html -s A4
 ```
@@ -48,6 +53,8 @@ vivliostyle build book.html -s A4
 ## API
 
 ```bash
+npm install --save @vivliostyle/vfm
+# or
 yarn add @vivliostyle/vfm
 ```
 
