@@ -394,19 +394,33 @@ Frontmatter is a way of defining metadata in Markdown (file) units.
 
 ```yaml
 ---
-title: Introduction to VFM
+title: 'Introduction to VFM'
 ---
 
 ```
 
 #### Reserved words
 
-| Property                                         | Type   | Description                                                                                                                                                                                    |
-| ------------------------------------------------ | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| title                                            | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
-| author                                           | String | Author of the document.                                                                                                                                                                        |
-| theme                                            | String | Vivliostyle Theme package or bare CSS file for the document.                                                                                                                                   |
-| class <Badge type="danger">UNIMPLEMENTED</Badge> | String | Custom class applied to `<body>`                                                                                                                                                               |
+| Property                                          | Type   | Description                                                                                                                                                                                    |
+| ------------------------------------------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| title                                             | String | The title of the document. Markdown The first `#` can be a title, but this is not always defined, so I want an explicit title. This SHOULD be treated as section title and MAY be used in ToC. |
+| author <Badge type="danger">UNIMPLEMENTED</Badge> | String | Author of the document.                                                                                                                                                                        |
+| theme                                             | String | Vivliostyle Theme package or bare CSS file for the document.                                                                                                                                   |
+| class <Badge type="danger">UNIMPLEMENTED</Badge>  | String | Custom class applied to `<body>`                                                                                                                                                               |
+
+**class**
+
+```yaml
+---
+class: twocolumn
+---
+
+```
+
+```css
+body.twocolumn {
+}
+```
 
 ## Full HTML document
 
