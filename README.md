@@ -1,5 +1,12 @@
 ![Vivliostyle Flavored Markdown](https://raw.githubusercontent.com/vivliostyle/vfm/master/assets/cover.png)
 
+[![npm-badge](https://flat.badgen.net/npm/v/@vivliostyle/vfm)][npm-url]
+[![npm: version (tag)](https://flat.badgen.net/npm/v/@vivliostyle/vfm/next)][npm-url]
+![npm: license](https://flat.badgen.net/npm/license/@vivliostyle/vfm)
+[![npm: total downloads](https://flat.badgen.net/npm/dt/@vivliostyle/vfm)][npm-url]
+
+[npm-url]: https://npmjs.org/package/@vivliostyle/vfm
+
 Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book authoring. It is standardized and published for Vivliostyle and its sibling projects.
 
 ## Table of contents
