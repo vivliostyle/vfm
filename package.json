@@ -5,6 +5,7 @@
   "author": "Yasuaki Uechi <y@uechi.io>",
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
+    "dev": "tsc -w",
     "prepublish": "yarn build",
     "prerelease": "np prerelease --tag next",
     "release": "np",
