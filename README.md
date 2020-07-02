@@ -68,7 +68,7 @@ yarn add @vivliostyle/vfm
 ```
 
 ```js
-const {stringify} = require('@vivliostyle/vfm');
+const { stringify } = require('@vivliostyle/vfm');
 
 console.log(
   stringify(`
@@ -103,7 +103,7 @@ This snippet will generates:
 #### `style` (default: `undefined`)
 
 ```js
-stringify('# Hello', {style: 'https://example.com/book.css'});
+stringify('# Hello', { style: 'https://example.com/book.css' });
 ```
 
 will generates:
@@ -150,7 +150,7 @@ will generates:
 #### `partial` (default: `false`)
 
 ```js
-stringify('# Hello', {partial: true});
+stringify('# Hello', { partial: true });
 ```
 
 will generates:
@@ -162,7 +162,7 @@ will generates:
 #### `title` (default: `undefined`)
 
 ```js
-stringify('# Hello', {title: 'Hello'});
+stringify('# Hello', { title: 'Hello' });
 ```
 
 will generates:
@@ -184,7 +184,7 @@ will generates:
 #### `language` (default: `en`)
 
 ```js
-stringify('# Hello', {language: 'ja'});
+stringify('# Hello', { language: 'ja' });
 ```
 
 will generates:
@@ -207,9 +207,9 @@ will generates:
 #### Unified processor
 
 ```js
-import {VFM} from '@vivliostyle/vfm';
+import { VFM } from '@vivliostyle/vfm';
 
-const processor = VFM({partial: true});
+const processor = VFM({ partial: true });
 const html = processor.processSync('# Hello').toString();
 ```
 

@@ -1,7 +1,7 @@
 import doc from 'rehype-document';
 import rehypeStringify from 'rehype-stringify';
-import unified, {Processor} from 'unified';
-import {replace as handleReplace, ReplaceRule} from './replace';
+import unified, { Processor } from 'unified';
+import { replace as handleReplace, ReplaceRule } from './plugins/replace';
 import markdown from './revive-parse';
 import html from './revive-rehype';
 
@@ -22,14 +22,14 @@ export function VFM({
   partial = false,
   title = undefined,
   language = 'en',
-  replace = [],
+  replace = undefined,
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified().use(markdown).use(html);
-  if (replace.length > 0) {
-    processor.use(handleReplace, {rules: replace});
+  if (replace) {
+    processor.use(handleReplace, { rules: replace });
   }
   if (!partial) {
-    processor.use(doc, {language, css: style, title});
+    processor.use(doc, { language, css: style, title });
   }
   processor.use(rehypeStringify);
 
