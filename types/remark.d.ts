@@ -1,16 +1,4 @@
-declare namespace NodeJS {
-  interface ProcessEnv {
-    [key: string]: string;
-  }
-}
-
 declare module 'rehype-raw' {
-  import { Plugin } from 'unified';
-  const plugin: Plugin;
-  export default plugin;
-}
-
-declare module 'rehype-stringify' {
   import { Plugin } from 'unified';
   const plugin: Plugin;
   export default plugin;
@@ -23,13 +11,15 @@ declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all';
 declare module 'mdast-util-to-string';
 declare module 'rehype-katex';
-declare module 'rehype-mathjax';
+declare module 'remark-slug';
 declare module 'rehype-slug';
 declare module 'remark-breaks';
 declare module 'remark-footnotes';
 declare module 'remark-math';
-declare module 'to-vfile';
+// declare module 'to-vfile';
 declare module 'unist-util-remove';
+declare module 'remark-attr';
+declare module 'unist-util-find-after';
 
 interface Tokenizer {
   (

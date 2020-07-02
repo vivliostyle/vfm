@@ -1,5 +1,4 @@
 import raw from 'rehype-raw';
-import slug from 'rehype-slug';
 import remark2rehype from 'remark-rehype';
 import unified from 'unified';
 import { handler as code } from './plugins/code';
@@ -22,6 +21,5 @@ export default [
   raw,
   figure,
   math,
-  slug,
   inspect('hast'),
 ] as unified.PluggableList<unified.Settings>;

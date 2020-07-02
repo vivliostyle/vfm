@@ -44,3 +44,7 @@ export const roleMappingTable: RoleMappingTable = {
   'doc-tip': ['aside'],
   'doc-toc': ['nav', 'section'],
 };
+
+export const roles = Object.keys(roleMappingTable).map((key) =>
+  key.replace(/^doc-/, ''),
+);

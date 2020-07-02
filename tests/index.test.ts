@@ -5,7 +5,7 @@ function partial(body: string) {
   return lib.stringify(body, { partial: true });
 }
 
-it.skip('handle custom attributes', () => {
+it('handle custom attributes', () => {
   // MEMO:
   // https://github.com/sethvincent/remark-bracketed-spans
   // https://github.com/Paperist/remark-crossref/
@@ -14,13 +14,11 @@ it.skip('handle custom attributes', () => {
     partial(`
 # Introduction {#introduction}
 `),
-  ).toBe(`<h1 id="introduction">Introduction</h1>`);
+  ).toBe(`<section id="introduction"><h1>Introduction</h1></section>`);
 
-  expect(
-    partial(`
-[text in the span]{.class .other-class key=val another=example}
-`),
-  ).toBe(`<h1 id="introduction">Introduction</h1>`);
+  expect(partial(`# Hello {hidden}`)).toBe(
+    `<section id="hello"><h1 style="display: none;">Hello</h1></section>`,
+  );
 });
 
 it('handle role', () => {
@@ -30,7 +28,9 @@ it('handle role', () => {
 # Tips
 :::
 `),
-  ).toBe(`<aside role="doc-tip"><h1 id="tips">Tips</h1></aside>`);
+  ).toBe(
+    `<aside role="doc-tip"><section id="tips"><h1>Tips</h1></section></aside>`,
+  );
 
   expect(
     partial(`
@@ -39,8 +39,19 @@ it('handle role', () => {
 :::
 `),
   ).toBe(
-    `<section role="doc-appendix"><h1 id="appendix">Appendix</h1></section>`,
+    `<section role="doc-appendix" id="appendix"><h1>Appendix</h1></section>`,
   );
+
+  expect(
+    partial(`
+# Table of Contents {@toc}
+
+- [Intro](intro.md)
+`),
+  )
+    .toBe(`<nav id="table-of-contents" role="doc-toc"><h1>Table of Contents</h1><ul>
+<li><a href="intro.md">Intro</a></li>
+</ul></nav>`);
 });
 
 it('reject incorrect fences', () => {
@@ -54,9 +65,9 @@ it('reject incorrect fences', () => {
 `),
   ).toBe(
     `<p>::::appendix<br>
-:::::nested</p>
-<h1 id="title">Title</h1>
-<p>:::::<br>
+:::::nested<br>
+# Title<br>
+:::::<br>
 ::::</p>`,
   );
 
@@ -69,7 +80,9 @@ it('reject incorrect fences', () => {
 :::
 `),
   ).toBe(
-    `<div class="appendix"><p>:::::nested</p><h1 id="title">Title</h1><p>:::::</p></div>`,
+    `<div class="appendix"><p>:::::nested<br>
+# Title<br>
+:::::</p></div>`,
   );
 });
 
@@ -82,7 +95,7 @@ test
 :::
 `),
   ).toBe(
-    `<div class="appendix"><h1 id="appendix">Appendix</h1><p>test</p></div>`,
+    `<div class="appendix"><section id="appendix"><h1>Appendix</h1><p>test</p></section></div>`,
   );
 
   expect(
@@ -98,7 +111,7 @@ Another block
 :::
 `),
   ).toBe(
-    `<div><h1 id="plain-block">Plain block</h1></div>
+    `<div><section id="plain-block"><h1>Plain block</h1></section></div>
 <hr>
 <div class="another"><p>Another block</p></div>`,
   );
@@ -114,7 +127,7 @@ A
 :::
 `),
   ).toBe(
-    `<div class="appendix"><p>A</p><div class="nested"><h1 id="title">Title</h1></div></div>`,
+    `<div class="appendix"><p>A</p><div class="nested"><section id="title"><h1>Title</h1></section></div></div>`,
   );
 });
 
@@ -133,7 +146,7 @@ it('stringify math', () => {
   );
 });
 
-it('stringify ruby', () => {
+it('ruby', () => {
   expect(partial('{A|B}')).toBe(`<p><ruby>A<rt>B</rt></ruby></p>`);
 });
 
@@ -153,7 +166,7 @@ it('stringify markdown string into html document', () => {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-<h1 id="こんにちは">こんにちは</h1>
+<section id="こんにちは"><h1>こんにちは</h1></section>
 </body>
 </html>
 `);

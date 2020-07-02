@@ -1,7 +1,6 @@
-import {Handler} from 'mdast-util-to-hast';
+import { Handler } from 'mdast-util-to-hast';
 import all from 'mdast-util-to-hast/lib/all';
-import {Plugin} from 'unified';
-import {Parent} from 'unist';
+import { Plugin } from 'unified';
 import u from 'unist-builder';
 
 // remark
@@ -24,7 +23,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
   return eat(eaten)({
     type: 'ruby',
     children: this.tokenizeInline(inlineContent, now),
-    data: {hName: 'ruby', rubyText},
+    data: { hName: 'ruby', rubyText },
   });
 };
 
@@ -34,24 +33,16 @@ tokenizer.locator = locateRuby;
 export const attacher: Plugin = function () {
   if (!this.Parser) return;
 
-  const {inlineTokenizers, inlineMethods} = this.Parser.prototype;
+  const { inlineTokenizers, inlineMethods } = this.Parser.prototype;
   inlineTokenizers.ruby = tokenizer;
   inlineMethods.splice(inlineMethods.indexOf('text'), 0, 'ruby');
 };
 
 // rehype
 export const handler: Handler = (h, node) => {
-  const rtStart =
-    (node as Parent).children.length > 0
-      ? (node as Parent).children[(node as Parent).children.length - 1]
-          .position!.end
-      : node.position!.start;
-
   const rtNode = h(
     {
       type: 'element',
-      start: rtStart,
-      end: node.position!.end,
     },
     'rt',
     [u('text', node.data!.rubyText as string)],
