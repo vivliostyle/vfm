@@ -4,6 +4,7 @@ import unified, { Processor } from 'unified';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
 import markdown from './revive-parse';
 import html from './revive-rehype';
+import { debug } from './utils/debug';
 
 export interface StringifyMarkdownOptions {
   style?: string | string[];
@@ -24,7 +25,10 @@ export function VFM({
   language = 'en',
   replace = undefined,
 }: StringifyMarkdownOptions = {}): Processor {
-  const processor = unified().use(markdown).use(html);
+  const processor = unified()
+    .use(markdown)
+    .data('settings', { position: false })
+    .use(html);
   if (replace) {
     processor.use(handleReplace, { rules: replace });
   }
@@ -41,6 +45,7 @@ export function stringify(
   options: StringifyMarkdownOptions = {},
 ): string {
   const processor = VFM(options);
-
-  return String(processor.processSync(markdownString));
+  const vfile = processor.processSync(markdownString);
+  debug(vfile.data);
+  return String(vfile);
 }

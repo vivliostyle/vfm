@@ -4,8 +4,6 @@ declare namespace NodeJS {
   }
 }
 
-declare module 'remark-math';
-declare module 'remark-breaks';
 declare module 'rehype-raw' {
   import { Plugin } from 'unified';
   const plugin: Plugin;
@@ -17,17 +15,21 @@ declare module 'rehype-stringify' {
   const plugin: Plugin;
   export default plugin;
 }
-declare module 'rehype-mathjax';
-declare module 'unist-util-remove';
-declare module 'rehype-katex';
-declare module 'rehype-slug';
+
+declare module 'hast-util-find-and-replace';
+declare module 'remark-shortcodes';
+declare module 'hast-util-is-element';
 declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all';
 declare module 'mdast-util-to-string';
-declare module 'hast-util-find-and-replace';
-declare module 'hast-util-is-element';
-
+declare module 'rehype-katex';
+declare module 'rehype-mathjax';
+declare module 'rehype-slug';
+declare module 'remark-breaks';
+declare module 'remark-footnotes';
+declare module 'remark-math';
 declare module 'to-vfile';
+declare module 'unist-util-remove';
 
 interface Tokenizer {
   (

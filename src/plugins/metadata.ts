@@ -1,18 +1,18 @@
-import {safeLoad as yaml} from 'js-yaml';
-import {FrontmatterContent} from 'mdast';
+import { safeLoad as yaml } from 'js-yaml';
+import { FrontmatterContent, Literal } from 'mdast';
 import toString from 'mdast-util-to-string';
-import {Node} from 'unist';
-import {select} from 'unist-util-select';
+import { Node } from 'unist';
+import { select } from 'unist-util-select';
 import visit from 'unist-util-visit';
-import {VFile} from 'vfile';
+import { VFile } from 'vfile';
 
 interface File extends VFile {
-  data: {title: string};
+  data: { title: string; toc: boolean };
 }
 
 // https://github.com/Symbitic/remark-plugins/blob/master/packages/remark-meta/src/index.js
 
-export function attacher() {
+export function plugin() {
   return (tree: Node, file: File) => {
     const heading = select('heading', tree);
     if (heading) {
@@ -24,6 +24,13 @@ export function attacher() {
         ...file.data,
         ...yaml(node.value),
       };
+    });
+
+    file.data.toc = false;
+    visit<Literal>(tree, ['shortcode'], (node) => {
+      if (node.identifier !== 'toc') return;
+      console.log(node);
+      file.data.toc = true;
     });
   };
 }

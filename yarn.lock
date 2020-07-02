@@ -2493,6 +2493,11 @@ flat@^4.1.0:
   dependencies:
     is-buffer "~2.0.3"
 
+flatmap@0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/flatmap/-/flatmap-0.0.3.tgz#1f18a4d938152d495965f9c958d923ab2dd669b4"
+  integrity sha1-Hxik2TgVLUlZZfnJWNkjqy3WabQ=
+
 for-in@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-1.0.2.tgz#81068d295a8142ec0ac726c6e2200c30fb6d5e80"
@@ -5400,6 +5405,11 @@ remark-breaks@^1.0.5:
   resolved "https://registry.yarnpkg.com/remark-breaks/-/remark-breaks-1.0.5.tgz#e9785f8b174f45c05af542fbeb18354b766e1139"
   integrity sha512-lr8+TlJI273NjEqL27eUthPYPTCgXEj4NaLbnazS3bQaQL2FySlsbtgo52gE36fE1gWeQgkn1VdmWsoT+uA7FA==
 
+remark-footnotes@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/remark-footnotes/-/remark-footnotes-1.0.0.tgz#9c7a97f9a89397858a50033373020b1ea2aad011"
+  integrity sha512-X9Ncj4cj3/CIvLI2Z9IobHtVi8FVdUrdJkCNaL9kdX8ohfsi18DXHsCVd/A7ssARBdccdDb5ODnt62WuEWaM/g==
+
 remark-frontmatter@^1.2.0:
   version "1.3.3"
   resolved "https://registry.yarnpkg.com/remark-frontmatter/-/remark-frontmatter-1.3.3.tgz#67ec63c89da5a84bb793ecec166e11b4eb47af10"
@@ -5469,6 +5479,11 @@ remark-rehype@^7.0.0:
   integrity sha512-uqQ/VbaTdxyu/da6npHAso6hA00cMqhA3a59RziQdOLN2KEIkPykAVy52IcmZEVTuauXO0VtpxkyCey4phtHzQ==
   dependencies:
     mdast-util-to-hast "^9.1.0"
+
+remark-shortcodes@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/remark-shortcodes/-/remark-shortcodes-0.3.1.tgz#e18949471797084e20d97a527475cbcfdea05cde"
+  integrity sha512-ornwmR9xHDtalUndKIFcAM14Z+OoKr8CRIdJpc1YFDxTHmVBBAu8ORmE9oP5fDuOWEu+r6YLyb5fCKScc4Gung==
 
 remove-trailing-separator@^1.0.1:
   version "1.1.0"
@@ -6521,6 +6536,14 @@ unist-builder@^2.0.0, unist-builder@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/unist-builder/-/unist-builder-2.0.3.tgz#77648711b5d86af0942f334397a33c5e91516436"
   integrity sha512-f98yt5pnlMWlzP539tPc4grGMsFaQQlP/vM396b00jngsiINumNmsY8rkXjfoi1c6QaM8nQ3vaGDuoKWbe/1Uw==
+
+unist-util-filter@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/unist-util-filter/-/unist-util-filter-2.0.2.tgz#b6cc310691d4b738782bdae3a7945f3d916a0e96"
+  integrity sha512-yHcR4YpvFzKx8EN9i2HhTORIR3zYC6YwsW6b2nuk8EI/3gps2YC008S+KJRyNuPViqScYQdrI67ceOryNL9EUQ==
+  dependencies:
+    flatmap "0.0.3"
+    unist-util-is "^4.0.0"
 
 unist-util-find-after@^3.0.0:
   version "3.0.0"
