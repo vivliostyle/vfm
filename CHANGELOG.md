@@ -1,3 +1,10 @@
+# [1.0.0-alpha.9](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.8...v1.0.0-alpha.9) (2020-07-02)
+
+### Features
+
+- code highlighting ([10058f3](https://github.com/vivliostyle/vfm/commit/10058f34086aa141c6b8b1852e0bd894ddec1fbd))
+- properly handle math ([45f2687](https://github.com/vivliostyle/vfm/commit/45f2687bd233e2ee977976fcb4c2513d79975267))
+
 # Change Log
 
 All notable changes to this project will be documented in this file.
