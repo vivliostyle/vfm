@@ -8,7 +8,8 @@
     "dev": "tsc -w",
     "prepublishOnly": "yarn build",
     "prerelease": "np prerelease --tag next",
-    "release": "np",
+    "release": "release-it",
+    "release:pre": "release-it --preRelease --npm.tag=next",
     "test": "jest"
   },
   "dependencies": {
@@ -40,6 +41,7 @@
     "unist-util-visit": "^2.0.2"
   },
   "devDependencies": {
+    "@release-it/conventional-changelog": "^1.1.4",
     "@types/debug": "^4.1.5",
     "@types/hast": "^2.3.1",
     "@types/jest": "^26.0.2",
@@ -55,6 +57,7 @@
     "prettier": "^2.0.5",
     "prettier-plugin-organize-imports": "^1.1.0",
     "pretty-quick": "^2.0.1",
+    "release-it": "^13.6.4",
     "shx": "^0.3.2",
     "ts-jest": "^26.1.1",
     "typescript": "^3.9.5"
