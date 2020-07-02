@@ -212,6 +212,8 @@ ruby rt {
 **VFM**
 
 ```md
+# Plain
+
 # Introduction {#intro}
 
 # Welcome {.title}
@@ -220,9 +222,17 @@ ruby rt {
 **HTML**
 
 ```html
-<section id="intro"><h1>Introduction</h1></section>
+<section id="plain">
+  <h1>Plain</h1>
+</section>
 
-<section id="welcome" class="title"><h1>Welcome</h1></section>
+<section id="intro">
+  <h1>Introduction</h1>
+</section>
+
+<section id="welcome" class="title">
+  <h1>Welcome</h1>
+</section>
 ```
 
 **CSS**
@@ -266,7 +276,9 @@ section.title h1 {
 **HTML**
 
 ```html
-<nav id="table-of-contents" role="doc-toc"><h1>Table of Contents</h1></nav>
+<nav id="table-of-contents" role="doc-toc">
+  <h1>Table of Contents</h1>
+</nav>
 ```
 
 **CSS**
@@ -443,21 +455,19 @@ $$\sum$$
 
 ```html
 <p>
-  <span class="math math-inline"
-    ><span class="katex"
-      ><span class="katex-html" aria-hidden="true"
-        ><span class="base"
-          ><span
-            class="strut"
-            style="height:0.43056em;vertical-align:0em;"
-          ></span
-          ><span class="mord mathdefault">s</span
-          ><span class="mord mathdefault">u</span
-          ><span class="mord mathdefault">m</span></span
-        ></span
-      ></span
-    ></span
-  >
+  <span class="math math-inline">
+    <span class="katex">
+      <span class="katex-html" aria-hidden="true">
+        <span class="base">
+          <span class="strut" style="height:0.43056em;vertical-align:0em;">
+          </span>
+          <span class="mord mathdefault">s</span>
+          <span class="mord mathdefault">u</span>
+          <span class="mord mathdefault">m</span>
+        </span>
+      </span>
+    </span>
+  </span>
 </p>
 ```
 
