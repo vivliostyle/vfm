@@ -7,7 +7,6 @@
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "dev": "tsc -w",
     "prepublishOnly": "yarn build",
-    "prerelease": "np prerelease --tag next",
     "release": "release-it",
     "release:pre": "release-it --preRelease --npm.tag=next",
     "test": "jest"
