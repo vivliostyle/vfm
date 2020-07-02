@@ -232,6 +232,8 @@ function main() {
 
 ## Spec
 
+[Current Status](https://github.com/vivliostyle/vfm/projects/1)
+
 ### Principles
 
 1. **Open**: steadily improving through open discussion and feedback from the vast community.
@@ -244,8 +246,11 @@ function main() {
 
 ## Contribution
 
-- Join [Discussion](https://github.com/vivliostyle/vfm/issues)
-- Implement [alpha-stage specs](https://github.com/vivliostyle/vfm/issues?q=is%3Aissue+is%3Aopen+label%3Astage%3Aalpha)
+We want you to:
+
+- Join [Discussion](https://github.com/vivliostyle/vfm/issues) to improve spec
+- Implement [alpha-stage specs](https://github.com/vivliostyle/vfm/issues?q=is%3Aissue+is%3Aopen+label%3Astage%3Aalpha) and send a PR
+- Test [beta-stage features](https://github.com/vivliostyle/vfm/issues?q=is%3Aissue+is%3Aopen+label%3Astage%3Abeta) and report a bug
 
 [![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/0)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/0)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/1)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/1)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/2)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/2)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/3)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/3)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/4)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/4)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/5)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/5)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/6)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/6)[![](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/images/7)](https://sourcerer.io/fame/uetchy/vivliostyle/vfm/links/7)
 
