@@ -1,3 +1,14 @@
+# [1.0.0-alpha.10](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.9...v1.0.0-alpha.10) (2020-07-02)
+
+### Bug Fixes
+
+- unwanted code attribution ([098eeb1](https://github.com/vivliostyle/vfm/commit/098eeb10296614ea43828636dbe1194192c4e65d))
+
+### Features
+
+- custom attributes ([dd74d39](https://github.com/vivliostyle/vfm/commit/dd74d39ad8c73cc1091f364d7acca9370af79c0d))
+- footnotes and toc beacon ([4151325](https://github.com/vivliostyle/vfm/commit/4151325c7bce1f4cb84aafbd7af81c724eb17dd9))
+
 # [1.0.0-alpha.9](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.8...v1.0.0-alpha.9) (2020-07-02)
 
 ### Features
