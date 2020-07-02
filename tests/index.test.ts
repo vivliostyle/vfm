@@ -1,8 +1,8 @@
 import * as lib from '../src';
-import {ReplaceRule} from '../src/replace';
+import { ReplaceRule } from '../src/plugins/replace';
 
 function partial(body: string) {
-  return lib.stringify(body, {partial: true});
+  return lib.stringify(body, { partial: true });
 }
 
 it.skip('handle custom attributes', () => {
@@ -128,8 +128,8 @@ b</p>`);
 });
 
 it('stringify math', () => {
-  expect(partial('$$sum$$')).toContain(
-    `<p><span class="math math-inline"><mjx-container class="MathJax" jax="SVG">`,
+  expect(partial('$$sum$$')).toBe(
+    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span><span class="mord mathdefault">u</span><span class="mord mathdefault">m</span></span></span></span></span></p>`,
   );
 });
 
@@ -144,7 +144,8 @@ it('convert img to figure', () => {
 });
 
 it('stringify markdown string into html document', () => {
-  expect(lib.stringify('# こんにちは', {title: 'Custom'})).toBe(`<!doctype html>
+  expect(lib.stringify('# こんにちは', { title: 'Custom' }))
+    .toBe(`<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -162,51 +163,33 @@ it('code', () => {
   expect(
     partial(`
 \`\`\`javascript
-function() {
-  console.log("Hello")
-}
+Hello
 \`\`\`
 `),
-  ).toBe(`<pre><code class="language-javascript">function() {
-  console.log("Hello")
-}
-</code></pre>`);
+  ).toBe(
+    `<pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre>`,
+  );
 });
 
 it('code with title', () => {
   expect(
     partial(`
 \`\`\`javascript:app.js
-function() {
-  console.log("Hello")
-}
+Hello
 \`\`\`
 
 \`\`\`javascript title=app.js highlight-line="2"
-function() {
-  console.log("Hello2")
-}
+Hello
 \`\`\`
 
 \`\`\`javascript:app.js highlight-line="2"
-function() {
-  console.log("Hello2")
-}
+Hello
 \`\`\`
 `),
   )
-    .toBe(`<figure class="language-javascript"><figcaption>app.js</figcaption><pre><code class="language-javascript">function() {
-  console.log("Hello")
-}
-</code></pre></figure>
-<figure class="language-javascript"><figcaption>app.js</figcaption><pre><code class="language-javascript">function() {
-  console.log("Hello2")
-}
-</code></pre></figure>
-<figure class="language-javascript"><figcaption>app.js</figcaption><pre><code class="language-javascript">function() {
-  console.log("Hello2")
-}
-</code></pre></figure>`);
+    .toBe(`<figure class="language-javascript"><figcaption>app.js</figcaption><pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre></figure>
+<figure class="language-javascript"><figcaption>app.js</figcaption><pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre></figure>
+<figure class="language-javascript"><figcaption>app.js</figcaption><pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre></figure>`);
 });
 
 it('replace', () => {
@@ -216,8 +199,8 @@ it('replace', () => {
       match: ([, a, b], h) => {
         return h(
           'div',
-          {class: 'balloon'},
-          h('img', {src: `./img/${a}.png`}),
+          { class: 'balloon' },
+          h('img', { src: `./img/${a}.png` }),
           h('span', b),
         );
       },
