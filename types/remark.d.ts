@@ -7,17 +7,19 @@ declare namespace NodeJS {
 declare module 'remark-math';
 declare module 'remark-breaks';
 declare module 'rehype-raw' {
-  import {Plugin} from 'unified';
+  import { Plugin } from 'unified';
   const plugin: Plugin;
   export default plugin;
 }
 
 declare module 'rehype-stringify' {
-  import {Plugin} from 'unified';
+  import { Plugin } from 'unified';
   const plugin: Plugin;
   export default plugin;
 }
 declare module 'rehype-mathjax';
+declare module 'unist-util-remove';
+declare module 'rehype-katex';
 declare module 'rehype-slug';
 declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all';
@@ -30,7 +32,7 @@ declare module 'to-vfile';
 interface Tokenizer {
   (
     this: TokenizerInstance,
-    eat: Eat & {now: () => Point},
+    eat: Eat & { now: () => Point },
     value: string,
     silent?: boolean,
   ): boolean | Node | void;

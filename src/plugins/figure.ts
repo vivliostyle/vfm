@@ -1,14 +1,14 @@
-import {Parent as HastParent} from 'hast';
+import { Parent as HastParent } from 'hast';
 import is from 'hast-util-is-element';
 import h from 'hastscript';
-import {Node, Parent} from 'unist';
+import { Node, Parent } from 'unist';
 import visit from 'unist-util-visit';
 
 interface HastNode extends HastParent {
-  properties: {[key: string]: any};
+  properties: { [key: string]: any };
 }
 
-export function handler(options = {}) {
+export function plugin(options = {}) {
   return (tree: Node) => {
     visit<HastNode>(tree, 'element', (node, index, parent) => {
       // handle captioned code block
@@ -18,7 +18,7 @@ export function handler(options = {}) {
         delete maybeCode!.properties.title;
         (parent as Parent).children[index] = h(
           'figure',
-          {class: maybeCode!.properties.className[0]},
+          { class: maybeCode!.properties.className[0] },
           h('figcaption', maybeTitle),
           node,
         );
