@@ -13,9 +13,12 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 - [Image](#image)
   - [with caption](#with-caption-1)
 - [Ruby](#ruby)
+- [Sectionization](#sectionization)
+  - [Section-only specifier](#section-only-specifier)
+  - [WAI-ARIA `role`](#wai-aria-role)
 - [Fenced block](#fenced-block)
   - [Nested fenced block](#nested-fenced-block)
-  - [WAI-ARIA `role`](#wai-aria-role)
+  - [WAI-ARIA `role`](#wai-aria-role-1)
 - [Raw HTML](#raw-html)
   - [with Markdown](#with-markdown)
 - [Math equation](#math-equation)
@@ -64,11 +67,9 @@ function main() {}
 **HTML**
 
 ```html
-<pre>
-  <code class="language-javascript">
-    function main() {}
-  </code>
-</pre>
+<pre class="language-javascript">
+<code class="language-javascript"><span class="token keyword">function</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+</code></pre>
 ```
 
 **CSS**
@@ -79,6 +80,8 @@ pre {
 pre code {
 }
 ```
+
+VFM uses [Prism](https://prismjs.com/) for syntax highlighting.
 
 ### with caption
 
@@ -199,6 +202,77 @@ This is <ruby>Ruby<rt>ルビ</rt></ruby>
 ruby {
 }
 ruby rt {
+}
+```
+
+## Sectionization
+
+<Badge type="warning">PRE-RELEASE</Badge>
+
+**VFM**
+
+```md
+# Introduction {#intro}
+
+# Welcome {.title}
+```
+
+**HTML**
+
+```html
+<section id="intro"><h1>Introduction</h1></section>
+
+<section id="welcome" class="title"><h1>Welcome</h1></section>
+```
+
+**CSS**
+
+```css
+section {
+}
+
+section h1 {
+}
+
+section.title {
+}
+
+section.title h1 {
+}
+```
+
+### Section-only specifier
+
+```md
+# Just a section {hidden}
+```
+
+**HTML**
+
+```html
+<section id="just-a-section">
+  <h1 style="display: none;">Just a section</h1>
+</section>
+```
+
+### WAI-ARIA `role`
+
+**VFM**
+
+```md
+# Table of Contents {@toc}
+```
+
+**HTML**
+
+```html
+<nav id="table-of-contents" role="doc-toc"><h1>Table of Contents</h1></nav>
+```
+
+**CSS**
+
+```css
+[role='doc-toc'] {
 }
 ```
 
@@ -362,19 +436,29 @@ div.author div.homepage {
 **VFM**
 
 ```markdown
-$$ \sum $$
+$$\sum$$
 ```
 
 **HTML**
 
 ```html
 <p>
-  <span class="math math-inline">
-    <mjx-container class="MathJax" jax="SVG"
-      ><!-- SVG --></svg></mjx-container
-  ></span>
+  <span class="math math-inline"
+    ><span class="katex"
+      ><span class="katex-html" aria-hidden="true"
+        ><span class="base"
+          ><span
+            class="strut"
+            style="height:0.43056em;vertical-align:0em;"
+          ></span
+          ><span class="mord mathdefault">s</span
+          ><span class="mord mathdefault">u</span
+          ><span class="mord mathdefault">m</span></span
+        ></span
+      ></span
+    ></span
+  >
 </p>
-<!-- MathJax style -->
 ```
 
 **CSS**

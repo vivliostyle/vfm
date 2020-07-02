@@ -5,6 +5,17 @@ function partial(body: string) {
   return lib.stringify(body, { partial: true });
 }
 
+it('code', () => {
+  expect(
+    partial(`
+\`\`\`js
+function() {"Hello"}
+\`\`\``),
+  ).toBe(
+    `<pre class="language-js"><code class="language-js"><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token string">"Hello"</span><span class="token punctuation">}</span></code></pre>`,
+  );
+});
+
 it('handle custom attributes', () => {
   // MEMO:
   // https://github.com/sethvincent/remark-bracketed-spans
