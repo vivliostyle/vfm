@@ -14,7 +14,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
   - [with caption](#with-caption-1)
 - [Ruby](#ruby)
 - [Sectionization](#sectionization)
-  - [Section-only specifier](#section-only-specifier)
+  - [Plain section](#plain-section)
   - [WAI-ARIA `role`](#wai-aria-role)
 - [Fenced block](#fenced-block)
   - [Nested fenced block](#nested-fenced-block)
@@ -238,31 +238,37 @@ ruby rt {
 **CSS**
 
 ```css
-section {
+body > section {
 }
-
-section h1 {
+body > section > h1:first-child {
 }
 
 section.title {
 }
 
-section.title h1 {
+section.title > h1:first-child {
 }
 ```
 
-### Section-only specifier
+### Plain section
+
+<Badge type="danger">UNIMPLEMENTED</Badge>
 
 ```md
-# Just a section {hidden}
+# {.author}
 ```
 
 **HTML**
 
 ```html
-<section id="just-a-section">
-  <h1 style="display: none;">Just a section</h1>
-</section>
+<section class="author"></section>
+```
+
+**CSS**
+
+```css
+section.author {
+}
 ```
 
 ### WAI-ARIA `role`
