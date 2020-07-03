@@ -12,25 +12,22 @@ interface File extends VFile {
 
 // https://github.com/Symbitic/remark-plugins/blob/master/packages/remark-meta/src/index.js
 
-export function plugin() {
-  return (tree: Node, file: File) => {
-    const heading = select('heading', tree);
-    if (heading) {
-      file.data.title = toString(heading);
-    }
+export const mdast = () => (tree: Node, file: File) => {
+  const heading = select('heading', tree);
+  if (heading) {
+    file.data.title = toString(heading);
+  }
 
-    visit<FrontmatterContent>(tree, ['yaml'], (node) => {
-      file.data = {
-        ...file.data,
-        ...yaml(node.value),
-      };
-    });
+  visit<FrontmatterContent>(tree, ['yaml'], (node) => {
+    file.data = {
+      ...file.data,
+      ...yaml(node.value),
+    };
+  });
 
-    file.data.toc = false;
-    visit<Literal>(tree, ['shortcode'], (node) => {
-      if (node.identifier !== 'toc') return;
-      console.log(node);
-      file.data.toc = true;
-    });
-  };
-}
+  file.data.toc = false;
+  visit<Literal>(tree, ['shortcode'], (node) => {
+    if (node.identifier !== 'toc') return;
+    file.data.toc = true;
+  });
+};

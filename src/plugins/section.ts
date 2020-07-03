@@ -9,21 +9,21 @@ import findAfter from 'unist-util-find-after';
 import visit from 'unist-util-visit-parents';
 import { roleMappingTable, roles } from '../utils/wai-aria';
 
+// TODO: handle @subtitle properly
+
 const MAX_HEADING_DEPTH = 6;
 
-export function plugin() {
-  return (tree: any) => {
-    for (let depth = MAX_HEADING_DEPTH; depth > 0; depth--) {
-      visit(
-        tree,
-        (node: any) => {
-          return node.type === 'heading' && node.depth === depth;
-        },
-        sectionize as any,
-      );
-    }
-  };
-}
+export const mdast = () => (tree: any) => {
+  for (let depth = MAX_HEADING_DEPTH; depth > 0; depth--) {
+    visit(
+      tree,
+      (node: any) => {
+        return node.type === 'heading' && node.depth === depth;
+      },
+      sectionize as any,
+    );
+  }
+};
 
 function sectionize(node: any, ancestors: Parent[]) {
   const start = node;

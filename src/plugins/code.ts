@@ -5,7 +5,7 @@ import { Node } from 'unist';
 import u from 'unist-builder';
 import visit from 'unist-util-visit';
 
-export function attacher() {
+export function mdast() {
   return (tree: Node) => {
     visit<Code>(tree, 'code', (node) => {
       const match = /^(.+?):(.+)$/.exec(node.lang ?? '');
@@ -16,7 +16,7 @@ export function attacher() {
         node.data = { ...(node.data ?? {}), hProperties: { title } };
         node.lang = lang;
         if (node.position?.end.offset) {
-          node.position!.end.offset -= title.length + 1;
+          node.position.end.offset -= title.length + 1;
         }
       }
 

@@ -10,4 +10,4 @@ const removeMathML = () => (tree: Node) => {
   });
 };
 
-export const plugin = { plugins: [katex, removeMathML] };
+export const hast = { plugins: [katex, removeMathML] };

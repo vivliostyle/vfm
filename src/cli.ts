@@ -3,7 +3,7 @@
 import fs from 'fs';
 import meow from 'meow';
 import readline from 'readline';
-import {stringify} from '.';
+import { stringify } from '.';
 
 const cli = meow(
   `
@@ -44,10 +44,10 @@ const cli = meow(
 function convert(
   input: string,
   flags: meow.TypedFlags<{
-    style: {type: 'string'; alias: string};
-    partial: {type: 'boolean'; alias: string};
-    title: {type: 'string'};
-    language: {type: 'string'};
+    style: { type: 'string'; alias: string };
+    partial: { type: 'boolean'; alias: string };
+    title: { type: 'string' };
+    language: { type: 'string' };
   }>,
 ) {
   return stringify(input, {
@@ -60,16 +60,17 @@ function convert(
 
 function main(
   cli: meow.Result<{
-    style: {type: 'string'; alias: string};
-    partial: {type: 'boolean'; alias: string};
-    title: {type: 'string'};
-    language: {type: 'string'};
+    style: { type: 'string'; alias: string };
+    partial: { type: 'boolean'; alias: string };
+    title: { type: 'string' };
+    language: { type: 'string' };
   }>,
 ) {
   try {
     const filepath = cli.input[0];
 
     if (filepath) {
+      // eslint-disable-next-line no-console
       return console.log(
         convert(fs.readFileSync(filepath).toString(), cli.flags),
       );
@@ -81,9 +82,11 @@ function main(
       terminal: false,
     });
     rl.on('line', function (line) {
+      // eslint-disable-next-line no-console
       console.log(convert(line, cli.flags));
     });
   } catch (err) {
+    // eslint-disable-next-line no-console
     console.log(err.message);
   }
 }

@@ -1,5 +1,5 @@
-import {Plugin} from 'unified';
-import {roleMappingTable} from '../utils/wai-aria';
+import { Plugin } from 'unified';
+import { roleMappingTable } from '../utils/wai-aria';
 
 const FENCE = ':';
 const ROLE_SYMBOL = '@';
@@ -17,7 +17,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 
   const fenceSymbol = FENCE.repeat(DEPTH + 3);
   const match = new RegExp(
-    `^${fenceSymbol}\s*(.*?)\s*\\n([\\w\\W]+?)\\n${fenceSymbol}$`,
+    `^${fenceSymbol}\\s*([^\\s]*?)\\s*\\n([\\w\\W]+?)\\n${fenceSymbol}$`,
     'm',
   ).exec(value);
   if (!match) return;
@@ -56,10 +56,10 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 tokenizer.notInLink = true;
 tokenizer.locator = locator;
 
-export const attacher: Plugin = function () {
+export const mdast: Plugin = function () {
   if (!this.Parser) return;
 
-  const {blockTokenizers, blockMethods} = this.Parser.prototype;
+  const { blockTokenizers, blockMethods } = this.Parser.prototype;
   blockTokenizers.fencedBlock = tokenizer;
   blockMethods.splice(blockMethods.indexOf('text'), 0, 'fencedBlock');
 };

@@ -5,6 +5,16 @@ function partial(body: string) {
   return lib.stringify(body, { partial: true });
 }
 
+// Snippet
+//
+// it('do something', ()=>{
+//   expect(partial(``)).toBe(``)
+// })
+
+it.skip('plain section', () => {
+  expect(partial(`# {.ok}`)).toBe(`<section class="ok"></section>`);
+});
+
 it('code', () => {
   expect(
     partial(`

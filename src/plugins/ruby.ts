@@ -18,7 +18,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
   if (silent) return true;
 
   now.column += 1;
-  now.offset! += 1;
+  now.offset += 1;
 
   return eat(eaten)({
     type: 'ruby',
@@ -30,7 +30,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
 tokenizer.notInLink = true;
 tokenizer.locator = locateRuby;
 
-export const attacher: Plugin = function () {
+export const mdast: Plugin = function () {
   if (!this.Parser) return;
 
   const { inlineTokenizers, inlineMethods } = this.Parser.prototype;
@@ -40,12 +40,13 @@ export const attacher: Plugin = function () {
 
 // rehype
 export const handler: Handler = (h, node) => {
+  if (!node.data) node.data = {};
   const rtNode = h(
     {
       type: 'element',
     },
     'rt',
-    [u('text', node.data!.rubyText as string)],
+    [u('text', node.data.rubyText as string)],
   );
 
   return h(node, 'ruby', [...all(h, node), rtNode]);

@@ -8,6 +8,6 @@ const keepToC = () => (tree: Node) => {
   });
 };
 
-export const plugin = {
+export const mdast = {
   plugins: [[shortcodes, { startBlock: '[[', endBlock: ']]' }], keepToC],
 };

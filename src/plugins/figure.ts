@@ -8,31 +8,29 @@ interface HastNode extends HastParent {
   properties: { [key: string]: any };
 }
 
-export function plugin(options = {}) {
-  return (tree: Node) => {
-    visit<HastNode>(tree, 'element', (node, index, parent) => {
-      // handle captioned code block
-      const maybeCode = node.children?.[0] as HastNode | undefined;
+export const hast = () => (tree: Node) => {
+  visit<HastNode>(tree, 'element', (node, index, parent) => {
+    // handle captioned code block
+    const maybeCode = node.children?.[0] as HastNode | undefined;
+    if (is(node, 'pre') && maybeCode?.properties.title) {
       const maybeTitle = maybeCode?.properties?.title;
-      if (is(node, 'pre') && maybeTitle) {
-        delete maybeCode!.properties.title;
-        (parent as Parent).children[index] = h(
-          'figure',
-          { class: maybeCode!.properties.className[0] },
-          h('figcaption', maybeTitle),
-          node,
-        );
-        return;
-      }
+      delete maybeCode.properties.title;
+      (parent as Parent).children[index] = h(
+        'figure',
+        { class: maybeCode.properties.className[0] },
+        h('figcaption', maybeTitle),
+        node,
+      );
+      return;
+    }
 
-      // handle captioned img
-      if (is(node, 'img') && node.properties.alt) {
-        (parent as Parent).children[index] = h(
-          'figure',
-          node,
-          h('figcaption', node.properties.alt),
-        );
-      }
-    });
-  };
-}
+    // handle captioned img
+    if (is(node, 'img') && node.properties.alt) {
+      (parent as Parent).children[index] = h(
+        'figure',
+        node,
+        h('figcaption', node.properties.alt),
+      );
+    }
+  });
+};
