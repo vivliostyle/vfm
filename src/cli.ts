@@ -41,21 +41,16 @@ const cli = meow(
   },
 );
 
-function convert(
-  input: string,
-  flags: meow.TypedFlags<{
-    style: { type: 'string'; alias: string };
-    partial: { type: 'boolean'; alias: string };
-    title: { type: 'string' };
-    language: { type: 'string' };
-  }>,
-) {
-  return stringify(input, {
-    partial: flags.partial,
-    style: flags.style,
-    title: flags.title,
-    language: flags.language,
-  });
+function compile(input: string) {
+  // eslint-disable-next-line no-console
+  console.log(
+    stringify(input, {
+      partial: cli.flags.partial,
+      style: cli.flags.style,
+      title: cli.flags.title,
+      language: cli.flags.language,
+    }),
+  );
 }
 
 function main(
@@ -70,20 +65,28 @@ function main(
     const filepath = cli.input[0];
 
     if (filepath) {
-      // eslint-disable-next-line no-console
-      return console.log(
-        convert(fs.readFileSync(filepath).toString(), cli.flags),
-      );
+      return compile(fs.readFileSync(filepath).toString());
     }
 
+    let buffer = '';
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
       terminal: false,
     });
-    rl.on('line', function (line) {
-      // eslint-disable-next-line no-console
-      console.log(convert(line, cli.flags));
+
+    rl.on('pause', () => {
+      compile(buffer);
+      buffer = '';
+    });
+
+    rl.on('line', (line) => {
+      if (line === 'EOD') {
+        compile(buffer);
+        buffer = '';
+        return;
+      }
+      buffer += line + '\n';
     });
   } catch (err) {
     // eslint-disable-next-line no-console
