@@ -15,17 +15,6 @@ it.skip('plain section', () => {
   expect(partial(`# {.ok}`)).toBe(`<section class="ok"></section>`);
 });
 
-it('code', () => {
-  expect(
-    partial(`
-\`\`\`js
-function() {"Hello"}
-\`\`\``),
-  ).toBe(
-    `<pre class="language-js"><code class="language-js"><span class="token keyword">function</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token string">"Hello"</span><span class="token punctuation">}</span></code></pre>`,
-  );
-});
-
 it('handle custom attributes', () => {
   // MEMO:
   // https://github.com/sethvincent/remark-bracketed-spans
@@ -161,22 +150,6 @@ b`),
 b</p>`);
 });
 
-it('stringify math', () => {
-  expect(partial('$$sum$$')).toBe(
-    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">s</span><span class="mord mathdefault">u</span><span class="mord mathdefault">m</span></span></span></span></span></p>`,
-  );
-});
-
-it('ruby', () => {
-  expect(partial('{A|B}')).toBe(`<p><ruby>A<rt>B</rt></ruby></p>`);
-});
-
-it('convert img to figure', () => {
-  expect(partial('![fig](image.png)')).toBe(
-    `<p><figure><img src="image.png" alt="fig"><figcaption>fig</figcaption></figure></p>`,
-  );
-});
-
 it('stringify markdown string into html document', () => {
   expect(lib.stringify('# こんにちは', { title: 'Custom' }))
     .toBe(`<!doctype html>
@@ -191,39 +164,6 @@ it('stringify markdown string into html document', () => {
 </body>
 </html>
 `);
-});
-
-it('code', () => {
-  expect(
-    partial(`
-\`\`\`javascript
-Hello
-\`\`\`
-`),
-  ).toBe(
-    `<pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre>`,
-  );
-});
-
-it('code with title', () => {
-  expect(
-    partial(`
-\`\`\`javascript:app.js
-Hello
-\`\`\`
-
-\`\`\`javascript title=app.js highlight-line="2"
-Hello
-\`\`\`
-
-\`\`\`javascript:app.js highlight-line="2"
-Hello
-\`\`\`
-`),
-  )
-    .toBe(`<figure class="language-javascript"><figcaption>app.js</figcaption><pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre></figure>
-<figure class="language-javascript"><figcaption>app.js</figcaption><pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre></figure>
-<figure class="language-javascript"><figcaption>app.js</figcaption><pre class="language-javascript"><code class="language-javascript"><span class="token maybe-class-name">Hello</span></code></pre></figure>`);
 });
 
 it('replace', () => {
