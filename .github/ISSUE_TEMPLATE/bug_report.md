@@ -3,24 +3,26 @@ name: Bug report
 about: Create a report to help us improve
 title: ''
 labels: bug
-assignees: ''
+assignees: akabekobeko
+
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Issue Details
 
-**To Reproduce**
-Steps to reproduce the behavior:
+- VFM version
+  - 1.0.0-alpha.XX
+- Node.js version
+  - 15.0.0
 
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## Expected Behavior
 
-**Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Debug log**
+## Actual Behavior
+
+A clear and concise description of what the bug is.
+
+### Debug log (Any)
 
 Run `vfm` with `DEBUG=vfm` to see detailed log.
 
@@ -28,8 +30,19 @@ Run `vfm` with `DEBUG=vfm` to see detailed log.
 DEBUG=vfm vfm TEST.md
 ```
 
-**Screenshots**
+### Screenshots (Any)
+
 If applicable, add screenshots to help explain your problem.
 
-**Additional context**
+## To Reproduce
+
+Steps to reproduce the behavior:
+
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+## Additional Context
+
 Add any other context about the problem here.
