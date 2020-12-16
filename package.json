@@ -1,7 +1,7 @@
 {
   "name": "@vivliostyle/vfm",
   "description": "Custom Markdown syntax specialized in book authoring.",
-  "version": "1.0.0-alpha.10",
+  "version": "1.0.0-alpha.11",
   "author": "Yasuaki Uechi <y@uechi.io>",
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
@@ -74,7 +74,9 @@
   },
   "types": "lib/index.d.ts",
   "main": "lib/index.js",
-  "bin": "lib/cli.js",
+  "bin": {
+    "vfm": "lib/cli.js"
+  },
   "files": [
     "lib"
   ],

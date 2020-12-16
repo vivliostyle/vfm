@@ -1,3 +1,16 @@
+# [1.0.0-alpha.11](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.10...v1.0.0-alpha.11) (2020-12-16)
+
+### Bug Fixes
+
+- handle multiline input ([f1afb20](https://github.com/vivliostyle/vfm/commit/f1afb206d18d15f5f9c6d49b14a69fbc0eaa08c0))
+
+### Features
+
+- Add code block tests ([687227b](https://github.com/vivliostyle/vfm/commit/687227b7a3d43df5c07ae2008db381e9c0aed33f))
+- Add math block tests ([b03bb73](https://github.com/vivliostyle/vfm/commit/b03bb7304f7dfba95e4fe0b94f963fe0c6856452))
+- Add parser definition tests ([a27d0ab](https://github.com/vivliostyle/vfm/commit/a27d0ab83eb47245ac69e6d15fa91c7099c128c2))
+- Add test codes ([34aa884](https://github.com/vivliostyle/vfm/commit/34aa8841fcbf53dc87c16177c6486b8dc60a11a1))
+
 # [1.0.0-alpha.10](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.9...v1.0.0-alpha.10) (2020-07-02)
 
 ### Bug Fixes
