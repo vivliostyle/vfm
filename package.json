@@ -8,7 +8,7 @@
     "dev": "tsc -w",
     "prepublishOnly": "yarn build",
     "release": "release-it",
-    "release:pre": "release-it --preRelease --npm.tag=next",
+    "release:pre": "release-it --preRelease",
     "test": "jest"
   },
   "dependencies": {
