@@ -97,17 +97,6 @@ it('reject incorrect fences', () => {
 });
 
 it('handle fenced block', () => {
-  const result = partial(`
-:::foos
-# foo
-foovar
-:::
-`);
-
-  expect(result).toBe(
-    `<div class="foos"><section id="foo"><h1>foo</h1><p>foovar</p></section></div>`,
-  );
-
   expect(
     partial(`
 :::appendix
