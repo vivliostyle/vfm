@@ -195,3 +195,20 @@ it('replace', () => {
     .toBe(`<p><div class="balloon"><img src="./img/icon1.png"><span>Notice</span></div></p>
 <p><div class="balloon"><img src="./img/person.png"><span>Nod nod</span></div></p>`);
 });
+
+it('empty replace', () => {
+  const rules = [] as ReplaceRule[];
+  expect(
+    lib.stringify(
+      `
+[icon1][Notice]
+
+[person][Nod nod]`,
+      {
+        partial: true,
+        replace: rules,
+      },
+    ),
+  ).toBe(`<p>[icon1][Notice]</p>
+<p>[person][Nod nod]</p>`);
+});

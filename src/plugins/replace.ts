@@ -8,7 +8,7 @@ export interface ReplaceRule {
 }
 
 export function replace({ rules }: { rules?: ReplaceRule[] } = {}) {
-  if (!rules) return;
+  if (!rules || rules.length == 0) return;
   const search = rules.map(
     (rule) =>
       [
