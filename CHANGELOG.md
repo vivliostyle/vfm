@@ -1,3 +1,9 @@
+# [1.0.0-alpha.15](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.14...v1.0.0-alpha.15) (2021-01-14)
+
+### Bug Fixes
+
+- replace() throws Error if empty ReplaceRules array is given ([b0cfb6a](https://github.com/vivliostyle/vfm/commit/b0cfb6ab869f39e7109f81c7e681c10ac5986bd2))
+
 # [1.0.0-alpha.14](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.13...v1.0.0-alpha.14) (2021-01-11)
 
 # [1.0.0-alpha.13](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.12...v1.0.0-alpha.13) (2021-01-11)
