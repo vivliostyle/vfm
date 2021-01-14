@@ -153,7 +153,7 @@ b</p>`);
 it('stringify markdown string into html document', () => {
   expect(lib.stringify('# こんにちは', { title: 'Custom' }))
     .toBe(`<!doctype html>
-<html lang="en">
+<html>
 <head>
 <meta charset="utf-8">
 <title>Custom</title>
