@@ -1,6 +1,7 @@
 import doc from 'rehype-document';
 import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
+import { hast as clearHtmlLang } from './plugins/clear-html-lang';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
 import markdown from './revive-parse';
 import html from './revive-rehype';
@@ -22,19 +23,25 @@ export function VFM({
   style = undefined,
   partial = false,
   title = undefined,
-  language = 'en',
+  language = undefined,
   replace = undefined,
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified()
     .use(markdown)
     .data('settings', { position: false })
     .use(html);
+
   if (replace) {
     processor.use(handleReplace, { rules: replace });
   }
+
   if (!partial) {
     processor.use(doc, { language, css: style, title });
+    if (!language) {
+      processor.use(clearHtmlLang);
+    }
   }
+
   processor.use(rehypeStringify);
 
   return processor;

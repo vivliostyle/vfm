@@ -1,12 +1,8 @@
-import { Parent as HastParent } from 'hast';
 import is from 'hast-util-is-element';
 import h from 'hastscript';
 import { Node, Parent } from 'unist';
 import visit from 'unist-util-visit';
-
-interface HastNode extends HastParent {
-  properties: { [key: string]: any };
-}
+import { HastNode } from './hastnode';
 
 export const hast = () => (tree: Node) => {
   visit<HastNode>(tree, 'element', (node, index, parent) => {

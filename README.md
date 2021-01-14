@@ -23,7 +23,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [`style` (default: `undefined`)](#style-default-undefined)
     - [`partial` (default: `false`)](#partial-default-false)
     - [`title` (default: `undefined`)](#title-default-undefined)
-    - [`language` (default: `en`)](#language-default-en)
+    - [`language` (default: `undefined`)](#language-default-undefined)
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
@@ -83,7 +83,7 @@ This snippet will generates:
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -101,6 +101,8 @@ This snippet will generates:
 ### Options
 
 #### `style` (default: `undefined`)
+
+Set the specified value as the `href` attribute of `<link rel="stylesheet">`.
 
 ```js
 stringify('# Hello', { style: 'https://example.com/book.css' });
@@ -149,6 +151,8 @@ will generates:
 
 #### `partial` (default: `false`)
 
+If `true` is specified, only the HTML defined in `<body>` is output.
+
 ```js
 stringify('# Hello', { partial: true });
 ```
@@ -160,6 +164,8 @@ will generates:
 ```
 
 #### `title` (default: `undefined`)
+
+Set the specified value as the text of `<title>`.
 
 ```js
 stringify('# Hello', { title: 'Hello' });
@@ -181,7 +187,9 @@ will generates:
 </html>
 ```
 
-#### `language` (default: `en`)
+#### `language` (default: `undefined`)
+
+Set the specified value as the `lang` attribute of `<html>`.
 
 ```js
 stringify('# Hello', { language: 'ja' });
