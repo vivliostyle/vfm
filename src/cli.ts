@@ -13,7 +13,7 @@ const cli = meow(
  
     Options
       --style, -s    Custom stylesheet path/URL
-      --partial, -r  Output markdown fragments
+      --partial, -p  Output markdown fragments
       --title        Document title (ignored in partial mode)
       --language     Document language (ignored in partial mode)
  
