@@ -11,7 +11,7 @@ it(
         └─0 inlineMath "x"
               data: {"hName":"span","hProperties":{"className":["math","math-inline"]},"hChildren":[{"type":"text","value":"x"}]}
     `,
-    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span></span></p>`,
+    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal">x</span></span></span></span></span></p>`,
   ),
 );
 
@@ -26,7 +26,7 @@ it(
         │     data: {"hName":"span","hProperties":{"className":["math","math-inline"]},"hChildren":[{"type":"text","value":"x"}]}
         └─1 text "y$"
     `,
-    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span></span>y$</p>`,
+    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal">x</span></span></span></span></span>y$</p>`,
   ),
 );
 
@@ -40,7 +40,7 @@ it(
         └─0 inlineMath "x"
               data: {"hName":"span","hProperties":{"className":["math","math-inline"]},"hChildren":[{"type":"text","value":"x"}]}
     `,
-    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">x</span></span></span></span></span></p>`,
+    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathnormal">x</span></span></span></span></span></p>`,
   ),
 );
 
@@ -82,6 +82,6 @@ it(
         └─0 inlineMath "x\\ny"
               data: {"hName":"span","hProperties":{"className":["math","math-inline"]},"hChildren":[{"type":"text","value":"x\\ny"}]}
     `,
-    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">x</span><span class="mord mathdefault" style="margin-right:0.03588em;">y</span></span></span></span></span></p>`,
+    `<p><span class="math math-inline"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathnormal">x</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span></span></p>`,
   ),
 );
