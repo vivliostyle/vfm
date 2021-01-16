@@ -1,4 +1,4 @@
-import { safeLoad as yaml } from 'js-yaml';
+import { load as yaml } from 'js-yaml';
 import { FrontmatterContent, Literal } from 'mdast';
 import toString from 'mdast-util-to-string';
 import { Node } from 'unist';
@@ -19,10 +19,13 @@ export const mdast = () => (tree: Node, file: File) => {
   }
 
   visit<FrontmatterContent>(tree, ['yaml'], (node) => {
-    file.data = {
-      ...file.data,
-      ...yaml(node.value),
-    };
+    const value = yaml(node.value);
+    if (typeof value === 'object') {
+      file.data = {
+        ...file.data,
+        ...value,
+      };
+    }
   });
 
   file.data.toc = false;
