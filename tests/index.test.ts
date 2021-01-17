@@ -1,8 +1,14 @@
 import * as lib from '../src';
 import { ReplaceRule } from '../src/plugins/replace';
 
-function partial(body: string) {
-  return lib.stringify(body, { partial: true });
+/**
+ * Run VFM stringify in partial mode.
+ * @param body Markdown string that becomes `<body>` part.
+ * @param autoLineBreaks Converts line breaks to `<br>`.
+ * @returns HTML string.
+ */
+function partial(body: string, autoLineBreaks = false) {
+  return lib.stringify(body, { partial: true, autoLineBreaks });
 }
 
 // Snippet
@@ -66,13 +72,16 @@ it('handle role', () => {
 
 it('reject incorrect fences', () => {
   expect(
-    partial(`
+    partial(
+      `
 ::::appendix
 :::::nested
 # Title
 :::::
 ::::
-`),
+`,
+      true,
+    ),
   ).toBe(
     `<p>::::appendix<br>
 :::::nested<br>
@@ -82,13 +91,16 @@ it('reject incorrect fences', () => {
   );
 
   expect(
-    partial(`
+    partial(
+      `
 :::appendix
 :::::nested
 # Title
 :::::
 :::
-`),
+`,
+      true,
+    ),
   ).toBe(
     `<div class="appendix"><p>:::::nested<br>
 # Title<br>
@@ -143,9 +155,12 @@ A
 
 it('handle hard line break', () => {
   expect(
-    partial(`
+    partial(
+      `
 a
-b`),
+b`,
+      true,
+    ),
   ).toBe(`<p>a<br>
 b</p>`);
 });

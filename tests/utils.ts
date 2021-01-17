@@ -1,6 +1,13 @@
 import unistInspect from 'unist-util-inspect';
 import { StringifyMarkdownOptions, VFM } from '../src';
 
+/**
+ * Utility for testing MDAST and HTML strings generated from Markdown.
+ * @param input Markdown string.
+ * @param expectedMdast Expected MDAST string.
+ * @param expectedHtml Expected HTML string.
+ * @param options Option for convert Markdown to VFM (HTML).
+ */
 export const buildProcessorTestingCode = (
   input: string,
   expectedMdast: string,
@@ -11,6 +18,7 @@ export const buildProcessorTestingCode = (
     title: undefined,
     language: undefined,
     replace: undefined,
+    autoLineBreaks: false,
   },
 ) => (): any => {
   const vfm = VFM(options).freeze();

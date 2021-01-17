@@ -14,19 +14,40 @@ import { mdast as section } from './plugins/section';
 import { mdast as toc } from './plugins/toc';
 import { inspect } from './utils/debug';
 
-export default [
-  [markdown, { gfm: true, commonmark: true }],
-  fencedBlock,
-  ruby,
-  breaks,
-  [footnotes, { inlineNotes: true }],
-  math,
-  attr,
-  slug,
-  section,
-  code,
-  toc,
-  frontmatter,
-  metadata,
-  inspect('mdast'),
-] as unified.PluggableList<unified.Settings>;
+/**
+ * Options for Markdown conversion.
+ */
+export interface MarkdownOptions {
+  /** Converts line breaks to `<br>`. */
+  autoLineBreaks: boolean;
+}
+
+/**
+ * Create MDAST parsers.
+ * @param options Options.
+ * @returns Parsers.
+ */
+export const reviveParse = (options: MarkdownOptions) => {
+  const results = [
+    [markdown, { gfm: true, commonmark: true }],
+    fencedBlock,
+    ruby,
+    [footnotes, { inlineNotes: true }],
+    math,
+    attr,
+    slug,
+    section,
+    code,
+    toc,
+    frontmatter,
+    metadata,
+    inspect('mdast'),
+  ] as unified.PluggableList<unified.Settings>;
+
+  if (options.autoLineBreaks) {
+    // Line breaks are processed immediately after ruby
+    results.splice(3, 0, breaks);
+  }
+
+  return results;
+};

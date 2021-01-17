@@ -3,31 +3,47 @@ import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { hast as clearHtmlLang } from './plugins/clear-html-lang';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
-import markdown from './revive-parse';
+import { reviveParse as markdown } from './revive-parse';
 import html from './revive-rehype';
 import { debug } from './utils/debug';
 
+/**
+ * Option for convert Markdown to a stringify (HTML).
+ */
 export interface StringifyMarkdownOptions {
+  /** Custom stylesheet path/URL. */
   style?: string | string[];
+  /** Output markdown fragments.  */
   partial?: boolean;
+  /** Document title (ignored in partial mode). */
   title?: string;
+  /** Document language (ignored in partial mode). */
   language?: string;
+  /** Replacement handler for HTML string. */
   replace?: ReplaceRule[];
+  /** Converts line breaks to `<br>`. */
+  autoLineBreaks?: boolean;
 }
 
 export interface Hooks {
   afterParse: ReplaceRule[];
 }
 
+/**
+ * Create Unified processor for MDAST and HAST.
+ * @param options Options.
+ * @returns Unified processor.
+ */
 export function VFM({
   style = undefined,
   partial = false,
   title = undefined,
   language = undefined,
   replace = undefined,
+  autoLineBreaks = false,
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified()
-    .use(markdown)
+    .use(markdown({ autoLineBreaks }))
     .data('settings', { position: false })
     .use(html);
 
@@ -47,6 +63,12 @@ export function VFM({
   return processor;
 }
 
+/**
+ * Convert Markdown to a stringify (HTML).
+ * @param markdownString Markdown string.
+ * @param options Options.
+ * @returns HTML string.
+ */
 export function stringify(
   markdownString: string,
   options: StringifyMarkdownOptions = {},
