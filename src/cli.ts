@@ -12,10 +12,11 @@ const cli = meow(
       $ echo <string> | vfm
  
     Options
-      --style, -s    Custom stylesheet path/URL
-      --partial, -p  Output markdown fragments
-      --title        Document title (ignored in partial mode)
-      --language     Document language (ignored in partial mode)
+      --style, -s           Custom stylesheet path/URL
+      --partial, -p         Output markdown fragments
+      --title               Document title (ignored in partial mode)
+      --language            Document language (ignored in partial mode)
+      --auto-line-breaks    Converts line breaks to <br>
  
     Examples
       $ vfm input.md
@@ -37,6 +38,9 @@ const cli = meow(
       language: {
         type: 'string',
       },
+      autoLineBreaks: {
+        type: 'boolean',
+      },
     },
   },
 );
@@ -49,6 +53,7 @@ function compile(input: string) {
       style: cli.flags.style,
       title: cli.flags.title,
       language: cli.flags.language,
+      autoLineBreaks: cli.flags.autoLineBreaks,
     }),
   );
 }
@@ -59,6 +64,7 @@ function main(
     partial: { type: 'boolean'; alias: string };
     title: { type: 'string' };
     language: { type: 'string' };
+    autoLineBreaks: { type: 'boolean' };
   }>,
 ) {
   try {
