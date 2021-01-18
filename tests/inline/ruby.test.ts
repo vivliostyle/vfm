@@ -74,6 +74,6 @@ it(
         └─2 text "b|c}"
     `,
     `<p>{a<br>\nb|c}</p>`,
-    { autoLineBreaks: true, partial: true },
+    { autoLineBreaks: true },
   ),
 );

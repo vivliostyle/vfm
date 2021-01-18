@@ -12,16 +12,23 @@ export const buildProcessorTestingCode = (
   input: string,
   expectedMdast: string,
   expectedHtml: string,
-  options: StringifyMarkdownOptions = {
-    style: undefined,
-    partial: true,
-    title: undefined,
-    language: undefined,
-    replace: undefined,
-    autoLineBreaks: false,
-  },
+  {
+    style = undefined,
+    partial = true,
+    title = undefined,
+    language = undefined,
+    replace = undefined,
+    autoLineBreaks = false,
+  }: StringifyMarkdownOptions = {},
 ) => (): any => {
-  const vfm = VFM(options).freeze();
+  const vfm = VFM({
+    style,
+    partial,
+    title,
+    language,
+    replace,
+    autoLineBreaks,
+  }).freeze();
   expect(unistInspect.noColor(vfm.parse(input))).toBe(expectedMdast.trim());
   expect(String(vfm.processSync(input))).toBe(expectedHtml);
 };
