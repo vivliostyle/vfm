@@ -153,18 +153,6 @@ A
   );
 });
 
-it('handle hard line break', () => {
-  expect(
-    partial(
-      `
-a
-b`,
-      true,
-    ),
-  ).toBe(`<p>a<br>
-b</p>`);
-});
-
 it('stringify markdown string into html document', () => {
   expect(lib.stringify('# こんにちは', { title: 'Custom' }))
     .toBe(`<!doctype html>

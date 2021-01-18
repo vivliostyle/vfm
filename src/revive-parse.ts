@@ -27,27 +27,21 @@ export interface MarkdownOptions {
  * @param options Options.
  * @returns Parsers.
  */
-export const reviveParse = (options: MarkdownOptions) => {
-  const results = [
-    [markdown, { gfm: true, commonmark: true }],
-    fencedBlock,
-    ruby,
-    [footnotes, { inlineNotes: true }],
-    math,
-    attr,
-    slug,
-    section,
-    code,
-    toc,
-    frontmatter,
-    metadata,
-    inspect('mdast'),
-  ] as unified.PluggableList<unified.Settings>;
-
-  if (options.autoLineBreaks) {
-    // Line breaks are processed immediately after ruby
-    results.splice(3, 0, breaks);
-  }
-
-  return results;
-};
+export const reviveParse = (
+  options: MarkdownOptions,
+): unified.PluggableList<unified.Settings> => [
+  [markdown, { gfm: true, commonmark: true }],
+  fencedBlock,
+  ruby,
+  ...(options.autoLineBreaks ? [breaks] : []),
+  [footnotes, { inlineNotes: true }],
+  math,
+  attr,
+  slug,
+  section,
+  code,
+  toc,
+  frontmatter,
+  metadata,
+  inspect('mdast'),
+];
