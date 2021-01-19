@@ -18,8 +18,8 @@ import { inspect } from './utils/debug';
  * Options for Markdown conversion.
  */
 export interface MarkdownOptions {
-  /** Converts line breaks to `<br>`. */
-  autoLineBreaks: boolean;
+  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
+  hardLineBreaks: boolean;
 }
 
 /**
@@ -33,7 +33,7 @@ export const reviveParse = (
   [markdown, { gfm: true, commonmark: true }],
   fencedBlock,
   ruby,
-  ...(options.autoLineBreaks ? [breaks] : []),
+  ...(options.hardLineBreaks ? [breaks] : []),
   [footnotes, { inlineNotes: true }],
   math,
   attr,

@@ -4,11 +4,11 @@ import { ReplaceRule } from '../src/plugins/replace';
 /**
  * Run VFM stringify in partial mode.
  * @param body Markdown string that becomes `<body>` part.
- * @param autoLineBreaks Converts line breaks to `<br>`.
+ * @param hardLineBreaks Add `<br>` at the position of hard line breaks, without needing spaces.
  * @returns HTML string.
  */
-function partial(body: string, autoLineBreaks = false) {
-  return lib.stringify(body, { partial: true, autoLineBreaks });
+function partial(body: string, hardLineBreaks = false) {
+  return lib.stringify(body, { partial: true, hardLineBreaks });
 }
 
 // Snippet

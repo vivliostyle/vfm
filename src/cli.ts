@@ -16,7 +16,7 @@ const cli = meow(
       --partial, -p         Output markdown fragments
       --title               Document title (ignored in partial mode)
       --language            Document language (ignored in partial mode)
-      --auto-line-breaks    Converts line breaks to <br>
+      --hard-line-breaks    Add <br> at the position of hard line breaks, without needing spaces
  
     Examples
       $ vfm input.md
@@ -38,7 +38,7 @@ const cli = meow(
       language: {
         type: 'string',
       },
-      autoLineBreaks: {
+      hardLineBreaks: {
         type: 'boolean',
       },
     },
@@ -53,7 +53,7 @@ function compile(input: string) {
       style: cli.flags.style,
       title: cli.flags.title,
       language: cli.flags.language,
-      autoLineBreaks: cli.flags.autoLineBreaks,
+      hardLineBreaks: cli.flags.hardLineBreaks,
     }),
   );
 }
@@ -64,7 +64,7 @@ function main(
     partial: { type: 'boolean'; alias: string };
     title: { type: 'string' };
     language: { type: 'string' };
-    autoLineBreaks: { type: 'boolean' };
+    hardLineBreaks: { type: 'boolean' };
   }>,
 ) {
   try {

@@ -21,8 +21,8 @@ export interface StringifyMarkdownOptions {
   language?: string;
   /** Replacement handler for HTML string. */
   replace?: ReplaceRule[];
-  /** Converts line breaks to `<br>`. */
-  autoLineBreaks?: boolean;
+  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
+  hardLineBreaks?: boolean;
 }
 
 export interface Hooks {
@@ -40,10 +40,10 @@ export function VFM({
   title = undefined,
   language = undefined,
   replace = undefined,
-  autoLineBreaks = false,
+  hardLineBreaks = false,
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified()
-    .use(markdown({ autoLineBreaks }))
+    .use(markdown({ hardLineBreaks }))
     .data('settings', { position: false })
     .use(html);
 

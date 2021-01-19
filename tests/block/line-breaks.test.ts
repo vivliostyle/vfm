@@ -1,7 +1,7 @@
 import { stripIndent } from 'common-tags';
 import { buildProcessorTestingCode } from '../utils';
 
-// remark-parse GFM seems to support only EOL space, so backslash is excluded.
+// remark-parse GFM seems to support only EOL two-spaces, so backslash is excluded.
 it(
   'default: GFM (EOL two-spaces)',
   buildProcessorTestingCode(
@@ -26,7 +26,7 @@ it(
 );
 
 it(
-  'optional: auto line breaks with GFM (EOL tow-spaces)',
+  'optional: hard line breaks with GFM (EOL tow-spaces)',
   buildProcessorTestingCode(
     stripIndent`
     a
@@ -47,6 +47,6 @@ it(
     b<br>
     c</p>
     `,
-    { autoLineBreaks: true },
+    { hardLineBreaks: true },
   ),
 );
