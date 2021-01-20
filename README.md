@@ -24,6 +24,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [`partial` (default: `false`)](#partial-default-false)
     - [`title` (default: `undefined`)](#title-default-undefined)
     - [`language` (default: `undefined`)](#language-default-undefined)
+    - [`hardLineBreaks` (default: `false`)](#hardLineBreaks-default-false)
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
@@ -112,7 +113,7 @@ will generates:
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -136,7 +137,7 @@ will generates:
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -175,7 +176,7 @@ will generates:
 
 ```html
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <meta charset="utf-8" />
     <title>Hello</title>
@@ -206,6 +207,38 @@ will generates:
   </head>
   <body>
     <p><h1>Hello</h1></p>
+  </body>
+</html>
+```
+
+#### `hardLineBreaks` (default: `false`)
+
+Converts line breaks to `<br>`.
+
+```js
+stringify(
+  `
+new
+line
+`,
+  { hardLineBreaks: true },
+);
+```
+
+will generates:
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+  </head>
+  <body>
+    <p>
+      new<br />
+      line
+    </p>
   </body>
 </html>
 ```

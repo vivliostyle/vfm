@@ -1,8 +1,14 @@
 import * as lib from '../src';
 import { ReplaceRule } from '../src/plugins/replace';
 
-function partial(body: string) {
-  return lib.stringify(body, { partial: true });
+/**
+ * Run VFM stringify in partial mode.
+ * @param body Markdown string that becomes `<body>` part.
+ * @param hardLineBreaks Add `<br>` at the position of hard line breaks, without needing spaces.
+ * @returns HTML string.
+ */
+function partial(body: string, hardLineBreaks = false) {
+  return lib.stringify(body, { partial: true, hardLineBreaks });
 }
 
 // Snippet
@@ -66,13 +72,16 @@ it('handle role', () => {
 
 it('reject incorrect fences', () => {
   expect(
-    partial(`
+    partial(
+      `
 ::::appendix
 :::::nested
 # Title
 :::::
 ::::
-`),
+`,
+      true,
+    ),
   ).toBe(
     `<p>::::appendix<br>
 :::::nested<br>
@@ -82,13 +91,16 @@ it('reject incorrect fences', () => {
   );
 
   expect(
-    partial(`
+    partial(
+      `
 :::appendix
 :::::nested
 # Title
 :::::
 :::
-`),
+`,
+      true,
+    ),
   ).toBe(
     `<div class="appendix"><p>:::::nested<br>
 # Title<br>
@@ -139,15 +151,6 @@ A
   ).toBe(
     `<div class="appendix"><p>A</p><div class="nested"><section id="title"><h1>Title</h1></section></div></div>`,
   );
-});
-
-it('handle hard line break', () => {
-  expect(
-    partial(`
-a
-b`),
-  ).toBe(`<p>a<br>
-b</p>`);
 });
 
 it('stringify markdown string into html document', () => {

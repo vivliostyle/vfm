@@ -14,11 +14,26 @@ import { mdast as section } from './plugins/section';
 import { mdast as toc } from './plugins/toc';
 import { inspect } from './utils/debug';
 
-export default [
+/**
+ * Options for Markdown conversion.
+ */
+export interface MarkdownOptions {
+  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
+  hardLineBreaks: boolean;
+}
+
+/**
+ * Create MDAST parsers.
+ * @param options Options.
+ * @returns Parsers.
+ */
+export const reviveParse = (
+  options: MarkdownOptions,
+): unified.PluggableList<unified.Settings> => [
   [markdown, { gfm: true, commonmark: true }],
   fencedBlock,
   ruby,
-  breaks,
+  ...(options.hardLineBreaks ? [breaks] : []),
   [footnotes, { inlineNotes: true }],
   math,
   attr,
@@ -29,4 +44,4 @@ export default [
   frontmatter,
   metadata,
   inspect('mdast'),
-] as unified.PluggableList<unified.Settings>;
+];
