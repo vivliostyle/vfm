@@ -24,7 +24,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [`partial` (default: `false`)](#partial-default-false)
     - [`title` (default: `undefined`)](#title-default-undefined)
     - [`language` (default: `undefined`)](#language-default-undefined)
-    - [`autoLineBreaks` (default: `false`)](#autoLineBreaks-default-false)
+    - [`hardLineBreaks` (default: `false`)](#hardLineBreaks-default-false)
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
@@ -211,7 +211,7 @@ will generates:
 </html>
 ```
 
-#### `autoLineBreaks` (default: `false`)
+#### `hardLineBreaks` (default: `false`)
 
 Converts line breaks to `<br>`.
 
@@ -221,7 +221,7 @@ stringify(
 new
 line
 `,
-  { autoLineBreaks: true },
+  { hardLineBreaks: true },
 );
 ```
 
