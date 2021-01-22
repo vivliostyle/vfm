@@ -1,3 +1,18 @@
+# [1.0.0-alpha.16](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.15...v1.0.0-alpha.16) (2021-01-22)
+
+### Bug Fixes
+
+- Apply option name changes to README ([e6c4431](https://github.com/vivliostyle/vfm/commit/e6c44311906c063913ab330f57e96eff38336f30))
+- CLI option shorthand mistake [#56](https://github.com/vivliostyle/vfm/issues/56) ([ed52f94](https://github.com/vivliostyle/vfm/commit/ed52f9418f9ad3e9c8b047164f8ddb6285f3ea4e))
+- Fixed by PR review ([417e944](https://github.com/vivliostyle/vfm/commit/417e944b2bf95560f88432377634047849fbfde1))
+
+### Features
+
+- Added --auto-line-breaks option to CLI ([24fe380](https://github.com/vivliostyle/vfm/commit/24fe3809990a9b03f9baafdea830d2beaa87b71e))
+- Change automatic line breaks to optional ([bebc736](https://github.com/vivliostyle/vfm/commit/bebc73601673428fcc357e52603c06f73de3d26a))
+- Changed to keep the default value per property by expanding the option ([3a691f6](https://github.com/vivliostyle/vfm/commit/3a691f6fd2eb4fd3e6cc0625573a11da66cd2a8d))
+- Renamed line breaks option ([494185a](https://github.com/vivliostyle/vfm/commit/494185a606e13d26710d9dac1d153eb184686d7b))
+
 # [1.0.0-alpha.15](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.14...v1.0.0-alpha.15) (2021-01-14)
 
 ### Bug Fixes
