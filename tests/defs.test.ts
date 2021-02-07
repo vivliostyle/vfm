@@ -41,7 +41,6 @@ it('has valid blockMethods', () => {
     'footnoteDefinition',
     'definition',
     'table',
-    'fencedBlock',
     'paragraph',
   ]);
 });
@@ -112,7 +111,6 @@ it('has valid interruptFootnoteDefinition', () => {
     'html',
     'definition',
     'table',
-    'fencedBlock',
     'footnoteDefinition',
   ]);
 });

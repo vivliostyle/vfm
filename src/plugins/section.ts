@@ -7,7 +7,6 @@
 import { Parent } from 'mdast';
 import findAfter from 'unist-util-find-after';
 import visit from 'unist-util-visit-parents';
-import { roleMappingTable, roles } from '../utils/wai-aria';
 
 // TODO: handle @subtitle properly
 
@@ -42,7 +41,7 @@ function sectionize(node: any, ancestors: Parent[]) {
     endIndex > 0 ? endIndex : undefined,
   );
 
-  let type = 'section';
+  const type = 'section';
 
   const hProperties = node.data?.hProperties;
   if (hProperties) {
@@ -53,18 +52,6 @@ function sectionize(node: any, ancestors: Parent[]) {
     // {hidden} specifier
     if (props.includes('hidden')) {
       node.data.hProperties.style = 'display: none;';
-    }
-
-    // {@toc} specifier
-    const ariaProp = props
-      .filter((prop) => prop.startsWith('@'))
-      .map((id) => id.slice(1))
-      .find((key) => roles.includes(key));
-    if (ariaProp) {
-      const role = `doc-${ariaProp}`;
-      type = roleMappingTable[role][0];
-      hProperties.role = role;
-      delete hProperties['@' + ariaProp];
     }
   }
 

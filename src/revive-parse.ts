@@ -7,7 +7,6 @@ import slug from 'remark-slug';
 import unified from 'unified';
 import { mdast as attr } from './plugins/attr';
 import { mdast as code } from './plugins/code';
-import { mdast as fencedBlock } from './plugins/fenced-block';
 import { mdast as metadata } from './plugins/metadata';
 import { mdast as ruby } from './plugins/ruby';
 import { mdast as section } from './plugins/section';
@@ -31,7 +30,6 @@ export const reviveParse = (
   options: MarkdownOptions,
 ): unified.PluggableList<unified.Settings> => [
   [markdown, { gfm: true, commonmark: true }],
-  fencedBlock,
   ruby,
   ...(options.hardLineBreaks ? [breaks] : []),
   [footnotes, { inlineNotes: true }],
