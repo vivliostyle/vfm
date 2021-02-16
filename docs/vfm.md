@@ -402,6 +402,20 @@ Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
 VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
 ```
 
+**HTML**
+
+```html
+<!-- hardLineBreaks: true -->
+<p>はじめまして。</p>
+<p>Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。<br>
+VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。</p>
+
+<!-- hardLineBreaks: false (Default) -->
+<p>はじめまして。</p>
+<p>Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
+VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。</p>
+```
+
 **CSS**
 
 ```css
