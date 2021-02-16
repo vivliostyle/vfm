@@ -7,7 +7,6 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [Hard new line](#hard-new-line)
 - [Code](#code)
   - [with caption](#with-caption)
 - [Image](#image)
@@ -22,31 +21,9 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
   - [Reserved words](#reserved-words)
 - [Full HTML document](#full-html-document)
 - [Page Layout](#page-layout)
+- [Hard new line (optional)](#hard-new-line)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Hard new line
-
-<Badge type="warning">PRE-RELEASE</Badge>
-
-- A newline puts `<br/>` to the end of a line.
-- Consecutive 2 newlines creates a new sentence block.
-
-**VFM**
-
-```md
-はじめまして。
-
-Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
-VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
-```
-
-**CSS**
-
-```css
-p {
-}
-```
 
 ## Code
 
@@ -405,4 +382,29 @@ body.twocolumn {
     {{HTML string}}
   </body>
 </html>
+```
+
+## Hard new line
+
+<Badge type="warning">PRE-RELEASE</Badge>
+
+- A newline puts `<br/>` to the end of a line.
+- Consecutive 2 newlines creates a new sentence block.
+
+This feature is optional. The Node.js API is enabled by specifying `hardLineBreaks: true` as an option and the CLI by specifying `--hard-line-breaks`.
+
+**VFM**
+
+```md
+はじめまして。
+
+Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
+VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。
+```
+
+**CSS**
+
+```css
+p {
+}
 ```
