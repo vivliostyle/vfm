@@ -2,7 +2,7 @@ import assert from 'assert';
 import { stringify } from '../../src/index';
 
 it('undefined', () => {
-  const actual = stringify('text');
+  const actual = stringify('text', { disableFormatHtml: true });
   const expected = `<!doctype html>
 <html>
 <head>
@@ -18,7 +18,7 @@ it('undefined', () => {
 });
 
 it('en', () => {
-  const actual = stringify('text', { language: 'en' });
+  const actual = stringify('text', { language: 'en', disableFormatHtml: true });
   const expected = `<!doctype html>
 <html lang="en">
 <head>

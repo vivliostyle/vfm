@@ -12,11 +12,12 @@ const cli = meow(
       $ echo <string> | vfm
  
     Options
-      --style, -s           Custom stylesheet path/URL
-      --partial, -p         Output markdown fragments
-      --title               Document title (ignored in partial mode)
-      --language            Document language (ignored in partial mode)
-      --hard-line-breaks    Add <br> at the position of hard line breaks, without needing spaces
+      --style, -s            Custom stylesheet path/URL
+      --partial, -p          Output markdown fragments
+      --title                Document title (ignored in partial mode)
+      --language             Document language (ignored in partial mode)
+      --hard-line-breaks     Add <br> at the position of hard line breaks, without needing spaces
+      --disable-format-html  Disable automatic HTML format
  
     Examples
       $ vfm input.md
@@ -41,6 +42,9 @@ const cli = meow(
       hardLineBreaks: {
         type: 'boolean',
       },
+      disableFormatHtml: {
+        type: 'boolean',
+      },
     },
   },
 );
@@ -54,6 +58,7 @@ function compile(input: string) {
       title: cli.flags.title,
       language: cli.flags.language,
       hardLineBreaks: cli.flags.hardLineBreaks,
+      disableFormatHtml: cli.flags.disableFormatHtml,
     }),
   );
 }
@@ -65,6 +70,7 @@ function main(
     title: { type: 'string' };
     language: { type: 'string' };
     hardLineBreaks: { type: 'boolean' };
+    disableFormatHtml: { type: 'boolean' };
   }>,
 ) {
   try {

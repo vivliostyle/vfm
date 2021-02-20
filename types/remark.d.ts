@@ -13,6 +13,7 @@ declare module 'mdast-util-to-string';
 declare module 'rehype-katex';
 declare module 'remark-slug';
 declare module 'rehype-slug';
+declare module 'rehype-format';
 declare module 'remark-breaks';
 declare module 'remark-footnotes';
 declare module 'remark-math';

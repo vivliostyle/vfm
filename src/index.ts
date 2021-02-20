@@ -1,4 +1,5 @@
 import doc from 'rehype-document';
+import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { hast as clearHtmlLang } from './plugins/clear-html-lang';
@@ -23,6 +24,8 @@ export interface StringifyMarkdownOptions {
   replace?: ReplaceRule[];
   /** Add `<br>` at the position of hard line breaks, without needing spaces. */
   hardLineBreaks?: boolean;
+  /** Disable automatic HTML format. */
+  disableFormatHtml?: boolean;
 }
 
 export interface Hooks {
@@ -41,6 +44,7 @@ export function VFM({
   language = undefined,
   replace = undefined,
   hardLineBreaks = false,
+  disableFormatHtml = false,
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified()
     .use(markdown({ hardLineBreaks }))
@@ -59,6 +63,11 @@ export function VFM({
   }
 
   processor.use(rehypeStringify);
+
+  // Explicitly specify true if want unformatted HTML during development or debug
+  if (!disableFormatHtml) {
+    processor.use(rehypeFormat);
+  }
 
   return processor;
 }

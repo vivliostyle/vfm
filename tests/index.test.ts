@@ -8,7 +8,11 @@ import { ReplaceRule } from '../src/plugins/replace';
  * @returns HTML string.
  */
 function partial(body: string, hardLineBreaks = false) {
-  return lib.stringify(body, { partial: true, hardLineBreaks });
+  return lib.stringify(body, {
+    partial: true,
+    hardLineBreaks,
+    disableFormatHtml: true,
+  });
 }
 
 // Snippet
@@ -38,8 +42,9 @@ it('handle custom attributes', () => {
 });
 
 it('stringify markdown string into html document', () => {
-  expect(lib.stringify('# こんにちは', { title: 'Custom' }))
-    .toBe(`<!doctype html>
+  expect(
+    lib.stringify('# こんにちは', { title: 'Custom', disableFormatHtml: true }),
+  ).toBe(`<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -76,6 +81,7 @@ it('replace', () => {
       {
         partial: true,
         replace: rules,
+        disableFormatHtml: true,
       },
     ),
   )
@@ -94,6 +100,7 @@ it('empty replace', () => {
       {
         partial: true,
         replace: rules,
+        disableFormatHtml: true,
       },
     ),
   ).toBe(`<p>[icon1][Notice]</p>

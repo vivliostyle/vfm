@@ -25,6 +25,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [`title` (default: `undefined`)](#title-default-undefined)
     - [`language` (default: `undefined`)](#language-default-undefined)
     - [`hardLineBreaks` (default: `false`)](#hardLineBreaks-default-false)
+    - [`disableFormatHtml` (default: `false`)](#disableFormatHtml-default-false)
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
@@ -83,7 +84,7 @@ console.log(
 This snippet will generates:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -112,7 +113,7 @@ stringify('# Hello', { style: 'https://example.com/book.css' });
 will generates:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -136,7 +137,7 @@ stringify('# Hello', {
 will generates:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -175,7 +176,7 @@ stringify('# Hello', { title: 'Hello' });
 will generates:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -199,7 +200,7 @@ stringify('# Hello', { language: 'ja' });
 will generates:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
@@ -228,7 +229,7 @@ line
 will generates:
 
 ```html
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -243,6 +244,32 @@ will generates:
 </html>
 ```
 
+#### `disableFormatHtml` (default: `false`)
+
+Disable automatic HTML format. Explicitly specify true if want unformatted HTML during development or debug.
+
+```js
+stringify(
+  `text`,
+  { disableFormatHtml: true },
+);
+```
+
+will generates:
+
+```html
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+</head>
+<body>
+<p>text</p>
+</body>
+</html>
+```
+
 ### Advanced usage
 
 #### Unified processor
@@ -252,7 +279,7 @@ import { VFM } from '@vivliostyle/vfm';
 
 const processor = VFM({ partial: true });
 const html = processor.processSync('# Hello').toString();
-```
+````
 
 #### Unified plugin
 
