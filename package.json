@@ -22,6 +22,7 @@
     "meow": "^9.0.0",
     "refractor": "^3.3.0",
     "rehype-document": "^5.1.0",
+    "rehype-format": "^3.1.0",
     "rehype-katex": "^4.0.0",
     "rehype-raw": "^5.0.0",
     "rehype-stringify": "^8.0.0",
