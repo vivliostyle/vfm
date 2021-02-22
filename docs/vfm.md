@@ -10,7 +10,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 - [Code](#code)
   - [with caption](#with-caption)
 - [Image](#image)
-  - [with caption](#with-caption-1)
+  - [with caption and single line](#with-caption-and-single-line)
 - [Ruby](#ruby)
 - [Sectionization](#sectionization)
   - [Plain section](#plain-section)
@@ -125,14 +125,22 @@ img {
 }
 ```
 
-### with caption
+### with caption and single line
 
 <Badge type="warning">PRE-RELEASE</Badge>
+
+Wraps an image written as a single line and with a caption in `<figure>`.
+
+If specify attributes for the image, the `id` is moved to `<figure>` and everything else is copied except for` <img> `specific (such as `src`).
 
 **VFM**
 
 ```md
 ![Figure 1](./fig1.png)
+
+![Figure 2](./fig2.png "Figure 2"){id="image" data-sample="sample"}
+
+text ![Figure 3](./fig3.png)
 ```
 
 **HTML**
@@ -142,6 +150,11 @@ img {
   <img src="./fig1.png" alt="Figure 1" />
   <figcaption>Figure 1</figcaption>
 </figure>
+<figure id="image" title="Figure 2" data-sample="sample">
+  <img src="./fig2.png" alt="caption" title="Figure 2" data-sample="sample">
+  <figcaption>Figure 2</figcaption>
+</figure>
+<p>text <img src="./fig3.png" alt="Figure 3"></p>
 ```
 
 **CSS**
@@ -407,13 +420,19 @@ VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プ
 ```html
 <!-- hardLineBreaks: true -->
 <p>はじめまして。</p>
-<p>Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。<br>
-VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。</p>
+<p>
+  Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。<br />
+  VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle
+  プロジェクトのために策定・実装されました。
+</p>
 
 <!-- hardLineBreaks: false (Default) -->
 <p>はじめまして。</p>
-<p>Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。
-VFM は出版物の執筆に適した Markdown 方言であり、Vivliostyle プロジェクトのために策定・実装されました。</p>
+<p>
+  Vivliostyle Flavored Markdown（略して VFM）の世界へようこそ。 VFM
+  は出版物の執筆に適した Markdown 方言であり、Vivliostyle
+  プロジェクトのために策定・実装されました。
+</p>
 ```
 
 **CSS**
