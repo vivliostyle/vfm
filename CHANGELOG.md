@@ -1,3 +1,5 @@
+# [1.0.0-alpha.17](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.16...v1.0.0-alpha.17) (2021-02-22)
+
 # [1.0.0-alpha.16](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.15...v1.0.0-alpha.16) (2021-01-22)
 
 ### Bug Fixes
