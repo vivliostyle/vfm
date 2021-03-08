@@ -9,7 +9,8 @@
     "prepublishOnly": "yarn build",
     "release": "release-it",
     "release:pre": "release-it --preRelease --npm.tag=latest",
-    "test": "jest"
+    "test": "jest",
+    "test:debug": "jest tests/xxx.test.ts --silent=false --verbose false"
   },
   "dependencies": {
     "debug": "^4.3.1",
