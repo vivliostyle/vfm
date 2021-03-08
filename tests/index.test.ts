@@ -25,22 +25,6 @@ it.skip('plain section', () => {
   expect(partial(`# {.ok}`)).toBe(`<section class="ok"></section>`);
 });
 
-it('handle custom attributes', () => {
-  // MEMO:
-  // https://github.com/sethvincent/remark-bracketed-spans
-  // https://github.com/Paperist/remark-crossref/
-  // https://github.com/mrzmmr/remark-behead
-  expect(
-    partial(`
-# Introduction {#introduction}
-`),
-  ).toBe(`<section id="introduction"><h1>Introduction</h1></section>`);
-
-  expect(partial(`# Hello {hidden}`)).toBe(
-    `<section id="hello"><h1 style="display: none;">Hello</h1></section>`,
-  );
-});
-
 it('stringify markdown string into html document', () => {
   expect(
     lib.stringify('# こんにちは', { title: 'Custom', disableFormatHtml: true }),
