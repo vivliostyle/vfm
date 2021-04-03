@@ -12,6 +12,12 @@ DEBUG=vfm vfm
 
 After setup, run `yarn dev` to watch files.
 
+## Commit Guide
+
+### Comment
+
+Please refer to [Semantic Commit Messages](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716) for the commit comment.
+
 ## Release Guide (Maintainers only)
 
 ### Enter pre-release
