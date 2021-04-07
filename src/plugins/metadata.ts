@@ -106,20 +106,21 @@ export const mdast = () => (tree: Node, file: MetadataVFile) => {
  * Set the metadata to HTML (HAST).
  * @returns Handler.
  */
-export const hast = () => (tree: Node, vfile: MetadataVFile) => {
+export const hast = () => (tree: Node, vfile: VFile) => {
+  const metadata = vfile as MetadataVFile;
   visit<HastNode>(tree, 'element', (node) => {
     if (node.tagName === 'head') {
-      if (vfile.data.author) {
-        setAuthor(node, vfile.data.author);
+      if (metadata.data.author) {
+        setAuthor(node, metadata.data.author);
       }
 
-      if (vfile.data.title) {
-        setTitle(node, vfile.data.title);
+      if (metadata.data.title) {
+        setTitle(node, metadata.data.title);
       }
     }
 
-    if (node.tagName === 'body' && vfile.data.class) {
-      setBodyClass(node, vfile.data.class);
+    if (node.tagName === 'body' && metadata.data.class) {
+      setBodyClass(node, metadata.data.class);
     }
   });
 };
