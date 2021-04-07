@@ -3,6 +3,7 @@ import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { hast as clearHtmlLang } from './plugins/clear-html-lang';
+import { hast as metadata } from './plugins/metadata'
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
 import { reviveParse as markdown } from './revive-parse';
 import html from './revive-rehype';
@@ -62,6 +63,7 @@ export function VFM({
     }
   }
 
+  processor.use(metadata)
   processor.use(rehypeStringify);
 
   // Explicitly specify true if want unformatted HTML during development or debug

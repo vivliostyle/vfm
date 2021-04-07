@@ -26,14 +26,13 @@ it.skip('plain section', () => {
 });
 
 it('stringify markdown string into html document', () => {
-  expect(
-    lib.stringify('# こんにちは', { title: 'Custom', disableFormatHtml: true }),
-  ).toBe(`<!doctype html>
+  expect(lib.stringify('# こんにちは', { disableFormatHtml: true }))
+    .toBe(`<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
-<title>Custom</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>こんにちは</title>
 </head>
 <body>
 <section id="こんにちは"><h1>こんにちは</h1></section>
