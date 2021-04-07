@@ -345,18 +345,26 @@ Frontmatter is a way of defining metadata in Markdown (file) units.
 ```yaml
 ---
 title: 'Introduction to VFM'
+author: 'Author'
+class: 'my-class'
 ---
 
 ```
 
 #### Reserved words
 
-| Property                                          | Type   | Description                                                                                 |
-| ------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------- |
-| title                                             | String | Document title. If missing, very first heading `#` of the content will be treated as title. |
-| author <Badge type="danger">UNIMPLEMENTED</Badge> | String | Document author.                                                                            |
-| theme                                             | String | Vivliostyle theme package or bare CSS file.                                                 |
-| class <Badge type="danger">UNIMPLEMENTED</Badge>  | String | Custom classes applied to `<body>`                                                          |
+| Property | Type   | Description                                                                                 |
+| -------- | ------ | ------------------------------------------------------------------------------------------- |
+| title    | String | Document title. If missing, very first heading `#` of the content will be treated as title. |
+| author   | String | Document author.                                                                            |
+| class    | String | Custom classes applied to `<body>`                                                          |
+| theme    | String | Vivliostyle theme package or bare CSS file.                                                 |
+
+The priority of `title` is as follows.
+
+1. `title` property of the frontmatter
+2. First heading `#` of the content
+3. `title` option of VFM
 
 **class**
 
