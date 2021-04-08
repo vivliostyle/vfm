@@ -89,3 +89,16 @@ it('empty replace', () => {
   ).toBe(`<p>[icon1][Notice]</p>
 <p>[person][Nod nod]</p>`);
 });
+
+it('<pre>', () => {
+  const actual = lib.stringify(`<pre>\n*    *    *\n   *    *    *\n</pre>`, {
+    partial: true,
+    disableFormatHtml: true,
+  });
+  // In CommonMark parsing, a line break is inserted immediately after `<pre>`
+  // In this test, line breaks are intentionally removed according to the behavior of VFM.
+  const expected = `<pre>*    *    *
+   *    *    *
+</pre>`;
+  expect(actual).toBe(expected);
+});
