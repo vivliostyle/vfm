@@ -61,8 +61,8 @@ export const hast = () => (tree: Node) => {
   visit<HastNode>(tree, 'element', (node, index, parent) => {
     // handle captioned code block
     const maybeCode = node.children?.[0] as HastNode | undefined;
-    if (is(node, 'pre') && maybeCode?.properties.title) {
-      const maybeTitle = maybeCode?.properties?.title;
+    if (is(node, 'pre') && maybeCode?.properties?.title) {
+      const maybeTitle = maybeCode.properties.title;
       delete maybeCode.properties.title;
       (parent as Parent).children[index] = h(
         'figure',
