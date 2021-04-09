@@ -2,7 +2,48 @@
   "name": "@vivliostyle/vfm",
   "description": "Custom Markdown syntax specialized in book authoring.",
   "version": "1.0.0-alpha.18",
-  "author": "Yasuaki Uechi <y@uechi.io>",
+  "author": "Vivliostyle Foundation",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "bin": {
+    "vfm": "lib/cli.js"
+  },
+  "keywords": [
+    "markdown",
+    "vfm",
+    "vivliostyle"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vivliostyle/vfm.git"
+  },
+  "homepage": "https://github.com/vivliostyle/vfm",
+  "bugs": {
+    "url": "https://github.com/vivliostyle/vfm/issues"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "types": "lib/index.d.ts",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged && pretty-quick --staged",
+      "pre-push": "npm test"
+    }
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint",
+      "git add"
+    ],
+    "*.md": [
+      "doctoc -p",
+      "git add"
+    ]
+  },
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "dev": "tsc -w",
@@ -73,46 +114,5 @@
     "shx": "^0.3.3",
     "ts-jest": "^26.5.4",
     "typescript": "^4.2.3"
-  },
-  "types": "lib/index.d.ts",
-  "main": "lib/index.js",
-  "bin": {
-    "vfm": "lib/cli.js"
-  },
-  "files": [
-    "lib"
-  ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged && pretty-quick --staged",
-      "pre-push": "npm test"
-    }
-  },
-  "lint-staged": {
-    "*.ts": [
-      "eslint",
-      "git add"
-    ],
-    "*.md": [
-      "doctoc -p",
-      "git add"
-    ]
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vivliostyle/vfm.git"
-  },
-  "bugs": {
-    "url": "https://github.com/vivliostyle/vfm/issues"
-  },
-  "homepage": "https://github.com/vivliostyle/vfm",
-  "keywords": [
-    "markdown",
-    "vfm",
-    "vivliostyle"
-  ],
-  "license": "Apache-2.0"
+  }
 }
