@@ -324,4 +324,5 @@ We want you to:
 
 ### Maintainers
 
+- [Akabeko](https://github.com/akabekobeko)
 - [Yasuaki Uechi](https://github.com/uetchy)
