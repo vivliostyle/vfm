@@ -1,3 +1,14 @@
+# [1.0.0-alpha.18](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.17...v1.0.0-alpha.18) (2021-04-09)
+
+### Bug Fixes
+
+- fixed a crash when specifying the HTML pre tag ([3fbbb82](https://github.com/vivliostyle/vfm/commit/3fbbb82144f4881a0085f60b27a66da0bed060ee))
+- Fixed type overload inconsistencies by casting ([59b887e](https://github.com/vivliostyle/vfm/commit/59b887e8a99a4d9cc1a2c9cc814f667a08c3f9a8))
+
+### Features
+
+- frontmatter and metadata ([d12188b](https://github.com/vivliostyle/vfm/commit/d12188b9ec9617f33e1ce9b3544fed3777fb4696))
+
 # [1.0.0-alpha.17](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.16...v1.0.0-alpha.17) (2021-02-22)
 
 # [1.0.0-alpha.16](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.15...v1.0.0-alpha.16) (2021-01-22)
