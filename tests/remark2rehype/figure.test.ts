@@ -13,7 +13,7 @@ it(
               url: "./img.png"
               alt: "caption"
     `,
-    `<figure><img src="./img.png" alt="caption"><figcaption>caption</figcaption></figure>`,
+    `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true">caption</figcaption></figure>`,
   ),
 );
 
@@ -56,7 +56,7 @@ it(
               alt: "caption"
     `,
     stripIndent`
-    <figure><img src="./img.png" alt="caption"><figcaption>caption</figcaption></figure>
+    <figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true">caption</figcaption></figure>
     <p>text <img src="./img.png" alt="caption"></p>
     `,
   ),
@@ -75,6 +75,6 @@ it(
               alt: "caption"
               data: {"hProperties":{"id":"image","data-sample":"sample"}}
     `,
-    `<figure id="image" title="title" data-sample="sample"><img src="./img.png" alt="caption" title="title" data-sample="sample"><figcaption>caption</figcaption></figure>`,
+    `<figure id="image" title="title" data-sample="sample"><img src="./img.png" alt="caption" title="title" data-sample="sample"><figcaption aria-hidden="true">caption</figcaption></figure>`,
   ),
 );
