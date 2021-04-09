@@ -42,7 +42,9 @@ const isImgProperty = (name: string): boolean => {
  */
 const wrapFigureImg = (img: HastNode, parent: HastNode) => {
   parent.tagName = 'figure';
-  parent.children.push(h('figcaption', img.properties.alt));
+  parent.children.push(
+    h('figcaption', { 'aria-hidden': 'true' }, [img.properties.alt]),
+  );
 
   // Move to parent because `id` attribute is unique
   if (img.properties.id) {
