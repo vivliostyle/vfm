@@ -370,7 +370,7 @@ The priority of `title` is as follows.
 
 ```yaml
 ---
-class: twocolumn
+class: 'twocolumn'
 ---
 
 ```
@@ -379,6 +379,8 @@ class: twocolumn
 body.twocolumn {
 }
 ```
+
+To specify multiple classes, define as `class:'foo bar'`.
 
 ## Full HTML document
 
