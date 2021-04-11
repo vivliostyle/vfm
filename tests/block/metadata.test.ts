@@ -130,3 +130,22 @@ class: 'my-class'
 `;
   assert.strictEqual(actual, expected);
 });
+
+it('multiple classes', () => {
+  const actual = stringify(
+    `---
+class: 'foo bar'
+---
+`,
+  );
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body class="foo bar"></body>
+</html>
+`;
+  assert.strictEqual(actual, expected);
+});
