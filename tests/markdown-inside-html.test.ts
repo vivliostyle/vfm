@@ -1,5 +1,5 @@
 import { stripIndent } from 'common-tags';
-import { buildProcessorTestingCode } from '../utils';
+import { buildProcessorTestingCode } from './utils';
 
 it(
   'allows markdown context in new paragraph',
