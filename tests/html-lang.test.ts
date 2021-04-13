@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { stringify } from '../../src/index';
+import { stringify } from '../src/index';
 
 it('undefined', () => {
   const actual = stringify('text', { disableFormatHtml: true });

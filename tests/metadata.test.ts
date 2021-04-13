@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { stringify } from '../../src/index';
+import { stringify } from '../src/index';
 
 it('all', () => {
   const actual = stringify(
