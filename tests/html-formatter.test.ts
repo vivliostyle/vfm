@@ -1,8 +1,7 @@
-import assert from 'assert';
 import { stringify } from '../src/index';
 
 it('Enable (default)', () => {
-  const actual = stringify(
+  const received = stringify(
     'あああああああああああああああああああああああああ いいいいいいいいいいいいいいいいいいいいいい ううううううううううううううううううううううううう えええええええええええええええええええええええええ おおおおおおおおおおおおおおおおおおおおおおお\n\nかきくけこ\n\nさしすせそ',
   );
   const expected = `<!doctype html>
@@ -18,11 +17,11 @@ it('Enable (default)', () => {
   </body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
 
 it('Disable', () => {
-  const actual = stringify(
+  const received = stringify(
     'あああああああああああああああああああああああああ いいいいいいいいいいいいいいいいいいいいいい ううううううううううううううううううううううううう えええええええええええええええええええええええええ おおおおおおおおおおおおおおおおおおおおおおお\n\nかきくけこ\n\nさしすせそ',
     { disableFormatHtml: true },
   );
@@ -39,5 +38,5 @@ it('Disable', () => {
 </body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
