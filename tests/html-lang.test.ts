@@ -1,8 +1,7 @@
-import assert from 'assert';
 import { stringify } from '../src/index';
 
 it('undefined', () => {
-  const actual = stringify('text', { disableFormatHtml: true });
+  const received = stringify('text', { disableFormatHtml: true });
   const expected = `<!doctype html>
 <html>
 <head>
@@ -14,11 +13,14 @@ it('undefined', () => {
 </body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
 
 it('en', () => {
-  const actual = stringify('text', { language: 'en', disableFormatHtml: true });
+  const received = stringify('text', {
+    language: 'en',
+    disableFormatHtml: true,
+  });
   const expected = `<!doctype html>
 <html lang="en">
 <head>
@@ -30,5 +32,5 @@ it('en', () => {
 </body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });

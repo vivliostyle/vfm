@@ -1,8 +1,7 @@
-import assert from 'assert';
 import { stringify } from '../src/index';
 
 it('all', () => {
-  const actual = stringify(
+  const received = stringify(
     `---
 title: 'Title'
 author: 'Author'
@@ -27,11 +26,11 @@ class: 'my-class'
   </body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
 
 it('title from heading, missing "title" property of Frontmatter', () => {
-  const actual = stringify(`# Page Title`);
+  const received = stringify(`# Page Title`);
   const expected = `<!doctype html>
 <html>
   <head>
@@ -46,11 +45,11 @@ it('title from heading, missing "title" property of Frontmatter', () => {
   </body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
 
 it('title from options', () => {
-  const actual = stringify(
+  const received = stringify(
     `---
 author: 'Author'
 class: 'my-class'
@@ -71,11 +70,11 @@ class: 'my-class'
   <body class="my-class"></body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
 
 it('overwrite optional title by frontmatter', () => {
-  const actual = stringify(
+  const received = stringify(
     `---
 title: 'Title'
 author: 'Author'
@@ -97,11 +96,11 @@ class: 'my-class'
   <body class="my-class"></body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
 
 it('overwrite optional title by heading', () => {
-  const actual = stringify(
+  const received = stringify(
     `---
 author: 'Author'
 class: 'my-class'
@@ -128,11 +127,11 @@ class: 'my-class'
   </body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
 
 it('multiple classes', () => {
-  const actual = stringify(
+  const received = stringify(
     `---
 class: 'foo bar'
 ---
@@ -147,5 +146,5 @@ class: 'foo bar'
   <body class="foo bar"></body>
 </html>
 `;
-  assert.strictEqual(actual, expected);
+  expect(received).toBe(expected);
 });
