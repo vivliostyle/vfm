@@ -7,7 +7,7 @@ import { hast as metadata } from './plugins/metadata';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
 import { reviveParse as markdown } from './revive-parse';
 import html from './revive-rehype';
-import { debug } from './utils/debug';
+import { debug } from './utils';
 
 /**
  * Option for convert Markdown to a stringify (HTML).
