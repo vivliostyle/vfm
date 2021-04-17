@@ -1,8 +1,8 @@
+import { Element } from 'hast';
 import is from 'hast-util-is-element';
 import h from 'hastscript';
 import { Node, Parent } from 'unist';
 import visit from 'unist-util-visit';
-import { HastNode } from './hastnode';
 
 /**
  * Check if the specified property is `<img>` specific.
@@ -40,7 +40,11 @@ const isImgProperty = (name: string): boolean => {
  * @param img `<img>` tag.
  * @param parent `<p>` tag.
  */
-const wrapFigureImg = (img: HastNode, parent: HastNode) => {
+const wrapFigureImg = (img: Element, parent: Element) => {
+  if (!(img.properties && parent.properties)) {
+    return;
+  }
+
   parent.tagName = 'figure';
   parent.children.push(
     h('figcaption', { 'aria-hidden': 'true' }, [img.properties.alt]),
@@ -60,30 +64,37 @@ const wrapFigureImg = (img: HastNode, parent: HastNode) => {
 };
 
 export const hast = () => (tree: Node) => {
-  visit<HastNode>(tree, 'element', (node, index, parent) => {
+  visit<Element>(tree, 'element', (node, index, parent) => {
     // handle captioned code block
-    const maybeCode = node.children?.[0] as HastNode | undefined;
-    if (is(node, 'pre') && maybeCode?.properties?.title) {
+    const maybeCode = node.children?.[0] as Element | undefined;
+    if (
+      is(node, 'pre') &&
+      maybeCode?.properties &&
+      maybeCode.properties.title
+    ) {
       const maybeTitle = maybeCode.properties.title;
       delete maybeCode.properties.title;
-      (parent as Parent).children[index] = h(
-        'figure',
-        { class: maybeCode.properties.className[0] },
-        h('figcaption', maybeTitle),
-        node,
-      );
+      if (Array.isArray(maybeCode.properties.className)) {
+        (parent as Parent).children[index] = h(
+          'figure',
+          { class: maybeCode.properties.className[0] },
+          h('figcaption', maybeTitle),
+          node,
+        );
+      }
+
       return;
     }
 
     // handle captioned and single line (like a block) img
     if (
       is(node, 'img') &&
-      node.properties.alt &&
+      node.properties?.alt &&
       parent &&
       parent.tagName === 'p' &&
       parent.children.length === 1
     ) {
-      wrapFigureImg(node, parent as HastNode);
+      wrapFigureImg(node, parent as Element);
     }
   });
 };

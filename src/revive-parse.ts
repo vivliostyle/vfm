@@ -11,7 +11,7 @@ import { mdast as metadata } from './plugins/metadata';
 import { mdast as ruby } from './plugins/ruby';
 import { mdast as section } from './plugins/section';
 import { mdast as toc } from './plugins/toc';
-import { inspect } from './utils/debug';
+import { inspect } from './utils';
 
 /**
  * Options for Markdown conversion.

@@ -1,3 +1,4 @@
+import { Element } from 'hast';
 import { load as yaml } from 'js-yaml';
 import { FrontmatterContent, Literal } from 'mdast';
 import toString from 'mdast-util-to-string';
@@ -5,7 +6,6 @@ import { Node } from 'unist';
 import { select } from 'unist-util-select';
 import visit from 'unist-util-visit';
 import { VFile } from 'vfile';
-import { HastNode } from './hastnode';
 
 /**
  * Extension of VFM metadata to VFile data.
@@ -28,7 +28,7 @@ interface MetadataVFile extends VFile {
  * @param node Node of HAST.
  * @param author Author.
  */
-const setAuthor = (node: HastNode, author: string) => {
+const setAuthor = (node: Element, author: string) => {
   node.children.push({
     type: 'element',
     tagName: 'meta',
@@ -42,10 +42,10 @@ const setAuthor = (node: HastNode, author: string) => {
  * @param node Node of HAST.
  * @param title Title.
  */
-const setTitle = (node: HastNode, title: string) => {
+const setTitle = (node: Element, title: string) => {
   const titleElement = node.children.find(
     (elm) => elm.type === 'element' && elm.tagName === 'title',
-  ) as HastNode | undefined;
+  ) as Element | undefined;
 
   if (titleElement) {
     const text = titleElement.children.find((n) => n.type === 'text');
@@ -70,8 +70,10 @@ const setTitle = (node: HastNode, title: string) => {
  * @param node Node of HAST.
  * @param className Value of class attribute.
  */
-const setBodyClass = (node: HastNode, value: string) => {
-  node.properties.class = value;
+const setBodyClass = (node: Element, value: string) => {
+  if (node.properties) {
+    node.properties.class = value;
+  }
 };
 
 /**
@@ -108,7 +110,7 @@ export const mdast = () => (tree: Node, file: MetadataVFile) => {
  */
 export const hast = () => (tree: Node, vfile: VFile) => {
   const metadata = vfile as MetadataVFile;
-  visit<HastNode>(tree, 'element', (node) => {
+  visit<Element>(tree, 'element', (node) => {
     if (node.tagName === 'head') {
       if (metadata.data.author) {
         setAuthor(node, metadata.data.author);
