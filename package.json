@@ -51,7 +51,7 @@
     "release": "release-it",
     "release:pre": "release-it --preRelease --npm.tag=latest",
     "test": "jest",
-    "test:debug": "jest tests/xxx.test.ts --silent=false --verbose false"
+    "test:debug": "jest tests/math.test.ts --silent=false --verbose false"
   },
   "dependencies": {
     "debug": "^4.3.1",
@@ -59,6 +59,7 @@
     "hast-util-is-element": "^1.1.0",
     "hastscript": "^6.0.0",
     "js-yaml": "^4.0.0",
+    "mdast-util-find-and-replace": "^1.1.1",
     "mdast-util-to-hast": "^10.1.1",
     "mdast-util-to-string": "^2.0.0",
     "meow": "^9.0.0",

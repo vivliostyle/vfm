@@ -8,19 +8,26 @@ import visit from 'unist-util-visit';
 import { VFile } from 'vfile';
 
 /**
+ * Metadata from frontmatter in markdown.
+ */
+export type Metadata = {
+  /** Title. */
+  title?: string;
+  /** Author. */
+  author?: string;
+  /** Value to specify for the `class` attribute of `<body>`. */
+  class?: string;
+  /** Enable math syntax. */
+  math?: boolean;
+  /** Value that indicates that the document is TOC. */
+  toc?: boolean;
+};
+
+/**
  * Extension of VFM metadata to VFile data.
  */
-interface MetadataVFile extends VFile {
-  data: {
-    /** Title. */
-    title?: string;
-    /** Author. */
-    author?: string;
-    /** Value to specify for the `class` attribute of `<body>`. */
-    class?: string;
-    /** Value that indicates that the document is TOC. */
-    toc?: boolean;
-  };
+export interface MetadataVFile extends VFile {
+  data: Metadata;
 }
 
 /**
@@ -39,6 +46,7 @@ const setAuthor = (node: Element, author: string) => {
 
 /**
  * Set the title to `<head>`.
+ * If `<title>` already exists, rewrite its text. Otherwise, add a new one at the end of `<head>`.
  * @param node Node of HAST.
  * @param title Title.
  */
@@ -48,6 +56,7 @@ const setTitle = (node: Element, title: string) => {
   ) as Element | undefined;
 
   if (titleElement) {
+    // Overwrite what was set in `rehype-document`
     const text = titleElement.children.find((n) => n.type === 'text');
     if (text) {
       text.value = title;

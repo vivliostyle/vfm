@@ -20,6 +20,7 @@ export const buildProcessorTestingCode = (
     replace = undefined,
     hardLineBreaks = false,
     disableFormatHtml = true,
+    math = false,
   }: StringifyMarkdownOptions = {},
 ) => (): any => {
   const vfm = VFM({
@@ -30,6 +31,7 @@ export const buildProcessorTestingCode = (
     replace,
     hardLineBreaks,
     disableFormatHtml,
+    math,
   }).freeze();
   expect(unistInspect.noColor(vfm.parse(input))).toBe(expectedMdast.trim());
   expect(String(vfm.processSync(input))).toBe(expectedHtml);

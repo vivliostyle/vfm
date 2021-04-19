@@ -1,7 +1,7 @@
 import { VFM } from '../src';
 
 it('has valid inlineMethods', () => {
-  const vfm = VFM({ partial: true }).freeze();
+  const vfm = VFM({ partial: true, math: true }).freeze();
   expect(vfm.Parser.prototype.inlineMethods).toEqual([
     'escape',
     'autoLink',
@@ -17,20 +17,20 @@ it('has valid inlineMethods', () => {
     'deletion',
     'code',
     'break',
+    'inlineMath',
+    'displayMath',
     'ruby',
-    'math',
     'text',
   ]);
 });
 
 it('has valid blockMethods', () => {
-  const vfm = VFM({ partial: true }).freeze();
+  const vfm = VFM({ partial: true, math: true }).freeze();
   expect(vfm.Parser.prototype.blockMethods).toEqual([
     'yamlFrontMatter',
     'blankLine',
     'indentedCode',
     'fencedCode',
-    'math',
     'blockquote',
     'atxHeading',
     'thematicBreak',
@@ -46,12 +46,11 @@ it('has valid blockMethods', () => {
 });
 
 it('has valid interruptParagraph', () => {
-  const vfm = VFM({ partial: true }).freeze();
+  const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptParagraph.map(
     ([name]: string[]) => name,
   );
   expect(interrupters).toEqual([
-    'math',
     'thematicBreak',
     'list',
     'atxHeading',
@@ -64,12 +63,11 @@ it('has valid interruptParagraph', () => {
 });
 
 it('has valid interruptList', () => {
-  const vfm = VFM({ partial: true }).freeze();
+  const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptList.map(
     ([name]: string[]) => name,
   );
   expect(interrupters).toEqual([
-    'math',
     'atxHeading',
     'fencedCode',
     'thematicBreak',
@@ -78,12 +76,11 @@ it('has valid interruptList', () => {
 });
 
 it('has valid interruptBlockquote', () => {
-  const vfm = VFM({ partial: true }).freeze();
+  const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptBlockquote.map(
     ([name]: string[]) => name,
   );
   expect(interrupters).toEqual([
-    'math',
     'indentedCode',
     'fencedCode',
     'atxHeading',
@@ -96,7 +93,7 @@ it('has valid interruptBlockquote', () => {
 });
 
 it('has valid interruptFootnoteDefinition', () => {
-  const vfm = VFM({ partial: true }).freeze();
+  const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptFootnoteDefinition.map(
     ([name]: string[]) => name,
   );

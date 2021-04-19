@@ -299,46 +299,43 @@ section.author {
 
 ## Math equation
 
-<Badge type="warning">PRE-RELEASE</Badge>
+Outputs HTML processed by [MathJax](https://www.mathjax.org/).
+
+It is disabled by default. It is activated by satisfying one of the following.
+
+- VFM options: `math: true`
+- CLI options: `--math`
+- Frontmatter: `math: true` (Priority over others)
 
 **VFM**
 
+The VFM syntax for MathJax inline is `$...$` and the display is `$$...$$`.
+
 ```markdown
-$$\sum$$
+inline: $x = y$
+
+display: $$1 + 1 = 2$$
 ```
 
 **HTML**
 
+It also outputs the `<script>` and `<body>` attributes for processing MathJax in Vivliostyle if `math` is enabled.
+
 ```html
-<p>
-  <span class="math math-inline">
-    <span class="katex">
-      <span class="katex-html" aria-hidden="true">
-        <span class="base">
-          <span class="strut" style="height:0.43056em;vertical-align:0em;">
-          </span>
-          <span class="mord mathdefault">s</span>
-          <span class="mord mathdefault">u</span>
-          <span class="mord mathdefault">m</span>
-        </span>
-      </span>
-    </span>
-  </span>
-</p>
-```
-
-**CSS**
-
-```css
-span.math {
-}
-span.math.math-inline {
-}
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  </head>
+  <body data-math-typeset>
+    <p>inline: \(x = y\)</p>
+    <p>display: $$1 + 1 = 2$$</p>
+  </body>
+</html>
 ```
 
 ## Frontmatter
-
-<Badge type="warning">PRE-RELEASE</Badge>
 
 Frontmatter is a way of defining metadata in Markdown (file) units.
 
@@ -347,24 +344,31 @@ Frontmatter is a way of defining metadata in Markdown (file) units.
 title: 'Introduction to VFM'
 author: 'Author'
 class: 'my-class'
+math: true
 ---
 
 ```
 
 #### Reserved words
 
-| Property | Type   | Description                                                                                 |
-| -------- | ------ | ------------------------------------------------------------------------------------------- |
-| title    | String | Document title. If missing, very first heading `#` of the content will be treated as title. |
-| author   | String | Document author.                                                                            |
-| class    | String | Custom classes applied to `<body>`                                                          |
-| theme    | String | Vivliostyle theme package or bare CSS file.                                                 |
+| Property | Type    | Description                                                                                 |
+| -------- | ------- | ------------------------------------------------------------------------------------------- |
+| title    | String  | Document title. If missing, very first heading `#` of the content will be treated as title. |
+| author   | String  | Document author.                                                                            |
+| class    | String  | Custom classes applied to `<body>`                                                          |
+| math     | Boolean | Enable math syntax.                                                                         |
+| theme    | String  | Vivliostyle theme package or bare CSS file.                                                 |
 
 The priority of `title` is as follows.
 
 1. `title` property of the frontmatter
 2. First heading `#` of the content
 3. `title` option of VFM
+
+The priority of `math` is as follows.
+
+1. `math` property of the frontmatter
+2. `math` option of VFM
 
 **class**
 
