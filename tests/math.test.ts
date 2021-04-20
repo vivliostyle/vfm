@@ -54,7 +54,7 @@ it('HTML header and body', () => {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
-<body data-math-typeset>
+<body data-math-typeset="true">
 <p>\\(x=y\\)</p>
 </body>
 </html>

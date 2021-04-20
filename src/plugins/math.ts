@@ -178,7 +178,7 @@ export const hast = () => (tree: Node) => {
         break;
 
       case 'body':
-        node.properties = { ...node.properties, 'data-math-typeset': true };
+        node.properties = { ...node.properties, 'data-math-typeset': 'true' };
         break;
     }
   });
