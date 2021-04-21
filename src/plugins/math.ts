@@ -22,7 +22,11 @@ const typeDisplay = 'displayMath';
 const mathUrl =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML';
 
-const createTokenizer = () => {
+/**
+ * Create tokenizers for remark-parse.
+ * @returns Tokenizers.
+ */
+const createTokenizers = () => {
   const tokenizerInlineMath: Tokenizer = function (eat, value, silent) {
     if (!value.startsWith('$') || value.startsWith('$$')) {
       return;
@@ -100,7 +104,7 @@ export const mdast: Plugin = function (): Transformer | undefined {
     this.Parser.prototype.inlineMethods
   ) {
     const { inlineTokenizers, inlineMethods } = this.Parser.prototype;
-    const tokenizers = createTokenizer();
+    const tokenizers = createTokenizers();
     inlineTokenizers[typeInline] = tokenizers.tokenizerInlineMath;
     inlineTokenizers[typeDisplay] = tokenizers.tokenizerDisplayMath;
     inlineMethods.splice(inlineMethods.indexOf('text'), 0, typeInline);
@@ -140,9 +144,20 @@ export const mdast: Plugin = function (): Transformer | undefined {
  * @returns Hypertext AST.
  */
 export const handlerInlineMath: Handler = (h, node: Node) => {
-  if (!node.data) node.data = {};
+  if (!node.data) {
+    node.data = {};
+  }
 
-  return u('text', `\\(${node.data.value as string}\\)`);
+  return h(
+    {
+      type: 'element',
+    },
+    'span',
+    {
+      class: 'math inline',
+    },
+    [u('text', `\\(${node.data.value as string}\\)`)],
+  );
 };
 
 /**
@@ -154,7 +169,16 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
 export const handlerDisplayMath: Handler = (h, node: Node) => {
   if (!node.data) node.data = {};
 
-  return u('text', `$$${node.data.value as string}$$`);
+  return h(
+    {
+      type: 'element',
+    },
+    'span',
+    {
+      class: 'math display',
+    },
+    [u('text', `$$${node.data.value as string}$$`)],
+  );
 };
 
 /**

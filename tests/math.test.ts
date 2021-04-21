@@ -8,13 +8,14 @@ const options = {
 
 it('inline', () => {
   const received = stringify('text$x=y$text', options);
-  const expected = '<p>text\\(x=y\\)text</p>';
+  const expected = '<p>text<span class="math inline">\\(x=y\\)</span>text</p>';
   expect(received).toBe(expected);
 });
 
 it('display', () => {
   const received = stringify('text$$1 + 1 = 2$$text', options);
-  const expected = '<p>text$$1 + 1 = 2$$text</p>';
+  const expected =
+    '<p>text<span class="math display">$$1 + 1 = 2$$</span>text</p>';
   expect(received).toBe(expected);
 });
 
@@ -23,7 +24,8 @@ it('inline and display', () => {
     'inline: $x = y$\n\ndisplay: $$1 + 1 = 2$$',
     options,
   );
-  const expected = '<p>inline: \\(x = y\\)</p>\n<p>display: $$1 + 1 = 2$$</p>';
+  const expected = `<p>inline: <span class="math inline">\\(x = y\\)</span></p>
+<p>display: <span class="math display">$$1 + 1 = 2$$</span></p>`;
   expect(received).toBe(expected);
 });
 
@@ -35,13 +37,15 @@ it('un-match', () => {
 
 it('inline: exclusive other markdown syntax', () => {
   const received = stringify('text$**bold**$text', options);
-  const expected = '<p>text\\(**bold**\\)text</p>';
+  const expected =
+    '<p>text<span class="math inline">\\(**bold**\\)</span>text</p>';
   expect(received).toBe(expected);
 });
 
 it('display: exclusive other markdown syntax', () => {
   const received = stringify('text$$**bold**$$text', options);
-  const expected = '<p>text$$**bold**$$text</p>';
+  const expected =
+    '<p>text<span class="math display">$$**bold**$$</span>text</p>';
   expect(received).toBe(expected);
 });
 
@@ -55,7 +59,7 @@ it('HTML header and body', () => {
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 </head>
 <body data-math-typeset="true">
-<p>\\(x=y\\)</p>
+<p><span class="math inline">\\(x=y\\)</span></p>
 </body>
 </html>
 `;

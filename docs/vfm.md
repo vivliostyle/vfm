@@ -329,10 +329,20 @@ It also outputs the `<script>` and `<body>` attributes for processing MathJax in
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   </head>
   <body data-math-typeset>
-    <p>inline: \(x = y\)</p>
-    <p>display: $$1 + 1 = 2$$</p>
+    <p>inline: <span class="math inline">\(x = y\)</span></p>
+    <p>display: <span class="math display">$$1 + 1 = 2$$</span></p>
   </body>
 </html>
+```
+
+**CSS**
+
+```css
+.math.inline {
+}
+
+.math.display {
+}
 ```
 
 ## Frontmatter
@@ -412,8 +422,6 @@ To specify multiple classes, define as `class:'foo bar'`.
 ```
 
 ## Hard new line
-
-<Badge type="warning">PRE-RELEASE</Badge>
 
 - A newline puts `<br/>` to the end of a line.
 - Consecutive 2 newlines creates a new sentence block.

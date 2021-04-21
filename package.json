@@ -51,7 +51,7 @@
     "release": "release-it",
     "release:pre": "release-it --preRelease --npm.tag=latest",
     "test": "jest",
-    "test:debug": "jest tests/xxx.test.ts --silent=false --verbose false"
+    "test:debug": "jest tests/math.test.ts --silent=false --verbose false"
   },
   "dependencies": {
     "debug": "^4.3.1",
