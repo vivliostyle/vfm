@@ -12,10 +12,77 @@ it('inline', () => {
   expect(received).toBe(expected);
 });
 
+it('inline: multiline', () => {
+  const md = `$x=y
+1 + 1 = 2$`;
+  const received = stringify(md, options);
+  const expected = `<p><span class="math inline">\\(x=y
+1 + 1 = 2\\)</span></p>`;
+  expect(received).toBe(expected);
+});
+
+it('inline: ignore "$ ...$"', () => {
+  const md = 'text $ text$x = y$';
+  const received = stringify(md, options);
+  const expected =
+    '<p>text $ text<span class="math inline">\\(x = y\\)</span></p>';
+  expect(received).toBe(expected);
+});
+
+it('inline: ignore "$... $"', () => {
+  const md = 'text $x = $y$ text';
+  const received = stringify(md, options);
+  const expected =
+    '<p>text <span class="math inline">\\(x = $y\\)</span> text</p>';
+  expect(received).toBe(expected);
+});
+
+it('inline: ignore "$" with number', () => {
+  const md = 'There are $3 and $4 bread.';
+  const received = stringify(md, options);
+  const expected = '<p>There are $3 and $4 bread.</p>';
+  expect(received).toBe(expected);
+});
+
+it('inline: ignore "$.\\$.$"', () => {
+  const md = 'text $x = 5\\$ + 4$ text';
+  const received = stringify(md, options);
+  const expected =
+    '<p>text <span class="math inline">\\(x = 5\\$ + 4\\)</span> text</p>';
+  expect(received).toBe(expected);
+});
+
+it('inline: exclusive other markdown syntax', () => {
+  const received = stringify('text$**bold**$text', options);
+  const expected =
+    '<p>text<span class="math inline">\\(**bold**\\)</span>text</p>';
+  expect(received).toBe(expected);
+});
+
 it('display', () => {
   const received = stringify('text$$1 + 1 = 2$$text', options);
   const expected =
     '<p>text<span class="math display">$$1 + 1 = 2$$</span>text</p>';
+  expect(received).toBe(expected);
+});
+
+it('display: multiline', () => {
+  const md = `$$
+x=y
+1 + 1 = 2
+$$`;
+  const received = stringify(md, options);
+  const expected = `<p><span class="math display">$$
+x=y
+1 + 1 = 2
+$$</span></p>`;
+  expect(received).toBe(expected);
+});
+
+it('display: exclusive other markdown syntax', () => {
+  const received = stringify('text$$**bold**$$text', options);
+  const expected =
+    '<p>text<span class="math display">$$**bold**$$</span>text</p>';
   expect(received).toBe(expected);
 });
 
@@ -29,23 +96,35 @@ it('inline and display', () => {
   expect(received).toBe(expected);
 });
 
-it('un-match', () => {
+it('un-match: $$$...', () => {
   const received = stringify('text$$$unmatch$$$text', options);
   const expected = '<p>text$$$unmatch$$$text</p>';
   expect(received).toBe(expected);
 });
 
-it('inline: exclusive other markdown syntax', () => {
-  const received = stringify('text$**bold**$text', options);
+it('un-match inline', () => {
+  const received = stringify('$x = y$ $ x = y$ $x = y $ $x = y$7', options);
   const expected =
-    '<p>text<span class="math inline">\\(**bold**\\)</span>text</p>';
+    '<p><span class="math inline">\\(x = y\\)</span> $ x = y$ $x = y $ $x = y$7</p>';
   expect(received).toBe(expected);
 });
 
-it('display: exclusive other markdown syntax', () => {
-  const received = stringify('text$$**bold**$$text', options);
-  const expected =
-    '<p>text<span class="math display">$$**bold**$$</span>text</p>';
+it('un-match: divided paragraph', () => {
+  const md = `$x = y
+
+1 + 1 = 2$
+$$
+x = y
+
+1 + 1 = 2
+$$`;
+  const received = stringify(md, options);
+  const expected = `<p>$x = y</p>
+<p>1 + 1 = 2$
+$$
+x = y</p>
+<p>1 + 1 = 2
+$$</p>`;
   expect(received).toBe(expected);
 });
 

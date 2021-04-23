@@ -6,11 +6,15 @@ import { Node } from 'unist';
 import u from 'unist-builder';
 import visit from 'unist-util-visit';
 
-/** Inline math format, e.g. `$...$`. */
-const regexpInline = /\$([^$].*?[^$])\$(?!\$)/g;
+/**
+ * Inline math format, e.g. `$...$`.
+ * - OK: `$x = y$`, `$x = \$y$`
+ * - NG: `$$x = y$`, `$x = y$$`, `$ x = y$`, `$x = y $`, `$x = y$7`
+ */
+const regexpInline = /\$([^($| )].*?[^(\\|$| )])\$(?!(\$|\d))/gs;
 
 /** Display math format, e.g. `$$...$$`. */
-const regexpDisplay = /\$\$([^$].*?[^$])\$\$(?!\$)/g;
+const regexpDisplay = /\$\$([^$].*?[^$])\$\$(?!\$)/gs;
 
 /** Type of inline math in Markdown AST. */
 const typeInline = 'inlineMath';
@@ -28,7 +32,11 @@ const mathUrl =
  */
 const createTokenizers = () => {
   const tokenizerInlineMath: Tokenizer = function (eat, value, silent) {
-    if (!value.startsWith('$') || value.startsWith('$$')) {
+    if (
+      !value.startsWith('$') ||
+      value.startsWith('$ ') ||
+      value.startsWith('$$')
+    ) {
       return;
     }
 

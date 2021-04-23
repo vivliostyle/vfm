@@ -307,12 +307,28 @@ It is disabled by default. It is activated by satisfying one of the following.
 - CLI options: `--math`
 - Frontmatter: `math: true` (Priority over others)
 
-**VFM**
-
 The VFM syntax for MathJax inline is `$...$` and the display is `$$...$$`.
 
+It also supports multiple lines, such as `$x = y\n1 + 1 = 2$` and `$$\nx = y\n$$`. However, if there is a blank line `\n\n` such as `$x = y\n\n1 + 1 = 2$ `, the paragraphs will be separated and it will not be a mathematical syntax.
+
+OK:
+
+- `$...$`, `$$...$$` ...Range specification matches
+- `$...\n...$`, `$\n...\n$` ...Within the same paragraph
+- `$...\$...$`, `$$...\$...$$` ...Escape `$` by `\`
+
+NG:
+
+- `$...$$`, `$$...$` ...Range specification does not match
+- `$...\n\n...$`, `$$...\n\n...$$` ...Split paragraph
+- `$ ...$` ...Space ` ` immediately after `$` at start of inline
+- `$... $` ...Space ` ` immediately before `$` at end of inline
+- `$...$5` ...Digit `0...N` immediately after `$` at end of inline
+
+**VFM**
+
 ```markdown
-inline: $x = y$
+inline:$x = y$
 
 display: $$1 + 1 = 2$$
 ```
