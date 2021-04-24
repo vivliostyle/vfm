@@ -315,14 +315,14 @@ OK:
 
 - `$...$`, `$$...$$` ...Range specification matches
 - `$...\n...$`, `$$\n...\n$$` ...Within the same paragraph
-- `$...\$...$`, `$$...\$...$$` ...Escape `$` by `\`
+- `$...\$...$`, `$...\$...\\\$..$`,  `$$...\$...\\\$...$$` ...Escape `$` by odd `\`
 
 NG:
 
 - `$...$$`, `$$...$` ...Range specification does not match
 - `$...\n\n...$`, `$$...\n\n...$$` ...Split paragraph
-- `$ ...$` ...Space ` ` immediately after `$` at start of inline
-- `$... $` ...Space ` ` immediately before `$` at end of inline
+- `$ ...$` ...Spaces (space, tab, new line, ...etc) ` ` immediately after `$` at start of inline
+- `$... $` ...Spaces (space, tab, new line, ...etc) ` ` immediately before `$` at end of inline
 - `$...$5` ...Digit `0...N` immediately after `$` at end of inline
 
 **VFM**

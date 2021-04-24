@@ -8,10 +8,12 @@ const options = {
 
 it('inline', () => {
   const md = `text$x = y$text
+$a$
 $(x = y)$
 $|x = y|$`;
   const received = stringify(md, options);
   const expected = `<p>text<span class="math inline">\\(x = y\\)</span>text
+<span class="math inline">\\(a\\)</span>
 <span class="math inline">\\((x = y)\\)</span>
 <span class="math inline">\\(|x = y|\\)</span></p>`;
   expect(received).toBe(expected);
@@ -62,10 +64,10 @@ it('inline: ignore "$" with number', () => {
 });
 
 it('inline: ignore "$.\\$.$"', () => {
-  const md = 'text $x = 5\\$ + 4$ text';
+  const md = 'text $x = 5\\$ + \\\\\\$ + 4$ text';
   const received = stringify(md, options);
   const expected =
-    '<p>text <span class="math inline">\\(x = 5\\$ + 4\\)</span> text</p>';
+    '<p>text <span class="math inline">\\(x = 5\\$ + \\\\\\$ + 4\\)</span> text</p>';
   expect(received).toBe(expected);
 });
 
@@ -77,9 +79,11 @@ it('inline: exclusive other markdown syntax', () => {
 });
 
 it('display', () => {
-  const received = stringify('text$$1 + 1 = 2$$text', options);
-  const expected =
-    '<p>text<span class="math display">$$1 + 1 = 2$$</span>text</p>';
+  const md = `text$$1 + 1 = 2$$text
+$$a$$`;
+  const received = stringify(md, options);
+  const expected = `<p>text<span class="math display">$$1 + 1 = 2$$</span>text
+<span class="math display">$$a$$</span></p>`;
   expect(received).toBe(expected);
 });
 
