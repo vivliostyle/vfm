@@ -14,7 +14,7 @@ import visit from 'unist-util-visit';
 const regexpInline = /\$([^$\s].*?(?<=[^\\$\s]|[^\\](?:\\\\)+))\$(?!\$|\d)/gs;
 
 /** Display math format, e.g. `$$...$$`. */
-const regexpDisplay = /\$\$([^$].*?[^$])\$\$(?!\$)/gs;
+const regexpDisplay = /\$\$([^$].*?(?<=[^$]))\$\$(?!\$)/gs;
 
 /** Type of inline math in Markdown AST. */
 const typeInline = 'inlineMath';
