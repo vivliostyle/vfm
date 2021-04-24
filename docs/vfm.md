@@ -314,7 +314,7 @@ It also supports multiple lines, such as `$x = y\n1 + 1 = 2$` and `$$\nx = y\n$$
 OK:
 
 - `$...$`, `$$...$$` ...Range specification matches
-- `$...\n...$`, `$\n...\n$` ...Within the same paragraph
+- `$...\n...$`, `$$\n...\n$$` ...Within the same paragraph
 - `$...\$...$`, `$$...\$...$$` ...Escape `$` by `\`
 
 NG:
