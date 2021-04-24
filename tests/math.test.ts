@@ -7,33 +7,50 @@ const options = {
 };
 
 it('inline', () => {
-  const received = stringify('text$x=y$text', options);
-  const expected = '<p>text<span class="math inline">\\(x=y\\)</span>text</p>';
+  const md = `text$x = y$text
+$(x = y)$
+$|x = y|$`;
+  const received = stringify(md, options);
+  const expected = `<p>text<span class="math inline">\\(x = y\\)</span>text
+<span class="math inline">\\((x = y)\\)</span>
+<span class="math inline">\\(|x = y|\\)</span></p>`;
   expect(received).toBe(expected);
 });
 
 it('inline: multiline', () => {
-  const md = `$x=y
+  const md = `$x = y
 1 + 1 = 2$`;
   const received = stringify(md, options);
-  const expected = `<p><span class="math inline">\\(x=y
+  const expected = `<p><span class="math inline">\\(x = y
 1 + 1 = 2\\)</span></p>`;
   expect(received).toBe(expected);
 });
 
-it('inline: ignore "$ ...$"', () => {
-  const md = 'text $ text$x = y$';
+it('inline: ignore "$ ...$", "$\n...$", "$\t...$"', () => {
+  const md = `text $ text$x = y$
+$
+x = y$
+$\tx = y$
+`;
   const received = stringify(md, options);
-  const expected =
-    '<p>text $ text<span class="math inline">\\(x = y\\)</span></p>';
+  const expected = `<p>text $ text<span class="math inline">\\(x = y\\)</span>
+$
+x = y$
+$\tx = y$</p>`;
   expect(received).toBe(expected);
 });
 
 it('inline: ignore "$... $"', () => {
-  const md = 'text $x = $y$ text';
+  const md = `text $x = $y$ text
+$x = y
+$
+$x = y\t$
+`;
   const received = stringify(md, options);
-  const expected =
-    '<p>text <span class="math inline">\\(x = $y\\)</span> text</p>';
+  const expected = `<p>text <span class="math inline">\\(x = $y\\)</span> text
+$x = y
+$
+$x = y\t$</p>`;
   expect(received).toBe(expected);
 });
 
