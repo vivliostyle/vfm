@@ -11,7 +11,7 @@ import visit from 'unist-util-visit';
  * - OK: `$x = y$`, `$x = \$y$`
  * - NG: `$$x = y$`, `$x = y$$`, `$ x = y$`, `$x = y $`, `$x = y$7`
  */
-const regexpInline = /\$([^$\s].*?[^\\$\s])\$(?!(\$|\d))/gs;
+const regexpInline = /\$([^$\s].*?(?<=[^\\$\s]|[^\\](?:\\\\)+))\$(?!\$|\d)/gs;
 
 /** Display math format, e.g. `$$...$$`. */
 const regexpDisplay = /\$\$([^$].*?[^$])\$\$(?!\$)/gs;
