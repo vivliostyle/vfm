@@ -1,3 +1,22 @@
+# [1.0.0-alpha.19](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.18...v1.0.0-alpha.19) (2021-04-26)
+
+
+### Bug Fixes
+
+* change `data-math-typeset` attribute to string boolean ([ee733b7](https://github.com/vivliostyle/vfm/commit/ee733b71de7a734af51358462e3a183d6be3f935))
+* change the value of `data-math-typeset` from `boolean` to `string` ([ab3442b](https://github.com/vivliostyle/vfm/commit/ab3442bc000e1ee93c5b913d1852ea47a1d984d8))
+* incorrect specification of characters immediately before/after the start and end in math syntax ([e0948ec](https://github.com/vivliostyle/vfm/commit/e0948ec608992b51f2240d79af57ff4f984df61b))
+
+
+### Features
+
+* add html tag for math syntax ([bcffbda](https://github.com/vivliostyle/vfm/commit/bcffbda34d1f3d947f94db8eef0583070afe7db4))
+* escape `$` with an even number of `\` and one-letter expression in math syntax (inline) ([26e4cb8](https://github.com/vivliostyle/vfm/commit/26e4cb8526e7f6d6e45496f1707885b8cba19c83))
+* implemented math syntax with MathJax ([1f62c24](https://github.com/vivliostyle/vfm/commit/1f62c2491500a886d8a8de3b912d3f43e8723901))
+* implemented MathJax multi-line specification, pre/post-conditions for start and end symbols, and escape ([2611e92](https://github.com/vivliostyle/vfm/commit/2611e9208d105da4a60eabf2b437d17908860981))
+* one-letter expression in math syntax (display) ([13f195a](https://github.com/vivliostyle/vfm/commit/13f195a6c2eed133c47ca61b8a70e1bed95024ff))
+* set `aria-hidden: true` to `<figcaption>` so that screen readers don't even read `<img>`'s `alt` and `<figcaption>` ([91bb30c](https://github.com/vivliostyle/vfm/commit/91bb30c094e9da3eeb07e4b1171b63c005fdc192))
+
 # [1.0.0-alpha.18](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.17...v1.0.0-alpha.18) (2021-04-09)
 
 ### Bug Fixes

@@ -1,7 +1,7 @@
 {
   "name": "@vivliostyle/vfm",
   "description": "Custom Markdown syntax specialized in book authoring.",
-  "version": "1.0.0-alpha.18",
+  "version": "1.0.0-alpha.19",
   "author": "Vivliostyle Foundation",
   "license": "Apache-2.0",
   "main": "lib/index.js",
