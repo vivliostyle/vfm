@@ -59,6 +59,7 @@
     "hast-util-is-element": "^1.1.0",
     "hastscript": "^6.0.0",
     "js-yaml": "^4.0.0",
+    "mdast-util-find-and-replace": "^1.1.1",
     "mdast-util-to-hast": "^10.1.1",
     "mdast-util-to-string": "^2.0.0",
     "meow": "^9.0.0",

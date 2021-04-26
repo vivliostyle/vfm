@@ -1,4 +1,4 @@
-import { stringify } from '../src/index';
+import { stringify, VFM } from '../src/index';
 
 it('all', () => {
   const received = stringify(
@@ -15,9 +15,9 @@ class: 'my-class'
 <html>
   <head>
     <meta charset="utf-8">
+    <title>Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Author">
-    <title>Title</title>
   </head>
   <body class="my-class">
     <section id="page-title">
@@ -35,8 +35,8 @@ it('title from heading, missing "title" property of Frontmatter', () => {
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
     <section id="page-title">
@@ -68,6 +68,27 @@ class: 'my-class'
     <meta name="author" content="Author">
   </head>
   <body class="my-class"></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('title with only frontmatter', () => {
+  const md = `---
+title: 'Title'
+---
+`;
+  const received = String(VFM().processSync(md));
+  // Since there is no option update that takes into account the stringify metadata,
+  // `<title>` is added to the end by your own processing instead of `rehype-document`.
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Title</title>
+  </head>
+  <body></body>
 </html>
 `;
   expect(received).toBe(expected);

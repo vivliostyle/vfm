@@ -299,46 +299,69 @@ section.author {
 
 ## Math equation
 
-<Badge type="warning">PRE-RELEASE</Badge>
+Outputs HTML processed by [MathJax](https://www.mathjax.org/).
+
+It is disabled by default. It is activated by satisfying one of the following.
+
+- VFM options: `math: true`
+- CLI options: `--math`
+- Frontmatter: `math: true` (Priority over others)
+
+The VFM syntax for MathJax inline is `$...$` and the display is `$$...$$`.
+
+It also supports multiple lines, such as `$x = y\n1 + 1 = 2$` and `$$\nx = y\n$$`. However, if there is a blank line `\n\n` such as `$x = y\n\n1 + 1 = 2$ `, the paragraphs will be separated and it will not be a mathematical syntax.
+
+OK:
+
+- `$...$`, `$$...$$` ...Range specification matches
+- `$...\n...$`, `$$\n...\n$$` ...Within the same paragraph
+- `$...\$...$`, `$...\$...\\\$..$`,  `$$...\$...\\\$...$$` ...Escape `$` by odd `\`
+
+NG:
+
+- `$...$$`, `$$...$` ...Range specification does not match
+- `$...\n\n...$`, `$$...\n\n...$$` ...Split paragraph
+- `$ ...$` ...Spaces (space, tab, new line, ...etc) ` ` immediately after `$` at start of inline
+- `$... $` ...Spaces (space, tab, new line, ...etc) ` ` immediately before `$` at end of inline
+- `$...$5` ...Digit `0...N` immediately after `$` at end of inline
 
 **VFM**
 
 ```markdown
-$$\sum$$
+inline:$x = y$
+
+display: $$1 + 1 = 2$$
 ```
 
 **HTML**
 
+It also outputs the `<script>` and `<body>` attributes for processing MathJax in Vivliostyle if `math` is enabled.
+
 ```html
-<p>
-  <span class="math math-inline">
-    <span class="katex">
-      <span class="katex-html" aria-hidden="true">
-        <span class="base">
-          <span class="strut" style="height:0.43056em;vertical-align:0em;">
-          </span>
-          <span class="mord mathdefault">s</span>
-          <span class="mord mathdefault">u</span>
-          <span class="mord mathdefault">m</span>
-        </span>
-      </span>
-    </span>
-  </span>
-</p>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  </head>
+  <body data-math-typeset="true">
+    <p>inline: <span class="math inline">\(x = y\)</span></p>
+    <p>display: <span class="math display">$$1 + 1 = 2$$</span></p>
+  </body>
+</html>
 ```
 
 **CSS**
 
 ```css
-span.math {
+.math.inline {
 }
-span.math.math-inline {
+
+.math.display {
 }
 ```
 
 ## Frontmatter
-
-<Badge type="warning">PRE-RELEASE</Badge>
 
 Frontmatter is a way of defining metadata in Markdown (file) units.
 
@@ -347,24 +370,31 @@ Frontmatter is a way of defining metadata in Markdown (file) units.
 title: 'Introduction to VFM'
 author: 'Author'
 class: 'my-class'
+math: true
 ---
 
 ```
 
 #### Reserved words
 
-| Property | Type   | Description                                                                                 |
-| -------- | ------ | ------------------------------------------------------------------------------------------- |
-| title    | String | Document title. If missing, very first heading `#` of the content will be treated as title. |
-| author   | String | Document author.                                                                            |
-| class    | String | Custom classes applied to `<body>`                                                          |
-| theme    | String | Vivliostyle theme package or bare CSS file.                                                 |
+| Property | Type    | Description                                                                                 |
+| -------- | ------- | ------------------------------------------------------------------------------------------- |
+| title    | String  | Document title. If missing, very first heading `#` of the content will be treated as title. |
+| author   | String  | Document author.                                                                            |
+| class    | String  | Custom classes applied to `<body>`                                                          |
+| math     | Boolean | Enable math syntax.                                                                         |
+| theme    | String  | Vivliostyle theme package or bare CSS file.                                                 |
 
 The priority of `title` is as follows.
 
 1. `title` property of the frontmatter
 2. First heading `#` of the content
 3. `title` option of VFM
+
+The priority of `math` is as follows.
+
+1. `math` property of the frontmatter
+2. `math` option of VFM
 
 **class**
 
@@ -408,8 +438,6 @@ To specify multiple classes, define as `class:'foo bar'`.
 ```
 
 ## Hard new line
-
-<Badge type="warning">PRE-RELEASE</Badge>
 
 - A newline puts `<br/>` to the end of a line.
 - Consecutive 2 newlines creates a new sentence block.

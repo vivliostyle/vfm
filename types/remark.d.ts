@@ -10,6 +10,7 @@ declare module 'hast-util-is-element';
 declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all';
 declare module 'mdast-util-to-string';
+declare module 'mdast-util-find-and-replace';
 declare module 'rehype-katex';
 declare module 'remark-slug';
 declare module 'rehype-slug';

@@ -4813,6 +4813,15 @@
   dependencies:
     "unist-util-visit" "^2.0.0"
 
+"mdast-util-find-and-replace@^1.1.1":
+  "integrity" "sha512-9cKl33Y21lyckGzpSmEQnIDjEfeeWelN5s1kUW1LwdB0Fkuq2u+4GdqcGEygYxJE8GVqCl0741bYXHgamfWAZA=="
+  "resolved" "https://registry.npmjs.org/mdast-util-find-and-replace/-/mdast-util-find-and-replace-1.1.1.tgz"
+  "version" "1.1.1"
+  dependencies:
+    "escape-string-regexp" "^4.0.0"
+    "unist-util-is" "^4.0.0"
+    "unist-util-visit-parents" "^3.0.0"
+
 "mdast-util-to-hast@^10.0.0", "mdast-util-to-hast@^10.1.1":
   "integrity" "sha512-+hvJrYiUgK2aY0Q1h1LaHQ4h0P7VVumWdAcUuG9k49lYglyU9GtTrA4O8hMh5gRnyT22wC15takM2qrrlpvNxQ=="
   "resolved" "https://registry.npmjs.org/mdast-util-to-hast/-/mdast-util-to-hast-10.1.1.tgz"
@@ -7338,15 +7347,7 @@
   dependencies:
     "unist-util-is" "^3.0.0"
 
-"unist-util-visit-parents@^3.0.0":
-  "integrity" "sha512-yJEfuZtzFpQmg1OSCyS9M5NJRrln/9FbYosH3iW0MG402QbdbaB8ZESwUv9RO6nRfLAKvWcMxCwdLWOov36x/g=="
-  "resolved" "https://registry.npmjs.org/unist-util-visit-parents/-/unist-util-visit-parents-3.0.2.tgz"
-  "version" "3.0.2"
-  dependencies:
-    "@types/unist" "^2.0.0"
-    "unist-util-is" "^4.0.0"
-
-"unist-util-visit-parents@^3.1.1":
+"unist-util-visit-parents@^3.0.0", "unist-util-visit-parents@^3.1.1":
   "integrity" "sha512-1KROIZWo6bcMrZEwiH2UrXDyalAa0uqzWCxCJj6lPOvTve2WkfgCytoDTPaMnodXh1WrXOq0haVYHj99ynJlsg=="
   "resolved" "https://registry.npmjs.org/unist-util-visit-parents/-/unist-util-visit-parents-3.1.1.tgz"
   "version" "3.1.1"
