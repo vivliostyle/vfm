@@ -20,7 +20,7 @@ class: 'my-class'
     <meta name="author" content="Author">
   </head>
   <body class="my-class">
-    <section id="page-title">
+    <section id="page-title" class="level1">
       <h1>Page Title</h1>
     </section>
   </body>
@@ -39,7 +39,7 @@ it('title from heading, missing "title" property of Frontmatter', () => {
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <section id="page-title">
+    <section id="page-title" class="level1">
       <h1>Page Title</h1>
     </section>
   </body>
@@ -142,7 +142,7 @@ class: 'my-class'
     <meta name="author" content="Author">
   </head>
   <body class="my-class">
-    <section id="heading-title">
+    <section id="heading-title" class="level1">
       <h1>Heading Title</h1>
     </section>
   </body>

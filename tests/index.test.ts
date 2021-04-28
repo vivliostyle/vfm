@@ -1,46 +1,6 @@
 import * as lib from '../src';
 import { ReplaceRule } from '../src/plugins/replace';
 
-/**
- * Run VFM stringify in partial mode.
- * @param body Markdown string that becomes `<body>` part.
- * @param hardLineBreaks Add `<br>` at the position of hard line breaks, without needing spaces.
- * @returns HTML string.
- */
-function partial(body: string, hardLineBreaks = false) {
-  return lib.stringify(body, {
-    partial: true,
-    hardLineBreaks,
-    disableFormatHtml: true,
-  });
-}
-
-// Snippet
-//
-// it('do something', ()=>{
-//   expect(partial(``)).toBe(``)
-// })
-
-it.skip('plain section', () => {
-  expect(partial(`# {.ok}`)).toBe(`<section class="ok"></section>`);
-});
-
-it('stringify markdown string into html document', () => {
-  expect(lib.stringify('# こんにちは', { disableFormatHtml: true }))
-    .toBe(`<!doctype html>
-<html>
-<head>
-<meta charset="utf-8">
-<title>こんにちは</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
-<section id="こんにちは"><h1>こんにちは</h1></section>
-</body>
-</html>
-`);
-});
-
 it('replace', () => {
   const rules = [
     {

@@ -12,7 +12,7 @@ it(
         │ data: {"hProperties":{"id":"foo"}}
         └─0 text "Heading"
     `,
-    `<section id="foo"><h1>Heading</h1></section>`,
+    `<section id="foo" class="level1"><h1>Heading</h1></section>`,
   ),
 );
 
@@ -27,7 +27,7 @@ it(
         │ data: {"hProperties":{"id":"foo"}}
         └─0 text "Heading"
     `,
-    `<section id="foo"><h1>Heading</h1></section>`,
+    `<section id="foo" class="level1"><h1>Heading</h1></section>`,
   ),
 );
 
@@ -44,7 +44,7 @@ it(
         └─1 emphasis[1]
             └─0 text "test"
     `,
-    `<section id="foo"><h1>Heading <em>test</em></h1></section>`,
+    `<section id="foo" class="level1"><h1>Heading <em>test</em></h1></section>`,
   ),
 );
 

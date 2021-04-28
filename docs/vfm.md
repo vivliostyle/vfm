@@ -203,21 +203,32 @@ ruby rt {
 # Introduction {#intro}
 
 # Welcome {.title}
+
+# Level 1
+
+## Level 2
 ```
 
 **HTML**
 
 ```html
-<section id="plain">
+<section id="plain" class="level1">
   <h1>Plain</h1>
 </section>
 
-<section id="intro">
+<section id="intro" class="level1">
   <h1>Introduction</h1>
 </section>
 
-<section id="welcome" class="title">
+<section class="level1 title" id="welcome">
   <h1>Welcome</h1>
+</section>
+
+<section id="level-1" class="level1">
+  <h1>Level 1</h1>
+  <section id="level-2" class="level2">
+    <h2>Level 2</h2>
+  </section>
 </section>
 ```
 
@@ -233,6 +244,11 @@ section.title {
 }
 
 section.title > h1:first-child {
+}
+
+.level1 {
+}
+.level2 {
 }
 ```
 
