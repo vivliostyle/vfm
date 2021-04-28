@@ -149,7 +149,7 @@ $$</p>`;
   expect(received).toBe(expected);
 });
 
-it('HTML header and body', () => {
+it('HTML heading and body', () => {
   const received = stringify('$x=y$', { math: true, disableFormatHtml: true });
   const expected = `<!doctype html>
 <html>

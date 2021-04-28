@@ -26,26 +26,26 @@ it('<h7> is not heading', () => {
 });
 
 it('<h1>, ... <h6>', () => {
-  const md = `# Header 1
-## Header 2
-### Header 3
-#### Header 4
-##### Header 5
-###### Header 6`;
+  const md = `# Heading 1
+## Heading 2
+### Heading 3
+#### Heading 4
+##### Heading 5
+###### Heading 6`;
   const received = stringify(md, { partial: true });
   const expected = `
-<section id="header-1" class="level1">
-  <h1>Header 1</h1>
-  <section id="header-2" class="level2">
-    <h2>Header 2</h2>
-    <section id="header-3" class="level3">
-      <h3>Header 3</h3>
-      <section id="header-4" class="level4">
-        <h4>Header 4</h4>
-        <section id="header-5" class="level5">
-          <h5>Header 5</h5>
-          <section id="header-6" class="level6">
-            <h6>Header 6</h6>
+<section id="heading-1" class="level1">
+  <h1>Heading 1</h1>
+  <section id="heading-2" class="level2">
+    <h2>Heading 2</h2>
+    <section id="heading-3" class="level3">
+      <h3>Heading 3</h3>
+      <section id="heading-4" class="level4">
+        <h4>Heading 4</h4>
+        <section id="heading-5" class="level5">
+          <h5>Heading 5</h5>
+          <section id="heading-6" class="level6">
+            <h6>Heading 6</h6>
           </section>
         </section>
       </section>
@@ -58,26 +58,26 @@ it('<h1>, ... <h6>', () => {
 
 // It seems that when the class is processed by `remark-attr`, it is output before id.
 it('<h1>, ... <h6> with attribute', () => {
-  const md = `# Header 1 {.depth1}
-## Header 2 {.depth2}
-### Header 3 {.depth3}
-#### Header 4 {.depth4}
-##### Header 5 {.depth5}
-###### Header 6 {.depth6}`;
+  const md = `# Heading 1 {.depth1}
+## Heading 2 {.depth2}
+### Heading 3 {.depth3}
+#### Heading 4 {.depth4}
+##### Heading 5 {.depth5}
+###### Heading 6 {.depth6}`;
   const received = stringify(md, { partial: true });
   const expected = `
-<section class="level1 depth1" id="header-1">
-  <h1>Header 1</h1>
-  <section class="level2 depth2" id="header-2">
-    <h2>Header 2</h2>
-    <section class="level3 depth3" id="header-3">
-      <h3>Header 3</h3>
-      <section class="level4 depth4" id="header-4">
-        <h4>Header 4</h4>
-        <section class="level5 depth5" id="header-5">
-          <h5>Header 5</h5>
-          <section class="level6 depth6" id="header-6">
-            <h6>Header 6</h6>
+<section class="level1 depth1" id="heading-1">
+  <h1>Heading 1</h1>
+  <section class="level2 depth2" id="heading-2">
+    <h2>Heading 2</h2>
+    <section class="level3 depth3" id="heading-3">
+      <h3>Heading 3</h3>
+      <section class="level4 depth4" id="heading-4">
+        <h4>Heading 4</h4>
+        <section class="level5 depth5" id="heading-5">
+          <h5>Heading 5</h5>
+          <section class="level6 depth6" id="heading-6">
+            <h6>Heading 6</h6>
           </section>
         </section>
       </section>
@@ -89,19 +89,19 @@ it('<h1>, ... <h6> with attribute', () => {
 });
 
 it('Complex structure', () => {
-  const md = `# Header 1
-## Header 2 {.foo}
-# Header 1`;
+  const md = `# Heading 1
+## Heading 2 {.foo}
+# Heading 1`;
   const received = stringify(md, { partial: true });
   const expected = `
-<section id="header-1" class="level1">
-  <h1>Header 1</h1>
-  <section class="level2 foo" id="header-2">
-    <h2>Header 2</h2>
+<section id="heading-1" class="level1">
+  <h1>Heading 1</h1>
+  <section class="level2 foo" id="heading-2">
+    <h2>Heading 2</h2>
   </section>
 </section>
-<section id="header-1-1" class="level1">
-  <h1>Header 1</h1>
+<section id="heading-1-1" class="level1">
+  <h1>Heading 1</h1>
 </section>
 `;
   expect(received).toBe(expected);

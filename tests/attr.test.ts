@@ -2,7 +2,7 @@ import { stripIndent } from 'common-tags';
 import { buildProcessorTestingCode } from './utils';
 
 it(
-  'Header with attributes',
+  'Heading with attributes',
   buildProcessorTestingCode(
     `# Heading {#foo}`,
     stripIndent`
@@ -17,7 +17,7 @@ it(
 );
 
 it(
-  'Header with attributes, specification by line break',
+  'Heading with attributes, specification by line break',
   buildProcessorTestingCode(
     `# Heading\n{#foo}`,
     stripIndent`
@@ -32,7 +32,7 @@ it(
 );
 
 it(
-  'Header with attributes and inline elements, specification by line break',
+  'Heading with attributes and inline elements, specification by line break',
   buildProcessorTestingCode(
     `# Heading *test*\n{#foo}`,
     stripIndent`
@@ -52,7 +52,7 @@ it(
 // https://github.com/arobase-che/remark-attr/issues/24
 /*
 it(
-  'Header with attributes and inline elements',
+  'Heading with attributes and inline elements',
   buildProcessorTestingCode(
     `# Heading *test* {#foo}`,
     stripIndent`
