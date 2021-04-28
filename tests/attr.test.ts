@@ -2,7 +2,7 @@ import { stripIndent } from 'common-tags';
 import { buildProcessorTestingCode } from './utils';
 
 it(
-  'Header with attributes',
+  'Heading with attributes',
   buildProcessorTestingCode(
     `# Heading {#foo}`,
     stripIndent`
@@ -12,12 +12,12 @@ it(
         │ data: {"hProperties":{"id":"foo"}}
         └─0 text "Heading"
     `,
-    `<section id="foo"><h1>Heading</h1></section>`,
+    `<section id="foo" class="level1"><h1>Heading</h1></section>`,
   ),
 );
 
 it(
-  'Header with attributes, specification by line break',
+  'Heading with attributes, specification by line break',
   buildProcessorTestingCode(
     `# Heading\n{#foo}`,
     stripIndent`
@@ -27,12 +27,12 @@ it(
         │ data: {"hProperties":{"id":"foo"}}
         └─0 text "Heading"
     `,
-    `<section id="foo"><h1>Heading</h1></section>`,
+    `<section id="foo" class="level1"><h1>Heading</h1></section>`,
   ),
 );
 
 it(
-  'Header with attributes and inline elements, specification by line break',
+  'Heading with attributes and inline elements, specification by line break',
   buildProcessorTestingCode(
     `# Heading *test*\n{#foo}`,
     stripIndent`
@@ -44,7 +44,7 @@ it(
         └─1 emphasis[1]
             └─0 text "test"
     `,
-    `<section id="foo"><h1>Heading <em>test</em></h1></section>`,
+    `<section id="foo" class="level1"><h1>Heading <em>test</em></h1></section>`,
   ),
 );
 
@@ -52,7 +52,7 @@ it(
 // https://github.com/arobase-che/remark-attr/issues/24
 /*
 it(
-  'Header with attributes and inline elements',
+  'Heading with attributes and inline elements',
   buildProcessorTestingCode(
     `# Heading *test* {#foo}`,
     stripIndent`
