@@ -195,6 +195,11 @@ ruby rt {
 
 <Badge type="warning">PRE-RELEASE</Badge>
 
+If specify the attribute in the heading, it will be as follows.
+
+- `id` is moved to `<section>`
+- Other attributes are copied to `<section>`
+
 **VFM**
 
 ```md
@@ -221,7 +226,7 @@ ruby rt {
 </section>
 
 <section class="level1 title" id="welcome">
-  <h1>Welcome</h1>
+  <h1 class="title">Welcome</h1>
 </section>
 
 <section id="level-1" class="level1">
