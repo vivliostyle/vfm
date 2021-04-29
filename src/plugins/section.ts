@@ -31,7 +31,7 @@ const checkProperties = (node: any, depth: number) => {
 
   // {hidden} specifier
   if (Object.keys(hProperties).includes('hidden')) {
-    node.data.hProperties.style = 'display: none;';
+    node.data.hProperties.hidden = "hidden";
   }
 
   // output section levels like Pandoc
