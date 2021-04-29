@@ -21,6 +21,14 @@ it('Leveling and copy attributes, however the `id` will be moved', () => {
   expect(received).toBe(expected);
 });
 
+it('Heading with hidden attribute', () => {
+  const md = '# Heading {hidden}';
+  const received = stringify(md, { partial: true, disableFormatHtml: true });
+  const expected =
+    '<section id="heading" class="level1"><h1 hidden>Heading</h1></section>';
+  expect(received).toBe(expected);
+});
+
 it('<h7> is not heading', () => {
   const md = '####### こんにちは {.test}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
