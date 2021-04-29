@@ -10,11 +10,22 @@ it('plain section', () => {
 });
 */
 
-it('<h1>', () => {
-  const md = '# こんにちは {.test}';
+it('Leveling and copy attributes, however the `id` will be moved', () => {
+  const md = '# こんにちは {#id1 .class1 key1=value1}';
+  const received = stringify(md, { partial: true });
+  const expected = `
+<section id="id1" class="level1 class1" key1="value1">
+  <h1 class="class1" key1="value1">こんにちは</h1>
+</section>
+`;
+  expect(received).toBe(expected);
+});
+
+it('Heading with hidden attribute', () => {
+  const md = '# Heading {hidden}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
   const expected =
-    '<section class="level1 test" id="こんにちは"><h1>こんにちは</h1></section>';
+    '<section id="heading" class="level1"><h1 hidden>Heading</h1></section>';
   expect(received).toBe(expected);
 });
 
@@ -67,17 +78,17 @@ it('<h1>, ... <h6> with attribute', () => {
   const received = stringify(md, { partial: true });
   const expected = `
 <section class="level1 depth1" id="heading-1">
-  <h1>Heading 1</h1>
+  <h1 class="depth1">Heading 1</h1>
   <section class="level2 depth2" id="heading-2">
-    <h2>Heading 2</h2>
+    <h2 class="depth2">Heading 2</h2>
     <section class="level3 depth3" id="heading-3">
-      <h3>Heading 3</h3>
+      <h3 class="depth3">Heading 3</h3>
       <section class="level4 depth4" id="heading-4">
-        <h4>Heading 4</h4>
+        <h4 class="depth4">Heading 4</h4>
         <section class="level5 depth5" id="heading-5">
-          <h5>Heading 5</h5>
+          <h5 class="depth5">Heading 5</h5>
           <section class="level6 depth6" id="heading-6">
-            <h6>Heading 6</h6>
+            <h6 class="depth6">Heading 6</h6>
           </section>
         </section>
       </section>
@@ -97,7 +108,7 @@ it('Complex structure', () => {
 <section id="heading-1" class="level1">
   <h1>Heading 1</h1>
   <section class="level2 foo" id="heading-2">
-    <h2>Heading 2</h2>
+    <h2 class="foo">Heading 2</h2>
   </section>
 </section>
 <section id="heading-1-1" class="level1">

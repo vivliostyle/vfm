@@ -14,12 +14,47 @@ import visit from 'unist-util-visit-parents';
 const MAX_HEADING_DEPTH = 6;
 
 /**
+ * Check the heading properties to generate properties for the parent `<section>` and update the heading style.
+ * @param node Node of Markdown AST.
+ * @returns Properties.
+ */
+const checkProperties = (node: any, depth: number) => {
+  if (!node.data?.hProperties) {
+    return undefined;
+  }
+
+  // Remove `id` attribute and copy otherwise for the parent `<section>`
+  const hProperties = { ...node.data.hProperties };
+  if (node.data.hProperties.id) {
+    delete node.data.hProperties.id;
+  }
+
+  // {hidden} specifier
+  if (Object.keys(hProperties).includes('hidden')) {
+    node.data.hProperties.hidden = "hidden";
+  }
+
+  // output section levels like Pandoc
+  if (Array.isArray(hProperties.class)) {
+    // Switch references as they do not affect the heading,
+    // and `remark-attr` may add classes, so make sure they come before them (always top)
+    const classes = [...hProperties.class];
+    classes.unshift(`level${depth}`);
+    hProperties.class = classes;
+  } else {
+    hProperties.class = [`level${depth}`];
+  }
+
+  return hProperties;
+};
+
+/**
  * Wrap the header in sections.
  * @param node Node of Markdown AST.
  * @param ancestors Parents.
  * @todo handle `@subtitle` properly.
  */
-function sectionize(node: any, ancestors: Parent[]) {
+const sectionize = (node: any, ancestors: Parent[]) => {
   const start = node;
   const depth = start.depth;
   const parent = ancestors[ancestors.length - 1];
@@ -36,19 +71,7 @@ function sectionize(node: any, ancestors: Parent[]) {
     endIndex > 0 ? endIndex : undefined,
   );
 
-  const type = 'section';
-
-  const hProperties = node.data?.hProperties;
-  if (hProperties) {
-    node.data.hProperties = {};
-
-    const props = Object.keys(hProperties);
-
-    // {hidden} specifier
-    if (props.includes('hidden')) {
-      node.data.hProperties.style = 'display: none;';
-    }
-  }
+  const hProperties = checkProperties(node, depth);
 
   const isDuplicated = parent.type === 'section';
   if (isDuplicated) {
@@ -61,14 +84,7 @@ function sectionize(node: any, ancestors: Parent[]) {
     return;
   }
 
-  // output section levels like Pandoc
-  if (Array.isArray(hProperties.class)) {
-    // `remark-attr` may add classes, so make sure they come before them (always top)
-    hProperties.class.unshift(`level${depth}`);
-  } else {
-    hProperties.class = [`level${depth}`];
-  }
-
+  const type = 'section';
   const section = {
     type,
     data: {
@@ -80,7 +96,7 @@ function sectionize(node: any, ancestors: Parent[]) {
   } as any;
 
   parent.children.splice(startIndex, section.children.length, section);
-}
+};
 
 /**
  * Process Markdown AST.
