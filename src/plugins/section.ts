@@ -31,7 +31,7 @@ const checkProperties = (node: any, depth: number) => {
 
   // {hidden} specifier
   if (Object.keys(hProperties).includes('hidden')) {
-    node.data.hProperties.hidden = "hidden";
+    node.data.hProperties.hidden = 'hidden';
   }
 
   // output section levels like Pandoc
@@ -50,14 +50,23 @@ const checkProperties = (node: any, depth: number) => {
 
 /**
  * Wrap the header in sections.
+ * - Do not sectionize if parent is `blockquote`.
+ * - The attributes of the heading are basically copied to the section.
+ * - The `id` attribute is moved to the section.
+ * - The `hidden` attribute is not copied and only the heading applies.
+ * - Set the `levelN` class in the section to match the heading depth.
  * @param node Node of Markdown AST.
  * @param ancestors Parents.
  * @todo handle `@subtitle` properly.
  */
 const sectionize = (node: any, ancestors: Parent[]) => {
+  const parent = ancestors[ancestors.length - 1];
+  if (parent.type === 'blockquote') {
+    return;
+  }
+
   const start = node;
   const depth = start.depth;
-  const parent = ancestors[ancestors.length - 1];
 
   const isEnd = (node: any) =>
     (node.type === 'heading' && node.depth <= depth) || node.type === 'export';

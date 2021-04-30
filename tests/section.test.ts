@@ -29,6 +29,17 @@ it('Heading with hidden attribute', () => {
   expect(received).toBe(expected);
 });
 
+it('Disable section with blockquote heading', () => {
+  const md = '> # Not Sectionize';
+  const received = stringify(md, { partial: true });
+  const expected = `
+<blockquote>
+  <h1 id="not-sectionize">Not Sectionize</h1>
+</blockquote>
+`;
+  expect(received).toBe(expected);
+});
+
 it('<h7> is not heading', () => {
   const md = '####### こんにちは {.test}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
