@@ -193,12 +193,13 @@ ruby rt {
 
 ## Sectionization
 
-<Badge type="warning">PRE-RELEASE</Badge>
+Make the heading a hierarchical section.
 
-If specify the attribute in the heading, it will be as follows.
-
-- `id` is moved to `<section>`
-- Other attributes are copied to `<section>`
+- Do not sectionize if parent is `blockquote`.
+- The attributes of the heading are basically copied to the section.
+- The `id` attribute is moved to the section.
+- The `hidden` attribute is not copied and only the heading applies.
+- Set the `levelN` class in the section to match the heading depth.
 
 **VFM**
 
@@ -212,6 +213,8 @@ If specify the attribute in the heading, it will be as follows.
 # Level 1
 
 ## Level 2
+
+> # Not Sectionize
 ```
 
 **HTML**
@@ -235,6 +238,10 @@ If specify the attribute in the heading, it will be as follows.
     <h2>Level 2</h2>
   </section>
 </section>
+
+<blockquote>
+  <h1 id="not-sectionize">Not Sectionize</h1>
+</blockquote>
 ```
 
 **CSS**
@@ -254,6 +261,9 @@ section.title > h1:first-child {
 .level1 {
 }
 .level2 {
+}
+
+blockquote > h1 {
 }
 ```
 
