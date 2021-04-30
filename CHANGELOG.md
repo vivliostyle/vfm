@@ -1,3 +1,13 @@
+# [1.0.0-alpha.20](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.19...v1.0.0-alpha.20) (2021-04-30)
+
+
+### Features
+
+* `hidden` specification of the heading is output as an attribute ([a933f6b](https://github.com/vivliostyle/vfm/commit/a933f6b00ce00bebb66c278afb105461d8c3d5d7))
+* Added section leveling ([021b72f](https://github.com/vivliostyle/vfm/commit/021b72ffc2650499682904715da80932ffb977fc))
+* Copy the section attributes from the heading, however the `id` will be moved ([a355dd5](https://github.com/vivliostyle/vfm/commit/a355dd5b30439bd0454334b5b1f441a8156e0a40))
+* Disable section with blockquote heading ([f493797](https://github.com/vivliostyle/vfm/commit/f493797a658c3c861c47a7f472e3e8d5cdaa6aeb))
+
 # [1.0.0-alpha.19](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.18...v1.0.0-alpha.19) (2021-04-26)
 
 
