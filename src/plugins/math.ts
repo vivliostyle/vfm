@@ -170,6 +170,7 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
     'span',
     {
       class: 'math inline',
+      'data-math-typeset': 'true',
     },
     [u('text', `\\(${node.data.value as string}\\)`)],
   );
@@ -193,6 +194,7 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
     'span',
     {
       class: 'math display',
+      'data-math-typeset': 'true',
     },
     [u('text', `$$${node.data.value as string}$$`)],
   );
@@ -222,10 +224,6 @@ export const hast = () => (tree: Node) => {
           children: [],
         });
         node.children.push({ type: 'text', value: '\n' });
-        break;
-
-      case 'body':
-        node.properties = { ...node.properties, 'data-math-typeset': 'true' };
         break;
     }
   });

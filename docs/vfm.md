@@ -368,7 +368,7 @@ display: $$1 + 1 = 2$$
 
 **HTML**
 
-It also outputs the `<script>` and `<body>` attributes for processing MathJax in Vivliostyle if `math` is enabled. However, even if the math syntax is valid, it will not be output if it does not actually exist.
+It also outputs `<script>` for processing MathJax in Vivliostyle if `math` is enabled. However, even if the math syntax is valid, it will not be output if it does not actually exist.
 
 ```html
 <html>
@@ -377,9 +377,9 @@ It also outputs the `<script>` and `<body>` attributes for processing MathJax in
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   </head>
-  <body data-math-typeset="true">
-    <p>inline: <span class="math inline">\(x = y\)</span></p>
-    <p>display: <span class="math display">$$1 + 1 = 2$$</span></p>
+  <body>
+    <p>inline: <span class="math inline" data-math-typeset="true>"\(x = y\)</span></p>
+    <p>display: <span class="math display" data-math-typeset="true">$$1 + 1 = 2$$</span></p>
   </body>
 </html>
 ```
