@@ -208,11 +208,11 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
  * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
 export const hast = () => (tree: Node) => {
-  if (!MATH_PROCESSED && !select('math', tree)) {
+  const isMathProcessed = MATH_PROCESSED;
+  MATH_PROCESSED = false;
+  if (!(isMathProcessed || select('math', tree))) {
     return;
   }
-
-  MATH_PROCESSED = false;
 
   visit<Element>(tree, 'element', (node) => {
     switch (node.tagName) {
