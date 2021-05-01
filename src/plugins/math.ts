@@ -27,9 +27,6 @@ const TYPE_DISPLAY = 'displayMath';
 const MATH_URL =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML';
 
-/** The flag indicates that math syntax was actually processed. */
-let MATH_PROCESSED = false;
-
 /**
  * Create tokenizers for remark-parse.
  * @returns Tokenizers.
@@ -109,8 +106,6 @@ const createTokenizers = () => {
  * @returns Transformer or undefined (less than remark 13).
  */
 export const mdast: Plugin = function (): Transformer | undefined {
-  MATH_PROCESSED = false;
-
   // For less than remark 13 with exclusive other markdown syntax
   if (
     this.Parser &&
@@ -162,8 +157,6 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
     node.data = {};
   }
 
-  MATH_PROCESSED = true;
-
   return h(
     {
       type: 'element',
@@ -184,9 +177,9 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
  * @returns Hypertext AST.
  */
 export const handlerDisplayMath: Handler = (h, node: Node) => {
-  if (!node.data) node.data = {};
-
-  MATH_PROCESSED = true;
+  if (!node.data) {
+    node.data = {};
+  }
 
   return h(
     {
@@ -208,9 +201,7 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
  * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
 export const hast = () => (tree: Node) => {
-  const isMathProcessed = MATH_PROCESSED;
-  MATH_PROCESSED = false;
-  if (!(isMathProcessed || select('math', tree))) {
+  if (!(select('[data-math-typeset="true"]', tree) || select('math', tree))) {
     return;
   }
 
