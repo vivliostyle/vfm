@@ -67,7 +67,7 @@ export function VFM({
   replace = undefined,
   hardLineBreaks = false,
   disableFormatHtml = false,
-  math = false,
+  math = true,
 }: StringifyMarkdownOptions = {}): Processor {
   const processor = unified()
     .use(markdown(hardLineBreaks, math))

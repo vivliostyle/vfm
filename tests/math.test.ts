@@ -3,7 +3,6 @@ import { stringify } from '../src/index';
 const options = {
   partial: true,
   disableFormatHtml: true,
-  math: true,
 };
 
 it('inline', () => {
@@ -166,7 +165,38 @@ it('HTML head and body', () => {
   expect(received).toBe(expected);
 });
 
-it('disable', () => {
+it('math syntax does not exist, without <script> and <body> attribute', () => {
+  const md = 'Sample';
+  const received = stringify(md, {
+    math: false,
+    disableFormatHtml: true,
+  });
+  const expected = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<p>Sample</p>
+</body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('disable with options', () => {
+  const md = '$x = y$';
+  const received = stringify(md, {
+    math: false,
+    partial: true,
+    disableFormatHtml: true,
+  });
+  const expected = '<p>$x = y$</p>';
+  expect(received).toBe(expected);
+});
+
+it('disable with frontmatter, override options', () => {
   const markdown = `---
 math: false
 ---

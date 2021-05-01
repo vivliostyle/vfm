@@ -18,7 +18,7 @@ const cli = meow(
       --language             Document language (ignored in partial mode)
       --hard-line-breaks     Add <br> at the position of hard line breaks, without needing spaces
       --disable-format-html  Disable automatic HTML format
-      --math                 Enable math syntax
+      --disable-math         Disable math syntax
  
     Examples
       $ vfm input.md
@@ -46,7 +46,7 @@ const cli = meow(
       disableFormatHtml: {
         type: 'boolean',
       },
-      math: {
+      disableMath: {
         type: 'boolean',
       },
     },
@@ -63,7 +63,7 @@ function compile(input: string) {
       language: cli.flags.language,
       hardLineBreaks: cli.flags.hardLineBreaks,
       disableFormatHtml: cli.flags.disableFormatHtml,
-      math: cli.flags.math,
+      math: cli.flags.disableMath === undefined ? true : !cli.flags.disableMath,
     }),
   );
 }
@@ -76,7 +76,7 @@ function main(
     language: { type: 'string' };
     hardLineBreaks: { type: 'boolean' };
     disableFormatHtml: { type: 'boolean' };
-    math: { type: 'boolean' };
+    disableMath: { type: 'boolean' };
   }>,
 ) {
   try {

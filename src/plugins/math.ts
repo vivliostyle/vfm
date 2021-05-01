@@ -11,20 +11,23 @@ import visit from 'unist-util-visit';
  * - OK: `$x = y$`, `$x = \$y$`
  * - NG: `$$x = y$`, `$x = y$$`, `$ x = y$`, `$x = y $`, `$x = y$7`
  */
-const regexpInline = /\$([^$\s].*?(?<=[^\\$\s]|[^\\](?:\\\\)+))\$(?!\$|\d)/gs;
+const REGEXP_INLINE = /\$([^$\s].*?(?<=[^\\$\s]|[^\\](?:\\\\)+))\$(?!\$|\d)/gs;
 
 /** Display math format, e.g. `$$...$$`. */
-const regexpDisplay = /\$\$([^$].*?(?<=[^$]))\$\$(?!\$)/gs;
+const REGEXP_DISPLAY = /\$\$([^$].*?(?<=[^$]))\$\$(?!\$)/gs;
 
 /** Type of inline math in Markdown AST. */
-const typeInline = 'inlineMath';
+const TYPE_INLINE = 'inlineMath';
 
 /** Type of display math in Markdown AST. */
-const typeDisplay = 'displayMath';
+const TYPE_DISPLAY = 'displayMath';
 
 /** URL of MathJax v2 supported by Vivliostyle. */
-const mathUrl =
+const MATH_URL =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML';
+
+/** The flag indicates that math syntax was actually processed. */
+let MATH_PROCESSED = false;
 
 /**
  * Create tokenizers for remark-parse.
@@ -40,7 +43,7 @@ const createTokenizers = () => {
       return;
     }
 
-    const match = new RegExp(regexpInline).exec(value);
+    const match = new RegExp(REGEXP_INLINE).exec(value);
     if (!match) {
       return;
     }
@@ -55,9 +58,9 @@ const createTokenizers = () => {
     now.offset += 1;
 
     return eat(eaten)({
-      type: typeInline,
+      type: TYPE_INLINE,
       children: [],
-      data: { hName: typeInline, value: valueText },
+      data: { hName: TYPE_INLINE, value: valueText },
     });
   };
 
@@ -71,7 +74,7 @@ const createTokenizers = () => {
       return;
     }
 
-    const match = new RegExp(regexpDisplay).exec(value);
+    const match = new RegExp(REGEXP_DISPLAY).exec(value);
     if (!match) {
       return;
     }
@@ -86,9 +89,9 @@ const createTokenizers = () => {
     now.offset += 1;
 
     return eat(eaten)({
-      type: typeDisplay,
+      type: TYPE_DISPLAY,
       children: [],
-      data: { hName: typeDisplay, value: valueText },
+      data: { hName: TYPE_DISPLAY, value: valueText },
     });
   };
 
@@ -105,6 +108,8 @@ const createTokenizers = () => {
  * @returns Transformer or undefined (less than remark 13).
  */
 export const mdast: Plugin = function (): Transformer | undefined {
+  MATH_PROCESSED = false;
+
   // For less than remark 13 with exclusive other markdown syntax
   if (
     this.Parser &&
@@ -113,30 +118,30 @@ export const mdast: Plugin = function (): Transformer | undefined {
   ) {
     const { inlineTokenizers, inlineMethods } = this.Parser.prototype;
     const tokenizers = createTokenizers();
-    inlineTokenizers[typeInline] = tokenizers.tokenizerInlineMath;
-    inlineTokenizers[typeDisplay] = tokenizers.tokenizerDisplayMath;
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, typeInline);
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, typeDisplay);
+    inlineTokenizers[TYPE_INLINE] = tokenizers.tokenizerInlineMath;
+    inlineTokenizers[TYPE_DISPLAY] = tokenizers.tokenizerDisplayMath;
+    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_INLINE);
+    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_DISPLAY);
     return;
   }
 
   return (tree: Node) => {
-    findReplace(tree, regexpInline, (_: string, valueText: string) => {
+    findReplace(tree, REGEXP_INLINE, (_: string, valueText: string) => {
       return {
-        type: typeInline,
+        type: TYPE_INLINE,
         data: {
-          hName: typeInline,
+          hName: TYPE_INLINE,
           value: valueText,
         },
         children: [],
       };
     });
 
-    findReplace(tree, regexpDisplay, (_: string, valueText: string) => {
+    findReplace(tree, REGEXP_DISPLAY, (_: string, valueText: string) => {
       return {
-        type: typeDisplay,
+        type: TYPE_DISPLAY,
         data: {
-          hName: typeDisplay,
+          hName: TYPE_DISPLAY,
           value: valueText,
         },
         children: [],
@@ -155,6 +160,8 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
   if (!node.data) {
     node.data = {};
   }
+
+  MATH_PROCESSED = true;
 
   return h(
     {
@@ -177,6 +184,8 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
 export const handlerDisplayMath: Handler = (h, node: Node) => {
   if (!node.data) node.data = {};
 
+  MATH_PROCESSED = true;
+
   return h(
     {
       type: 'element',
@@ -194,6 +203,12 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
  * Set the `<script>` to load MathJax and `<body>` attribute that enable math typesetting.
  */
 export const hast = () => (tree: Node) => {
+  if (!MATH_PROCESSED) {
+    return;
+  }
+
+  MATH_PROCESSED = false;
+
   visit<Element>(tree, 'element', (node) => {
     switch (node.tagName) {
       case 'head':
@@ -202,7 +217,7 @@ export const hast = () => (tree: Node) => {
           tagName: 'script',
           properties: {
             async: true,
-            src: mathUrl,
+            src: MATH_URL,
           },
           children: [],
         });
