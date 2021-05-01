@@ -165,6 +165,45 @@ it('Output <script> tag', () => {
   expect(received).toBe(expected);
 });
 
+it('Output <script> if <math> tag exists', () => {
+  const md = '- MathML: <math><mi>x</mi><mo>=</mo><mi>y</mi></math>.';
+  const received = stringify(md, { disableFormatHtml: true });
+  const expected = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+</head>
+<body>
+<ul>
+<li>MathML: <math><mi>x</mi><mo>=</mo><mi>y</mi></math>.</li>
+</ul>
+</body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('Not output <script> if <math> tag exists with disable math syntax', () => {
+  const md = '- MathML: <math><mi>x</mi><mo>=</mo><mi>y</mi></math>.';
+  const received = stringify(md, { math: false, disableFormatHtml: true });
+  const expected = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<ul>
+<li>MathML: <math><mi>x</mi><mo>=</mo><mi>y</mi></math>.</li>
+</ul>
+</body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
 it('math syntax does not exist, without <script> tag', () => {
   const md = 'Sample';
   const received = stringify(md, {

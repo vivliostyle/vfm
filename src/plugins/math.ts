@@ -1,4 +1,5 @@
 import { Element } from 'hast';
+import { select } from 'hast-util-select';
 import findReplace from 'mdast-util-find-and-replace';
 import { Handler } from 'mdast-util-to-hast';
 import { Plugin, Transformer } from 'unified';
@@ -203,9 +204,11 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
 /**
  * Process math related Hypertext AST.
  * Set the `<script>` to load MathJax and `<body>` attribute that enable math typesetting.
+ *
+ * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
-export const hast = () => (tree: Node) => {
-  if (!MATH_PROCESSED) {
+export const hast = () => (tree: Element) => {
+  if (!MATH_PROCESSED && !select('math', tree)) {
     return;
   }
 
