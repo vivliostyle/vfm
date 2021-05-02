@@ -368,7 +368,7 @@ display: $$1 + 1 = 2$$
 
 **HTML**
 
-It also outputs `<script>` for processing MathJax in Vivliostyle if `math` is enabled. However, the math syntax or the `<math>` tag must actually exist.
+It also outputs `<script>` for processing MathJax if `math` is enabled and the math syntax or the `<math>` tag is actually existed.
 
 ```html
 <html>
