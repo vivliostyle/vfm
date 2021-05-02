@@ -7,6 +7,7 @@ declare module 'rehype-raw' {
 declare module 'hast-util-find-and-replace';
 declare module 'remark-shortcodes';
 declare module 'hast-util-is-element';
+declare module 'hast-util-select';
 declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all';
 declare module 'mdast-util-to-string';

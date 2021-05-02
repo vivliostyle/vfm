@@ -1,4 +1,5 @@
 import { Element } from 'hast';
+import { select } from 'hast-util-select';
 import findReplace from 'mdast-util-find-and-replace';
 import { Handler } from 'mdast-util-to-hast';
 import { Plugin, Transformer } from 'unified';
@@ -11,19 +12,19 @@ import visit from 'unist-util-visit';
  * - OK: `$x = y$`, `$x = \$y$`
  * - NG: `$$x = y$`, `$x = y$$`, `$ x = y$`, `$x = y $`, `$x = y$7`
  */
-const regexpInline = /\$([^$\s].*?(?<=[^\\$\s]|[^\\](?:\\\\)+))\$(?!\$|\d)/gs;
+const REGEXP_INLINE = /\$([^$\s].*?(?<=[^\\$\s]|[^\\](?:\\\\)+))\$(?!\$|\d)/gs;
 
 /** Display math format, e.g. `$$...$$`. */
-const regexpDisplay = /\$\$([^$].*?(?<=[^$]))\$\$(?!\$)/gs;
+const REGEXP_DISPLAY = /\$\$([^$].*?(?<=[^$]))\$\$(?!\$)/gs;
 
 /** Type of inline math in Markdown AST. */
-const typeInline = 'inlineMath';
+const TYPE_INLINE = 'inlineMath';
 
 /** Type of display math in Markdown AST. */
-const typeDisplay = 'displayMath';
+const TYPE_DISPLAY = 'displayMath';
 
 /** URL of MathJax v2 supported by Vivliostyle. */
-const mathUrl =
+const MATH_URL =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML';
 
 /**
@@ -40,7 +41,7 @@ const createTokenizers = () => {
       return;
     }
 
-    const match = new RegExp(regexpInline).exec(value);
+    const match = new RegExp(REGEXP_INLINE).exec(value);
     if (!match) {
       return;
     }
@@ -55,9 +56,9 @@ const createTokenizers = () => {
     now.offset += 1;
 
     return eat(eaten)({
-      type: typeInline,
+      type: TYPE_INLINE,
       children: [],
-      data: { hName: typeInline, value: valueText },
+      data: { hName: TYPE_INLINE, value: valueText },
     });
   };
 
@@ -71,7 +72,7 @@ const createTokenizers = () => {
       return;
     }
 
-    const match = new RegExp(regexpDisplay).exec(value);
+    const match = new RegExp(REGEXP_DISPLAY).exec(value);
     if (!match) {
       return;
     }
@@ -86,9 +87,9 @@ const createTokenizers = () => {
     now.offset += 1;
 
     return eat(eaten)({
-      type: typeDisplay,
+      type: TYPE_DISPLAY,
       children: [],
-      data: { hName: typeDisplay, value: valueText },
+      data: { hName: TYPE_DISPLAY, value: valueText },
     });
   };
 
@@ -113,30 +114,30 @@ export const mdast: Plugin = function (): Transformer | undefined {
   ) {
     const { inlineTokenizers, inlineMethods } = this.Parser.prototype;
     const tokenizers = createTokenizers();
-    inlineTokenizers[typeInline] = tokenizers.tokenizerInlineMath;
-    inlineTokenizers[typeDisplay] = tokenizers.tokenizerDisplayMath;
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, typeInline);
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, typeDisplay);
+    inlineTokenizers[TYPE_INLINE] = tokenizers.tokenizerInlineMath;
+    inlineTokenizers[TYPE_DISPLAY] = tokenizers.tokenizerDisplayMath;
+    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_INLINE);
+    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_DISPLAY);
     return;
   }
 
   return (tree: Node) => {
-    findReplace(tree, regexpInline, (_: string, valueText: string) => {
+    findReplace(tree, REGEXP_INLINE, (_: string, valueText: string) => {
       return {
-        type: typeInline,
+        type: TYPE_INLINE,
         data: {
-          hName: typeInline,
+          hName: TYPE_INLINE,
           value: valueText,
         },
         children: [],
       };
     });
 
-    findReplace(tree, regexpDisplay, (_: string, valueText: string) => {
+    findReplace(tree, REGEXP_DISPLAY, (_: string, valueText: string) => {
       return {
-        type: typeDisplay,
+        type: TYPE_DISPLAY,
         data: {
-          hName: typeDisplay,
+          hName: TYPE_DISPLAY,
           value: valueText,
         },
         children: [],
@@ -163,6 +164,7 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
     'span',
     {
       class: 'math inline',
+      'data-math-typeset': 'true',
     },
     [u('text', `\\(${node.data.value as string}\\)`)],
   );
@@ -175,7 +177,9 @@ export const handlerInlineMath: Handler = (h, node: Node) => {
  * @returns Hypertext AST.
  */
 export const handlerDisplayMath: Handler = (h, node: Node) => {
-  if (!node.data) node.data = {};
+  if (!node.data) {
+    node.data = {};
+  }
 
   return h(
     {
@@ -184,6 +188,7 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
     'span',
     {
       class: 'math display',
+      'data-math-typeset': 'true',
     },
     [u('text', `$$${node.data.value as string}$$`)],
   );
@@ -192,8 +197,14 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
 /**
  * Process math related Hypertext AST.
  * Set the `<script>` to load MathJax and `<body>` attribute that enable math typesetting.
+ *
+ * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
 export const hast = () => (tree: Node) => {
+  if (!(select('[data-math-typeset="true"]', tree) || select('math', tree))) {
+    return;
+  }
+
   visit<Element>(tree, 'element', (node) => {
     switch (node.tagName) {
       case 'head':
@@ -202,15 +213,11 @@ export const hast = () => (tree: Node) => {
           tagName: 'script',
           properties: {
             async: true,
-            src: mathUrl,
+            src: MATH_URL,
           },
           children: [],
         });
         node.children.push({ type: 'text', value: '\n' });
-        break;
-
-      case 'body':
-        node.properties = { ...node.properties, 'data-math-typeset': 'true' };
         break;
     }
   });

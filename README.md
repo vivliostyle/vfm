@@ -26,6 +26,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [`language` (default: `undefined`)](#language-default-undefined)
     - [`hardLineBreaks` (default: `false`)](#hardLineBreaks-default-false)
     - [`disableFormatHtml` (default: `false`)](#disableFormatHtml-default-false)
+    - [`math` (default: `true`)](#math-default-true)
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
@@ -267,6 +268,56 @@ will generates:
 <body>
 <p>text</p>
 </body>
+</html>
+```
+
+#### `math` (default: `true`)
+
+Handles math syntax. The default value is `true`, which is valid.
+
+```js
+stringify(
+  `$x = y$`
+);
+```
+
+will generates:
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+  </head>
+  <body data-math-typeset="true">
+    <p><span class="math inline">\(x = y\)</span></p>
+  </body>
+</html>
+```
+
+To explicitly disable it, specify `false` for this option or `math: false` for Markdown's Frontmatter.
+
+```js
+stringify(
+  `$x = y$`,
+  { math: false }
+);
+```
+
+will generates:
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <p>$x = y$</p>
+  </body>
 </html>
 ```
 

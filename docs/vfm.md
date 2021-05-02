@@ -332,11 +332,13 @@ section.author {
 
 Outputs HTML processed by [MathJax](https://www.mathjax.org/).
 
-It is disabled by default. It is activated by satisfying one of the following.
+It is Enabled by default. To disable it, specify the following.
 
-- VFM options: `math: true`
-- CLI options: `--math`
-- Frontmatter: `math: true` (Priority over others)
+- `stringify` API options: `math: false`
+- `VFM` API options: `math: false`
+- CLI options: `--disable-math`
+- Frontmatter: `math: false`
+  - It takes precedence over `stringify`, but` VFM` does not.
 
 The VFM syntax for MathJax inline is `$...$` and the display is `$$...$$`.
 
@@ -366,7 +368,7 @@ display: $$1 + 1 = 2$$
 
 **HTML**
 
-It also outputs the `<script>` and `<body>` attributes for processing MathJax in Vivliostyle if `math` is enabled.
+It also outputs `<script>` for processing MathJax if `math` is enabled and the math syntax or the `<math>` tag is actually existed.
 
 ```html
 <html>
@@ -375,9 +377,9 @@ It also outputs the `<script>` and `<body>` attributes for processing MathJax in
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML"></script>
   </head>
-  <body data-math-typeset="true">
-    <p>inline: <span class="math inline">\(x = y\)</span></p>
-    <p>display: <span class="math display">$$1 + 1 = 2$$</span></p>
+  <body>
+    <p>inline: <span class="math inline" data-math-typeset="true>"\(x = y\)</span></p>
+    <p>display: <span class="math display" data-math-typeset="true">$$1 + 1 = 2$$</span></p>
   </body>
 </html>
 ```
@@ -424,8 +426,9 @@ The priority of `title` is as follows.
 
 The priority of `math` is as follows.
 
-1. `math` property of the frontmatter
-2. `math` option of VFM
+1. `math` option of `VFM` API
+2. `math` property of the frontmatter
+3. `math` option of `stringify` API
 
 **class**
 
