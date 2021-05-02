@@ -1,3 +1,17 @@
+# [1.0.0-alpha.21](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.20...v1.0.0-alpha.21) (2021-05-02)
+
+
+### Bug Fixes
+
+* Error of `tsc` ([6e3b85a](https://github.com/vivliostyle/vfm/commit/6e3b85a6cb4c75c6ab1b98b00d50815836b0c986))
+* Math syntax attributes should have been specified in the wrapping `<span>` instead of the `<body>`. ([13dbc79](https://github.com/vivliostyle/vfm/commit/13dbc799bc6526f3aad4c208c3a7dd726bfa6431))
+
+
+### Features
+
+* If math syntax is enabled and `<math>` is detected, `<script>` is output. ([6a707ef](https://github.com/vivliostyle/vfm/commit/6a707ef71ff36237d7138872f397a7b0e75d0657))
+* Math syntax enabled default ([408a623](https://github.com/vivliostyle/vfm/commit/408a62357b3c752810c9ebc855f7df3f00f79db8))
+
 # [1.0.0-alpha.20](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.19...v1.0.0-alpha.20) (2021-04-30)
 
 
