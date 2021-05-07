@@ -19,6 +19,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 - [Math equation](#math-equation)
 - [Frontmatter](#frontmatter)
   - [Reserved words](#reserved-words)
+- [Footnotes](#footnotes)
 - [Full HTML document](#full-html-document)
 - [Page Layout](#page-layout)
 - [Hard new line (optional)](#hard-new-line)
@@ -445,6 +446,47 @@ body.twocolumn {
 ```
 
 To specify multiple classes, define as `class:'foo bar'`.
+
+## Footnotes
+
+Define a footnote.
+
+**VFM**
+
+```markdown
+VFM is developed in the GitHub repository [^1].
+Issues are managed on GitHub [^Issues].
+Footnotes can also be written inline ^[This part is a footnote.].
+
+[^1]: [VFM](https://github.com/vivliostyle/vfm)
+
+[^Issues]: [Issues](https://github.com/vivliostyle/vfm/issues)
+```
+
+**HTML**
+
+```html
+<p>
+  VFM is developed in the GitHub repository <sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>.
+  Issues are managed on GitHub <sup id="fnref-issues"><a href="#fn-issues" class="footnote-ref">Issues</a></sup>.
+  Footnotes can also be written inline <sup id="fnref-2"><a href="#fn-2" class="footnote-ref">2</a></sup>.
+</p>
+<div class="footnotes">
+  <hr>
+  <ol>
+    <li id="fn-1"><a href="https://github.com/vivliostyle/vfm">VFM</a><a href="#fnref-1" class="footnote-backref">↩</a></li>
+    <li id="fn-issues"><a href="https://github.com/vivliostyle/vfm/issues">Issues</a><a href="#fnref-issues" class="footnote-backref">↩</a></li>
+    <li id="fn-2">This part is a footnote.<a href="#fnref-2" class="footnote-backref">↩</a></li>
+  </ol>
+</div>
+```
+
+**CSS**
+
+```css
+.footnotes {
+}
+```
 
 ## Full HTML document
 

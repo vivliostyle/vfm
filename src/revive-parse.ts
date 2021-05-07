@@ -1,11 +1,11 @@
 import breaks from 'remark-breaks';
-import footnotes from 'remark-footnotes';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
 import slug from 'remark-slug';
 import unified from 'unified';
 import { mdast as attr } from './plugins/attr';
 import { mdast as code } from './plugins/code';
+import { mdast as footnotes } from './plugins/footnotes';
 import { mdast as math } from './plugins/math';
 import { mdast as metadata } from './plugins/metadata';
 import { mdast as ruby } from './plugins/ruby';
@@ -27,7 +27,7 @@ export const reviveParse = (
   ...(hardLineBreaks ? [breaks] : []),
   ...(enableMath ? [math] : []),
   ruby,
-  [footnotes, { inlineNotes: true }],
+  footnotes,
   attr,
   slug,
   section,
