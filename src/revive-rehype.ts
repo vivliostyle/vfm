@@ -3,6 +3,7 @@ import remark2rehype from 'remark-rehype';
 import unified from 'unified';
 import { handler as code } from './plugins/code';
 import { hast as figure } from './plugins/figure';
+import { hast as footnotes } from './plugins/footnotes';
 import {
   handlerDisplayMath as displayMath,
   handlerInlineMath as inlineMath,
@@ -30,5 +31,6 @@ export const reviveRehype = [
   ],
   raw,
   figure,
+  footnotes,
   inspect('hast'),
 ] as unified.PluggableList<unified.Settings>;

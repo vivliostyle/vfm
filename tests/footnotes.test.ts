@@ -6,13 +6,13 @@ it('Footnotes', () => {
 [^1]: [VFM](https://github.com/vivliostyle/vfm)`;
   const received = stringify(md, { partial: true });
   const expected = `
-<p>VFM is developed in the GitHub repository <sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>.</p>
-<div class="footnotes">
+<p>VFM is developed in the GitHub repository <a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
+<section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
-    <li id="fn-1"><a href="https://github.com/vivliostyle/vfm">VFM</a><a href="#fnref-1" class="footnote-backref">↩</a></li>
+    <li id="fn1" role="doc-endnote"><a href="https://github.com/vivliostyle/vfm">VFM</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>
   </ol>
-</div>
+</section>
 `;
   expect(received).toBe(expected);
 });
@@ -21,13 +21,13 @@ it('Inline', () => {
   const md = `Footnotes can also be written inline ^[This part is a footnote.].`;
   const received = stringify(md, { partial: true });
   const expected = `
-<p>Footnotes can also be written inline <sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>.</p>
-<div class="footnotes">
+<p>Footnotes can also be written inline <a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
+<section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
-    <li id="fn-1">This part is a footnote.<a href="#fnref-1" class="footnote-backref">↩</a></li>
+    <li id="fn1" role="doc-endnote">This part is a footnote.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>
   </ol>
-</div>
+</section>
 `;
   expect(received).toBe(expected);
 });
@@ -44,18 +44,18 @@ Footnotes can also be written inline ^[This part is a footnote.].
   const received = stringify(md, { partial: true });
   const expected = `
 <p>
-  VFM is developed in the GitHub repository <sup id="fnref-1"><a href="#fn-1" class="footnote-ref">1</a></sup>.
-  Issues are managed on GitHub <sup id="fnref-issues"><a href="#fn-issues" class="footnote-ref">Issues</a></sup>.
-  Footnotes can also be written inline <sup id="fnref-2"><a href="#fn-2" class="footnote-ref">2</a></sup>.
+  VFM is developed in the GitHub repository <a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.
+  Issues are managed on GitHub <a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.
+  Footnotes can also be written inline <a id="fnref3" href="#fn3" class="footnote-ref" role="doc-noteref"><sup>3</sup></a>.
 </p>
-<div class="footnotes">
+<section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
-    <li id="fn-1"><a href="https://github.com/vivliostyle/vfm">VFM</a><a href="#fnref-1" class="footnote-backref">↩</a></li>
-    <li id="fn-issues"><a href="https://github.com/vivliostyle/vfm/issues">Issues</a><a href="#fnref-issues" class="footnote-backref">↩</a></li>
-    <li id="fn-2">This part is a footnote.<a href="#fnref-2" class="footnote-backref">↩</a></li>
+    <li id="fn1" role="doc-endnote"><a href="https://github.com/vivliostyle/vfm">VFM</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>
+    <li id="fn2" role="doc-endnote"><a href="https://github.com/vivliostyle/vfm/issues">Issues</a><a href="#fnref2" class="footnote-back" role="doc-backlink">↩</a></li>
+    <li id="fn3" role="doc-endnote">This part is a footnote.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩</a></li>
   </ol>
-</div>
+</section>
 `;
   expect(received).toBe(expected);
 });
