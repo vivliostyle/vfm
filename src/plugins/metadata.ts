@@ -86,14 +86,36 @@ const setBodyClass = (node: Element, value: string) => {
 };
 
 /**
+ * Create the title text without footnotes.
+ * @param tree Tree of Markdown AST.
+ * @returns Title text or `undefined`.
+ */
+const createTitle = (tree: Node) => {
+  const heading = select('heading', tree) as Element | undefined;
+  if (!heading) {
+    return;
+  }
+
+  // Create title string with footnotes removed
+  const children = [...heading.children];
+  heading.children = heading.children.filter(
+    (child: Node) => child.type !== 'footnote',
+  );
+  const text = toString(heading);
+  heading.children = children;
+
+  return text;
+};
+
+/**
  * Parse Markdown's Frontmatter to metadate (`VFile.data`).
  * @returns Handler.
  * @see https://github.com/Symbitic/remark-plugins/blob/master/packages/remark-meta/src/index.js
  */
 export const mdast = () => (tree: Node, file: MetadataVFile) => {
-  const heading = select('heading', tree);
-  if (heading) {
-    file.data.title = toString(heading);
+  const title = createTitle(tree);
+  if (title) {
+    file.data.title = title;
   }
 
   visit<FrontmatterContent>(tree, ['yaml'], (node) => {
