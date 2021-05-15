@@ -454,9 +454,9 @@ Define a footnotes, like [Pandoc](https://pandoc.org/MANUAL.html#footnotes).
 **VFM**
 
 ```markdown
-VFM is developed in the GitHub repository [^1].
-Issues are managed on GitHub [^Issues].
-Footnotes can also be written inline ^[This part is a footnote.].
+VFM is developed in the GitHub repository[^1].
+Issues are managed on GitHub[^Issues].
+Footnotes can also be written inline^[This part is a footnote.].
 
 [^1]: [VFM](https://github.com/vivliostyle/vfm)
 
