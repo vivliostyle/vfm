@@ -1,3 +1,16 @@
+# [1.0.0-alpha.22](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.21...v1.0.0-alpha.22) (2021-05-15)
+
+
+### Bug Fixes
+
+* Fixed an issue where inline footnotes were copied to title tag and section id when heading was defined ([59f8db0](https://github.com/vivliostyle/vfm/commit/59f8db0c0ab050026acbfeae4c0b486c2a740850))
+
+
+### Features
+
+* Convert footnotes HTML like Pandoc ([146abea](https://github.com/vivliostyle/vfm/commit/146abea96aa7d477e1508797f39b0acdc040c50e))
+* footnotes ([d439d82](https://github.com/vivliostyle/vfm/commit/d439d82d2cbcdafda840f384399eebb3addfc230))
+
 # [1.0.0-alpha.21](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.20...v1.0.0-alpha.21) (2021-05-02)
 
 
