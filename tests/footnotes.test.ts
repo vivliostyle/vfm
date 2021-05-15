@@ -59,3 +59,29 @@ Footnotes can also be written inline ^[This part is a footnote.].
 `;
   expect(received).toBe(expected);
 });
+
+it('Heading title and section id without inline footnotes text', () => {
+  const md = '# Test^[Test]';
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <section id="test" class="level1">
+      <h1>Test<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></h1>
+    </section>
+    <section class="footnotes" role="doc-endnotes">
+      <hr>
+      <ol>
+        <li id="fn1" role="doc-endnote">Test<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>
+      </ol>
+    </section>
+  </body>
+</html>
+`;
+  expect(received).toBe(expected);
+});

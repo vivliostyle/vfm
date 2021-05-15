@@ -1,7 +1,6 @@
 import breaks from 'remark-breaks';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
-import slug from 'remark-slug';
 import unified from 'unified';
 import { mdast as attr } from './plugins/attr';
 import { mdast as code } from './plugins/code';
@@ -10,6 +9,7 @@ import { mdast as math } from './plugins/math';
 import { mdast as metadata } from './plugins/metadata';
 import { mdast as ruby } from './plugins/ruby';
 import { mdast as section } from './plugins/section';
+import { mdast as slug } from './plugins/slug';
 import { mdast as toc } from './plugins/toc';
 import { inspect } from './utils';
 
