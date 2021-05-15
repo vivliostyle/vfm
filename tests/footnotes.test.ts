@@ -1,12 +1,12 @@
 import { stringify } from '../src/index';
 
 it('Footnotes', () => {
-  const md = `VFM is developed in the GitHub repository [^1].
+  const md = `VFM is developed in the GitHub repository[^1].
 
 [^1]: [VFM](https://github.com/vivliostyle/vfm)`;
   const received = stringify(md, { partial: true });
   const expected = `
-<p>VFM is developed in the GitHub repository <a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>VFM is developed in the GitHub repository<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
 <section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
@@ -18,10 +18,10 @@ it('Footnotes', () => {
 });
 
 it('Inline', () => {
-  const md = `Footnotes can also be written inline ^[This part is a footnote.].`;
+  const md = `Footnotes can also be written inline^[This part is a footnote.].`;
   const received = stringify(md, { partial: true });
   const expected = `
-<p>Footnotes can also be written inline <a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>Footnotes can also be written inline<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
 <section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
@@ -33,9 +33,9 @@ it('Inline', () => {
 });
 
 it('Multiple', () => {
-  const md = `VFM is developed in the GitHub repository [^1].
-Issues are managed on GitHub [^Issues].
-Footnotes can also be written inline ^[This part is a footnote.].
+  const md = `VFM is developed in the GitHub repository[^1].
+Issues are managed on GitHub[^Issues].
+Footnotes can also be written inline^[This part is a footnote.].
 
 [^1]: [VFM](https://github.com/vivliostyle/vfm)
 
@@ -44,9 +44,9 @@ Footnotes can also be written inline ^[This part is a footnote.].
   const received = stringify(md, { partial: true });
   const expected = `
 <p>
-  VFM is developed in the GitHub repository <a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.
-  Issues are managed on GitHub <a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.
-  Footnotes can also be written inline <a id="fnref3" href="#fn3" class="footnote-ref" role="doc-noteref"><sup>3</sup></a>.
+  VFM is developed in the GitHub repository<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.
+  Issues are managed on GitHub<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.
+  Footnotes can also be written inline<a id="fnref3" href="#fn3" class="footnote-ref" role="doc-noteref"><sup>3</sup></a>.
 </p>
 <section class="footnotes" role="doc-endnotes">
   <hr>
