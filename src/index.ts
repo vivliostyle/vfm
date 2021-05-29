@@ -1,8 +1,8 @@
-import doc from 'rehype-document';
 import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { hast as hastClearHtmlLang } from './plugins/clear-html-lang';
+import { mdast as doc } from './plugins/document';
 import { hast as hastMath } from './plugins/math';
 import { hast as hastMetadata, MetadataVFile } from './plugins/metadata';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
@@ -79,7 +79,7 @@ export function VFM({
   }
 
   if (!partial) {
-    processor.use(doc, { language, css: style, title });
+    processor.use(doc, { language, css: style, title, responsive: true });
     if (!language) {
       processor.use(hastClearHtmlLang);
     }
