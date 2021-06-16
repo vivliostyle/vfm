@@ -325,7 +325,9 @@ section.author {
 
 ```html
 <div class="custom">
-  <h1>Heading</h1>
+  <section id="heading" class="level1">
+    <h1>Heading</h1>
+  </section>
 </div>
 ```
 
