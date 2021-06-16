@@ -62,3 +62,41 @@ it('<pre>', () => {
 </pre>`;
   expect(actual).toBe(expected);
 });
+
+it('Raw HTML', () => {
+  const actual = lib.stringify(
+    `<div class="custom">
+  <p>Hey</p>
+</div>`,
+    {
+      partial: true,
+    },
+  );
+  const expected = `
+<div class="custom">
+  <p>Hey</p>
+</div>
+`;
+  expect(actual).toBe(expected);
+});
+
+it('Raw HTML with Markdown', () => {
+  const actual = lib.stringify(
+    `<div class="custom">
+
+# Heading
+  
+</div>`,
+    {
+      partial: true,
+    },
+  );
+  const expected = `
+<div class="custom">
+  <section id="heading" class="level1">
+    <h1>Heading</h1>
+  </section>
+</div>
+`;
+  expect(actual).toBe(expected);
+});
