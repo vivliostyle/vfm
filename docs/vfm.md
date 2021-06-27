@@ -483,21 +483,23 @@ author: 'Author'
 
 ### Reserved properties
 
-|Property|Type|Description|
-|---|---|---|
-|`id`|`String`|`<html id="...">`|
-|`lang`|`String`|`<html lang="...">`|
-|`dir`|`String`|`<html dir="...">`, value is `ltr`, `rtl` or `auto`.|
-|`class`|`String`|`<html class="...">`|
-|`title`|`String`|`<title>...</title>`, if missing, very first heading of the content will be treated as title.|
-|`html`|`Object`|`<html key="value">`, key/value pair becomes attribute of `<html>`.|
-|`body`|`Object`|`<body key="value">`, key/value pair becomes attribute of `<body>`.|
-|`base`|`Object`|`<base key="value">`, key/value pair becomes attribute of `<base>`.|
-|`meta`|`Object[]`|`<meta key="value">`, key/value pair becomes attribute of `<meta>`.|
-|`link`|`Object[]`|`<link key="value">`, key/value pair becomes attribute of `<link>`.|
-|`script`|`Object[]`|`<script key="value">`, key/value pair becomes attribute of `<script>`.|
-|`vfm`|`Object`|VFM settings.|
-|Other|`String`|`<meta name="key" content="value">`, key/value pair becomes one `<meta>`.|
+| Property | Type       | Description |
+| -------: | :--------: | --- |
+| `id`     | `String`   | `<html id="...">` |
+| `lang`   | `String`   | `<html lang="...">` |
+| `dir`    | `String`   | `<html dir="...">`, value is `ltr`, `rtl` or `auto`. |
+| `class`  | `String`   | `<html class="...">` |
+| `title`  | `String`   | `<title>...</title>`, if missing, very first heading of the content will be treated as title. |
+| `html`   | `Object`   | `<html key="value">`, key/value pair becomes attribute of `<html>`. |
+| `body`   | `Object`   | `<body key="value">`, key/value pair becomes attribute of `<body>`. |
+| `base`   | `Object`   | `<base key="value">`, key/value pair becomes attribute of `<base>`. |
+| `meta`   | `Object[]` | `<meta key="value">`, key/value pair becomes attribute of `<meta>`. |
+| `link`   | `Object[]` | `<link key="value">`, key/value pair becomes attribute of `<link>`. |
+| `script` | `Object[]` | `<script key="value">`, key/value pair becomes attribute of `<script>`. |
+| `vfm`    | `Object`   | VFM settings. |
+| `head`   | -          | Reserved for future use. |
+| `style`  | -          | Reserved for future use. |
+| Other    |`String`|`<meta name="key" content="value">`, key/value pair becomes one `<meta>`. |
 
 **vfm**
 

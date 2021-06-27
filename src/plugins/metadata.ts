@@ -60,6 +60,10 @@ export type Metadata = {
   script?: Array<Array<Attribute>>;
   /** VFM settings. */
   vfm?: VFMSettings;
+  /** `<style>...</style>`, reserved for future use. */
+  style?: string;
+  /** `<head>...</head>`, reserved for future use. */
+  head?: string;
 };
 
 /** Key/Value pair. */
@@ -244,6 +248,11 @@ export const readMetadata = (md: string): Metadata => {
 
       case 'vfm':
         metadata[key] = readSettings(data[key]);
+        break;
+
+      case 'style':
+      case 'head':
+        // Reserved for future use.
         break;
 
       default:
