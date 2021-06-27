@@ -1,3 +1,16 @@
+# [1.0.0-alpha.23](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.22...v1.0.0-alpha.23) (2021-06-27)
+
+
+### Bug Fixes
+
+* Don't convert dates and times that aren't quoted ([4adef06](https://github.com/vivliostyle/vfm/commit/4adef06bdbc6414878699d8f88804b90f12d5a06))
+
+
+### Features
+
+* Implemented document processing as VFM in case of major metadeta design changes ([fb57dae](https://github.com/vivliostyle/vfm/commit/fb57daed7acdae7115a9cc4d9dd3b9aa340bfbb4))
+* Improved metadata definition with frontmatter ([449fa46](https://github.com/vivliostyle/vfm/commit/449fa46c27a97112599fcf9e6083d0dba38a754c))
+
 # [1.0.0-alpha.22](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.21...v1.0.0-alpha.22) (2021-05-15)
 
 
