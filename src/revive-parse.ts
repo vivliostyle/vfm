@@ -6,7 +6,6 @@ import { mdast as attr } from './plugins/attr';
 import { mdast as code } from './plugins/code';
 import { mdast as footnotes } from './plugins/footnotes';
 import { mdast as math } from './plugins/math';
-import { mdast as metadata } from './plugins/metadata';
 import { mdast as ruby } from './plugins/ruby';
 import { mdast as section } from './plugins/section';
 import { mdast as slug } from './plugins/slug';
@@ -34,6 +33,5 @@ export const reviveParse = (
   code,
   toc,
   frontmatter,
-  metadata,
   inspect('mdast'),
 ];

@@ -1,117 +1,100 @@
-/**
- * derived from `rehype-document`.
- * original: Copyright (c) 2016 Titus Wormer <tituswormer@gmail.com>
- * modified: 2021 and later is Akabeko
- * @license MIT
- * @see https://github.com/rehypejs/rehype-document
- */
-
 import doctype from 'doctype';
-import { Properties } from 'hast';
 import h from 'hastscript';
 import { Node } from 'unist';
 import { VFile } from 'vfile';
+import { Attribute, Metadata } from './metadata';
 
-/** Options. */
-export type DocOptions = {
-  /** Text of <html lang="...">. */
-  language?: string;
-  /**
-   * Version of HTML.
-   * @see https://github.com/wooorm/doctype
-   */
-  doctype?: string;
-  /** Whether to insert a `meta[viewport]`. */
-  responsive?: boolean;
-  /** Text of `<title>...</title>`. */
-  title?: string;
-  /** Array of `<meta>`. */
-  meta?: Properties | Properties[];
-  /** Array of `<link>`. */
-  link?: Properties | Properties[];
-  /** Array of `<style>...</style>` */
-  style?: string | string[];
-  /** Array of `<link ref="stylesheet" href="...">`. */
-  css?: string | string[];
-  /** Array of `<script>...</script>`. */
-  script?: string | string[];
-  /** Array of `<script src="...">`. */
-  js?: string | string[];
-};
+/** Key/Value pair. */
+type KeyValue = { [key: string]: any };
 
 /**
- * Makes the specified values into an array.
- * @param value Value.
- * @returns Array.
+ * Create AST properties from attributes.
+ * @param attributes Attributes.
+ * @returns Properties.
  */
-const castArray = <T>(value: undefined | T | T[]): T[] => {
-  if (!value) {
-    return [];
+const createProperties = (attributes?: Array<Attribute>): KeyValue => {
+  if (!attributes) {
+    return {};
   }
 
-  return Array.isArray(value) ? value : [value];
+  const props: KeyValue = {};
+  for (const attr of attributes) {
+    props[attr.name] = attr.value;
+  }
+
+  return props;
 };
 
 /**
- * Process Markdown AST.
- * @param options Options.
- * @returns Transformer.
+ * Create Markdown AST for `<head>`.
+ * @param data Metadata.
+ * @param vfile VFile.
+ * @returns AST of `<head>`.
  */
-export const mdast = (options: DocOptions) => (tree: Node, vfile: VFile) => {
+const createHead = (data: Metadata, vfile: VFile) => {
   const head = [{ type: 'text', value: '\n' }, h('meta', { charset: 'utf-8' })];
 
-  // `<title>...</title>`
+  // <title>...</title>
   {
-    const title = options.title || vfile.stem;
+    const title = data.title || vfile.stem;
     if (title) {
       head.push({ type: 'text', value: '\n' }, h('title', [title]));
     }
   }
 
-  // `<meta>`
-  {
-    const properties = castArray<Properties>(options.meta);
-    if (options.responsive) {
-      properties.unshift({
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      });
-    }
-
-    for (const meta of properties) {
-      head.push({ type: 'text', value: '\n' }, h('meta', meta));
-    }
+  // <base>
+  if (data.base) {
+    const props = createProperties(data.base);
+    head.push({ type: 'text', value: '\n' }, h('base', props));
   }
 
-  // `<link>`
+  // <meta>
   {
-    const properties = castArray<Properties>(options.link);
-    for (const link of properties) {
-      head.push({ type: 'text', value: '\n' }, h('link', link));
-    }
-  }
+    // Add viewport of default
+    const meta: Array<Array<Attribute>> = data.meta ? [...data.meta] : [];
+    meta.unshift([
+      { name: 'name', value: 'viewport' },
+      { name: 'content', value: 'width=device-width, initial-scale=1' },
+    ]);
 
-  // `<style>...</style>`
-  {
-    const styles = castArray<string>(options.style);
-    for (const style of styles) {
-      head.push({ type: 'text', value: '\n' }, h('style', style));
+    for (const attributes of meta) {
+      const props = createProperties(attributes);
+      head.push({ type: 'text', value: '\n' }, h('meta', props));
     }
 
     head.push({ type: 'text', value: '\n' });
   }
 
-  // `<link rel="stylesheet" href="...">`
-  {
-    const filePaths = castArray<string>(options.css);
-    for (const href of filePaths) {
-      head.push(
-        { type: 'text', value: '\n' },
-        h('link', { rel: 'stylesheet', href }),
-      );
+  // <link>
+  if (data.link) {
+    for (const attributes of data.link) {
+      const props = createProperties(attributes);
+      head.push({ type: 'text', value: '\n' }, h('link', props));
     }
+
+    head.push({ type: 'text', value: '\n' });
   }
 
+  // <script>
+  if (data.script) {
+    for (const attributes of data.script) {
+      const props = createProperties(attributes);
+      head.push({ type: 'text', value: '\n' }, h('script', props));
+    }
+
+    head.push({ type: 'text', value: '\n' });
+  }
+
+  return head;
+};
+
+/**
+ * Create Markdown AST for `<body>`.
+ * @param data Metadata.
+ * @param tree Tree of Markdown AST.
+ * @returns AST of `<body>`.
+ */
+const createBody = (data: Metadata, tree: Node) => {
   // <body>...</body>
   const contents =
     tree.type === 'root' && Array.isArray(tree.children)
@@ -121,36 +104,61 @@ export const mdast = (options: DocOptions) => (tree: Node, vfile: VFile) => {
     contents.unshift({ type: 'text', value: '\n' });
   }
 
-  // `<script>...</script>` to end of `<body>`
-  {
-    const scripts = castArray<string>(options.script);
-    for (const script of scripts) {
-      contents.push({ type: 'text', value: '\n' }, h('script', script));
-    }
+  contents.push({ type: 'text', value: '\n' });
+
+  const props = createProperties(data.body);
+  return h('body', props, contents);
+};
+
+/**
+ * Create properties for `<html>`.
+ * Sets the value defined for `html` in Frontmatter.
+ * However, if `id`,` lang`, `dir`, and `class` are defined in the root, those are given priority.
+ * @param data Metadata.
+ * @param tree Tree of Markdown AST.
+ * @param vfile VFile.
+ * @returns AST of `<html>`.
+ */
+const createHTML = (data: Metadata, tree: Node, vfile: VFile) => {
+  const props = createProperties(data.html);
+
+  if (data.id) {
+    props.id = data.id;
   }
 
-  // `<script src="...">` to end of `<body>`
-  {
-    const sources = castArray<string>(options.js);
-    for (const src of sources) {
-      contents.push({ type: 'text', value: '\n' }, h('script', { src }));
-    }
-
-    contents.push({ type: 'text', value: '\n' });
+  if (data.lang) {
+    props.lang = data.lang;
   }
 
+  if (data.dir) {
+    props.dir = data.dir;
+  }
+
+  if (data.class) {
+    props.class = data.class;
+  }
+
+  return h('html', props, [
+    { type: 'text', value: '\n' },
+    h('head', createHead(data, vfile)),
+    { type: 'text', value: '\n' },
+    createBody(data, tree),
+    { type: 'text', value: '\n' },
+  ]);
+};
+
+/**
+ * Process Markdown AST.
+ * @param data Options.
+ * @returns Transformer.
+ */
+export const mdast = (data: Metadata) => (tree: Node, vfile: VFile) => {
   return {
     type: 'root',
     children: [
-      { type: 'doctype', name: doctype(options.doctype || 5) },
+      { type: 'doctype', name: doctype(5) },
       { type: 'text', value: '\n' },
-      h('html', { lang: options.language || undefined }, [
-        { type: 'text', value: '\n' },
-        h('head', head),
-        { type: 'text', value: '\n' },
-        h('body', contents),
-        { type: 'text', value: '\n' },
-      ]),
+      createHTML(data, tree, vfile),
       { type: 'text', value: '\n' },
     ],
   };

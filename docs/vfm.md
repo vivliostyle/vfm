@@ -340,7 +340,8 @@ It is Enabled by default. To disable it, specify the following.
 - `stringify` API options: `math: false`
 - `VFM` API options: `math: false`
 - CLI options: `--disable-math`
-- Frontmatter: `math: false`
+- Frontmatter: `math: false` of `vfm:` property
+  - refs: [Frontmatter](#frontmatter)
   - It takes precedence over `stringify`, but` VFM` does not.
 
 The VFM syntax for MathJax inline is `$...$` and the display is `$$...$$`.
@@ -399,55 +400,133 @@ It also outputs `<script>` for processing MathJax if `math` is enabled and the m
 
 ## Frontmatter
 
-Frontmatter is a way of defining metadata in Markdown (file) units.
+Frontmatter is a way of defining metadata in Markdown (file) units. Write YAML at the beginning of the file.
+
+I'm using [js-yaml](https://www.npmjs.com/package/js-yaml) for parse in YAML. Schema is [JSON_SCHEMA](https://yaml.org/spec/1.2/spec.html#id2803231). 
+
+**VFM**
 
 ```yaml
 ---
-title: 'Introduction to VFM'
-author: 'Author'
+id: 'my-page'
+lang: 'ja'
+dir: 'ltr'
 class: 'my-class'
-math: true
+title: 'Title'
+html:
+  data-color-mode: 'dark'
+  data-light-theme: 'light'
+  data-dark-theme: 'dark'
+body:
+  id: 'body'
+  class: 'foo bar'
+base:
+  target: '_top'
+  href: 'https://www.example.com/'
+meta:
+  - name: 'theme-color'
+    media: '(prefers-color-scheme: light)'
+    content: 'red'
+  - name: 'theme-color'
+    media: '(prefers-color-scheme: dark)'
+    content: 'darkred'
+link:
+  - rel: 'stylesheet'
+    href: 'sample1.css'
+  - rel: 'stylesheet'
+    href: 'sample2.css'
+script:
+  - type: 'text/javascript'
+    src: 'sample1.js'
+  - type: 'text/javascript'
+    src: 'sample2.js'
+vfm:
+  math: false
+  theme: 'theme.css'
+author: 'Author'
 ---
 
 ```
 
-#### Reserved words
+**HTML**
 
-| Property | Type    | Description                                                                                 |
-| -------- | ------- | ------------------------------------------------------------------------------------------- |
-| title    | String  | Document title. If missing, very first heading `#` of the content will be treated as title. |
-| author   | String  | Document author.                                                                            |
-| class    | String  | Custom classes applied to `<body>`                                                          |
-| math     | Boolean | Enable math syntax.                                                                         |
-| theme    | String  | Vivliostyle theme package or bare CSS file.                                                 |
-
-The priority of `title` is as follows.
-
-1. `title` property of the frontmatter
-2. First heading `#` of the content
-3. `title` option of VFM
-
-The priority of `math` is as follows.
-
-1. `math` option of `VFM` API
-2. `math` property of the frontmatter
-3. `math` option of `stringify` API
-
-**class**
-
-```yaml
----
-class: 'twocolumn'
----
-
+```html
+<!doctype html>
+<html data-color-mode="dark" data-light-theme="light" data-dark-theme="dark" id="my-page" lang="ja" dir="ltr" class="my-class">
+  <head>
+    <meta charset="utf-8">
+    <title>Title</title>
+    <base target="_top" href="https://www.example.com/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="red">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="darkred">
+    <meta name="author" content="Author">
+    <link rel="stylesheet" href="sample1.css">
+    <link rel="stylesheet" href="sample2.css">
+    <script type="text/javascript" src="sample1.js"></script>
+    <script type="text/javascript" src="sample2.js"></script>
+  </head>
+  <body id="body" class="foo bar">
+    <p>Text</p>
+  </body>
+</html>
 ```
+
+**CSS**
 
 ```css
-body.twocolumn {
+.my-class {
+}
+
+.foo.bar {
 }
 ```
 
-To specify multiple classes, define as `class:'foo bar'`.
+### Reserved properties
+
+| Property | Type       | Description |
+| -------: | :--------: | --- |
+| `id`     | `String`   | `<html id="...">` |
+| `lang`   | `String`   | `<html lang="...">` |
+| `dir`    | `String`   | `<html dir="...">`, value is `ltr`, `rtl` or `auto`. |
+| `class`  | `String`   | `<html class="...">` |
+| `title`  | `String`   | `<title>...</title>`, if missing, very first heading of the content will be treated as title. |
+| `html`   | `Object`   | `<html key="value">`, key/value pair becomes attribute of `<html>`. |
+| `body`   | `Object`   | `<body key="value">`, key/value pair becomes attribute of `<body>`. |
+| `base`   | `Object`   | `<base key="value">`, key/value pair becomes attribute of `<base>`. |
+| `meta`   | `Object[]` | `<meta key="value">`, key/value pair becomes attribute of `<meta>`. |
+| `link`   | `Object[]` | `<link key="value">`, key/value pair becomes attribute of `<link>`. |
+| `script` | `Object[]` | `<script key="value">`, key/value pair becomes attribute of `<script>`. |
+| `vfm`    | `Object`   | VFM settings. |
+| `head`   | -          | Reserved for future use. |
+| `style`  | -          | Reserved for future use. |
+| Other    |`String`|`<meta name="key" content="value">`, key/value pair becomes one `<meta>`. |
+
+**vfm**
+
+|Property|Type|Description|
+|---|---|---|
+|`math`|Boolean|Enable math syntax, default 'true'.|
+|`theme`|String|Vivliostyle theme package or bare CSS file.|
+
+### Priority with options
+
+If there are multiple specifications for the same purpose, the priority is as follows.
+
+1. Frontmatter
+2. VFM options
+
+In Frontmatter, if there is a duplicate of the root `id` and` id` in the `html` property, the root definition takes precedence.
+
+```yaml
+---
+id: 'sample1'
+html:
+  id: 'sample2'
+---
+```
+
+In this example, `sample1` is adopted.
 
 ## Footnotes
 
