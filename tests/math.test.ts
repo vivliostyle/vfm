@@ -237,7 +237,8 @@ it('disable with options', () => {
 
 it('disable with frontmatter, override options', () => {
   const markdown = `---
-math: false
+vfm:
+  math: false
 ---
 $x=y$
 `;

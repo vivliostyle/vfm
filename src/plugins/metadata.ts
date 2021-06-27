@@ -2,95 +2,82 @@ import { Element } from 'hast';
 import { load as yaml } from 'js-yaml';
 import { FrontmatterContent, Literal } from 'mdast';
 import toString from 'mdast-util-to-string';
+import stringify from 'rehype-stringify';
+import frontmatter from 'remark-frontmatter';
+import markdown from 'remark-parse';
+import remark2rehype from 'remark-rehype';
+import unified from 'unified';
 import { Node } from 'unist';
 import { select } from 'unist-util-select';
 import visit from 'unist-util-visit';
 import { VFile } from 'vfile';
+import { mdast as footnotes } from './footnotes';
 
-/**
- * Metadata from frontmatter in markdown.
- */
-export type Metadata = {
-  /** Title. */
-  title?: string;
-  /** Author. */
-  author?: string;
-  /** Value to specify for the `class` attribute of `<body>`. */
-  class?: string;
+/** Attribute of HTML tag. */
+export type Attribute = {
+  /** Name. */
+  name: string;
+  /** Value. */
+  value: string;
+};
+
+/** Settings of VFM. */
+export type VFMSettings = {
   /** Enable math syntax. */
   math?: boolean;
-  /** Value that indicates that the document is TOC. */
-  toc?: boolean;
+  /** Path of theme. */
+  theme?: string;
+  /** Enable TOC mode. */
+  toc: boolean;
 };
+
+/** Metadata from Frontmatter. */
+export type Metadata = {
+  /** Value of `<html id="...">`. */
+  id?: string;
+  /** Value of `<html lang="...">`. */
+  lang?: string;
+  /** Value of `<html dir="...">`. e.g. `ltr`, `rtl`, `auto`. */
+  dir?: string;
+  /** Value of `<html class="...">`. */
+  class?: string;
+  /** Value of `<title>...</title>`. */
+  title?: string;
+  /**
+   * Attributes of `<html>`.
+   * The `id`,` lang`, `dir`, and` class` specified in the root take precedence over the value of this property.
+   */
+  html?: Array<Attribute>;
+  /** Attributes of `<body>`. */
+  body?: Array<Attribute>;
+  /** Attributes of `<base>`. */
+  base?: Array<Attribute>;
+  /** Attribute collection of `<meta>`. */
+  meta?: Array<Array<Attribute>>;
+  /** Attribute collection of `<link>`. */
+  link?: Array<Array<Attribute>>;
+  /** Attribute collection of `<script>`. */
+  script?: Array<Array<Attribute>>;
+  /** VFM settings. */
+  vfm?: VFMSettings;
+};
+
+/** Key/Value pair. */
+type KeyValue = { [key: string]: any };
 
 /**
  * Extension of VFM metadata to VFile data.
  */
-export interface MetadataVFile extends VFile {
-  data: Metadata;
+interface MetadataVFile extends VFile {
+  data: any;
 }
 
 /**
- * Set the author to `<head>`.
- * @param node Node of HAST.
- * @param author Author.
- */
-const setAuthor = (node: Element, author: string) => {
-  node.children.push({
-    type: 'element',
-    tagName: 'meta',
-    properties: { name: 'author', content: author },
-    children: [],
-  });
-};
-
-/**
- * Set the title to `<head>`.
- * If `<title>` already exists, rewrite its text. Otherwise, add a new one at the end of `<head>`.
- * @param node Node of HAST.
- * @param title Title.
- */
-const setTitle = (node: Element, title: string) => {
-  const titleElement = node.children.find(
-    (elm) => elm.type === 'element' && elm.tagName === 'title',
-  ) as Element | undefined;
-
-  if (titleElement) {
-    // Overwrite what was set in `rehype-document`
-    const text = titleElement.children.find((n) => n.type === 'text');
-    if (text) {
-      text.value = title;
-    } else {
-      titleElement.children.push({ type: 'text', value: title });
-    }
-  } else {
-    node.children.push({
-      type: 'element',
-      tagName: 'title',
-      properties: {},
-      children: [{ type: 'text', value: title }],
-    });
-    node.children.push({ type: 'text', value: '\n' });
-  }
-};
-
-/**
- * Set the class attribute to `<body>`.
- * @param node Node of HAST.
- * @param className Value of class attribute.
- */
-const setBodyClass = (node: Element, value: string) => {
-  if (node.properties) {
-    node.properties.class = value;
-  }
-};
-
-/**
- * Create the title text without footnotes.
+ * Read the title from heading without footnotes.
  * @param tree Tree of Markdown AST.
  * @returns Title text or `undefined`.
  */
-const createTitle = (tree: Node) => {
+const readTitleFromHeading = (tree: Node) => {
   const heading = select('heading', tree) as Element | undefined;
   if (!heading) {
     return;
@@ -112,12 +99,7 @@ const createTitle = (tree: Node) => {
  * @returns Handler.
  * @see https://github.com/Symbitic/remark-plugins/blob/master/packages/remark-meta/src/index.js
  */
-export const mdast = () => (tree: Node, file: MetadataVFile) => {
-  const title = createTitle(tree);
-  if (title) {
-    file.data.title = title;
-  }
-
+const mdast = () => (tree: Node, file: MetadataVFile) => {
   visit<FrontmatterContent>(tree, ['yaml'], (node) => {
     const value = yaml(node.value);
     if (typeof value === 'object') {
@@ -128,32 +110,155 @@ export const mdast = () => (tree: Node, file: MetadataVFile) => {
     }
   });
 
-  file.data.toc = false;
+  // If title is undefined in frontmatter, read from heading
+  if (!file.data.title) {
+    const title = readTitleFromHeading(tree);
+    if (title) {
+      file.data.title = title;
+    }
+  }
+
   visit<Literal>(tree, ['shortcode'], (node) => {
-    if (node.identifier !== 'toc') return;
-    file.data.toc = true;
+    if (node.identifier !== 'toc') {
+      return;
+    }
+
+    if (file.data.vfm) {
+      file.data.vfm.toc = true;
+    } else {
+      file.data.vfm = { math: true, toc: true };
+    }
   });
 };
 
 /**
- * Set the metadata to HTML (HAST).
- * @returns Handler.
+ * Parse Markdown frontmatter.
+ * @param md Markdown.
+ * @returns Key/Value pair.
  */
-export const hast = () => (tree: Node, vfile: VFile) => {
-  const metadata = vfile as MetadataVFile;
-  visit<Element>(tree, 'element', (node) => {
-    if (node.tagName === 'head') {
-      if (metadata.data.author) {
-        setAuthor(node, metadata.data.author);
-      }
+const parseMarkdown = (md: string): KeyValue => {
+  const processor = unified()
+    .use([
+      [markdown, { gfm: true, commonmark: true }],
+      // Remove footnotes when reading title from heading
+      footnotes,
+      frontmatter,
+      mdast,
+    ] as unified.PluggableList<unified.Settings>)
+    .data('settings', { position: false })
+    .use(remark2rehype)
+    .use(stringify);
 
-      if (metadata.data.title) {
-        setTitle(node, metadata.data.title);
-      }
-    }
+  return processor.processSync(md).data as KeyValue;
+};
 
-    if (node.tagName === 'body' && metadata.data.class) {
-      setBodyClass(node, metadata.data.class);
+/**
+ * Read an attributes from data object.
+ * @param data Data object.
+ * @returns Attributes of HTML tag.
+ */
+const readAttributes = (data: any): Array<Attribute> | undefined => {
+  if (typeof data !== 'object') {
+    return;
+  }
+
+  const result: Array<Attribute> = [];
+  for (const key of Object.keys(data)) {
+    result.push({ name: key, value: `${data[key]}` });
+  }
+
+  return result;
+};
+
+/**
+ * Read an attributes collection from data object.
+ * @param data Data object.
+ * @returns Attributes collection of HTML tag.
+ */
+const readAttributesCollection = (
+  data: any,
+): Array<Array<Attribute>> | undefined => {
+  if (!Array.isArray(data)) {
+    return;
+  }
+
+  const result: Array<Array<Attribute>> = [];
+  data.forEach((value) => {
+    const attributes = readAttributes(value);
+    if (attributes) {
+      result.push(attributes);
     }
   });
+
+  return result;
+};
+
+/**
+ * Read VFM settings from data object.
+ * @param data Data object.
+ * @returns Settings.
+ */
+const readSettings = (data: any): VFMSettings => {
+  if (typeof data !== 'object') {
+    return { toc: false };
+  }
+
+  return {
+    math: typeof data.math === 'boolean' ? data.math : undefined,
+    theme: typeof data.theme === 'string' ? data.theme : undefined,
+    toc: typeof data.toc === 'boolean' ? data.toc : false,
+  };
+};
+
+/**
+ * Read metadata from Markdown frontmatter.
+ * @param md Markdown.
+ * @returns Metadata.
+ */
+export const readMetadata = (md: string): Metadata => {
+  const metadata: Metadata = {};
+  const data = parseMarkdown(md);
+  const others: Array<Array<Attribute>> = [];
+
+  for (const key of Object.keys(data)) {
+    switch (key) {
+      case 'id':
+      case 'lang':
+      case 'dir':
+      case 'class':
+      case 'title':
+        metadata[key] = `${data[key]}`;
+        break;
+
+      case 'html':
+      case 'body':
+      case 'base':
+        metadata[key] = readAttributes(data[key]);
+        break;
+
+      case 'meta':
+      case 'link':
+      case 'script':
+        metadata[key] = readAttributesCollection(data[key]);
+        break;
+
+      case 'vfm':
+        metadata[key] = readSettings(data[key]);
+        break;
+
+      default:
+        others.push([
+          { name: 'name', value: key },
+          { name: 'content', value: `${data[key]}` },
+        ]);
+        break;
+    }
+  }
+
+  // Other properties should be `<meta>`
+  if (0 < others.length) {
+    metadata.meta = metadata.meta ? metadata.meta.concat(others) : others;
+  }
+
+  return metadata;
 };

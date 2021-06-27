@@ -1,10 +1,10 @@
 import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
-import { hast as hastClearHtmlLang } from './plugins/clear-html-lang';
 import { mdast as doc } from './plugins/document';
+//import { mdast as doc } from './plugins/document.old';
 import { hast as hastMath } from './plugins/math';
-import { hast as hastMetadata, MetadataVFile } from './plugins/metadata';
+import { Metadata, readMetadata } from './plugins/metadata';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
 import { reviveParse as markdown } from './revive-parse';
 import { reviveRehype as html } from './revive-rehype';
@@ -37,21 +37,46 @@ export interface Hooks {
 }
 
 /**
- * Update the settings by comparing the options with the frontmatter metadata.
+ * Check the metadata with options.
+ * @param metadata Metadata.
  * @param options Options.
- * @param md Markdown string.
- * @returns Options updated by checking.
+ * @returns Checked metadata.
  */
-const checkOptions = (options: StringifyMarkdownOptions, md: string) => {
-  // Reduce processing as much as possible because it only reads metadata.
-  const processor = VFM({ partial: true, disableFormatHtml: true });
-  const metadata = (processor.processSync(md) as MetadataVFile).data;
-  const opts = options;
+const checkMetadata = (
+  metadata: Metadata,
+  options: StringifyMarkdownOptions,
+) => {
+  const result = { ...metadata };
 
-  opts.title = metadata.title === undefined ? opts.title : metadata.title;
-  opts.math = metadata.math === undefined ? opts.math : metadata.math;
+  if (metadata.title === undefined && options.title !== undefined) {
+    result.title = options.title;
+  }
 
-  return opts;
+  if (metadata.lang === undefined && options.language !== undefined) {
+    result.lang = options.language;
+  }
+
+  if (options.style) {
+    if (metadata.link === undefined) {
+      metadata.link = [];
+    }
+
+    if (typeof options.style === 'string') {
+      metadata.link.push([
+        { name: 'rel', value: 'stylesheet' },
+        { name: 'href', value: options.style },
+      ]);
+    } else if (Array.isArray(options.style)) {
+      for (const style of options.style) {
+        metadata.link.push([
+          { name: 'rel', value: 'stylesheet' },
+          { name: 'href', value: style },
+        ]);
+      }
+    }
+  }
+
+  return result;
 };
 
 /**
@@ -59,16 +84,24 @@ const checkOptions = (options: StringifyMarkdownOptions, md: string) => {
  * @param options Options.
  * @returns Unified processor.
  */
-export function VFM({
-  style = undefined,
-  partial = false,
-  title = undefined,
-  language = undefined,
-  replace = undefined,
-  hardLineBreaks = false,
-  disableFormatHtml = false,
-  math = true,
-}: StringifyMarkdownOptions = {}): Processor {
+export function VFM(
+  {
+    style = undefined,
+    partial = false,
+    title = undefined,
+    language = undefined,
+    replace = undefined,
+    hardLineBreaks = false,
+    disableFormatHtml = false,
+    math = true,
+  }: StringifyMarkdownOptions = {},
+  metadata: Metadata = {},
+): Processor {
+  const meta = checkMetadata(metadata, { style, title, language });
+  if (meta.vfm && meta.vfm.math !== undefined) {
+    math = meta.vfm.math;
+  }
+
   const processor = unified()
     .use(markdown(hardLineBreaks, math))
     .data('settings', { position: false })
@@ -79,13 +112,9 @@ export function VFM({
   }
 
   if (!partial) {
-    processor.use(doc, { language, css: style, title, responsive: true });
-    if (!language) {
-      processor.use(hastClearHtmlLang);
-    }
+    processor.use(doc, meta);
   }
 
-  processor.use(hastMetadata);
   processor.use(rehypeStringify);
 
   // Must be run after `rehype-document` to write to `<head>`
@@ -111,7 +140,7 @@ export function stringify(
   markdownString: string,
   options: StringifyMarkdownOptions = {},
 ): string {
-  const processor = VFM(checkOptions(options, markdownString));
+  const processor = VFM(options, readMetadata(markdownString));
   const vfile = processor.processSync(markdownString);
   debug(vfile.data);
   return String(vfile);
