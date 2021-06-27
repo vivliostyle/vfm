@@ -340,7 +340,8 @@ It is Enabled by default. To disable it, specify the following.
 - `stringify` API options: `math: false`
 - `VFM` API options: `math: false`
 - CLI options: `--disable-math`
-- Frontmatter: `math: false`
+- Frontmatter: `math: false` of `vfm:` property
+  - refs: [Frontmatter](#frontmatter)
   - It takes precedence over `stringify`, but` VFM` does not.
 
 The VFM syntax for MathJax inline is `$...$` and the display is `$$...$$`.
