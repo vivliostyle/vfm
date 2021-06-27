@@ -251,3 +251,23 @@ link:
 `;
   expect(received).toBe(expected);
 });
+
+it('Do not convert date and time', () => {
+  const md = `---
+date: 2021-06-27
+date2: "2021-06-27"
+---`;
+  const received = stringify(md, { style: ['sample2.css', 'sample3.css'] });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="date" content="2021-06-27">
+    <meta name="date2" content="2021-06-27">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});

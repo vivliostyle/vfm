@@ -401,6 +401,8 @@ It also outputs `<script>` for processing MathJax if `math` is enabled and the m
 
 Frontmatter is a way of defining metadata in Markdown (file) units. Write YAML at the beginning of the file.
 
+I'm using [js-yaml](https://www.npmjs.com/package/js-yaml) for parse in YAML. Schema is [JSON_SCHEMA](https://yaml.org/spec/1.2/spec.html#id2803231). 
+
 **VFM**
 
 ```yaml

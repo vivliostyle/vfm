@@ -1,5 +1,5 @@
 import { Element } from 'hast';
-import { load as yaml } from 'js-yaml';
+import { JSON_SCHEMA, load as yaml } from 'js-yaml';
 import { FrontmatterContent, Literal } from 'mdast';
 import toString from 'mdast-util-to-string';
 import stringify from 'rehype-stringify';
@@ -101,7 +101,7 @@ const readTitleFromHeading = (tree: Node) => {
  */
 const mdast = () => (tree: Node, file: MetadataVFile) => {
   visit<FrontmatterContent>(tree, ['yaml'], (node) => {
-    const value = yaml(node.value);
+    const value = yaml(node.value, { schema: JSON_SCHEMA });
     if (typeof value === 'object') {
       file.data = {
         ...file.data,
