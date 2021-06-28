@@ -30,6 +30,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
+    - [readMetadata](#readmetadata)
 - [Spec](#spec)
   - [Principles](#principles)
   - [Links](#links)
@@ -71,7 +72,7 @@ yarn add @vivliostyle/vfm
 ```
 
 ```js
-const { stringify } = require('@vivliostyle/vfm');
+import { stringify } from '@vivliostyle/vfm';
 
 console.log(
   stringify(`
@@ -90,6 +91,7 @@ This snippet will generates:
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>はじめに</title>
   </head>
   <body>
     <h1>はじめに</h1>
@@ -330,7 +332,7 @@ import { VFM } from '@vivliostyle/vfm';
 
 const processor = VFM({ partial: true });
 const html = processor.processSync('# Hello').toString();
-````
+```
 
 #### Unified plugin
 
@@ -348,6 +350,40 @@ function main() {
     .processSync('# Hello');
 }
 ```
+
+#### readMetadata
+
+Read metadata from Markdown frontmatter.
+
+Useful if just want to get the metadata, Markdown parse and metadata typing (for TypeScript) are handled by the VFM side.
+
+`readMetadata(md: string): Metadata`
+
+- params:
+  - `md`: `String` Markdown text.
+- returns:
+  - `metadata`: `Metadata` Metadata.
+
+```js
+import { readMetadata } from '@vivliostyle/vfm'
+
+const md = `---
+id: 'my-page'
+lang: 'en'
+dir: 'ltr'
+class: 'my-class'
+title: 'Title'
+vfm:
+  math: false
+  theme: 'sample.css'
+---
+`;
+
+const metadata = readMetadata(md);
+console.log(metadata);
+```
+
+About `Metadata`, refer to [VFM](https://vivliostyle.github.io/vfm/#/vfm)'s "Frontmatter" or type information of TypeScript.
 
 ## Spec
 

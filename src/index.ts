@@ -2,13 +2,15 @@ import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { mdast as doc } from './plugins/document';
-//import { mdast as doc } from './plugins/document.old';
 import { hast as hastMath } from './plugins/math';
 import { Metadata, readMetadata } from './plugins/metadata';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace';
 import { reviveParse as markdown } from './revive-parse';
 import { reviveRehype as html } from './revive-rehype';
 import { debug } from './utils';
+
+// Expose metadata reading by VFM
+export * from './plugins/metadata';
 
 /**
  * Option for convert Markdown to a stringify (HTML).
