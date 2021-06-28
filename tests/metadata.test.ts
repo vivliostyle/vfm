@@ -229,7 +229,40 @@ link:
   expect(received).toBe(expected);
 });
 
-it('Styles from options', () => {
+it('Styles from options (String)', () => {
+  const md = ``;
+  const received = stringify(md, { style: 'sample.css' });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="sample.css">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('Styles from options (String[])', () => {
+  const md = ``;
+  const received = stringify(md, { style: ['sample1.css', 'sample2.css'] });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="sample1.css">
+    <link rel="stylesheet" href="sample2.css">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('Styles from options with frontmatter', () => {
   const md = `---
 link:
   - rel: 'stylesheet'
@@ -257,7 +290,7 @@ it('Do not convert date and time', () => {
 date: 2021-06-27
 date2: "2021-06-27"
 ---`;
-  const received = stringify(md, { style: ['sample2.css', 'sample3.css'] });
+  const received = stringify(md);
   const expected = `<!doctype html>
 <html>
   <head>
@@ -284,7 +317,7 @@ head: |
   <meta name="sample-meta1" content="meta1">
   <meta name="sample-meta2" content="meta2">
 ---`;
-  const received = stringify(md, { style: ['sample2.css', 'sample3.css'] });
+  const received = stringify(md);
   const expected = `<!doctype html>
 <html>
   <head>
