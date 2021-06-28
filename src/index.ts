@@ -39,23 +39,20 @@ export interface Hooks {
 }
 
 /**
- * Check the metadata with options.
+ * Check and update metadata with options.
  * @param metadata Metadata.
  * @param options Options.
- * @returns Checked metadata.
  */
 const checkMetadata = (
   metadata: Metadata,
   options: StringifyMarkdownOptions,
 ) => {
-  const result = { ...metadata };
-
   if (metadata.title === undefined && options.title !== undefined) {
-    result.title = options.title;
+    metadata.title = options.title;
   }
 
   if (metadata.lang === undefined && options.language !== undefined) {
-    result.lang = options.language;
+    metadata.lang = options.language;
   }
 
   if (options.style) {
@@ -77,8 +74,6 @@ const checkMetadata = (
       }
     }
   }
-
-  return result;
 };
 
 /**
@@ -99,9 +94,9 @@ export function VFM(
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
 ): Processor {
-  const meta = checkMetadata(metadata, { style, title, language });
-  if (meta.vfm && meta.vfm.math !== undefined) {
-    math = meta.vfm.math;
+  checkMetadata(metadata, { style, title, language });
+  if (metadata.vfm && metadata.vfm.math !== undefined) {
+    math = metadata.vfm.math;
   }
 
   const processor = unified()
@@ -114,7 +109,7 @@ export function VFM(
   }
 
   if (!partial) {
-    processor.use(doc, meta);
+    processor.use(doc, metadata);
   }
 
   processor.use(rehypeStringify);
