@@ -1,3 +1,15 @@
+# [1.0.0-alpha.24](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.23...v1.0.0-alpha.24) (2021-06-28)
+
+
+### Bug Fixes
+
+* Fixed an issue where the optional `style` specification was ignored ([88bdb6c](https://github.com/vivliostyle/vfm/commit/88bdb6c0bcdad72e29517253da0970b0b6690bc2))
+
+
+### Features
+
+* Expose readMetadata API ([6ff37c5](https://github.com/vivliostyle/vfm/commit/6ff37c5c3fc37ff5c651f0b2f86b5d379883229e))
+
 # [1.0.0-alpha.23](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.22...v1.0.0-alpha.23) (2021-06-27)
 
 
