@@ -36,8 +36,8 @@ const createHead = (data: Metadata, vfile: VFile) => {
 
   // <title>...</title>
   {
-    const title = data.title || vfile.stem;
-    if (title) {
+    const title = typeof data.title === 'string' ? data.title : vfile.stem;
+    if (typeof title === 'string') {
       head.push({ type: 'text', value: '\n' }, h('title', [title]));
     }
   }
@@ -122,19 +122,19 @@ const createBody = (data: Metadata, tree: Node) => {
 const createHTML = (data: Metadata, tree: Node, vfile: VFile) => {
   const props = createProperties(data.html);
 
-  if (data.id) {
+  if (typeof data.id === 'string') {
     props.id = data.id;
   }
 
-  if (data.lang) {
+  if (typeof data.lang === 'string') {
     props.lang = data.lang;
   }
 
-  if (data.dir) {
+  if (typeof data.dir === 'string') {
     props.dir = data.dir;
   }
 
-  if (data.class) {
+  if (typeof data.class === 'string') {
     props.class = data.class;
   }
 

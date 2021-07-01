@@ -207,6 +207,70 @@ Text
   expect(received).toBe(expected);
 });
 
+it('If the value is null or empty string, it will be an empty string', () => {
+  const md = `---
+id:
+lang:
+dir: ""
+class:
+title: ""
+html:
+  data-color-mode:
+  data-light-theme:
+  data-dark-theme:
+body:
+  id:
+  class:
+base:
+  target:
+  href:
+meta:
+  - name:
+    media:
+    content:
+  - name:
+    media:
+    content:
+link:
+  - rel:
+    href:
+  - rel:
+    href:
+script:
+  - type:
+    src:
+  - type:
+    src:
+author:
+---
+
+Text
+  `;
+
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html data-color-mode="" data-light-theme="" data-dark-theme="" id="" lang="" dir="" class="">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <base target="" href="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="" media="" content="">
+    <meta name="" media="" content="">
+    <meta name="author" content="">
+    <link rel="" href="">
+    <link rel="" href="">
+    <script type="" src=""></script>
+    <script type="" src=""></script>
+  </head>
+  <body id="" class="">
+    <p>Text</p>
+  </body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
 it('Style from options', () => {
   const md = `---
 link:

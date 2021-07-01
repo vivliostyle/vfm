@@ -157,6 +157,16 @@ const parseMarkdown = (md: string): KeyValue => {
 };
 
 /**
+ * Read the string or null value in the YAML parse result.
+ * If the value is null, it will be an empty string
+ * @param value Value of YAML parse result.
+ * @returns String.
+ */
+const readStringOrNullValue = (value: string | null) => {
+  return value === null ? '' : `${value}`;
+};
+
+/**
  * Read an attributes from data object.
  * @param data Data object.
  * @returns Attributes of HTML tag.
@@ -168,7 +178,7 @@ const readAttributes = (data: any): Array<Attribute> | undefined => {
 
   const result: Array<Attribute> = [];
   for (const key of Object.keys(data)) {
-    result.push({ name: key, value: `${data[key]}` });
+    result.push({ name: key, value: readStringOrNullValue(data[key]) });
   }
 
   return result;
@@ -231,7 +241,7 @@ export const readMetadata = (md: string): Metadata => {
       case 'dir':
       case 'class':
       case 'title':
-        metadata[key] = `${data[key]}`;
+        metadata[key] = readStringOrNullValue(data[key]);
         break;
 
       case 'html':
@@ -258,7 +268,7 @@ export const readMetadata = (md: string): Metadata => {
       default:
         others.push([
           { name: 'name', value: key },
-          { name: 'content', value: `${data[key]}` },
+          { name: 'content', value: readStringOrNullValue(data[key]) },
         ]);
         break;
     }
