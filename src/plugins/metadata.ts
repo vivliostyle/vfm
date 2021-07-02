@@ -66,7 +66,10 @@ export type Metadata = {
   head?: string;
 };
 
-/** Key/Value pair. */
+/**
+ * Key/Value pair.
+ * Definition to enable subscript access of `Object`.
+ */
 type KeyValue = { [key: string]: any };
 
 /**
@@ -81,7 +84,7 @@ interface MetadataVFile extends VFile {
  * @param tree Tree of Markdown AST.
  * @returns Title text or `undefined`.
  */
-const readTitleFromHeading = (tree: Node) => {
+const readTitleFromHeading = (tree: Node): string | undefined => {
   const heading = select('heading', tree) as Element | undefined;
   if (!heading) {
     return;
@@ -160,9 +163,9 @@ const parseMarkdown = (md: string): KeyValue => {
  * Read the string or null value in the YAML parse result.
  * If the value is null, it will be an empty string
  * @param value Value of YAML parse result.
- * @returns String.
+ * @returns Text.
  */
-const readStringOrNullValue = (value: string | null) => {
+const readStringOrNullValue = (value: string | null): string => {
   return value === null ? '' : `${value}`;
 };
 
@@ -172,7 +175,7 @@ const readStringOrNullValue = (value: string | null) => {
  * @returns Attributes of HTML tag.
  */
 const readAttributes = (data: any): Array<Attribute> | undefined => {
-  if (typeof data !== 'object') {
+  if (data === null || typeof data !== 'object') {
     return;
   }
 

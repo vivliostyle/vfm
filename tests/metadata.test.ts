@@ -271,6 +271,27 @@ Text
   expect(received).toBe(expected);
 });
 
+it('Specify null or empty string for Object', () => {
+  const md = `---
+html:
+meta:
+  -
+vfm: ''
+---
+`;
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
 it('Style from options', () => {
   const md = `---
 link:
