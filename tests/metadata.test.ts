@@ -273,10 +273,10 @@ Text
 
 it('Specify null or empty string for Object', () => {
   const md = `---
-html:
+html: ''
 meta:
   -
-vfm: ''
+vfm:
 ---
 `;
   const received = stringify(md);

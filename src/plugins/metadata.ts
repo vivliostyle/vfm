@@ -216,7 +216,7 @@ const readAttributesCollection = (
  * @returns Settings.
  */
 const readSettings = (data: any): VFMSettings => {
-  if (typeof data !== 'object') {
+  if (data === null || typeof data !== 'object') {
     return { toc: false };
   }
 
