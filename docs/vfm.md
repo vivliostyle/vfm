@@ -404,6 +404,8 @@ Frontmatter is a way of defining metadata in Markdown (file) units. Write YAML a
 
 I'm using [js-yaml](https://www.npmjs.com/package/js-yaml) for parse in YAML. Schema is [JSON_SCHEMA](https://yaml.org/spec/1.2/spec.html#id2803231). 
 
+The js-yaml parse makes `key:` to `key: null`. However, VFM treats this as an empty string. If `key:` or `key:""` is specified as the property of the attribute value, it is output as `key=""`. 
+
 **VFM**
 
 ```yaml

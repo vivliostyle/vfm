@@ -66,7 +66,10 @@ export type Metadata = {
   head?: string;
 };
 
-/** Key/Value pair. */
+/**
+ * Key/Value pair.
+ * Definition to enable subscript access of `Object`.
+ */
 type KeyValue = { [key: string]: any };
 
 /**
@@ -81,7 +84,7 @@ interface MetadataVFile extends VFile {
  * @param tree Tree of Markdown AST.
  * @returns Title text or `undefined`.
  */
-const readTitleFromHeading = (tree: Node) => {
+const readTitleFromHeading = (tree: Node): string | undefined => {
   const heading = select('heading', tree) as Element | undefined;
   if (!heading) {
     return;
@@ -157,18 +160,28 @@ const parseMarkdown = (md: string): KeyValue => {
 };
 
 /**
+ * Read the string or null value in the YAML parse result.
+ * If the value is null, it will be an empty string
+ * @param value Value of YAML parse result.
+ * @returns Text.
+ */
+const readStringOrNullValue = (value: string | null): string => {
+  return value === null ? '' : `${value}`;
+};
+
+/**
  * Read an attributes from data object.
  * @param data Data object.
  * @returns Attributes of HTML tag.
  */
 const readAttributes = (data: any): Array<Attribute> | undefined => {
-  if (typeof data !== 'object') {
+  if (data === null || typeof data !== 'object') {
     return;
   }
 
   const result: Array<Attribute> = [];
   for (const key of Object.keys(data)) {
-    result.push({ name: key, value: `${data[key]}` });
+    result.push({ name: key, value: readStringOrNullValue(data[key]) });
   }
 
   return result;
@@ -203,7 +216,7 @@ const readAttributesCollection = (
  * @returns Settings.
  */
 const readSettings = (data: any): VFMSettings => {
-  if (typeof data !== 'object') {
+  if (data === null || typeof data !== 'object') {
     return { toc: false };
   }
 
@@ -231,7 +244,7 @@ export const readMetadata = (md: string): Metadata => {
       case 'dir':
       case 'class':
       case 'title':
-        metadata[key] = `${data[key]}`;
+        metadata[key] = readStringOrNullValue(data[key]);
         break;
 
       case 'html':
@@ -258,7 +271,7 @@ export const readMetadata = (md: string): Metadata => {
       default:
         others.push([
           { name: 'name', value: key },
-          { name: 'content', value: `${data[key]}` },
+          { name: 'content', value: readStringOrNullValue(data[key]) },
         ]);
         break;
     }
