@@ -1,3 +1,12 @@
+# [1.0.0-alpha.25](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.24...v1.0.0-alpha.25) (2021-07-03)
+
+
+### Bug Fixes
+
+* Fixed an issue that caused an error if Object was null for `vfm` ([38906f0](https://github.com/vivliostyle/vfm/commit/38906f04ee73b6f27d5ba06f05705899859c7c7c))
+* Fixed an issue that caused an error if YAML object was null ([43233a3](https://github.com/vivliostyle/vfm/commit/43233a3d1501f315259cfe9c09e63bf58ee3aace))
+* Fixed to be empty string instead of null when only key is specified in Frontmatter YAML ([1a64e33](https://github.com/vivliostyle/vfm/commit/1a64e33ab558348890547bc16dc5f445c8e336eb))
+
 # [1.0.0-alpha.24](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.23...v1.0.0-alpha.24) (2021-06-28)
 
 
