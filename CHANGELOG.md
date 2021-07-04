@@ -1,3 +1,10 @@
+# [1.0.0-alpha.26](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.25...v1.0.0-alpha.26) (2021-07-04)
+
+
+### Features
+
+* Added VFM settings to Frontmatter ([ff4efc7](https://github.com/vivliostyle/vfm/commit/ff4efc76ccf2984765f714d22ad0c6293be05482))
+
 # [1.0.0-alpha.25](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.24...v1.0.0-alpha.25) (2021-07-03)
 
 
