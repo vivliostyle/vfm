@@ -25,10 +25,16 @@ export type Attribute = {
 export type VFMSettings = {
   /** Enable math syntax. */
   math?: boolean;
+  /** Output markdown fragments.  */
+  partial?: boolean;
+  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
+  hardLineBreaks?: boolean;
+  /** Disable automatic HTML format. */
+  disableFormatHtml?: boolean;
   /** Path of theme. */
   theme?: string;
   /** Enable TOC mode. */
-  toc: boolean;
+  toc?: boolean;
 };
 
 /** Metadata from Frontmatter. */
@@ -222,6 +228,15 @@ const readSettings = (data: any): VFMSettings => {
 
   return {
     math: typeof data.math === 'boolean' ? data.math : undefined,
+    partial: typeof data.partial === 'boolean' ? data.partial : undefined,
+    hardLineBreaks:
+      typeof data.hardLineBreaks === 'boolean'
+        ? data.hardLineBreaks
+        : undefined,
+    disableFormatHtml:
+      typeof data.disableFormatHtml === 'boolean'
+        ? data.disableFormatHtml
+        : undefined,
     theme: typeof data.theme === 'string' ? data.theme : undefined,
     toc: typeof data.toc === 'boolean' ? data.toc : false,
   };

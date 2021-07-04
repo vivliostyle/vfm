@@ -38,6 +38,9 @@ script:
     src: 'sample2.js'
 vfm:
   math: false
+  partial: true
+  hardLineBreaks: true
+  disableFormatHtml: true
   theme: 'theme.css'
 author: 'Author'
 other-meta1: 'other1'
@@ -111,6 +114,9 @@ other-meta2: 'other2'
     ],
     vfm: {
       math: false,
+      partial: true,
+      hardLineBreaks: true,
+      disableFormatHtml: true,
       toc: false,
       theme: 'theme.css',
     },
@@ -410,6 +416,68 @@ head: |
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('vfm.partial: true', () => {
+  const md = `---
+vfm:
+  partial: true
+---
+
+Text
+`;
+  const received = stringify(md, { partial: false });
+  const expected = `
+<p>Text</p>
+`;
+  expect(received).toBe(expected);
+});
+
+it('vfm.hardLineBreaks: true', () => {
+  const md = `---
+vfm:
+  hardLineBreaks: true
+---
+
+Text
+Text
+`;
+  const received = stringify(md, { hardLineBreaks: false });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <p>Text<br>Text</p>
+  </body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('vfm.disableFormatHtml: true', () => {
+  const md = `---
+vfm:
+  disableFormatHtml: true
+---
+
+Text
+`;
+  const received = stringify(md, { disableFormatHtml: false });
+  const expected = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<p>Text</p>
+</body>
 </html>
 `;
   expect(received).toBe(expected);
