@@ -445,6 +445,9 @@ script:
 vfm:
   math: false
   theme: 'theme.css'
+  partial: false
+  hardLineBreaks: false
+  disableFormatHtml: false
 author: 'Author'
 ---
 
@@ -506,10 +509,13 @@ author: 'Author'
 
 **vfm**
 
-|Property|Type|Description|
-|---|---|---|
-|`math`|Boolean|Enable math syntax, default 'true'.|
-|`theme`|String|Vivliostyle theme package or bare CSS file.|
+| Property            | Type      | Default | Description |
+| ------------------: | :-------: | :-----: | --- |
+| `math`              | `Boolean` | `true`  | Enable math syntax. |
+| `partial`           | `Boolean` | `false` | Output markdown fragments. |
+| `hardLineBreaks`    | `Boolean` | `false` | Add `<br>` at the position of hard line breaks, without needing spaces. |
+| `disableFormatHtml` | `Boolean` | `false` | Disable automatic HTML format. |
+| `theme`             | `String`  | -       | Vivliostyle theme package or bare CSS file. |
 
 ### Priority with options
 

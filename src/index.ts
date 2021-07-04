@@ -18,7 +18,7 @@ export * from './plugins/metadata';
 export interface StringifyMarkdownOptions {
   /** Custom stylesheet path/URL. */
   style?: string | string[];
-  /** Output markdown fragments.  */
+  /** Output markdown fragments. */
   partial?: boolean;
   /** Document title (ignored in partial mode). */
   title?: string;
@@ -95,8 +95,21 @@ export function VFM(
   metadata: Metadata = {},
 ): Processor {
   checkMetadata(metadata, { style, title, language });
-  if (metadata.vfm && metadata.vfm.math !== undefined) {
-    math = metadata.vfm.math;
+
+  // Prioritize metadata `vfm` settings over options
+  if (metadata.vfm) {
+    if (metadata.vfm.math !== undefined) {
+      math = metadata.vfm.math;
+    }
+    if (metadata.vfm.partial !== undefined) {
+      partial = metadata.vfm.partial;
+    }
+    if (metadata.vfm.hardLineBreaks !== undefined) {
+      hardLineBreaks = metadata.vfm.hardLineBreaks;
+    }
+    if (metadata.vfm.disableFormatHtml !== undefined) {
+      disableFormatHtml = metadata.vfm.disableFormatHtml;
+    }
   }
 
   const processor = unified()
