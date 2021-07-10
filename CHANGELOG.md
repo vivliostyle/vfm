@@ -1,3 +1,10 @@
+# [1.0.0-alpha.27](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.26...v1.0.0-alpha.27) (2021-07-10)
+
+
+### Bug Fixes
+
+* Fixed an issue where ruby couldn't escape pipe with a backslash ([ac111a2](https://github.com/vivliostyle/vfm/commit/ac111a201deedfdebb176ee2eff3ecf7eb3735f3))
+
 # [1.0.0-alpha.26](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.25...v1.0.0-alpha.26) (2021-07-04)
 
 
