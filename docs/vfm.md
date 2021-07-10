@@ -12,6 +12,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 - [Image](#image)
   - [with caption and single line](#with-caption-and-single-line)
 - [Ruby](#ruby)
+  - [Escape pipe in ruby body](#escape-pipe-in-ruby-body)
 - [Sectionization](#sectionization)
   - [Plain section](#plain-section)
 - [Raw HTML](#raw-html)
@@ -169,8 +170,6 @@ figure figcaption {
 
 ## Ruby
 
-<Badge type="warning">PRE-RELEASE</Badge>
-
 **VFM**
 
 ```
@@ -190,6 +189,22 @@ ruby {
 }
 ruby rt {
 }
+```
+
+### Escape pipe in ruby body
+
+If want to escape the delimiter pipe `|`, add `\` immediately before it.
+
+**VFM**
+
+```
+{a\|b|c}
+```
+
+**HTML**
+
+```html
+<p><ruby>a|b<rt>c</rt></ruby></p>
 ```
 
 ## Sectionization

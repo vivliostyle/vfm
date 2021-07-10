@@ -10,7 +10,7 @@ function locateRuby(value: string, fromIndex: number) {
 
 const tokenizer: Tokenizer = function (eat, value, silent) {
   const now = eat.now();
-  const match = /^{(.+?)\|(.+?)}/.exec(value);
+  const match = /^{(.+?)(?<=[^\\|])\|(.+?)}/.exec(value);
   if (!match) return;
 
   const [eaten, inlineContent, rubyText] = match;
