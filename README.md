@@ -2,7 +2,6 @@
 
 [![Actions Status: test](https://github.com/vivliostyle/vfm/workflows/CI/badge.svg)](https://github.com/vivliostyle/vfm/actions?query=CI)
 [![npm-badge](https://flat.badgen.net/npm/v/@vivliostyle/vfm)][npm-url]
-[![npm: version (tag)](https://flat.badgen.net/npm/v/@vivliostyle/vfm/next)][npm-url]
 [![npm: total downloads](https://flat.badgen.net/npm/dt/@vivliostyle/vfm)][npm-url]
 ![npm: license](https://flat.badgen.net/npm/license/@vivliostyle/vfm)
 
@@ -15,6 +14,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Install](#install)
 - [Use](#use)
   - [Usage with `vivliostyle` command](#usage-with-vivliostyle-command)
@@ -24,8 +24,8 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [`partial` (default: `false`)](#partial-default-false)
     - [`title` (default: `undefined`)](#title-default-undefined)
     - [`language` (default: `undefined`)](#language-default-undefined)
-    - [`hardLineBreaks` (default: `false`)](#hardLineBreaks-default-false)
-    - [`disableFormatHtml` (default: `false`)](#disableFormatHtml-default-false)
+    - [`hardLineBreaks` (default: `false`)](#hardlinebreaks-default-false)
+    - [`disableFormatHtml` (default: `false`)](#disableformathtml-default-false)
     - [`math` (default: `true`)](#math-default-true)
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
@@ -44,8 +44,6 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
 ```bash
 npm install -g @vivliostyle/vfm
 ```
-
-If you want to test latest spec, run `npm install -g @vivliostyle/vfm@next` instead.
 
 ## Use
 
