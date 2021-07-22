@@ -4,6 +4,9 @@
   "version": "1.0.0-alpha.27",
   "author": "Vivliostyle Foundation",
   "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 12"
+  },
   "main": "lib/index.js",
   "bin": {
     "vfm": "lib/cli.js"
