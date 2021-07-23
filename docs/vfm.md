@@ -13,8 +13,9 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
   - [with caption](#with-caption)
 - [Footnotes](#footnotes)
 - [Frontmatter](#frontmatter)
-  - [Reserved words](#reserved-words)
+  - [Reserved properties](#reserved-properties)
   - [Priority with options](#priority-with-options)
+  - [Merge class properties](#merge-class-properties)
 - [Hard new line (optional)](#hard-new-line)
 - [Image](#image)
   - [with caption and single line](#with-caption-and-single-line)
@@ -237,7 +238,7 @@ author: 'Author'
 | `id`     | `String`   | `<html id="...">` |
 | `lang`   | `String`   | `<html lang="...">` |
 | `dir`    | `String`   | `<html dir="...">`, value is `ltr`, `rtl` or `auto`. |
-| `class`  | `String`   | `<html class="...">` |
+| `class`  | `String`   | `<html class="...">` and `<body class="...">` |
 | `title`  | `String`   | `<title>...</title>`, if missing, very first heading of the content will be treated as title. |
 | `html`   | `Object`   | `<html key="value">`, key/value pair becomes attribute of `<html>`. |
 | `body`   | `Object`   | `<body key="value">`, key/value pair becomes attribute of `<body>`. |
@@ -267,7 +268,7 @@ If there are multiple specifications for the same purpose, the priority is as fo
 1. Frontmatter
 2. VFM options
 
-In Frontmatter, if there is a duplicate of the root `id` and` id` in the `html` property, the root definition takes precedence.
+In Frontmatter, if there is a duplicate of the root `id` and `id` in the `html` property, the root definition takes precedence.
 
 ```yaml
 ---
@@ -278,6 +279,35 @@ html:
 ```
 
 In this example, `sample1` is adopted.
+
+```html
+<html id="sample1">
+</html>
+```
+
+### Merge class properties
+
+The `class` properties of the root, `html`, and `body` are combined separated by spaces.
+
+```yaml
+---
+class: 'root'
+html:
+  class: 'html'
+body:
+  class: 'body sample'
+---
+```
+
+In this example, merged.
+
+```html
+<html class="root html">
+  <body class="root body sample">
+  </body>
+</html>
+```
+
 
 ## Hard new line
 

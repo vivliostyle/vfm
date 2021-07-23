@@ -205,7 +205,7 @@ Text
     <script type="text/javascript" src="sample1.js"></script>
     <script type="text/javascript" src="sample2.js"></script>
   </head>
-  <body id="body" class="foo bar">
+  <body id="body" class="my-class foo bar">
     <p>Text</p>
   </body>
 </html>
@@ -478,6 +478,28 @@ Text
 <body>
 <p>Text</p>
 </body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+it('Merge `class` properties', () => {
+  const md = `---
+class: "root"
+html:
+  class: "html"
+body:
+  class: "foo bar"
+---
+`;
+  const received = stringify(md, { disableFormatHtml: false });
+  const expected = `<!doctype html>
+<html class="root html">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body class="root foo bar"></body>
 </html>
 `;
   expect(received).toBe(expected);
