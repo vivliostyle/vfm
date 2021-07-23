@@ -90,11 +90,11 @@ const createHead = (data: Metadata, vfile: VFile) => {
 
 /**
  * Create Markdown AST for `<body>`.
- * @param data Metadata.
+ * @param metadata Metadata.
  * @param tree Tree of Markdown AST.
  * @returns AST of `<body>`.
  */
-const createBody = (data: Metadata, tree: Node) => {
+const createBody = (metadata: Metadata, tree: Node) => {
   // <body>...</body>
   const contents =
     tree.type === 'root' && Array.isArray(tree.children)
@@ -106,7 +106,15 @@ const createBody = (data: Metadata, tree: Node) => {
 
   contents.push({ type: 'text', value: '\n' });
 
-  const props = createProperties(data.body);
+  const props = createProperties(metadata.body);
+
+  // <body class="root-class body-class1 body-class2 ...">
+  if (typeof metadata.class === 'string') {
+    props.class = props.class
+      ? `${metadata.class} ${props.class}`
+      : metadata.class;
+  }
+
   return h('body', props, contents);
 };
 
@@ -114,35 +122,38 @@ const createBody = (data: Metadata, tree: Node) => {
  * Create properties for `<html>`.
  * Sets the value defined for `html` in Frontmatter.
  * However, if `id`,` lang`, `dir`, and `class` are defined in the root, those are given priority.
- * @param data Metadata.
+ * @param metadata Metadata.
  * @param tree Tree of Markdown AST.
  * @param vfile VFile.
  * @returns AST of `<html>`.
  */
-const createHTML = (data: Metadata, tree: Node, vfile: VFile) => {
-  const props = createProperties(data.html);
+const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
+  const props = createProperties(metadata.html);
 
-  if (typeof data.id === 'string') {
-    props.id = data.id;
+  if (typeof metadata.id === 'string') {
+    props.id = metadata.id;
   }
 
-  if (typeof data.lang === 'string') {
-    props.lang = data.lang;
+  if (typeof metadata.lang === 'string') {
+    props.lang = metadata.lang;
   }
 
-  if (typeof data.dir === 'string') {
-    props.dir = data.dir;
+  if (typeof metadata.dir === 'string') {
+    props.dir = metadata.dir;
   }
 
-  if (typeof data.class === 'string') {
-    props.class = data.class;
+  // <html class="root-class html-class1 html-class2 ...">
+  if (typeof metadata.class === 'string') {
+    props.class = props.class
+      ? `${metadata.class} ${props.class}`
+      : metadata.class;
   }
 
   return h('html', props, [
     { type: 'text', value: '\n' },
-    h('head', createHead(data, vfile)),
+    h('head', createHead(metadata, vfile)),
     { type: 'text', value: '\n' },
-    createBody(data, tree),
+    createBody(metadata, tree),
     { type: 'text', value: '\n' },
   ]);
 };
