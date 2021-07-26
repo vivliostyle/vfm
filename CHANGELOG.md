@@ -1,3 +1,10 @@
+# [1.0.1](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.27...v1.0.1) (2021-07-27)
+
+
+### Features
+* Explicitly support Node.js LTS ([0778773](https://github.com/vivliostyle/vfm/commit/0778773bc3d582dabef0f8ef3a6127b50f5f469b))
+* Merge the frontmatter's class properties ([f5a3461](https://github.com/vivliostyle/vfm/commit/f5a3461cfb49807307a0d45fefa93a05506d330e))
+
 # [1.0.0-alpha.27](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.26...v1.0.0-alpha.27) (2021-07-10)
 
 
