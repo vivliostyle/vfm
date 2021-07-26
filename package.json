@@ -52,6 +52,7 @@
     "dev": "tsc -w",
     "prepublishOnly": "yarn build",
     "release": "release-it",
+    "release:dry": "release-it --dry-run",
     "release:pre": "release-it --preRelease --npm.tag=latest",
     "test": "jest",
     "test:debug": "jest tests/xxx.test.ts --silent=false --verbose false"
