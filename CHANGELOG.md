@@ -1,3 +1,5 @@
+## [1.0.2](https://github.com/vivliostyle/vfm/compare/v1.0.1...v1.0.2) (2021-07-26)
+
 # [1.0.1](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.27...v1.0.1) (2021-07-27)
 
 
