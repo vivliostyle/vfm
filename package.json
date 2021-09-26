@@ -50,7 +50,7 @@
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "dev": "tsc -w",
-    "prepublishOnly": "yarn build",
+    "prepublishOnly": "npm run build",
     "release": "release-it",
     "release:dry": "release-it --dry-run",
     "release:pre": "release-it --preRelease --npm.tag=latest",
