@@ -1,4 +1,4 @@
-import * as lib from '../src';
+import { stringify } from '../src';
 import { ReplaceRule } from '../src/plugins/replace';
 
 it('replace', () => {
@@ -16,7 +16,7 @@ it('replace', () => {
     },
   ] as ReplaceRule[];
   expect(
-    lib.stringify(
+    stringify(
       `
 [icon1][Notice]
 
@@ -35,7 +35,7 @@ it('replace', () => {
 it('empty replace', () => {
   const rules = [] as ReplaceRule[];
   expect(
-    lib.stringify(
+    stringify(
       `
 [icon1][Notice]
 
@@ -51,7 +51,7 @@ it('empty replace', () => {
 });
 
 it('<pre>', () => {
-  const actual = lib.stringify(`<pre>\n*    *    *\n   *    *    *\n</pre>`, {
+  const actual = stringify(`<pre>\n*    *    *\n   *    *    *\n</pre>`, {
     partial: true,
     disableFormatHtml: true,
   });
@@ -64,7 +64,7 @@ it('<pre>', () => {
 });
 
 it('Raw HTML', () => {
-  const actual = lib.stringify(
+  const actual = stringify(
     `<div class="custom">
   <p>Hey</p>
 </div>`,
@@ -81,7 +81,7 @@ it('Raw HTML', () => {
 });
 
 it('Raw HTML with Markdown', () => {
-  const actual = lib.stringify(
+  const actual = stringify(
     `<div class="custom">
 
 # Heading
@@ -97,6 +97,29 @@ it('Raw HTML with Markdown', () => {
     <h1>Heading</h1>
   </section>
 </div>
+`;
+  expect(actual).toBe(expected);
+});
+
+it('User-specified metadata (without Frontmatter)', () => {
+  const actual = stringify(
+    '# Title',
+    {},
+    { title: 'My Page', body: [{ name: 'id', value: 'page' }] },
+  );
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body id="page">
+    <section id="title" class="level1">
+      <h1>Title</h1>
+    </section>
+  </body>
+</html>
 `;
   expect(actual).toBe(expected);
 });

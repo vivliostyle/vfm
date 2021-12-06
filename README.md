@@ -31,6 +31,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
     - [readMetadata](#readmetadata)
+- [User-specified metadata](#user-specified-metadata)
 - [Spec](#spec)
   - [Principles](#principles)
   - [Links](#links)
@@ -382,6 +383,41 @@ console.log(metadata);
 ```
 
 About `Metadata`, refer to [VFM](https://vivliostyle.github.io/vfm/#/vfm)'s "Frontmatter" or type information of TypeScript.
+
+## User-specified metadata
+
+Metadata can be specified for `stringify`, this specification takes precedence over Frontmatter. 
+
+The following usage is assumed.
+
+- Use metadata other than Frontmatter
+- Process Frontmatter metadata obtained by `readMetadata` 
+
+```js
+stringify(
+  '# Title',
+  {},
+  { title: 'My Page', body: [{ name: 'id', value: 'page' }] },
+);
+```
+
+HTML:
+
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>My Page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body id="page">
+    <section id="title" class="level1">
+      <h1>Title</h1>
+    </section>
+  </body>
+</html>
+```
 
 ## Spec
 
