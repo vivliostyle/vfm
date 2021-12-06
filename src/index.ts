@@ -149,8 +149,9 @@ export function VFM(
 export function stringify(
   markdownString: string,
   options: StringifyMarkdownOptions = {},
+  metadata: Metadata = readMetadata(markdownString),
 ): string {
-  const processor = VFM(options, readMetadata(markdownString));
+  const processor = VFM(options, metadata);
   const vfile = processor.processSync(markdownString);
   debug(vfile.data);
   return String(vfile);
