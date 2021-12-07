@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/vivliostyle/vfm/compare/v1.0.2...v1.1.0) (2021-12-07)
+
+
+### Features
+
+* Supports metadata specification for stringify ([249cf32](https://github.com/vivliostyle/vfm/commit/249cf3212c33d5806c6c16acca59063eef325855))
+
 ## [1.0.2](https://github.com/vivliostyle/vfm/compare/v1.0.1...v1.0.2) (2021-07-26)
 
 # [1.0.1](https://github.com/vivliostyle/vfm/compare/v1.0.0-alpha.27...v1.0.1) (2021-07-27)
