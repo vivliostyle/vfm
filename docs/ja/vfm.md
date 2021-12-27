@@ -9,26 +9,26 @@ VFMの記法とその機能は、アルファベットの昇順（`A`〜`Z`）�
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [コード (Code)](#code)
+- [コード \(Code\)](#コード-code)
   - [キャプションをつける (with caption)](#with-caption)
-- [脚注 (Footnotes)](#footnotes)
-- [フロントマター／前付け (Frontmatter)](#frontmatter)
-  - [実装保留中のプロパティ (Reserved properties)](#reserved-properties)
-  - [プロパティのオプション(Priority with options)](#priority-with-options)
-  - [classプロパティでの統合(Merge class properties)](#merge-class-properties)
-- [強制改行（オプション） (Hard new line (optional))](#hard-new-line)
-- [画像 (Image)](#image)
+- [脚注 \(Footnotes\)](#footnotes)
+- [フロントマター／前付け \(Frontmatter\)](#frontmatter)
+  - [実装保留中のプロパティ \(Reserved properties\)](#reserved-properties)
+  - [プロパティのオプション \(Priority with options\)](#priority-with-options)
+  - [classプロパティでの統合 \(Merge class properties\)](#merge-class-properties)
+- [強制改行（オプション） \(Hard new line \(optional\)\)](#hard-new-line)
+- [画像 \(Image\)](#image)
   - [単行のキャプションをつける(with caption and single line)](#with-caption-and-single-line)
-- [数式 (Math equation)](#math-equation)
-- [そのままのHTML (Raw HTML)](#raw-html)
-  - [Markdownをつける(with Markdown)](#with-markdown)
-- [ルビ (Ruby)](#ruby)
-  - [ルビにおけるパイプのエスケープ(Escape pipe in ruby body)](#escape-pipe-in-ruby-body)
-- [セクション分け (Sectionization)](#sectionization)
+- [数式 \(Math equation\)](#math-equation)
+- [そのままのHTML \(Raw HTML\)](#raw-html)
+  - [Markdownをつける\(with Markdown\)](#with-markdown)
+- [ルビ \(Ruby\)](#ruby)
+  - [ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)](#escape-pipe-in-ruby-body)
+- [セクション分け \(Sectionization\)](#sectionization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## コード (Code)
+## コード \(Code\)
 
 **VFM**
 
@@ -57,7 +57,7 @@ pre code {
 
 VFMはシンタックス・ハイライトに[Prism](https://prismjs.com/)を利用しています。
 
-### キャプションをつける (with caption)
+### キャプションをつける \(with caption\)
 
 **VFM**
 
@@ -101,7 +101,7 @@ figure[class^='language-'] pre code {
 }
 ```
 
-## 脚注 (Footnotes)
+## 脚注 \(Footnotes\)
 
 [Pandoc](https://pandoc.org/MANUAL.html#footnotes)に似た脚注を定義します。
 
@@ -232,7 +232,7 @@ author: 'Author'
 }
 ```
 
-### 実装保留中のプロパティ (Reserved properties)
+### 実装保留中のプロパティ \(Reserved properties\)
 
 | プロパティ | データ型 | 説明 |
 | -------: | :--------: | --- |
@@ -262,7 +262,7 @@ author: 'Author'
 | `disableFormatHtml` | `Boolean` | `false` |HTMLの自動整形を無効にする |
 | `theme`             | `String`  | -       | Vivliostyleのthemeパッケージか、そのままのCSSファイル |
 
-### プロパティのオプション (Priority with options)
+### プロパティのオプション \(Priority with options\)
 
 同じ目的の仕様が複数ある場合、優先順位は以下の通りになります。
 
@@ -286,7 +286,7 @@ In this example, `sample1` is adopted.
 </html>
 ```
 
-### classプロパティでの統合 (Merge class properties)
+### classプロパティでの統合 \(Merge class properties\)
 
 ルート、`html`、`body`の `class` プロパティは、スペースで区切って統合されます。
 
@@ -309,7 +309,7 @@ body:
 </html>
 ```
 
-## 強制改行（オプション） (Hard new line (optional))
+## 強制改行（オプション） \(Hard new line \(optional\)\)
 
 - 改行すると、行末に `<br/>` が付きます
 - 2行連続の改行で新しい文ブロックを作成します.
@@ -352,7 +352,7 @@ p {
 }
 ```
 
-## 画像 (Image)
+## 画像 \(Image\)
 
 **VFM**
 
@@ -373,7 +373,7 @@ img {
 }
 ```
 
-### 単行のキャプションをつける(with caption and single line)
+### 単行のキャプションをつける\(with caption and single line\)
 
 1行で書かれ、また`<figure>`によりキャプションが付けられた画像を包含します。
 
@@ -412,7 +412,7 @@ figure figcaption {
 }
 ```
 
-## 数式 (Math equation)
+## 数式 \(Math equation\)
 
 [MathJax](https://www.mathjax.org/)により処理したHTMLを出力します。
 
@@ -433,7 +433,7 @@ OK:
 
 - `$...$`、`$$...$$` ……範囲指定が一致
 - `$...\n...$`、`$$\n...\n$$` ……同じ段落内
-- `$...\$...$`、`$...\$...\\\$..$`、`$$...\$...\\\$...$$`……奇数の `\`で `$`をエスケープする
+- `$...\$...$`、`$...\$...\\\$..$`、`$$...\$...\\\$...$$`……奇数の `\`で `$`をエスケープ（無効化）する
 
 NG:
 
@@ -479,7 +479,7 @@ display: $$1 + 1 = 2$$
 }
 ```
 
-## そのままのHTML (Raw HTML)
+## そのままのHTML \(Raw HTML\)
 
 **VFM**
 
@@ -497,7 +497,7 @@ display: $$1 + 1 = 2$$
 </div>
 ```
 
-### Markdownをつける (with Markdown)
+### Markdownをつける \(with Markdown\)
 
 **VFM**
 
@@ -542,9 +542,9 @@ ruby rt {
 }
 ```
 
-### ルビにおけるパイプのエスケープ (Escape pipe in ruby body)
+### ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)
 
-区切り符号パイプ `|` をエスケープしたい場合、直前に `\` を追加してください。
+区切り符号パイプ `|` をエスケープ（無効化）したい場合、直前に `\` を追加してください。
 
 **VFM**
 
@@ -558,7 +558,7 @@ ruby rt {
 <p><ruby>a|b<rt>c</rt></ruby></p>
 ```
 
-## セクション分け (Sectionization)
+## セクション分け \(Sectionization\)
 
 見出しを階層的なセクションにする。
 
