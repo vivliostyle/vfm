@@ -4,27 +4,27 @@ Vivliostyle Flavored Markdown (VFM) は、本の執筆のために最適化さ�
 
 ## 目次
 
-VFMの記法とその機能は、アルファベットの昇順（`A`〜`Z`）で表示されます。
+VFMの記法とその機能は、見出しカッコ内のアルファベット昇順（`A`〜`Z`）で表示されます。
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [コード \(Code\)](#コード-code)
-  - [キャプションをつける (with caption)](#with-caption)
-- [脚注 \(Footnotes\)](#footnotes)
-- [フロントマター／前付け \(Frontmatter\)](#frontmatter)
-  - [実装保留中のプロパティ \(Reserved properties\)](#reserved-properties)
-  - [プロパティのオプション \(Priority with options\)](#priority-with-options)
-  - [classプロパティでの統合 \(Merge class properties\)](#merge-class-properties)
-- [強制改行（オプション） \(Hard new line \(optional\)\)](#hard-new-line)
-- [画像 \(Image\)](#image)
-  - [単行のキャプションをつける(with caption and single line)](#with-caption-and-single-line)
-- [数式 \(Math equation\)](#math-equation)
-- [そのままのHTML \(Raw HTML\)](#raw-html)
-  - [Markdownをつける\(with Markdown\)](#with-markdown)
-- [ルビ \(Ruby\)](#ruby)
-  - [ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)](#escape-pipe-in-ruby-body)
-- [セクション分け \(Sectionization\)](#sectionization)
+- [コード \(Code\)](#%E3%82%B3%E3%83%BC%E3%83%89-code)
+  - [キャプションをつける \(with caption\)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-caption)
+- [脚注 \(Footnotes\)](#%E8%84%9A%E6%B3%A8-footnotes)
+- [フロントマター／前付け \(Frontmatter\)](#%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%83%9E%E3%82%BF%E3%83%BC%EF%BC%8F%E5%89%8D%E4%BB%98%E3%81%91-frontmatter)
+  - [実装保留中のプロパティ \(Reserved properties\)](#%E5%AE%9F%E8%A3%85%E4%BF%9D%E7%95%99%E4%B8%AD%E3%81%AE%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3-reserved-properties)
+  - [プロパティのオプション \(Priority with options\)](#%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-priority-with-options)
+  - [classプロパティでの統合 \(Merge class properties\)](#class%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%A7%E3%81%AE%E7%B5%B1%E5%90%88-merge-class-properties)
+- [強制改行（オプション） \(Hard new line \(optional\)\)](#%E5%BC%B7%E5%88%B6%E6%94%B9%E8%A1%8C%EF%BC%88%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%EF%BC%89-hard-new-line-optional)
+- [画像 \(Image\)](#%E7%94%BB%E5%83%8F-image)
+  - [単行のキャプションをつける(with caption and single line)](#%E5%8D%98%E8%A1%8C%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8Bwith-caption-and-single-line)
+- [数式 \(Math equation\)](#%E6%95%B0%E5%BC%8F-math-equation)
+- [そのままのHTML \(Raw HTML\)](#%E3%81%9D%E3%81%AE%E3%81%BE%E3%81%BE%E3%81%AEhtml-raw-html)
+  - [Markdownをつける\(with Markdown\)](#markdown%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-markdown)
+- [ルビ \(Ruby\)](#%E3%83%AB%E3%83%93-ruby)
+  - [ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)](#%E3%83%AB%E3%83%93%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%91%E3%82%A4%E3%83%97%E3%81%AE%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97-escape-pipe-in-ruby-body)
+- [セクション分け \(Sectionization\)](#%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%86%E3%81%91-sectionization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -560,7 +560,7 @@ ruby rt {
 
 ## セクション分け \(Sectionization\)
 
-見出しを階層的なセクションにする。
+見出しを階層的なセクションにします。
 
 - 親が `blockquote` の場合、セクション分けはしません
 - 見出しの属性は基本的にセクションにコピーされます
