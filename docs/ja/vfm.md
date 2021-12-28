@@ -281,7 +281,7 @@ html:
 ---
 ```
 
-In this example, `sample1` is adopted.
+この例では`sample1`が採用されています。
 
 ```html
 <html id="sample1">
