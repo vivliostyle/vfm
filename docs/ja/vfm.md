@@ -144,7 +144,7 @@ VFMはGitHubリポジトリで開発しています[^1].
 
 ## フロントマター／前付け (Frontmatter)
 
-フロントマター／前付けは、Markdown（ファイル）単位でメタデータを定義する方法です。ファイルの冒頭にYAMLを記述します。
+フロントマター／前付けは、Markdownファイル単位でメタデータを定義する方法です。ファイルの冒頭にYAMLを記述します。
 
 YAMLのパースには[js-yaml](https://www.npmjs.com/package/js-yaml)を使用しています。スキーマは[JSON_SCHEMA](https://yaml.org/spec/1.2/spec.html#id2803231)です。
 
