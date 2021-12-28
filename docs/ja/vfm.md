@@ -67,7 +67,7 @@ function main() {}
 ```
 ````
 
-or
+あるいは
 
 ````md
 ```javascript title=app.js
