@@ -9,14 +9,15 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
+
 - [Code](#code)
   - [with caption](#with-caption)
 - [Footnotes](#footnotes)
 - [Frontmatter](#frontmatter)
-  - [Reserved properties](#reserved-properties)
+  - [Defined properties](#defined-properties)
   - [Priority with options](#priority-with-options)
   - [Merge class properties](#merge-class-properties)
-- [Hard new line (optional)](#hard-new-line)
+- [Hard new line](#hard-new-line)
 - [Image](#image)
   - [with caption and single line](#with-caption-and-single-line)
 - [Math equation](#math-equation)
@@ -195,6 +196,7 @@ vfm:
 author: 'Author'
 ---
 
+Text
 ```
 
 **HTML**
@@ -215,7 +217,7 @@ author: 'Author'
     <script type="text/javascript" src="sample1.js"></script>
     <script type="text/javascript" src="sample2.js"></script>
   </head>
-  <body id="body" class="foo bar">
+  <body id="body" class="my-class foo bar">
     <p>Text</p>
   </body>
 </html>
@@ -231,7 +233,7 @@ author: 'Author'
 }
 ```
 
-### Reserved properties
+### Defined properties
 
 | Property | Type       | Description |
 | -------: | :--------: | --- |
@@ -438,9 +440,9 @@ OK:
 NG:
 
 - `$...$$`, `$$...$` ...Range specification does not match
-- `$...\n\n...$`, `$$...\n\n...$$` ...Split paragraph
-- `$ ...$` ...Spaces (space, tab, new line, ...etc) ` ` immediately after `$` at start of inline
-- `$... $` ...Spaces (space, tab, new line, ...etc) ` ` immediately before `$` at end of inline
+- `$...\n\n...$`, `$$...\n\n...$$` ...Separated into paragraphs by line breaks
+- `$ ...$` ...Spaces (space, tab, new line, ...etc), ` ` immediately after `$` at start of inline
+- `$... $` ...Spaces (space, tab, new line, ...etc), ` ` immediately before `$` at end of inline
 - `$...$5` ...Digit `0...N` immediately after `$` at end of inline
 
 **VFM**

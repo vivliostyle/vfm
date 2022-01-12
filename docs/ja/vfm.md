@@ -1,30 +1,31 @@
 # Vivliostyle Flavored Markdown
 
-Vivliostyle Flavored Markdown (VFM) は、本の執筆のために最適化されたMarkdown記法です。Vivliostyleとその関連プロジェクトのために標準化され、公開されています。VFMは、[CommonMark](https://commonmark.org/) および [GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/) をベースにして実装されています。
+Vivliostyle Flavored Markdown (VFM) は本の執筆のために最適化された Markdown 記法です。Vivliostyle とその関連プロジェクトのために標準化され、公開されています。VFMは [CommonMark](https://commonmark.org/) および [GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/) をベースにして実装されています。
 
 ## 目次
 
-VFMの記法とその機能は、見出しカッコ内のアルファベット昇順（`A`〜`Z`）で表示されます。
+VFM の記法と機能を見出しカッコ内のアルファベット昇順（`A`〜`Z`）で並べています。
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [コード \(Code\)](#%E3%82%B3%E3%83%BC%E3%83%89-code)
-  - [キャプションをつける \(with caption\)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-caption)
-- [脚注 \(Footnotes\)](#%E8%84%9A%E6%B3%A8-footnotes)
-- [フロントマター／前付け \(Frontmatter\)](#%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%83%9E%E3%82%BF%E3%83%BC%EF%BC%8F%E5%89%8D%E4%BB%98%E3%81%91-frontmatter)
-  - [実装保留中のプロパティ \(Reserved properties\)](#%E5%AE%9F%E8%A3%85%E4%BF%9D%E7%95%99%E4%B8%AD%E3%81%AE%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3-reserved-properties)
-  - [プロパティのオプション \(Priority with options\)](#%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-priority-with-options)
-  - [classプロパティでの統合 \(Merge class properties\)](#class%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%A7%E3%81%AE%E7%B5%B1%E5%90%88-merge-class-properties)
-- [強制改行（オプション） \(Hard new line \(optional\)\)](#%E5%BC%B7%E5%88%B6%E6%94%B9%E8%A1%8C%EF%BC%88%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%EF%BC%89-hard-new-line-optional)
-- [画像 \(Image\)](#%E7%94%BB%E5%83%8F-image)
-  - [単行のキャプションをつける(with caption and single line)](#%E5%8D%98%E8%A1%8C%E3%81%AE%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8Bwith-caption-and-single-line)
-- [数式 \(Math equation\)](#%E6%95%B0%E5%BC%8F-math-equation)
-- [そのままのHTML \(Raw HTML\)](#%E3%81%9D%E3%81%AE%E3%81%BE%E3%81%BE%E3%81%AEhtml-raw-html)
-  - [Markdownをつける\(with Markdown\)](#markdown%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-markdown)
-- [ルビ \(Ruby\)](#%E3%83%AB%E3%83%93-ruby)
-  - [ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)](#%E3%83%AB%E3%83%93%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%91%E3%82%A4%E3%83%97%E3%81%AE%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97-escape-pipe-in-ruby-body)
-- [セクション分け \(Sectionization\)](#%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%86%E3%81%91-sectionization)
+
+- [コード \(Code\)](#%E3%82%B3%E3%83%BC%E3%83%89-%5Ccode%5C)
+  - [キャプションをつける \(with caption\)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-%5Cwith-caption%5C)
+- [脚注 \(Footnotes\)](#%E8%84%9A%E6%B3%A8-%5Cfootnotes%5C)
+- [フロントマター／前付け (Frontmatter)](#%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%83%9E%E3%82%BF%E3%83%BC%EF%BC%8F%E5%89%8D%E4%BB%98%E3%81%91-frontmatter)
+  - [定義済みのプロパティ \(Defined properties\)](#%E5%AE%9A%E7%BE%A9%E6%B8%88%E3%81%BF%E3%81%AE%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3-%5Cdefined-properties%5C)
+  - [プロパティのオプション \(Priority with options\)](#%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-%5Cpriority-with-options%5C)
+  - [class プロパティの結合 \(Merge class properties\)](#class-%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E7%B5%90%E5%90%88-%5Cmerge-class-properties%5C)
+- [強制改行（オプション） \(Hard new line \(optional\)\)](#%E5%BC%B7%E5%88%B6%E6%94%B9%E8%A1%8C%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-%5Chard-new-line-%5Coptional%5C%5C)
+- [画像 \(Image\)](#%E7%94%BB%E5%83%8F-%5Cimage%5C)
+  - [単一行キャプション \(with caption and single line\)](#%E5%8D%98%E4%B8%80%E8%A1%8C%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-%5Cwith-caption-and-single-line%5C)
+- [数式 \(Math equation\)](#%E6%95%B0%E5%BC%8F-%5Cmath-equation%5C)
+- [そのままのHTML \(Raw HTML\)](#%E3%81%9D%E3%81%AE%E3%81%BE%E3%81%BE%E3%81%AEhtml-%5Craw-html%5C)
+  - [Markdownをつける \(with Markdown\)](#markdown%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-%5Cwith-markdown%5C)
+- [ルビ (Ruby)](#%E3%83%AB%E3%83%93-ruby)
+  - [ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)](#%E3%83%AB%E3%83%93%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%91%E3%82%A4%E3%83%97%E3%81%AE%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97-%5Cescape-pipe-in-ruby-body%5C)
+- [セクション分け \(Sectionization\)](#%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%86%E3%81%91-%5Csectionization%5C)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -55,7 +56,7 @@ pre code {
 }
 ```
 
-VFMはシンタックス・ハイライトに[Prism](https://prismjs.com/)を利用しています。
+VFM は構文強調に [Prism](https://prismjs.com/) を利用しています。
 
 ### キャプションをつける \(with caption\)
 
@@ -103,13 +104,13 @@ figure[class^='language-'] pre code {
 
 ## 脚注 \(Footnotes\)
 
-[Pandoc](https://pandoc.org/MANUAL.html#footnotes)に似た脚注を定義します。
+脚注の定義は [Pandoc](https://pandoc.org/MANUAL.html#footnotes) のようになります。
 
 **VFM**
 
 ```markdown
-VFMはGitHubリポジトリで開発しています[^1].
-イシューはGitHubで管理します[^イシュー].
+VFM は GitHub リポジトリで開発しています[^1].
+イシューは GitHub で管理します[^イシュー].
 脚注は行の中に記述することもできます^[この部分が脚注です。].
 
 [^1]: [VFM](https://github.com/vivliostyle/vfm)
@@ -121,8 +122,8 @@ VFMはGitHubリポジトリで開発しています[^1].
 
 ```html
     <p>
-      VFMはGitHubリポジトリで開発しています<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.
-      イシューはGitHubで管理します<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.
+      VFM は GitHub リポジトリで開発しています<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.
+      イシューは GitHub で管理します<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.
       脚注は行の中に記述することもできます<a id="fnref3" href="#fn3" class="footnote-ref" role="doc-noteref"><sup>3</sup></a>.
     </p>
     <section class="footnotes" role="doc-endnotes">
@@ -144,11 +145,11 @@ VFMはGitHubリポジトリで開発しています[^1].
 
 ## フロントマター／前付け (Frontmatter)
 
-フロントマター／前付けは、Markdownファイル単位でメタデータを定義する方法です。ファイルの冒頭にYAMLを記述します。
+フロントマター／前付けは Markdown ファイル単位でメタデータを定義するための方法です。ファイルの冒頭へ YAML で記述します。
 
-YAMLのパースには[js-yaml](https://www.npmjs.com/package/js-yaml)を使用しています。スキーマは[JSON_SCHEMA](https://yaml.org/spec/1.2/spec.html#id2803231)です。
+YAML の解析には [js-yaml](https://www.npmjs.com/package/js-yaml) を使用しています。スキーマは [JSON_SCHEMA](https://yaml.org/spec/1.2/spec.html#id2803231) です。
 
-js-yaml のパースでは `key:` は `key: null` にします。しかし、VFMはこれを空の文字列として扱います。属性値のプロパティとして `key:` または `key:""` が指定された場合、 `key=""` と出力されます。
+js-yaml の解析は `key:` を `key: null` にします。しかし VFM はこれを空の文字列として扱います。属性値のプロパティとして `key:` または `key:""` が指定された場合は `key=""` を出力します。
 
 **VFM**
 
@@ -195,6 +196,7 @@ vfm:
 author: 'Author'
 ---
 
+テキスト
 ```
 
 **HTML**
@@ -219,7 +221,6 @@ author: 'Author'
     <p>テキスト</p>
   </body>
 </html>
-
 ```
 
 **CSS**
@@ -232,46 +233,44 @@ author: 'Author'
 }
 ```
 
-### 実装保留中のプロパティ \(Reserved properties\)
+### 定義済みのプロパティ \(Defined properties\)
 
 | プロパティ | データ型 | 説明 |
 | -------: | :--------: | --- |
 | `id`     | `String`   | `<html id="...">` |
 | `lang`   | `String`   | `<html lang="...">` |
-| `dir`    | `String`   | `<html dir="...">`, 値は `ltr`、`rtl` あるいは `auto` |
-| `class`  | `String`   | `<html class="...">` と `<body class="...">` |
-| `title`  | `String`   | `<title>...</title>`がない場合、コンテンツの最初の見出しがタイトルになる |
-| `html`   | `Object`   | `<html key="value">`とすると、キーと値のペアは `<html>` の属性になる |
-| `body`   | `Object`   | `<body key="value">`とすると、キーと値のペアは `<body>` の属性になる|
-| `base`   | `Object`   | `<base key="value">`とすると、キーと値のペアは `<base>` の属性になる|
-| `meta`   | `Object[]` |  `<meta key="value">` とすると、キーと値のペアは `<meta>` の属性となる|
-| `link`   | `Object[]` | `<meta key="value">` とすると、キーと値のペアは `<link>` の属性となる。|
-| `script` | `Object[]` | `<script key="value">` とすると、キーと値のペアは `<script>` の属性となる|
-| `vfm`    | `Object`   | VFMの設定|
-| `head`   | -          | 将来使用するための予約|
-| `style`  | -          | 将来使用するための予約|
-| その他 |`String`|`<meta name="key" content="value">` とすると、キーと値のペアは単独の `<meta>` になる。|
+| `dir`    | `String`   | `<html dir="...">`、指定可能な値は `ltr`、`rtl` または `auto`。 |
+| `class`  | `String`   | `<html class="...">` と `<body class="...">` へ反映される。|
+| `title`  | `String`   | `<title>...</title>` がない場合、コンテンツの最初の見出しがタイトルになる。 |
+| `html`   | `Object`   | `<html key="value">`、キーと値のペアが `<html>` の属性になる。 |
+| `body`   | `Object`   | `<body key="value">`、キーと値のペアが `<body>` の属性になる。 |
+| `base`   | `Object`   | `<base key="value">`、キーと値のペアが `<base>` の属性になる。 |
+| `meta`   | `Object[]` |  `<meta key="value">`、キーと値のペアが `<meta>` の属性となる。 |
+| `link`   | `Object[]` | `<meta key="value">`、キーと値のペアが `<link>` の属性となる。 |
+| `script` | `Object[]` | `<script key="value">`、キーと値のペアが `<script>` の属性となる。 |
+| `vfm`    | `Object`   | VFM の設定。 |
+| `head`   | -          | 将来の利用に予約済み。 |
+| `style`  | -          | 将来の利用に予約済み。 |
+| その他 |`String`|`<meta name="key" content="value">`、キーと値のペアは単独の `<meta>` になる。 |
 
 **vfm**
 
 | プロパティ| データ型| 初期値 | 説明 |
 | ------------------: | :-------: | :-----: | --- |
-| `math`              | `Boolean` | `true`  | 数式の記法を有効にする |
-| `partial`           | `Boolean` | `false` | マークダウンによるfragmentを出力 |
-| `hardLineBreaks`    | `Boolean` | `false` | 空白を必要としない、強制改行の位置に `<br>` を追加|
-| `disableFormatHtml` | `Boolean` | `false` |HTMLの自動整形を無効にする |
-| `theme`             | `String`  | -       | Vivliostyleのthemeパッケージか、そのままのCSSファイル |
+| `math`              | `Boolean` | `true`  | 数式を有効にする。 |
+| `partial`           | `Boolean` | `false` | Markdown 部分だけを HTML 化する。`<body>` 以上は出力されない。 |
+| `hardLineBreaks`    | `Boolean` | `false` | 空白を必要とせず強制改行の位置へ `<br>` を追加。 |
+| `disableFormatHtml` | `Boolean` | `false` | HTML の自動整形を無効にする。 |
+| `theme`             | `String`  | -       | Vivliostyle の theme パッケージか、CSS ファイルをそのまま指定する。 |
 
 ### プロパティのオプション \(Priority with options\)
 
 同じ目的の仕様が複数ある場合、優先順位は以下の通りになります。
 
 1. フロントマター／前付け
-2. VFMオプション
+2. VFM オプション
 
-フロントマター／前付けにおいては、`html`プロパティでルートの `id` と重複して`id` が指定されている場合、ルートで定義された方が優先されます。
-
-
+フロントマター／前付けにおいて `html` プロパティでルートの `id` と重複した `id` が指定されている場合、ルートで定義された方が優先されます。
 
 ```yaml
 ---
@@ -281,16 +280,16 @@ html:
 ---
 ```
 
-この例では`sample1`が採用されています。
+この例では `sample1` が採用されました。
 
 ```html
 <html id="sample1">
 </html>
 ```
 
-### classプロパティでの統合 \(Merge class properties\)
+### class プロパティの結合 \(Merge class properties\)
 
-ルート、`html`、`body`の `class` プロパティは、スペースで区切って統合されます。
+最上層と `html`、`body` の `class` プロパティはスペース区切りで結合されます。
 
 ```yaml
 ---
@@ -302,7 +301,7 @@ body:
 ---
 ```
 
-以下の例では統合されています。
+以下は結合された例です。
 
 ```html
 <html class="root html">
@@ -313,10 +312,10 @@ body:
 
 ## 強制改行（オプション） \(Hard new line \(optional\)\)
 
-- 改行すると、行末に `<br/>` が付きます
-- 2行連続の改行で新しい文ブロックを作成します.
+- 改行すると行末へ `<br/>` が付きます
+- 2 行連続の改行は新しいブロックを生成します
 
-この機能はオプションです。Node.js APIではオプションとして `hardLineBreaks: true` を、CLIでは `--hard-line-breaks` を指定することで有効になります。
+この機能はオプションです。Node.js API はオプションとして `hardLineBreaks: true`、CLI では `--hard-line-breaks` を指定することで有効化されます。
 
 **VFM**
 
@@ -375,11 +374,11 @@ img {
 }
 ```
 
-### 単行のキャプションをつける\(with caption and single line\)
+### 単一行キャプション \(with caption and single line\)
 
-1行で書かれ、また`<figure>`によりキャプションが付けられた画像を包含します。
+単一行で書かれた画像はキャプション付きで `<figure>` 内へ包み込みます。
 
-画像の属性を指定すると、 `id`は` <figure> `に移動され、` <img> `固有のもの（`src`など）を除いて他のすべてがコピーされます。
+画像の属性を指定した場合、`id` は `<figure>` へ移動され ` <img>` 固有のもの (`src` など) を除いたすべてがコピーされます。
 
 **VFM**
 
@@ -416,34 +415,35 @@ figure figcaption {
 
 ## 数式 \(Math equation\)
 
-[MathJax](https://www.mathjax.org/)により処理したHTMLを出力します。
+[MathJax](https://www.mathjax.org/) により処理したHTMLを出力します。
 
-デフォルトでは有効になっています。無効にする場合は、以下を指定してください。
+数式は標準で有効化されています。無効にする場合は以下を指定してください。
 
-- `stringify` APIオプション: `math: false`
-- `VFM` APIオプション: `math: false`
-- CLIオプション: `--disable-math`
-- フロントマター: `vfm:`プロパティの`math: false`
-  - 参照: [フロントマター／前付け (Frontmatter)](#frontmatter)
-  - これは `stringify` よりも優先されますが、`VFM` では異なります。
+- `stringify` API のオプション : `math: false`
+- `VFM` API のオプション : `math: false`
+- CLI オプション : `--disable-math`
+- フロントマター : `vfm:` プロパティへ `math: false`
+  - 参照 : [フロントマター／前付け (Frontmatter)](#frontmatter)
+  - これは `stringify` よりも優先されますが `VFM` ではそうなりません
 
-MathJaxにおけるインラインのVFM記法は`$...$`であり、表示は`$$...$$`となります。
+VFM における MathJax のインライン記法は `$...$`、ディスプレイ記法は `$$...$$` となります。
 
-また、`$x = yÌn1 + 1 = 2$` や `$$nx = yÌn$` のような複数行もサポートします。ただし、`$x = yn´kn1 + 1 = 2$ `のように空行 `nn` があると段落に分かれてしまい、数式の記法になりません。
+また `$x = y\n1 + 1 = 2$` や `$$\nx = y\n$$` のような複数行もサポートします。ただし `$x = y\n\n1 + 1 = 2$ ` のように空行 `\n\n` がある場合は段落として分かれるため数式にはなりません。
 
 OK:
 
-- `$...$`、`$$...$$` ……範囲指定が一致
-- `$...\n...$`、`$$\n...\n$$` ……同じ段落内
-- `$...\$...$`、`$...\$...\\\$..$`、`$$...\$...\\\$...$$`……奇数の `\`で `$`をエスケープ（無効化）する
+- `$...$`, `$$...$$` ...範囲指定が一致
+- `$...\n...$`, `$$\n...\n$$` ...同じ段落内
+- `$...\$...$`, `$...\$...\\\$..$`,  `$$...\$...\\\$...$$` ...奇数個の `\` により `$` をエスケープ（無効化）する
 
 NG:
 
-- `$...$$`、`$$...$` ……範囲指定が不一致
-- `$...\n\n...$`、`$$...\n\n...$$` ……段落に分離
-- `$ ...$``$ ...$` ……スペース（スペース、タブ、改行など）` `インライン開始時の `$`の直後
-- `$…… $` ……スペース（スペース、タブ、改行など） ` `インラインの最後の `$`の直前
-- `$...$5` ……インラインの最後の `$`の直後に `0 ... N`を数字で示す
+- `$...$$`, `$$...$` ...範囲指定が不一致
+- `$...\n\n...$`, `$$...\n\n...$$` ...改行によって段落へ分離されてしまう
+- `$ ...$` ...スペース (スペース、タブ文字、改行など)、インライン開始の `$` 直後に ` ` がある
+- `$... $` ...スペース (スペース、タブ文字、改行など)、インライン終了の `$` 直前に ` ` がある
+- `$...$5` ...インライン終了の `$` 直後に数字 `0...N` がある
+
 
 **VFM**
 
@@ -455,7 +455,7 @@ display: $$1 + 1 = 2$$
 
 **HTML**
 
-また、`math`が有効であり数式記法や`<math>`タグが存在する場合、MathJax処理用の`<script>`も出力します。
+`math` が有効で数式記法か `<math>` タグが存在する場合は MathJax 処理用の `<script>` も出力します。
 
 ```html
 <html>
@@ -546,7 +546,7 @@ ruby rt {
 
 ### ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)
 
-区切り符号パイプ `|` をエスケープ（無効化）したい場合、直前に `\` を追加してください。
+区切り記号となるパイプ `|` をエスケープ (無効化) したい場合は直前に `\` を追加します。
 
 **VFM**
 
@@ -564,11 +564,11 @@ ruby rt {
 
 見出しを階層的なセクションにします。
 
-- 親が `blockquote` の場合、セクション分けはしません
-- 見出しの属性は基本的にセクションにコピーされます
+- 親が `blockquote` の場合はセクションを分けません
+- 見出しの属性は基本的にセクションへコピーされます
 - `id` 属性はセクションに移動します
-- `hidden` 属性はコピーされず、見出しだけが適用されます
-- 見出しの深さに一致するように、セクションの `levelN` クラスを設定します
+- `hidden` 属性はコピーされず、見出しだけに適用されます
+- 見出しの深さへ一致するように、セクションの `levelN` クラスを設定します
 
 **VFM**
 
