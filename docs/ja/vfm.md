@@ -10,26 +10,26 @@ VFM の記法と機能を見出しカッコ内のアルファベット昇順（`
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [コード \(Code\)](#%E3%82%B3%E3%83%BC%E3%83%89-%5Ccode%5C)
-  - [キャプションをつける \(with caption\)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-%5Cwith-caption%5C)
-- [脚注 \(Footnotes\)](#%E8%84%9A%E6%B3%A8-%5Cfootnotes%5C)
+- [コード (Code)](#%E3%82%B3%E3%83%BC%E3%83%89-code)
+  - [キャプションをつける (with caption)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-caption)
+- [脚注 (Footnotes)](#%E8%84%9A%E6%B3%A8-footnotes)
 - [フロントマター／前付け (Frontmatter)](#%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%83%9E%E3%82%BF%E3%83%BC%EF%BC%8F%E5%89%8D%E4%BB%98%E3%81%91-frontmatter)
-  - [定義済みのプロパティ \(Defined properties\)](#%E5%AE%9A%E7%BE%A9%E6%B8%88%E3%81%BF%E3%81%AE%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3-%5Cdefined-properties%5C)
-  - [プロパティのオプション \(Priority with options\)](#%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-%5Cpriority-with-options%5C)
-  - [class プロパティの結合 \(Merge class properties\)](#class-%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E7%B5%90%E5%90%88-%5Cmerge-class-properties%5C)
-- [強制改行（オプション） \(Hard new line \(optional\)\)](#%E5%BC%B7%E5%88%B6%E6%94%B9%E8%A1%8C%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-%5Chard-new-line-%5Coptional%5C%5C)
-- [画像 \(Image\)](#%E7%94%BB%E5%83%8F-%5Cimage%5C)
-  - [単一行キャプション \(with caption and single line\)](#%E5%8D%98%E4%B8%80%E8%A1%8C%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-%5Cwith-caption-and-single-line%5C)
-- [数式 \(Math equation\)](#%E6%95%B0%E5%BC%8F-%5Cmath-equation%5C)
-- [そのままのHTML \(Raw HTML\)](#%E3%81%9D%E3%81%AE%E3%81%BE%E3%81%BE%E3%81%AEhtml-%5Craw-html%5C)
-  - [Markdownをつける \(with Markdown\)](#markdown%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-%5Cwith-markdown%5C)
+  - [定義済みのプロパティ (Defined properties)](#%E5%AE%9A%E7%BE%A9%E6%B8%88%E3%81%BF%E3%81%AE%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3-defined-properties)
+  - [プロパティのオプション (Priority with options)](#%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-priority-with-options)
+  - [class プロパティの結合 (Merge class properties)](#class-%E3%83%97%E3%83%AD%E3%83%91%E3%83%86%E3%82%A3%E3%81%AE%E7%B5%90%E5%90%88-merge-class-properties)
+- [強制改行（オプション） (Hard new line (optional))](#%E5%BC%B7%E5%88%B6%E6%94%B9%E8%A1%8C%E3%82%AA%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-hard-new-line-optional)
+- [画像 (Image)](#%E7%94%BB%E5%83%8F-image)
+  - [単一行キャプション (with caption and single line)](#%E5%8D%98%E4%B8%80%E8%A1%8C%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3-with-caption-and-single-line)
+- [数式 (Math equation)](#%E6%95%B0%E5%BC%8F-math-equation)
+- [そのままのHTML (Raw HTML)](#%E3%81%9D%E3%81%AE%E3%81%BE%E3%81%BE%E3%81%AEhtml-raw-html)
+  - [Markdownをつける (with Markdown)](#markdown%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-markdown)
 - [ルビ (Ruby)](#%E3%83%AB%E3%83%93-ruby)
-  - [ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)](#%E3%83%AB%E3%83%93%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%91%E3%82%A4%E3%83%97%E3%81%AE%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97-%5Cescape-pipe-in-ruby-body%5C)
-- [セクション分け \(Sectionization\)](#%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%86%E3%81%91-%5Csectionization%5C)
+  - [ルビにおけるパイプのエスケープ (Escape pipe in ruby body)](#%E3%83%AB%E3%83%93%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%91%E3%82%A4%E3%83%97%E3%81%AE%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97-escape-pipe-in-ruby-body)
+- [セクション分け (Sectionization)](#%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%86%E3%81%91-sectionization)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## コード \(Code\)
+## コード (Code)
 
 **VFM**
 
@@ -58,7 +58,7 @@ pre code {
 
 VFM は構文強調に [Prism](https://prismjs.com/) を利用しています。
 
-### キャプションをつける \(with caption\)
+### キャプションをつける (with caption)
 
 **VFM**
 
@@ -102,7 +102,7 @@ figure[class^='language-'] pre code {
 }
 ```
 
-## 脚注 \(Footnotes\)
+## 脚注 (Footnotes)
 
 脚注の定義は [Pandoc](https://pandoc.org/MANUAL.html#footnotes) のようになります。
 
@@ -233,7 +233,7 @@ author: 'Author'
 }
 ```
 
-### 定義済みのプロパティ \(Defined properties\)
+### 定義済みのプロパティ (Defined properties)
 
 | プロパティ | データ型 | 説明 |
 | -------: | :--------: | --- |
@@ -263,7 +263,7 @@ author: 'Author'
 | `disableFormatHtml` | `Boolean` | `false` | HTML の自動整形を無効にする。 |
 | `theme`             | `String`  | -       | Vivliostyle の theme パッケージか、CSS ファイルをそのまま指定する。 |
 
-### プロパティのオプション \(Priority with options\)
+### プロパティのオプション (Priority with options)
 
 同じ目的の仕様が複数ある場合、優先順位は以下の通りになります。
 
@@ -287,7 +287,7 @@ html:
 </html>
 ```
 
-### class プロパティの結合 \(Merge class properties\)
+### class プロパティの結合 (Merge class properties)
 
 最上層と `html`、`body` の `class` プロパティはスペース区切りで結合されます。
 
@@ -310,7 +310,7 @@ body:
 </html>
 ```
 
-## 強制改行（オプション） \(Hard new line \(optional\)\)
+## 強制改行（オプション） (Hard new line (optional))
 
 - 改行すると行末へ `<br/>` が付きます
 - 2 行連続の改行は新しいブロックを生成します
@@ -353,7 +353,7 @@ p {
 }
 ```
 
-## 画像 \(Image\)
+## 画像 (Image)
 
 **VFM**
 
@@ -374,7 +374,7 @@ img {
 }
 ```
 
-### 単一行キャプション \(with caption and single line\)
+### 単一行キャプション (with caption and single line)
 
 単一行で書かれた画像はキャプション付きで `<figure>` 内へ包み込みます。
 
@@ -413,7 +413,7 @@ figure figcaption {
 }
 ```
 
-## 数式 \(Math equation\)
+## 数式 (Math equation)
 
 [MathJax](https://www.mathjax.org/) により処理したHTMLを出力します。
 
@@ -481,7 +481,7 @@ display: $$1 + 1 = 2$$
 }
 ```
 
-## そのままのHTML \(Raw HTML\)
+## そのままのHTML (Raw HTML)
 
 **VFM**
 
@@ -499,7 +499,7 @@ display: $$1 + 1 = 2$$
 </div>
 ```
 
-### Markdownをつける \(with Markdown\)
+### Markdownをつける (with Markdown)
 
 **VFM**
 
@@ -544,7 +544,7 @@ ruby rt {
 }
 ```
 
-### ルビにおけるパイプのエスケープ \(Escape pipe in ruby body\)
+### ルビにおけるパイプのエスケープ (Escape pipe in ruby body)
 
 区切り記号となるパイプ `|` をエスケープ (無効化) したい場合は直前に `\` を追加します。
 
@@ -560,7 +560,7 @@ ruby rt {
 <p><ruby>a|b<rt>c</rt></ruby></p>
 ```
 
-## セクション分け \(Sectionization\)
+## セクション分け (Sectionization)
 
 見出しを階層的なセクションにします。
 
