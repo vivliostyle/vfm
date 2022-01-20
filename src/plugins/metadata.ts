@@ -70,6 +70,15 @@ export type Metadata = {
   style?: string;
   /** `<head>...</head>`, reserved for future use. */
   head?: string;
+
+  /**
+   * A set of key-value pairs that are specified in `readMetadata` not to be processed as `<meta>`.
+   * The data types converted from Frontmatter's YAML are retained.
+   * Use this if want to add custom metadata with a third party tool.
+   */
+  excludes?: {
+    [key: string]: any;
+  };
 };
 
 /**
@@ -244,15 +253,27 @@ const readSettings = (data: any): VFMSettings => {
 
 /**
  * Read metadata from Markdown frontmatter.
+ *
+ * Keys that are not defined as VFM are treated as `meta`. If you specify a key name in `excludes`, the key and its data type will be preserved and stored in `excludes` instead of `meta`.
  * @param md Markdown.
+ * @param excludes A collection of key names to be ignored by meta processing.
  * @returns Metadata.
  */
-export const readMetadata = (md: string): Metadata => {
+export const readMetadata = (md: string, excludes: string[] = []): Metadata => {
   const metadata: Metadata = {};
   const data = parseMarkdown(md);
   const others: Array<Array<Attribute>> = [];
 
   for (const key of Object.keys(data)) {
+    if (excludes.includes(key)) {
+      if (!metadata.excludes) {
+        metadata.excludes = {};
+      }
+
+      metadata.excludes[key] = data[key];
+      continue;
+    }
+
     switch (key) {
       case 'id':
       case 'lang':
