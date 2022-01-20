@@ -356,11 +356,11 @@ Read metadata from Markdown frontmatter.
 
 Useful if just want to get the metadata, Markdown parse and metadata typing (for TypeScript) are handled by the VFM side.
 
-`readMetadata(md: string, excludes: string[]): Metadata`
+`readMetadata(md: string, customKeys: string[]): Metadata`
 
 - params:
   - `md`: `String` Markdown text.
-  - `excludes`: `String[]` A collection of key names to be ignored by meta processing.
+  - `customKeys`: `String[]` A collection of key names to be ignored by meta processing.
 - returns:
   - `metadata`: `Metadata` Metadata.
 
