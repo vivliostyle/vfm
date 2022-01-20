@@ -356,11 +356,11 @@ Read metadata from Markdown frontmatter.
 
 Useful if just want to get the metadata, Markdown parse and metadata typing (for TypeScript) are handled by the VFM side.
 
-`readMetadata(md: string, excludes: string[]): Metadata`
+`readMetadata(md: string, customKeys: string[]): Metadata`
 
 - params:
   - `md`: `String` Markdown text.
-  - `excludes`: `String[]` A collection of key names to be ignored by meta processing.
+  - `customKeys`: `String[]` A collection of key names to be ignored by meta processing.
 - returns:
   - `metadata`: `Metadata` Metadata.
 
@@ -385,11 +385,11 @@ console.log(metadata);
 
 About `Metadata` details, refer to [VFM](https://vivliostyle.github.io/vfm/#/vfm)'s "Frontmatter" or type information of TypeScript.
 
-**About `excludes`**
+**About `customKeys`**
 
 Use this if want to add custom metadata with a third party tool.
 
-Keys that are not defined as VFM are treated as `meta`. If you specify a key name in `excludes`, the key and its data type will be preserved and stored in `excludes` instead of `meta`.
+Keys that are not defined as VFM are treated as `meta`. If you specify a key name in `customKeys`, the key and its data type will be preserved and stored in `custom` instead of `meta`.
 
 ```js
 import { readMetadata } from '@vivliostyle/vfm'
@@ -409,13 +409,15 @@ Results:
 ```js
 {
   title: 'title',
-  excludes: {
+  custom: {
     tags: ['foo', 'bar']
   }
 }
 ```
 
-`tags` is stored and retained structure in `excludes` instead of `meta`.
+`tags` is stored and retained structure in `custom` instead of `meta`.
+
+If specify a default key such as `title`, it will be processed as `custom`.
 
 #### User-specified metadata
 

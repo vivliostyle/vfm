@@ -1,5 +1,5 @@
 import { stringify } from '../src/index';
-import { readMetadata } from '../src/plugins/metadata';
+import { Metadata, readMetadata } from '../src/plugins/metadata';
 
 it('Read all', () => {
   const received = readMetadata(
@@ -49,7 +49,7 @@ other-meta2: 'other2'
 
 `,
   );
-  const expected = {
+  const expected: Metadata = {
     id: 'my-page',
     lang: 'ja',
     dir: 'ltr',
@@ -512,9 +512,9 @@ tags: ["Foo", "Bar"]
 ---
 `;
   const received = readMetadata(md, ['tags']);
-  const expected = {
+  const expected: Metadata = {
     title: 'Title',
-    excludes: {
+    custom: {
       tags: ['Foo', 'Bar'],
     },
   };
@@ -526,10 +526,9 @@ it('Overwrite key with excludes', () => {
 title: ["Foo", "Bar"]
 ---
 `;
-  // It's not supposed to, but it can be overridden, so we'll test it.
   const received = readMetadata(md, ['title']);
-  const expected = {
-    excludes: {
+  const expected: Metadata = {
+    custom: {
       title: ['Foo', 'Bar'],
     },
   };
