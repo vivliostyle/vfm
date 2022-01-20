@@ -504,3 +504,34 @@ body:
 `;
   expect(received).toBe(expected);
 });
+
+it('Excludes key', () => {
+  const md = `---
+title: "Title"
+tags: ["Foo", "Bar"]
+---
+`;
+  const received = readMetadata(md, ['tags']);
+  const expected = {
+    title: 'Title',
+    excludes: {
+      tags: ['Foo', 'Bar'],
+    },
+  };
+  expect(received).toStrictEqual(expected);
+});
+
+it('Overwrite key with excludes', () => {
+  const md = `---
+title: ["Foo", "Bar"]
+---
+`;
+  // It's not supposed to, but it can be overridden, so we'll test it.
+  const received = readMetadata(md, ['title']);
+  const expected = {
+    excludes: {
+      title: ['Foo', 'Bar'],
+    },
+  };
+  expect(received).toStrictEqual(expected);
+});
