@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/vivliostyle/vfm/compare/v1.2.0...v1.2.1) (2022-01-20)
+
+
+### Bug Fixes
+
+* Rename `readMetadata` argument and `Metadata` property `excludes` to be more understandable ([60affea](https://github.com/vivliostyle/vfm/commit/60affeaf09d7d86fc00c5a2322715b8dfaf688d8))
+
 # [1.2.0](https://github.com/vivliostyle/vfm/compare/v1.1.0...v1.2.0) (2022-01-20)
 
 
