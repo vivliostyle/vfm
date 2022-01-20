@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/vivliostyle/vfm/compare/v1.1.0...v1.2.0) (2022-01-20)
+
+
+### Bug Fixes
+
+* Fixed TOC link in Japanese version ([a46c2a3](https://github.com/vivliostyle/vfm/commit/a46c2a31d94e171c839e7bdfc0e8c55ff5d61e5f))
+
+
+### Features
+
+* Add `excludes` argument to `readMetadata` ([174c8dd](https://github.com/vivliostyle/vfm/commit/174c8dddd626b8ce11b69ac57149c182945dfd82))
+
 # [1.1.0](https://github.com/vivliostyle/vfm/compare/v1.0.2...v1.1.0) (2021-12-07)
 
 
