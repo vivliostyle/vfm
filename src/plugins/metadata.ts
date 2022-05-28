@@ -11,6 +11,7 @@ import { Node } from 'unist';
 import { select } from 'unist-util-select';
 import visit from 'unist-util-visit';
 import { VFile } from 'vfile';
+import { mdast as attr } from './attr';
 import { mdast as footnotes } from './footnotes';
 
 /** Attribute of HTML tag. */
@@ -164,6 +165,7 @@ const parseMarkdown = (md: string): KeyValue => {
       [markdown, { gfm: true, commonmark: true }],
       // Remove footnotes when reading title from heading
       footnotes,
+      attr,
       frontmatter,
       mdast,
     ] as unified.PluggableList<unified.Settings>)
