@@ -1,3 +1,11 @@
+## [1.2.2](https://github.com/vivliostyle/vfm/compare/v1.2.1...v1.2.2) (2022-05-29)
+
+
+### Bug Fixes
+
+* remove heading attributes notation on page title ([f23ff1f](https://github.com/vivliostyle/vfm/commit/f23ff1f5182b0554f73f0fe92ee3a068e7aab2a1))
+* Type error of object property ([e8755d9](https://github.com/vivliostyle/vfm/commit/e8755d9de0839878b018a1b2c6f5b84c4ba93416))
+
 ## [1.2.1](https://github.com/vivliostyle/vfm/compare/v1.2.0...v1.2.1) (2022-01-20)
 
 
