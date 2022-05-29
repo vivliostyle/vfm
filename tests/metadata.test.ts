@@ -534,3 +534,12 @@ title: ["Foo", "Bar"]
   };
   expect(received).toStrictEqual(expected);
 });
+
+it('Exclude attribute syntax in title heading', () => {
+  const md = '# Foo {.bar}';
+  const received = readMetadata(md);
+  const expected: Metadata = {
+    title: 'Foo',
+  };
+  expect(received).toStrictEqual(expected);
+});
