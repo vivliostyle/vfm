@@ -565,9 +565,6 @@ If want to escape the delimiter pipe `|`, add `\` immediately before it.
 Make the heading a hierarchical section.
 
 - Do not sectionize if parent is `blockquote`.
-- The attributes of the heading are basically copied to the section.
-- The `id` attribute is moved to the section.
-- The `hidden` attribute is not copied and only the heading applies.
 - Set the `levelN` class in the section to match the heading depth.
 
 **VFM**
@@ -589,22 +586,22 @@ Make the heading a hierarchical section.
 **HTML**
 
 ```html
-<section id="plain" class="level1">
-  <h1>Plain</h1>
+<section class="level1">
+  <h1 id="plain">Plain</h1>
 </section>
 
-<section id="intro" class="level1">
-  <h1>Introduction</h1>
+<section class="level1">
+  <h1 id="intro">Introduction</h1>
 </section>
 
-<section class="level1 title" id="welcome">
-  <h1 class="title">Welcome</h1>
+<section class="level1">
+  <h1 id="welcome" class="title">Welcome</h1>
 </section>
 
-<section id="level-1" class="level1">
-  <h1>Level 1</h1>
-  <section id="level-2" class="level2">
-    <h2>Level 2</h2>
+<section class="level1">
+  <h1 id="level-1">Level 1</h1>
+  <section class="level2">
+    <h2 id="level-2">Level 2</h2>
   </section>
 </section>
 
@@ -619,12 +616,6 @@ Make the heading a hierarchical section.
 body > section {
 }
 body > section > h1:first-child {
-}
-
-section.title {
-}
-
-section.title > h1:first-child {
 }
 
 .level1 {
