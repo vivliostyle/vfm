@@ -14,46 +14,8 @@ import visit from 'unist-util-visit-parents';
 const MAX_HEADING_DEPTH = 6;
 
 /**
- * Check the heading properties to generate properties for the parent `<section>` and update the heading style.
- * @param node Node of Markdown AST.
- * @returns Properties.
- */
-const checkProperties = (node: any, depth: number) => {
-  if (!node.data?.hProperties) {
-    return undefined;
-  }
-
-  // Remove `id` attribute and copy otherwise for the parent `<section>`
-  const hProperties = { ...node.data.hProperties };
-  if (node.data.hProperties.id) {
-    delete node.data.hProperties.id;
-  }
-
-  // {hidden} specifier
-  if (Object.keys(hProperties).includes('hidden')) {
-    node.data.hProperties.hidden = 'hidden';
-  }
-
-  // output section levels like Pandoc
-  if (Array.isArray(hProperties.class)) {
-    // Switch references as they do not affect the heading,
-    // and `remark-attr` may add classes, so make sure they come before them (always top)
-    const classes = [...hProperties.class];
-    classes.unshift(`level${depth}`);
-    hProperties.class = classes;
-  } else {
-    hProperties.class = [`level${depth}`];
-  }
-
-  return hProperties;
-};
-
-/**
  * Wrap the header in sections.
  * - Do not sectionize if parent is `blockquote`.
- * - The attributes of the heading are basically copied to the section.
- * - The `id` attribute is moved to the section.
- * - The `hidden` attribute is not copied and only the heading applies.
  * - Set the `levelN` class in the section to match the heading depth.
  * @param node Node of Markdown AST.
  * @param ancestors Parents.
@@ -80,7 +42,12 @@ const sectionize = (node: any, ancestors: Parent[]) => {
     endIndex > 0 ? endIndex : undefined,
   );
 
-  const hProperties = checkProperties(node, depth);
+  const hProperties = { class: [`level${depth}`] };
+
+  // {hidden} specifier
+  if (Object.keys(node.data.hProperties).includes('hidden')) {
+    node.data.hProperties.hidden = 'hidden';
+  }
 
   const isDuplicated = parent.type === 'section';
   if (isDuplicated) {
