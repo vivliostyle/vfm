@@ -565,10 +565,8 @@ ruby rt {
 見出しを階層的なセクションにします。
 
 - 親が `blockquote` の場合はセクションを分けません
-- 見出しの属性は基本的にセクションへコピーされます
-- `id` 属性はセクションに移動します
-- `hidden` 属性はコピーされず、見出しだけに適用されます
 - 見出しの深さへ一致するように、セクションの `levelN` クラスを設定します
+- 見出しの深さへ一致するように、セクションの `aria-labelledby` 属性を設定します
 
 **VFM**
 
@@ -589,22 +587,22 @@ ruby rt {
 **HTML**
 
 ```html
-<section id="plain" class="level1">
+<section id="plain" class="level1" aria-labelledby="heading-1">
   <h1>Plain</h1>
 </section>
 
-<section id="intro" class="level1">
+<section id="intro" class="level1" aria-labelledby="heading-1">
   <h1>Introduction</h1>
 </section>
 
-<section class="level1 title" id="welcome">
-  <h1 class="title">Welcome</h1>
+<section class="level1" aria-labelledby="heading-1">
+  <h1 id="welcome" class="title">Welcome</h1>
 </section>
 
-<section id="level-1" class="level1">
-  <h1>Level 1</h1>
-  <section id="level-2" class="level2">
-    <h2>Level 2</h2>
+<section class="level1" aria-labelledby="heading-1">
+  <h1 id="level-1">Level 1</h1>
+  <section class="level2" aria-labelledby="heading-2">
+    <h2 id="level-2">Level 2</h2>
   </section>
 </section>
 
@@ -619,12 +617,6 @@ ruby rt {
 body > section {
 }
 body > section > h1:first-child {
-}
-
-section.title {
-}
-
-section.title > h1:first-child {
 }
 
 .level1 {
