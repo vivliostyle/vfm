@@ -5,7 +5,7 @@ it('Heading with attributes', () => {
     partial: true,
     disableFormatHtml: true,
   });
-  const expected = `<section class="level1"><h1 id="foo">Heading</h1></section>`;
+  const expected = `<section class="level1" aria-labelledby="heading-1"><h1 id="foo">Heading</h1></section>`;
   expect(received).toBe(expected);
 });
 
@@ -14,7 +14,7 @@ it('Heading with attributes, specification by line break', () => {
     partial: true,
     disableFormatHtml: true,
   });
-  const expected = `<section class="level1"><h1 id="foo">Heading</h1></section>`;
+  const expected = `<section class="level1" aria-labelledby="heading-1"><h1 id="foo">Heading</h1></section>`;
   expect(received).toBe(expected);
 });
 
@@ -23,6 +23,6 @@ it('Heading with attributes and inline elements, specification by line break', (
     partial: true,
     disableFormatHtml: true,
   });
-  const expected = `<section class="level1"><h1 id="foo">Heading <em>test</em></h1></section>`;
+  const expected = `<section class="level1" aria-labelledby="heading-1"><h1 id="foo">Heading <em>test</em></h1></section>`;
   expect(received).toBe(expected);
 });

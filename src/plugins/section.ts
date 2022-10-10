@@ -42,7 +42,10 @@ const sectionize = (node: any, ancestors: Parent[]) => {
     endIndex > 0 ? endIndex : undefined,
   );
 
-  const hProperties = { class: [`level${depth}`] };
+  const hProperties = {
+    class: [`level${depth}`],
+    'aria-labelledby': `heading-${depth}`,
+  };
 
   // {hidden} specifier
   if (Object.keys(node.data.hProperties).includes('hidden')) {

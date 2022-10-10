@@ -14,7 +14,7 @@ it('Leveling and copy attributes, however the `id` will be moved', () => {
   const md = '# こんにちは {#id1 .class1 key1=value1}';
   const received = stringify(md, { partial: true });
   const expected = `
-<section class="level1">
+<section class="level1" aria-labelledby="heading-1">
   <h1 id="id1" class="class1" key1="value1">こんにちは</h1>
 </section>
 `;
@@ -25,7 +25,7 @@ it('Heading with hidden attribute', () => {
   const md = '# Heading {hidden}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
   const expected =
-    '<section class="level1"><h1 hidden id="heading">Heading</h1></section>';
+    '<section class="level1" aria-labelledby="heading-1"><h1 hidden id="heading">Heading</h1></section>';
   expect(received).toBe(expected);
 });
 
@@ -56,17 +56,17 @@ it('<h1>, ... <h6>', () => {
 ###### Heading 6`;
   const received = stringify(md, { partial: true });
   const expected = `
-<section class="level1">
+<section class="level1" aria-labelledby="heading-1">
   <h1 id="heading-1">Heading 1</h1>
-  <section class="level2">
+  <section class="level2" aria-labelledby="heading-2">
     <h2 id="heading-2">Heading 2</h2>
-    <section class="level3">
+    <section class="level3" aria-labelledby="heading-3">
       <h3 id="heading-3">Heading 3</h3>
-      <section class="level4">
+      <section class="level4" aria-labelledby="heading-4">
         <h4 id="heading-4">Heading 4</h4>
-        <section class="level5">
+        <section class="level5" aria-labelledby="heading-5">
           <h5 id="heading-5">Heading 5</h5>
-          <section class="level6">
+          <section class="level6" aria-labelledby="heading-6">
             <h6 id="heading-6">Heading 6</h6>
           </section>
         </section>
@@ -88,17 +88,17 @@ it('<h1>, ... <h6> with attribute', () => {
 ###### Heading 6 {.depth6}`;
   const received = stringify(md, { partial: true });
   const expected = `
-<section class="level1">
+<section class="level1" aria-labelledby="heading-1">
   <h1 class="depth1" id="heading-1">Heading 1</h1>
-  <section class="level2">
+  <section class="level2" aria-labelledby="heading-2">
     <h2 class="depth2" id="heading-2">Heading 2</h2>
-    <section class="level3">
+    <section class="level3" aria-labelledby="heading-3">
       <h3 class="depth3" id="heading-3">Heading 3</h3>
-      <section class="level4">
+      <section class="level4" aria-labelledby="heading-4">
         <h4 class="depth4" id="heading-4">Heading 4</h4>
-        <section class="level5">
+        <section class="level5" aria-labelledby="heading-5">
           <h5 class="depth5" id="heading-5">Heading 5</h5>
-          <section class="level6">
+          <section class="level6" aria-labelledby="heading-6">
             <h6 class="depth6" id="heading-6">Heading 6</h6>
           </section>
         </section>
@@ -116,13 +116,13 @@ it('Complex structure', () => {
 # Heading 1`;
   const received = stringify(md, { partial: true });
   const expected = `
-<section class="level1">
+<section class="level1" aria-labelledby="heading-1">
   <h1 id="heading-1">Heading 1</h1>
-  <section class="level2">
+  <section class="level2" aria-labelledby="heading-2">
     <h2 class="foo" id="heading-2">Heading 2</h2>
   </section>
 </section>
-<section class="level1">
+<section class="level1" aria-labelledby="heading-1">
   <h1 id="heading-1-1">Heading 1</h1>
 </section>
 `;

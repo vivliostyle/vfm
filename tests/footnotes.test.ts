@@ -71,7 +71,7 @@ it('Heading title and section id without inline footnotes text', () => {
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <section class="level1">
+    <section class="level1" aria-labelledby="heading-1">
       <h1 id="test">Test<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></h1>
     </section>
     <section class="footnotes" role="doc-endnotes">
