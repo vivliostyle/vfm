@@ -565,10 +565,8 @@ ruby rt {
 見出しを階層的なセクションにします。
 
 - 親が `blockquote` の場合はセクションを分けません
-- 見出しの属性は基本的にセクションへコピーされます
-- `id` 属性はセクションに移動します
-- `hidden` 属性はコピーされず、見出しだけに適用されます
 - 見出しの深さへ一致するように、セクションの `levelN` クラスを設定します
+- 見出しの `id` 属性値をセクションの `aria-labelledby` 属性へ値をコピーします
 
 **VFM**
 
@@ -589,28 +587,24 @@ ruby rt {
 **HTML**
 
 ```html
-<section id="plain" class="level1">
-  <h1>Plain</h1>
+<section class="level1" aria-labelledby="plain">
+  <h1 id="plain">Plain</h1>
 </section>
-
-<section id="intro" class="level1">
-  <h1>Introduction</h1>
+<section class="level1" aria-labelledby="intro">
+  <h1 id="intro">Introduction</h1>
 </section>
-
-<section class="level1 title" id="welcome">
-  <h1 class="title">Welcome</h1>
+<section class="level1" aria-labelledby="welcome">
+  <h1 class="title" id="welcome">Welcome</h1>
 </section>
-
-<section id="level-1" class="level1">
-  <h1>Level 1</h1>
-  <section id="level-2" class="level2">
-    <h2>Level 2</h2>
+<section class="level1" aria-labelledby="level-1">
+  <h1 id="level-1">Level 1</h1>
+  <section class="level2" aria-labelledby="level-2">
+    <h2 id="level-2">Level 2</h2>
+    <blockquote>
+      <h1 id="not-sectionize">Not Sectionize</h1>
+    </blockquote>
   </section>
 </section>
-
-<blockquote>
-  <h1 id="not-sectionize">Not Sectionize</h1>
-</blockquote>
 ```
 
 **CSS**
@@ -619,12 +613,6 @@ ruby rt {
 body > section {
 }
 body > section > h1:first-child {
-}
-
-section.title {
-}
-
-section.title > h1:first-child {
 }
 
 .level1 {
