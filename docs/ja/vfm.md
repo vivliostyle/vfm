@@ -566,7 +566,7 @@ ruby rt {
 
 - 親が `blockquote` の場合はセクションを分けません
 - 見出しの深さへ一致するように、セクションの `levelN` クラスを設定します
-- 見出しの深さへ一致するように、セクションの `aria-labelledby` 属性を設定します
+- 見出しに `id` 属性がある場合は、セクションの `aria-labelledby` 属性に値をコピーします
 
 **VFM**
 
@@ -587,28 +587,24 @@ ruby rt {
 **HTML**
 
 ```html
-<section id="plain" class="level1" aria-labelledby="heading-1">
-  <h1>Plain</h1>
+<section class="level1" aria-labelledby="plain">
+  <h1 id="plain">Plain</h1>
 </section>
-
-<section id="intro" class="level1" aria-labelledby="heading-1">
-  <h1>Introduction</h1>
+<section class="level1" aria-labelledby="intro">
+  <h1 id="intro">Introduction</h1>
 </section>
-
-<section class="level1" aria-labelledby="heading-1">
-  <h1 id="welcome" class="title">Welcome</h1>
+<section class="level1" aria-labelledby="welcome">
+  <h1 class="title" id="welcome">Welcome</h1>
 </section>
-
-<section class="level1" aria-labelledby="heading-1">
+<section class="level1" aria-labelledby="level-1">
   <h1 id="level-1">Level 1</h1>
-  <section class="level2" aria-labelledby="heading-2">
+  <section class="level2" aria-labelledby="level-2">
     <h2 id="level-2">Level 2</h2>
+    <blockquote>
+      <h1 id="not-sectionize">Not Sectionize</h1>
+    </blockquote>
   </section>
 </section>
-
-<blockquote>
-  <h1 id="not-sectionize">Not Sectionize</h1>
-</blockquote>
 ```
 
 **CSS**

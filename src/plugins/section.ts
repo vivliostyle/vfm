@@ -14,6 +14,24 @@ import visit from 'unist-util-visit-parents';
 const MAX_HEADING_DEPTH = 6;
 
 /**
+ * Create the attribute properties of a section.
+ * @param depth - Depth of heading elements that are sections.
+ * @param node - Node of Markdown AST.
+ * @returns Properties.
+ */
+const createProperties = (depth: number, node: any): KeyValue => {
+  const properties: KeyValue = {
+    class: [`level${depth}`],
+  };
+
+  if (node?.data?.hProperties?.id) {
+    properties['aria-labelledby'] = node?.data.hProperties.id;
+  }
+
+  return properties;
+};
+
+/**
  * Wrap the header in sections.
  * - Do not sectionize if parent is `blockquote`.
  * - Set the `levelN` class in the section to match the heading depth.
@@ -42,10 +60,7 @@ const sectionize = (node: any, ancestors: Parent[]) => {
     endIndex > 0 ? endIndex : undefined,
   );
 
-  const hProperties = {
-    class: [`level${depth}`],
-    'aria-labelledby': `heading-${depth}`,
-  };
+  const hProperties = createProperties(depth, node);
 
   // {hidden} specifier
   if (Object.keys(node.data.hProperties).includes('hidden')) {

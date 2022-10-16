@@ -44,3 +44,6 @@ type TokenizerInstance = {
   tokenizeInline: (value: string, location: Point) => Node | void;
   enterBlock: () => () => void;
 };
+
+/** Key/Value pair. */
+type KeyValue = { [key: string]: any };

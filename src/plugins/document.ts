@@ -4,9 +4,6 @@ import { Node } from 'unist';
 import { VFile } from 'vfile';
 import { Attribute, Metadata } from './metadata';
 
-/** Key/Value pair. */
-type KeyValue = { [key: string]: any };
-
 /**
  * Create AST properties from attributes.
  * @param attributes Attributes.

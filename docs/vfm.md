@@ -566,7 +566,7 @@ Make the heading a hierarchical section.
 
 - Do not sectionize if parent is `blockquote`.
 - Set the `levelN` class in the section to match the heading depth.
-- Set the `aria-labelledby` attribute in the section to match the heading depth.
+- If the heading has an `id` attribute, copy the value to the `aria-labelledby` attribute of the section.
 
 **VFM**
 
@@ -587,28 +587,24 @@ Make the heading a hierarchical section.
 **HTML**
 
 ```html
-<section class="level1">
+<section class="level1" aria-labelledby="plain">
   <h1 id="plain">Plain</h1>
 </section>
-
-<section class="level1">
+<section class="level1" aria-labelledby="intro">
   <h1 id="intro">Introduction</h1>
 </section>
-
-<section class="level1">
-  <h1 id="welcome" class="title">Welcome</h1>
+<section class="level1" aria-labelledby="welcome">
+  <h1 class="title" id="welcome">Welcome</h1>
 </section>
-
-<section class="level1">
+<section class="level1" aria-labelledby="level-1">
   <h1 id="level-1">Level 1</h1>
-  <section class="level2">
+  <section class="level2" aria-labelledby="level-2">
     <h2 id="level-2">Level 2</h2>
+    <blockquote>
+      <h1 id="not-sectionize">Not Sectionize</h1>
+    </blockquote>
   </section>
 </section>
-
-<blockquote>
-  <h1 id="not-sectionize">Not Sectionize</h1>
-</blockquote>
 ```
 
 **CSS**

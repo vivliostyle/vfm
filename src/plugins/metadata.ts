@@ -83,12 +83,6 @@ export type Metadata = {
 };
 
 /**
- * Key/Value pair.
- * Definition to enable subscript access of `Object`.
- */
-type KeyValue = { [key: string]: any };
-
-/**
  * Extension of VFM metadata to VFile data.
  */
 interface MetadataVFile extends VFile {

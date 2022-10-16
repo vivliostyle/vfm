@@ -14,7 +14,7 @@ it('Leveling and copy attributes, however the `id` will be moved', () => {
   const md = '# こんにちは {#id1 .class1 key1=value1}';
   const received = stringify(md, { partial: true });
   const expected = `
-<section class="level1" aria-labelledby="heading-1">
+<section class="level1" aria-labelledby="id1">
   <h1 id="id1" class="class1" key1="value1">こんにちは</h1>
 </section>
 `;
@@ -25,7 +25,7 @@ it('Heading with hidden attribute', () => {
   const md = '# Heading {hidden}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
   const expected =
-    '<section class="level1" aria-labelledby="heading-1"><h1 hidden id="heading">Heading</h1></section>';
+    '<section class="level1" aria-labelledby="heading"><h1 hidden id="heading">Heading</h1></section>';
   expect(received).toBe(expected);
 });
 
@@ -122,8 +122,44 @@ it('Complex structure', () => {
     <h2 class="foo" id="heading-2">Heading 2</h2>
   </section>
 </section>
-<section class="level1" aria-labelledby="heading-1">
+<section class="level1" aria-labelledby="heading-1-1">
   <h1 id="heading-1-1">Heading 1</h1>
+</section>
+`;
+  expect(received).toBe(expected);
+});
+
+it('Sample', () => {
+  const md = `# Plain
+
+  # Introduction {#intro}
+  
+  # Welcome {.title}
+  
+  # Level 1
+  
+  ## Level 2
+  
+  > # Not Sectionize`;
+  const received = stringify(md, { partial: true });
+  const expected = `
+<section class="level1" aria-labelledby="plain">
+  <h1 id="plain">Plain</h1>
+</section>
+<section class="level1" aria-labelledby="intro">
+  <h1 id="intro">Introduction</h1>
+</section>
+<section class="level1" aria-labelledby="welcome">
+  <h1 class="title" id="welcome">Welcome</h1>
+</section>
+<section class="level1" aria-labelledby="level-1">
+  <h1 id="level-1">Level 1</h1>
+  <section class="level2" aria-labelledby="level-2">
+    <h2 id="level-2">Level 2</h2>
+    <blockquote>
+      <h1 id="not-sectionize">Not Sectionize</h1>
+    </blockquote>
+  </section>
 </section>
 `;
   expect(received).toBe(expected);
