@@ -566,7 +566,7 @@ Make the heading a hierarchical section.
 
 - Do not sectionize if parent is `blockquote`.
 - Set the `levelN` class in the section to match the heading depth.
-- If the heading has an `id` attribute, copy the value to the `aria-labelledby` attribute of the section.
+- Copy the value of the `id` attribute of the heading to the `aria-labelledby` attribute of the section.
 
 **VFM**
 
