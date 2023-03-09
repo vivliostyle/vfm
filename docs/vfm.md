@@ -379,8 +379,6 @@ img {
 
 Wraps an image written as a single line and with a caption in `<figure>`.
 
-If specify attributes for the image, the `id` is moved to `<figure>` and everything else is copied except for` <img> `specific (such as `src`).
-
 **VFM**
 
 ```md
@@ -395,14 +393,16 @@ text ![Figure 3](./fig3.png)
 
 ```html
 <figure>
-  <img src="./fig1.png" alt="Figure 1" />
-  <figcaption>Figure 1</figcaption>
+  <img src="./fig1.png" alt="Figure 1">
+  <figcaption aria-hidden="true">Figure 1</figcaption>
 </figure>
-<figure id="image" title="Figure 2" data-sample="sample">
-  <img src="./fig2.png" alt="caption" title="Figure 2" data-sample="sample">
-  <figcaption>Figure 2</figcaption>
+<figure>
+  <img src="./fig2.png" alt="Figure 2" title="Figure 2" id="image" data-sample="sample">
+  <figcaption aria-hidden="true">Figure 2</figcaption>
 </figure>
-<p>text <img src="./fig3.png" alt="Figure 3"></p>
+<p>text 
+  <img src="./fig3.png" alt="Figure 3">
+</p>
 ```
 
 **CSS**
