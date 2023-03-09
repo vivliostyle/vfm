@@ -378,8 +378,6 @@ img {
 
 単一行で書かれた画像はキャプション付きで `<figure>` 内へ包み込みます。
 
-画像の属性を指定した場合、`id` は `<figure>` へ移動され ` <img>` 固有のもの (`src` など) を除いたすべてがコピーされます。
-
 **VFM**
 
 ```md
@@ -394,14 +392,16 @@ text ![Figure 3](./fig3.png)
 
 ```html
 <figure>
-  <img src="./fig1.png" alt="Figure 1" />
-  <figcaption>Figure 1</figcaption>
+  <img src="./fig1.png" alt="Figure 1">
+  <figcaption aria-hidden="true">Figure 1</figcaption>
 </figure>
-<figure id="image" title="Figure 2" data-sample="sample">
-  <img src="./fig2.png" alt="caption" title="Figure 2" data-sample="sample">
-  <figcaption>Figure 2</figcaption>
+<figure>
+  <img src="./fig2.png" alt="Figure 2" title="Figure 2" id="image" data-sample="sample">
+  <figcaption aria-hidden="true">Figure 2</figcaption>
 </figure>
-<p>text <img src="./fig3.png" alt="Figure 3"></p>
+<p>text 
+  <img src="./fig3.png" alt="Figure 3">
+</p>
 ```
 
 **CSS**

@@ -75,6 +75,6 @@ it(
               alt: "caption"
               data: {"hProperties":{"id":"image","data-sample":"sample"}}
     `,
-    `<figure id="image" title="title" data-sample="sample"><img src="./img.png" alt="caption" title="title" data-sample="sample"><figcaption aria-hidden="true">caption</figcaption></figure>`,
+    `<figure><img src="./img.png" alt="caption" title="title" id="image" data-sample="sample"><figcaption aria-hidden="true">caption</figcaption></figure>`,
   ),
 );
