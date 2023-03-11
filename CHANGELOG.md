@@ -1,3 +1,11 @@
+# [2.1.0](https://github.com/vivliostyle/vfm/compare/v1.2.2...v2.1.0) (2023-03-11)
+
+
+### Features
+
+* disable attributes copy to parent ([#157](https://github.com/vivliostyle/vfm/issues/157)) ([3690e17](https://github.com/vivliostyle/vfm/commit/3690e171e96731e800166c157f50a51ae44cd35c))
+* disable img attributes copy to figure element ([#167](https://github.com/vivliostyle/vfm/issues/167)) ([78ea9bf](https://github.com/vivliostyle/vfm/commit/78ea9bffb4992eec2290e31a9d086b40b0f9304b)), closes [#151](https://github.com/vivliostyle/vfm/issues/151)
+
 # [1.3.0](https://github.com/vivliostyle/vfm/compare/v1.2.2...v1.3.0) (2023-03-11)
 
 
