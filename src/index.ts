@@ -63,12 +63,14 @@ const checkMetadata = (
     if (typeof options.style === 'string') {
       metadata.link.push([
         { name: 'rel', value: 'stylesheet' },
+        { name: 'type', value: 'text/css' },
         { name: 'href', value: options.style },
       ]);
     } else if (Array.isArray(options.style)) {
       for (const style of options.style) {
         metadata.link.push([
           { name: 'rel', value: 'stylesheet' },
+          { name: 'type', value: 'text/css' },
           { name: 'href', value: style },
         ]);
       }
