@@ -28,8 +28,10 @@ meta:
     content: 'darkred'
 link:
   - rel: 'stylesheet'
+    type: 'text/css'
     href: 'sample1.css'
   - rel: 'stylesheet'
+    type: 'text/css'
     href: 'sample2.css'
 script:
   - type: 'text/javascript'
@@ -95,10 +97,12 @@ other-meta2: 'other2'
     link: [
       [
         { name: 'rel', value: 'stylesheet' },
+        { name: 'type', value: 'text/css' },
         { name: 'href', value: 'sample1.css' },
       ],
       [
         { name: 'rel', value: 'stylesheet' },
+        { name: 'type', value: 'text/css'},
         { name: 'href', value: 'sample2.css' },
       ],
     ],
@@ -172,8 +176,10 @@ meta:
     content: 'darkred'
 link:
   - rel: 'stylesheet'
+    type: 'text/css'
     href: 'sample1.css'
   - rel: 'stylesheet'
+    type: 'text/css'
     href: 'sample2.css'
 script:
   - type: 'text/javascript'
@@ -200,8 +206,8 @@ Text
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="red">
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="darkred">
     <meta name="author" content="Author">
-    <link rel="stylesheet" href="sample1.css">
-    <link rel="stylesheet" href="sample2.css">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
     <script type="text/javascript" src="sample1.js"></script>
     <script type="text/javascript" src="sample2.js"></script>
   </head>
@@ -239,8 +245,10 @@ meta:
     content:
 link:
   - rel:
+    type:
     href:
   - rel:
+    type:
     href:
 script:
   - type:
@@ -264,8 +272,8 @@ Text
     <meta name="" media="" content="">
     <meta name="" media="" content="">
     <meta name="author" content="">
-    <link rel="" href="">
-    <link rel="" href="">
+    <link rel="" type="" href="">
+    <link rel="" type="" href="">
     <script type="" src=""></script>
     <script type="" src=""></script>
   </head>
@@ -302,6 +310,7 @@ it('Style from options', () => {
   const md = `---
 link:
   - rel: 'stylesheet'
+    type: 'text/css'
     href: 'sample1.css'
 ---
 `;
@@ -311,8 +320,8 @@ link:
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="sample1.css">
-    <link rel="stylesheet" href="sample2.css">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
   </head>
   <body></body>
 </html>
@@ -328,7 +337,7 @@ it('Styles from options (String)', () => {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="sample.css">
+    <link rel="stylesheet" type="text/css" href="sample.css">
   </head>
   <body></body>
 </html>
@@ -344,8 +353,8 @@ it('Styles from options (String[])', () => {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="sample1.css">
-    <link rel="stylesheet" href="sample2.css">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
   </head>
   <body></body>
 </html>
@@ -357,6 +366,7 @@ it('Styles from options with frontmatter', () => {
   const md = `---
 link:
   - rel: 'stylesheet'
+    type: 'text/css'
     href: 'sample1.css'
 ---
 `;
@@ -366,9 +376,9 @@ link:
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="sample1.css">
-    <link rel="stylesheet" href="sample2.css">
-    <link rel="stylesheet" href="sample3.css">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
+    <link rel="stylesheet" type="text/css" href="sample3.css">
   </head>
   <body></body>
 </html>
