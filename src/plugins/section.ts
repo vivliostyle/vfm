@@ -69,8 +69,29 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
   const start = node;
   const depth = start.depth;
 
+  // check if it's HTML end tag without corresponding start tag in sibling nodes.
+  const isHtmlEnd = (node: any) => {
+    if (node.type === 'html' && node.value.startsWith('</')) {
+      // it's HTML end tag, check if it has corresponding start tag
+      const tag = /^<\/([^>\s]+)/.exec(node.value)?.[1];
+      const isHtmlStart = (node: any) =>
+        node.type === 'html' && /^<([^>\s]+)/.exec(node.value)?.[1] === tag;
+      const htmlStart = findAfter(parent, start, isHtmlStart);
+      if (
+        !htmlStart ||
+        parent.children.indexOf(htmlStart) > parent.children.indexOf(node)
+      ) {
+        // corresponding start tag not found in sibling nodes
+        return true;
+      }
+    }
+    return false;
+  };
+
   const isEnd = (node: any) =>
-    (node.type === 'heading' && node.depth <= depth) || node.type === 'export';
+    (node.type === 'heading' && node.depth <= depth) ||
+    node.type === 'export' ||
+    isHtmlEnd(node);
   const end = findAfter(parent, start, isEnd);
 
   const startIndex = parent.children.indexOf(start);
