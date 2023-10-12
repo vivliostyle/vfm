@@ -8,31 +8,36 @@ import { StringifyMarkdownOptions, VFM } from '../src';
  * @param expectedHtml Expected HTML string.
  * @param options Option for convert Markdown to VFM (HTML).
  */
-export const buildProcessorTestingCode = (
-  input: string,
-  expectedMdast: string,
-  expectedHtml: string,
-  {
-    style = undefined,
-    partial = true,
-    title = undefined,
-    language = undefined,
-    replace = undefined,
-    hardLineBreaks = false,
-    disableFormatHtml = true,
-    math = false,
-  }: StringifyMarkdownOptions = {},
-) => (): any => {
-  const vfm = VFM({
-    style,
-    partial,
-    title,
-    language,
-    replace,
-    hardLineBreaks,
-    disableFormatHtml,
-    math,
-  }).freeze();
-  expect(unistInspect.noColor(vfm.parse(input))).toBe(expectedMdast.trim());
-  expect(String(vfm.processSync(input))).toBe(expectedHtml);
-};
+export const buildProcessorTestingCode =
+  (
+    input: string,
+    expectedMdast: string,
+    expectedHtml: string,
+    {
+      style = undefined,
+      partial = true,
+      title = undefined,
+      language = undefined,
+      replace = undefined,
+      hardLineBreaks = false,
+      disableFormatHtml = true,
+      math = false,
+    }: StringifyMarkdownOptions = {},
+  ) =>
+  (): any => {
+    const vfm = VFM({
+      style,
+      partial,
+      title,
+      language,
+      replace,
+      hardLineBreaks,
+      disableFormatHtml,
+      math,
+    }).freeze();
+    const R = / \(.+?\)$/gm; // Remove position information
+    expect(unistInspect.noColor(vfm.parse(input)).replace(R, '')).toBe(
+      expectedMdast.trim(),
+    );
+    expect(String(vfm.processSync(input))).toBe(expectedHtml);
+  };

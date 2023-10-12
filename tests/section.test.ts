@@ -40,6 +40,26 @@ it('Disable section with blockquote heading', () => {
   expect(received).toBe(expected);
 });
 
+it('Disable section with closing hashes', () => {
+  const md = '### Not Sectionize ###';
+  const received = stringify(md, { partial: true });
+  const expected = `
+<h3 id="not-sectionize">Not Sectionize</h3>
+`;
+  expect(received).toBe(expected);
+});
+
+it('Do not disable section with insufficient closing hashes', () => {
+  const md = '### Sectionize ##';
+  const received = stringify(md, { partial: true });
+  const expected = `
+<section class="level3" aria-labelledby="sectionize">
+  <h3 id="sectionize">Sectionize</h3>
+</section>
+`;
+  expect(received).toBe(expected);
+});
+
 it('<h7> is not heading', () => {
   const md = '####### こんにちは {.test}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });

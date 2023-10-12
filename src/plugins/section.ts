@@ -7,6 +7,7 @@
  */
 
 import { Parent } from 'mdast';
+import { VFile } from 'vfile';
 import findAfter from 'unist-util-find-after';
 import visit from 'unist-util-visit-parents';
 
@@ -32,6 +33,23 @@ const createProperties = (depth: number, node: any): KeyValue => {
 };
 
 /**
+ * Check if the heading has a non-section mark (sufficient number of closing hashes).
+ * @param node Node of Markdown AST.
+ * @param file Virtual file.
+ * @returns `true` if the node has a non-section mark.
+ */
+const hasNonSectionMark = (node: any, file: VFile): boolean => {
+  const startOffset = node.position?.start.offset ?? 0;
+  const endOffset = node.position?.end.offset ?? 0;
+  const text = file.toString().slice(startOffset, endOffset);
+  const depth = node.depth;
+  if ((/[ \t](#+)$/.exec(text)?.[1]?.length ?? 0) >= depth) {
+    return true;
+  }
+  return false;
+};
+
+/**
  * Wrap the header in sections.
  * - Do not sectionize if parent is `blockquote`.
  * - Set the `levelN` class in the section to match the heading depth.
@@ -39,7 +57,10 @@ const createProperties = (depth: number, node: any): KeyValue => {
  * @param ancestors Parents.
  * @todo handle `@subtitle` properly.
  */
-const sectionize = (node: any, ancestors: Parent[]) => {
+const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
+  if (hasNonSectionMark(node, file)) {
+    return;
+  }
   const parent = ancestors[ancestors.length - 1];
   if (parent.type === 'blockquote') {
     return;
@@ -96,7 +117,10 @@ const sectionize = (node: any, ancestors: Parent[]) => {
  * Process Markdown AST.
  * @returns Transformer.
  */
-export const mdast = () => (tree: any) => {
+export const mdast = () => (tree: any, file: VFile) => {
+  const sectionize = (node: Node, ancestors: Parent[]) => {
+    sectionizeIfRequired(node, ancestors, file);
+  };
   for (let depth = MAX_HEADING_DEPTH; depth > 0; depth--) {
     visit(
       tree,

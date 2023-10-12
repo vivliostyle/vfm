@@ -564,6 +564,9 @@ If want to escape the delimiter pipe `|`, add `\` immediately before it.
 
 Make the heading a hierarchical section.
 
+- Do not sectionize if the heading line starts with `#`s and ends with equal or greater number of `#`s.
+  - `### Not Sectionize ###` (enclosed by equal number of `#`s) -- not sectionize
+  - `### Sectionize ##` (insufficient number of closing `#`s) -- sectionize 
 - Do not sectionize if parent is `blockquote`.
 - Set the `levelN` class in the section to match the heading depth.
 - Copy the value of the `id` attribute of the heading to the `aria-labelledby` attribute of the section.
