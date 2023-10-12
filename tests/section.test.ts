@@ -184,3 +184,38 @@ it('Sample', () => {
 `;
   expect(received).toBe(expected);
 });
+
+it('HTML block with headings', () => {
+  const md = `# Heading 1
+
+## Heading 2-1
+
+<aside class="note">
+
+### NOTE
+
+This is a note.
+
+</aside>
+
+## Heading 2-2`;
+  const received = stringify(md, { partial: true });
+  const expected = `
+<section class="level1" aria-labelledby="heading-1">
+  <h1 id="heading-1">Heading 1</h1>
+  <section class="level2" aria-labelledby="heading-2-1">
+    <h2 id="heading-2-1">Heading 2-1</h2>
+    <aside class="note">
+      <section class="level3" aria-labelledby="note">
+        <h3 id="note">NOTE</h3>
+        <p>This is a note.</p>
+      </section>
+    </aside>
+  </section>
+  <section class="level2" aria-labelledby="heading-2-2">
+    <h2 id="heading-2-2">Heading 2-2</h2>
+  </section>
+</section>
+`;
+  expect(received).toBe(expected);
+});
