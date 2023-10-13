@@ -40,7 +40,7 @@ const createSlug = (heading: Heading, slugger: GithubSlugger) => {
   heading.children = heading.children.filter(
     (child: Node) => child.type !== 'footnote',
   );
-  const text = slugger.slug(toString(heading));
+  const text = slugger.slug(toString(heading).replace(/<[^<>]*>/g, ''));
   heading.children = children;
 
   return text;

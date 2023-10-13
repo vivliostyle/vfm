@@ -105,7 +105,10 @@ const readTitleFromHeading = (tree: Node): string | undefined => {
   heading.children = heading.children.filter(
     (child: Node) => child.type !== 'footnote',
   );
-  const text = toString(heading);
+  // Remove ruby text and HTML tags
+  const text = toString(heading)
+    .replace(/{(.+?)(?<=[^\\|])\|(.+?)}/g, '$1')
+    .replace(/<[^<>]*>/g, '');
   heading.children = children;
 
   return text;
