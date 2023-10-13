@@ -32,6 +32,16 @@ const createProperties = (depth: number, node: any): KeyValue => {
   return properties;
 };
 
+const getHeadingLine = (node: any, file: VFile): string => {
+  if (node?.type !== 'heading') {
+    return '';
+  }
+  const startOffset = node.position?.start.offset ?? 0;
+  const endOffset = node.position?.end.offset ?? 0;
+  const text = file.toString().slice(startOffset, endOffset);
+  return text.trim();
+};
+
 /**
  * Check if the heading has a non-section mark (sufficient number of closing hashes).
  * @param node Node of Markdown AST.
@@ -39,14 +49,20 @@ const createProperties = (depth: number, node: any): KeyValue => {
  * @returns `true` if the node has a non-section mark.
  */
 const hasNonSectionMark = (node: any, file: VFile): boolean => {
-  const startOffset = node.position?.start.offset ?? 0;
-  const endOffset = node.position?.end.offset ?? 0;
-  const text = file.toString().slice(startOffset, endOffset);
-  const depth = node.depth;
-  if ((/[ \t](#+)$/.exec(text)?.[1]?.length ?? 0) >= depth) {
-    return true;
-  }
-  return false;
+  const line = getHeadingLine(node, file);
+  return (
+    !!line && (/^#.*[ \t](#+)$/.exec(line)?.[1]?.length ?? 0) >= node.depth
+  );
+};
+
+/**
+ * Check if the node is a section-end mark (line with only hashes).
+ * @param node Node of Markdown AST.
+ * @returns `true` if the node is a section-end mark.
+ */
+const isSectionEndMark = (node: any, file: VFile): boolean => {
+  const line = getHeadingLine(node, file);
+  return !!line && /^(#+)$/.exec(line)?.[1]?.length === node.depth;
 };
 
 /**
@@ -131,7 +147,12 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
     children: between,
   } as any;
 
-  parent.children.splice(startIndex, section.children.length, section);
+  parent.children.splice(
+    startIndex,
+    section.children.length +
+      (isSectionEndMark(end, file) && end.depth === depth ? 1 : 0),
+    section,
+  );
 };
 
 /**
