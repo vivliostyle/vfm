@@ -102,7 +102,7 @@ other-meta2: 'other2'
       ],
       [
         { name: 'rel', value: 'stylesheet' },
-        { name: 'type', value: 'text/css'},
+        { name: 'type', value: 'text/css' },
         { name: 'href', value: 'sample2.css' },
       ],
     ],
@@ -130,8 +130,10 @@ other-meta2: 'other2'
 });
 
 it('Title from heading', () => {
-  const received = readMetadata(`# Heading Title`);
-  const expected = 'Heading Title';
+  const received = readMetadata(
+    `# Heading Title with {Ruby|ルビ} and <mark>HTML tag</mark>`,
+  );
+  const expected = 'Heading Title with Ruby and HTML tag';
 
   expect(received.title).toBe(expected);
 });
