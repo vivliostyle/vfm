@@ -1,3 +1,17 @@
+# [2.2.0](https://github.com/vivliostyle/vfm/compare/v2.1.0...v2.2.0) (2023-10-14)
+
+
+### Bug Fixes
+
+* HTML block with markdown heading causes wrong HTML sectioning ([#174](https://github.com/vivliostyle/vfm/issues/174)) ([c551024](https://github.com/vivliostyle/vfm/commit/c55102440febcb08c6222b497924382bd8fe174a)), closes [#171](https://github.com/vivliostyle/vfm/issues/171)
+* HTML title generated from heading should not have ruby text and HTML tags ([#178](https://github.com/vivliostyle/vfm/issues/178)) ([59fee36](https://github.com/vivliostyle/vfm/commit/59fee3647989a41932306eb97d50f053675bee79)), closes [#166](https://github.com/vivliostyle/vfm/issues/166)
+
+
+### Features
+
+* Support non-sectionize headings, enclosed by equal number of hashes ([#172](https://github.com/vivliostyle/vfm/issues/172)) ([463c615](https://github.com/vivliostyle/vfm/commit/463c61588e923467d094a1c48d22daea163f8d9e)), closes [#155](https://github.com/vivliostyle/vfm/issues/155)
+* Support section-end mark (line with only hashes) ([#175](https://github.com/vivliostyle/vfm/issues/175)) ([63869ed](https://github.com/vivliostyle/vfm/commit/63869eddb6a381c59a25ca9528ff0fd55ad962c4)), closes [#155](https://github.com/vivliostyle/vfm/issues/155)
+
 # [2.1.0](https://github.com/vivliostyle/vfm/compare/v1.2.2...v2.1.0) (2023-03-11)
 
 
