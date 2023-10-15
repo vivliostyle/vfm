@@ -61,13 +61,16 @@ const visitor: Visitor<Element> = (node) => {
     return;
   }
 
+  // Skip if the role already exists.
+  if (node.properties.role) {
+    return;
+  }
+
+  // Set the first target class found to role.
   for (const className of node.properties.className) {
     if (typeof className === 'string' && targetClassNames.includes(className)) {
-      if (Array.isArray(node.properties.role)) {
-        node.properties.role.push(`doc-${className}`);
-      } else {
-        node.properties.role = [`doc-${className}`];
-      }
+      node.properties.role = `doc-${className}`;
+      break;
     }
   }
 };
