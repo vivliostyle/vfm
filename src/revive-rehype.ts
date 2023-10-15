@@ -9,6 +9,7 @@ import {
   handlerInlineMath as inlineMath,
 } from './plugins/math';
 import { handler as ruby } from './plugins/ruby';
+import { hast as waiAria } from './plugins/wai-aria-role';
 import { inspect } from './utils';
 
 /**
@@ -32,5 +33,6 @@ export const reviveRehype = [
   raw,
   figure,
   footnotes,
+  waiAria,
   inspect('hast'),
 ] as unified.PluggableList<unified.Settings>;
