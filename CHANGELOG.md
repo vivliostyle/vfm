@@ -1,3 +1,15 @@
+## [2.2.1](https://github.com/vivliostyle/vfm/compare/v2.2.0...v2.2.1) (2023-11-05)
+
+
+### Bug Fixes
+
+* HTML block causes wrong sectioning (vfm 2.2.0) ([#184](https://github.com/vivliostyle/vfm/issues/184)) ([6848823](https://github.com/vivliostyle/vfm/commit/6848823a403ee96ca9f40555e8f118a055f3a43d)), closes [#183](https://github.com/vivliostyle/vfm/issues/183)
+
+
+### Reverts
+
+* Revert "chore: Update support version of Node.js (#179)" (#180) ([cf4776c](https://github.com/vivliostyle/vfm/commit/cf4776c903e52aee90a9f22d5540d670b4589936)), closes [#179](https://github.com/vivliostyle/vfm/issues/179) [#180](https://github.com/vivliostyle/vfm/issues/180)
+
 # [2.2.0](https://github.com/vivliostyle/vfm/compare/v2.1.0...v2.2.0) (2023-10-14)
 
 
