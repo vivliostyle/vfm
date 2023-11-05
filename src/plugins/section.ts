@@ -87,28 +87,33 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
 
   // check if it's HTML end tag without corresponding start tag in sibling nodes.
   const isHtmlEnd = (node: any) => {
-    if (node.type === 'html') {
-      const tag = /<\/([^>\s]+)\s*>[^<]*$/.exec(node.value)?.[1];
-      if (tag) {
-        // it's HTML end tag, check if it has corresponding start tag
-        const isHtmlStart = (node: any) =>
-          node.type === 'html' &&
-          new RegExp(`<${tag}\\b[^>]*>`).test(node.value);
-        const htmlStart = findAfter(parent, start, isHtmlStart);
-        if (
-          !htmlStart ||
-          parent.children.indexOf(htmlStart) > parent.children.indexOf(node)
-        ) {
-          // corresponding start tag is not found in this section level,
-          // check if it is found earlier.
-          const htmlStart1 = findAfter(parent, 0, isHtmlStart);
-          if (
-            htmlStart1 &&
-            parent.children.indexOf(htmlStart1) < parent.children.indexOf(start)
-          ) {
-            return true;
-          }
-        }
+    if (node.type !== 'html') {
+      return false;
+    }
+
+    const tag = /<\/([^>\s]+)\s*>[^<]*$/.exec(node.value)?.[1];
+    if (!tag) {
+      return false;
+    }
+
+    // it's HTML end tag, check if it has corresponding start tag
+    const isHtmlStart = (node: any) =>
+      node.type === 'html' && new RegExp(`<${tag}\\b[^>]*>`).test(node.value);
+    const htmlStart = findAfter(parent, start, isHtmlStart);
+    if (
+      !htmlStart ||
+      parent.children.indexOf(htmlStart) > parent.children.indexOf(node)
+    ) {
+      // corresponding start tag is not found in this section level,
+      // check if it is found earlier.
+      const htmlStart1 = findAfter(parent, 0, isHtmlStart);
+      if (
+        htmlStart1 &&
+        parent.children.indexOf(htmlStart1) < parent.children.indexOf(start)
+      ) {
+        return true;
+      }
+    }
       }
     }
     return false;
