@@ -114,8 +114,6 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
         return true;
       }
     }
-      }
-    }
     return false;
   };
 
