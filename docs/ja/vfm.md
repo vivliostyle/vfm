@@ -515,8 +515,8 @@ display: $$1 + 1 = 2$$
 
 ```html
 <div class="custom">
-  <section id="heading" class="level1">
-    <h1>Heading</h1>
+  <section class="level1" aria-labelledby="heading">
+    <h1 id="heading">Heading</h1>
   </section>
 </div>
 ```
