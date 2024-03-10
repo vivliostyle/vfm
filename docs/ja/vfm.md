@@ -586,7 +586,15 @@ ruby rt {
 
 ## Level 2
 
-> # Not Sectionize
+### Level 3
+
+##
+
+Level 2 was ended by `##`.
+
+## Not Sectionize {.just-a-heading} ##
+
+> # Not Sectionize in Blockquote
 ```
 
 **HTML**
@@ -605,10 +613,15 @@ ruby rt {
   <h1 id="level-1">Level 1</h1>
   <section class="level2" aria-labelledby="level-2">
     <h2 id="level-2">Level 2</h2>
-    <blockquote>
-      <h1 id="not-sectionize">Not Sectionize</h1>
-    </blockquote>
+    <section class="level3" aria-labelledby="level-3">
+      <h3 id="level-3">Level 3</h3>
+    </section>
   </section>
+  <p>Level 2 was ended by <code>##</code>.</p>
+  <h2 class="just-a-heading" id="not-sectionize">Not Sectionize</h2>
+  <blockquote>
+    <h1 id="not-sectionize-in-blockquote">Not Sectionize in Blockquote</h1>
+  </blockquote>
 </section>
 ```
 
@@ -617,7 +630,11 @@ ruby rt {
 ```css
 body > section {
 }
-body > section > h1:first-child {
+
+section[aria-labelledby="intro"] {
+}
+
+section:has(> h1.title) {
 }
 
 .level1 {
