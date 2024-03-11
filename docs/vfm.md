@@ -571,7 +571,7 @@ Make the heading a hierarchical section.
   - e.g., the section starting with `### Heading 3` can end with `###`.
 - Do not sectionize if parent is `blockquote`.
 - Set the `levelN` class in the section to match the heading depth.
-- Copy the value of the `id` attribute of the heading to the `aria-labelledby` attribute of the section.
+- Copy the value of the `id` attribute of the heading to the `aria-labelledby` attribute of the section. (**Deprecated**: See https://github.com/vivliostyle/vfm/issues/190)
 
 **VFM**
 
@@ -631,7 +631,7 @@ Level 2 was ended by `##`.
 body > section {
 }
 
-section[aria-labelledby="intro"] {
+section:has(> #intro) {
 }
 
 section:has(> h1.title) {
