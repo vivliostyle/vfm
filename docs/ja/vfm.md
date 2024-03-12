@@ -571,7 +571,7 @@ ruby rt {
   - 例: `### Heading 3` で開始したセクションは `###` で終了させられる
 - 親が `blockquote` の場合はセクションを分けません
 - 見出しの深さへ一致するように、セクションの `levelN` クラスを設定します
-- 見出しの `id` 属性値をセクションの `aria-labelledby` 属性へ値をコピーします
+- 見出しの `id` 属性値をセクションの `aria-labelledby` 属性へ値をコピーします（**廃止予定**: https://github.com/vivliostyle/vfm/issues/190 参照）
 
 **VFM**
 
@@ -631,7 +631,7 @@ Level 2 was ended by `##`.
 body > section {
 }
 
-section[aria-labelledby="intro"] {
+section:has(> #intro) {
 }
 
 section:has(> h1.title) {
