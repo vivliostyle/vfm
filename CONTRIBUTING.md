@@ -4,13 +4,13 @@
 
 ```bash
 git clone https://github.com/vivliostyle/vfm.git && cd vfm
-yarn install
-yarn build
-yarn link
+npm install
+npm run build
+npm link
 DEBUG=vfm vfm
 ```
 
-After setup, run `yarn dev` to watch files.
+After setup, run `npm run dev` to watch files.
 
 ## Commit Guide
 
@@ -29,7 +29,7 @@ release-it --preRelease=beta --npm.tag=next
 ### Bump pre-release version
 
 ```bash
-yarn release:pre
+npm run release:pre
 # or
 release-it --preRelease --npm.tag=next
 ```
@@ -37,7 +37,7 @@ release-it --preRelease --npm.tag=next
 ### Graduate
 
 ```bash
-yarn release
+npm run release
 # or
 release-it
 ```

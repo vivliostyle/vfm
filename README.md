@@ -66,8 +66,6 @@ vivliostyle build book.html -s A4
 
 ```bash
 npm install --save @vivliostyle/vfm
-# or
-yarn add @vivliostyle/vfm
 ```
 
 ```js
