@@ -1,7 +1,8 @@
+import { test } from 'vitest';
 import { stripIndent } from 'common-tags';
 import { buildProcessorTestingCode } from './utils';
 
-it(
+test(
   'simple code',
   buildProcessorTestingCode(
     stripIndent`
@@ -19,7 +20,7 @@ it(
   ),
 );
 
-it(
+test(
   'code with title',
   buildProcessorTestingCode(
     stripIndent`
@@ -37,7 +38,7 @@ it(
   ),
 );
 
-it(
+test(
   'code with extra metadata',
   buildProcessorTestingCode(
     stripIndent`

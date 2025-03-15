@@ -1,3 +1,4 @@
+import { expect } from 'vitest';
 import unistInspect from 'unist-util-inspect';
 import { StringifyMarkdownOptions, VFM } from '../src';
 

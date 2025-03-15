@@ -1,6 +1,7 @@
+import { test, expect } from 'vitest';
 import { VFM } from '../src';
 
-it('has valid inlineMethods', () => {
+test('has valid inlineMethods', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
   expect(vfm.Parser.prototype.inlineMethods).toEqual([
     'escape',
@@ -24,7 +25,7 @@ it('has valid inlineMethods', () => {
   ]);
 });
 
-it('has valid blockMethods', () => {
+test('has valid blockMethods', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
   expect(vfm.Parser.prototype.blockMethods).toEqual([
     'yamlFrontMatter',
@@ -45,7 +46,7 @@ it('has valid blockMethods', () => {
   ]);
 });
 
-it('has valid interruptParagraph', () => {
+test('has valid interruptParagraph', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptParagraph.map(
     ([name]: string[]) => name,
@@ -62,7 +63,7 @@ it('has valid interruptParagraph', () => {
   ]);
 });
 
-it('has valid interruptList', () => {
+test('has valid interruptList', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptList.map(
     ([name]: string[]) => name,
@@ -75,7 +76,7 @@ it('has valid interruptList', () => {
   ]);
 });
 
-it('has valid interruptBlockquote', () => {
+test('has valid interruptBlockquote', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptBlockquote.map(
     ([name]: string[]) => name,
@@ -92,7 +93,7 @@ it('has valid interruptBlockquote', () => {
   ]);
 });
 
-it('has valid interruptFootnoteDefinition', () => {
+test('has valid interruptFootnoteDefinition', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
   const interrupters = vfm.Parser.prototype.interruptFootnoteDefinition.map(
     ([name]: string[]) => name,

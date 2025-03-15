@@ -1,8 +1,9 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src/index';
 
 // This test always fails, `remark-attr` does not handle empty headings.
 /*
-it('plain section', () => {
+test('plain section', () => {
   const md = '# {.ok}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
   const expected = '<section class="level1 ok"></section>';
@@ -10,7 +11,7 @@ it('plain section', () => {
 });
 */
 
-it('Leveling and copy attributes, however the `id` will be moved', () => {
+test('Leveling and copy attributes, however the `id` will be moved', () => {
   const md = '# こんにちは {#id1 .class1 key1=value1}';
   const received = stringify(md, { partial: true });
   const expected = `
@@ -21,7 +22,7 @@ it('Leveling and copy attributes, however the `id` will be moved', () => {
   expect(received).toBe(expected);
 });
 
-it('Heading with hidden attribute', () => {
+test('Heading with hidden attribute', () => {
   const md = '# Heading {hidden}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
   const expected =
@@ -29,7 +30,7 @@ it('Heading with hidden attribute', () => {
   expect(received).toBe(expected);
 });
 
-it('Disable section with blockquote heading', () => {
+test('Disable section with blockquote heading', () => {
   const md = '> # Not Sectionize';
   const received = stringify(md, { partial: true });
   const expected = `
@@ -40,7 +41,7 @@ it('Disable section with blockquote heading', () => {
   expect(received).toBe(expected);
 });
 
-it('Disable section with closing hashes', () => {
+test('Disable section with closing hashes', () => {
   const md = '### Not Sectionize ###';
   const received = stringify(md, { partial: true });
   const expected = `
@@ -49,7 +50,7 @@ it('Disable section with closing hashes', () => {
   expect(received).toBe(expected);
 });
 
-it('Do not disable section with insufficient closing hashes', () => {
+test('Do not disable section with insufficient closing hashes', () => {
   const md = '### Sectionize ##';
   const received = stringify(md, { partial: true });
   const expected = `
@@ -60,14 +61,14 @@ it('Do not disable section with insufficient closing hashes', () => {
   expect(received).toBe(expected);
 });
 
-it('<h7> is not heading', () => {
+test('<h7> is not heading', () => {
   const md = '####### こんにちは {.test}';
   const received = stringify(md, { partial: true, disableFormatHtml: true });
   const expected = '<p>####### こんにちは {.test}</p>';
   expect(received).toBe(expected);
 });
 
-it('<h1>, ... <h6>', () => {
+test('<h1>, ... <h6>', () => {
   const md = `# Heading 1
 ## Heading 2
 ### Heading 3
@@ -99,7 +100,7 @@ it('<h1>, ... <h6>', () => {
 });
 
 // It seems that when the class is processed by `remark-attr`, it is output before id.
-it('<h1>, ... <h6> with attribute', () => {
+test('<h1>, ... <h6> with attribute', () => {
   const md = `# Heading 1 {.depth1}
 ## Heading 2 {.depth2}
 ### Heading 3 {.depth3}
@@ -130,7 +131,7 @@ it('<h1>, ... <h6> with attribute', () => {
   expect(received).toBe(expected);
 });
 
-it('Complex structure', () => {
+test('Complex structure', () => {
   const md = `# Heading 1
 ## Heading 2 {.foo}
 # Heading 1`;
@@ -149,7 +150,7 @@ it('Complex structure', () => {
   expect(received).toBe(expected);
 });
 
-it('Sample', () => {
+test('Sample', () => {
   const md = `# Plain
 
   # Introduction {#intro}
@@ -185,7 +186,7 @@ it('Sample', () => {
   expect(received).toBe(expected);
 });
 
-it('HTML block with headings', () => {
+test('HTML block with headings', () => {
   const md = `# Heading 1
 
 ## Heading 2-1
@@ -220,7 +221,7 @@ This is a note.
   expect(received).toBe(expected);
 });
 
-it('Section-end marks', () => {
+test('Section-end marks', () => {
   const md = `# Heading 1
 
 Depth 1

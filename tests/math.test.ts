@@ -1,3 +1,4 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src/index';
 
 const options = {
@@ -5,7 +6,7 @@ const options = {
   disableFormatHtml: true,
 };
 
-it('inline', () => {
+test('inline', () => {
   const md = `text$x = y$text
 $a$
 $(x = y)$
@@ -18,7 +19,7 @@ $|x = y|$`;
   expect(received).toBe(expected);
 });
 
-it('inline: multiline', () => {
+test('inline: multiline', () => {
   const md = `$x = y
 1 + 1 = 2$`;
   const received = stringify(md, options);
@@ -27,7 +28,7 @@ it('inline: multiline', () => {
   expect(received).toBe(expected);
 });
 
-it('inline: ignore "$ ...$", "$\n...$", "$\t...$"', () => {
+test('inline: ignore "$ ...$", "$\n...$", "$\t...$"', () => {
   const md = `text $ text$x = y$
 $
 x = y$
@@ -41,7 +42,7 @@ $\tx = y$</p>`;
   expect(received).toBe(expected);
 });
 
-it('inline: ignore "$... $"', () => {
+test('inline: ignore "$... $"', () => {
   const md = `text $x = $y$ text
 $x = y
 $
@@ -55,14 +56,14 @@ $x = y\t$</p>`;
   expect(received).toBe(expected);
 });
 
-it('inline: ignore "$" with number', () => {
+test('inline: ignore "$" with number', () => {
   const md = 'There are $3 and $4 bread.';
   const received = stringify(md, options);
   const expected = '<p>There are $3 and $4 bread.</p>';
   expect(received).toBe(expected);
 });
 
-it('inline: ignore "$.\\$.$"', () => {
+test('inline: ignore "$.\\$.$"', () => {
   const md = 'text $x = 5\\$ + \\\\\\$ + 4$ text';
   const received = stringify(md, options);
   const expected =
@@ -70,14 +71,14 @@ it('inline: ignore "$.\\$.$"', () => {
   expect(received).toBe(expected);
 });
 
-it('inline: exclusive other markdown syntax', () => {
+test('inline: exclusive other markdown syntax', () => {
   const received = stringify('text$**bold**$text', options);
   const expected =
     '<p>text<span class="math inline" data-math-typeset="true">\\(**bold**\\)</span>text</p>';
   expect(received).toBe(expected);
 });
 
-it('display', () => {
+test('display', () => {
   const md = `text$$1 + 1 = 2$$text
 $$a$$`;
   const received = stringify(md, options);
@@ -86,7 +87,7 @@ $$a$$`;
   expect(received).toBe(expected);
 });
 
-it('display: multiline', () => {
+test('display: multiline', () => {
   const md = `$$
 x=y
 1 + 1 = 2
@@ -99,14 +100,14 @@ $$</span></p>`;
   expect(received).toBe(expected);
 });
 
-it('display: exclusive other markdown syntax', () => {
+test('display: exclusive other markdown syntax', () => {
   const received = stringify('text$$**bold**$$text', options);
   const expected =
     '<p>text<span class="math display" data-math-typeset="true">$$**bold**$$</span>text</p>';
   expect(received).toBe(expected);
 });
 
-it('inline and display', () => {
+test('inline and display', () => {
   const received = stringify(
     'inline: $x = y$\n\ndisplay: $$1 + 1 = 2$$',
     options,
@@ -116,20 +117,20 @@ it('inline and display', () => {
   expect(received).toBe(expected);
 });
 
-it('un-match: $$$...', () => {
+test('un-match: $$$...', () => {
   const received = stringify('text$$$unmatch$$$text', options);
   const expected = '<p>text$$$unmatch$$$text</p>';
   expect(received).toBe(expected);
 });
 
-it('un-match inline', () => {
+test('un-match inline', () => {
   const received = stringify('$x = y$ $ x = y$ $x = y $ $x = y$7', options);
   const expected =
     '<p><span class="math inline" data-math-typeset="true">\\(x = y\\)</span> $ x = y$ $x = y $ $x = y$7</p>';
   expect(received).toBe(expected);
 });
 
-it('un-match: divided paragraph', () => {
+test('un-match: divided paragraph', () => {
   const md = `$x = y
 
 1 + 1 = 2$
@@ -148,7 +149,7 @@ $$</p>`;
   expect(received).toBe(expected);
 });
 
-it('Output <script> tag', () => {
+test('Output <script> tag', () => {
   const received = stringify('$x=y$', { math: true, disableFormatHtml: true });
   const expected = `<!doctype html>
 <html>
@@ -165,7 +166,7 @@ it('Output <script> tag', () => {
   expect(received).toBe(expected);
 });
 
-it('Output <script> if <math> tag exists', () => {
+test('Output <script> if <math> tag exists', () => {
   const md = '- MathML: <math><mi>x</mi><mo>=</mo><mi>y</mi></math>.';
   const received = stringify(md, { disableFormatHtml: true });
   const expected = `<!doctype html>
@@ -185,7 +186,7 @@ it('Output <script> if <math> tag exists', () => {
   expect(received).toBe(expected);
 });
 
-it('Not output <script> if <math> tag exists with disable math syntax', () => {
+test('Not output <script> if <math> tag exists with disable math syntax', () => {
   const md = '- MathML: <math><mi>x</mi><mo>=</mo><mi>y</mi></math>.';
   const received = stringify(md, { math: false, disableFormatHtml: true });
   const expected = `<!doctype html>
@@ -204,7 +205,7 @@ it('Not output <script> if <math> tag exists with disable math syntax', () => {
   expect(received).toBe(expected);
 });
 
-it('math syntax does not exist, without <script> tag', () => {
+test('math syntax does not exist, without <script> tag', () => {
   const md = 'Sample';
   const received = stringify(md, {
     math: false,
@@ -224,7 +225,7 @@ it('math syntax does not exist, without <script> tag', () => {
   expect(received).toBe(expected);
 });
 
-it('disable with options', () => {
+test('disable with options', () => {
   const md = '$x = y$';
   const received = stringify(md, {
     math: false,
@@ -235,7 +236,7 @@ it('disable with options', () => {
   expect(received).toBe(expected);
 });
 
-it('disable with frontmatter, override options', () => {
+test('disable with frontmatter, override options', () => {
   const markdown = `---
 vfm:
   math: false

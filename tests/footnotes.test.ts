@@ -1,6 +1,7 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src/index';
 
-it('Footnotes', () => {
+test('Footnotes', () => {
   const md = `VFM is developed in the GitHub repository[^1].
 
 [^1]: [VFM](https://github.com/vivliostyle/vfm)`;
@@ -17,7 +18,7 @@ it('Footnotes', () => {
   expect(received).toBe(expected);
 });
 
-it('Inline', () => {
+test('Inline', () => {
   const md = `Footnotes can also be written inline^[This part is a footnote.].`;
   const received = stringify(md, { partial: true });
   const expected = `
@@ -32,7 +33,7 @@ it('Inline', () => {
   expect(received).toBe(expected);
 });
 
-it('Multiple', () => {
+test('Multiple', () => {
   const md = `VFM is developed in the GitHub repository[^1].
 Issues are managed on GitHub[^Issues].
 Footnotes can also be written inline^[This part is a footnote.].
@@ -60,7 +61,7 @@ Footnotes can also be written inline^[This part is a footnote.].
   expect(received).toBe(expected);
 });
 
-it('Heading title and section id without inline footnotes text', () => {
+test('Heading title and section id without inline footnotes text', () => {
   const md = '# Test^[Test]';
   const received = stringify(md);
   const expected = `<!doctype html>

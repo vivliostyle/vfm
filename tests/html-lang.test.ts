@@ -1,6 +1,7 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src/index';
 
-it('undefined', () => {
+test('undefined', () => {
   const received = stringify('text', { disableFormatHtml: true });
   const expected = `<!doctype html>
 <html>
@@ -16,7 +17,7 @@ it('undefined', () => {
   expect(received).toBe(expected);
 });
 
-it('en', () => {
+test('en', () => {
   const received = stringify('text', {
     language: 'en',
     disableFormatHtml: true,

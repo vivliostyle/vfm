@@ -1,8 +1,9 @@
+import { test } from 'vitest';
 import { stripIndent } from 'common-tags';
 import { buildProcessorTestingCode } from './utils';
 
 // remark-parse GFM seems to support only EOL two-spaces, so backslash is excluded.
-it(
+test(
   'default: GFM (EOL two-spaces)',
   buildProcessorTestingCode(
     stripIndent`
@@ -25,7 +26,7 @@ it(
   ),
 );
 
-it(
+test(
   'optional: hard line breaks with GFM (EOL tow-spaces)',
   buildProcessorTestingCode(
     stripIndent`
