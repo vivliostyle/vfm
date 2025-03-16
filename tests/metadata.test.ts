@@ -1,7 +1,8 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src/index';
 import { Metadata, readMetadata } from '../src/plugins/metadata';
 
-it('Read all', () => {
+test('Read all', () => {
   const received = readMetadata(
     `---
 id: 'my-page'
@@ -129,7 +130,7 @@ other-meta2: 'other2'
   expect(received).toStrictEqual(expected);
 });
 
-it('Title from heading', () => {
+test('Title from heading', () => {
   const received = readMetadata(
     `# Heading Title with {Ruby|ルビ} and <mark>HTML tag</mark>`,
   );
@@ -138,7 +139,7 @@ it('Title from heading', () => {
   expect(received.title).toBe(expected);
 });
 
-it('Title from heading with frontmatter', () => {
+test('Title from heading with frontmatter', () => {
   const received = readMetadata(
     `---
 title: 'Title'
@@ -152,7 +153,7 @@ title: 'Title'
   expect(received.title).toBe(expected);
 });
 
-it('All documents', () => {
+test('All documents', () => {
   const md = `---
 id: 'my-page'
 lang: 'ja'
@@ -221,7 +222,7 @@ Text
   expect(received).toBe(expected);
 });
 
-it('If the value is null or empty string, it will be an empty string', () => {
+test('If the value is null or empty string, it will be an empty string', () => {
   const md = `---
 id:
 lang:
@@ -287,7 +288,7 @@ Text
   expect(received).toBe(expected);
 });
 
-it('Specify null or empty string for Object', () => {
+test('Specify null or empty string for Object', () => {
   const md = `---
 html: ''
 meta:
@@ -308,7 +309,7 @@ vfm:
   expect(received).toBe(expected);
 });
 
-it('Style from options', () => {
+test('Style from options', () => {
   const md = `---
 link:
   - rel: 'stylesheet'
@@ -331,7 +332,7 @@ link:
   expect(received).toBe(expected);
 });
 
-it('Styles from options (String)', () => {
+test('Styles from options (String)', () => {
   const md = ``;
   const received = stringify(md, { style: 'sample.css' });
   const expected = `<!doctype html>
@@ -347,7 +348,7 @@ it('Styles from options (String)', () => {
   expect(received).toBe(expected);
 });
 
-it('Styles from options (String[])', () => {
+test('Styles from options (String[])', () => {
   const md = ``;
   const received = stringify(md, { style: ['sample1.css', 'sample2.css'] });
   const expected = `<!doctype html>
@@ -364,7 +365,7 @@ it('Styles from options (String[])', () => {
   expect(received).toBe(expected);
 });
 
-it('Styles from options with frontmatter', () => {
+test('Styles from options with frontmatter', () => {
   const md = `---
 link:
   - rel: 'stylesheet'
@@ -388,7 +389,7 @@ link:
   expect(received).toBe(expected);
 });
 
-it('Do not convert date and time', () => {
+test('Do not convert date and time', () => {
   const md = `---
 date: 2021-06-27
 date2: "2021-06-27"
@@ -408,7 +409,7 @@ date2: "2021-06-27"
   expect(received).toBe(expected);
 });
 
-it('Reserved for future use, `style` and `head`', () => {
+test('Reserved for future use, `style` and `head`', () => {
   const md = `---
 style: |
   @media {
@@ -433,7 +434,7 @@ head: |
   expect(received).toBe(expected);
 });
 
-it('vfm.partial: true', () => {
+test('vfm.partial: true', () => {
   const md = `---
 vfm:
   partial: true
@@ -448,7 +449,7 @@ Text
   expect(received).toBe(expected);
 });
 
-it('vfm.hardLineBreaks: true', () => {
+test('vfm.hardLineBreaks: true', () => {
   const md = `---
 vfm:
   hardLineBreaks: true
@@ -472,7 +473,7 @@ Text
   expect(received).toBe(expected);
 });
 
-it('vfm.disableFormatHtml: true', () => {
+test('vfm.disableFormatHtml: true', () => {
   const md = `---
 vfm:
   disableFormatHtml: true
@@ -495,7 +496,7 @@ Text
   expect(received).toBe(expected);
 });
 
-it('Merge `class` properties', () => {
+test('Merge `class` properties', () => {
   const md = `---
 class: "root"
 html:
@@ -517,7 +518,7 @@ body:
   expect(received).toBe(expected);
 });
 
-it('Excludes key', () => {
+test('Excludes key', () => {
   const md = `---
 title: "Title"
 tags: ["Foo", "Bar"]
@@ -533,7 +534,7 @@ tags: ["Foo", "Bar"]
   expect(received).toStrictEqual(expected);
 });
 
-it('Overwrite key with excludes', () => {
+test('Overwrite key with excludes', () => {
   const md = `---
 title: ["Foo", "Bar"]
 ---
@@ -547,7 +548,7 @@ title: ["Foo", "Bar"]
   expect(received).toStrictEqual(expected);
 });
 
-it('Exclude attribute syntax in title heading', () => {
+test('Exclude attribute syntax in title heading', () => {
   const md = '# Foo {.bar}';
   const received = readMetadata(md);
   const expected: Metadata = {

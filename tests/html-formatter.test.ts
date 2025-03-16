@@ -1,6 +1,7 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src/index';
 
-it('Enable (default)', () => {
+test('Enable (default)', () => {
   const received = stringify(
     'あああああああああああああああああああああああああ いいいいいいいいいいいいいいいいいいいいいい ううううううううううううううううううううううううう えええええええええええええええええええええええええ おおおおおおおおおおおおおおおおおおおおおおお\n\nかきくけこ\n\nさしすせそ',
   );
@@ -20,7 +21,7 @@ it('Enable (default)', () => {
   expect(received).toBe(expected);
 });
 
-it('Disable', () => {
+test('Disable', () => {
   const received = stringify(
     'あああああああああああああああああああああああああ いいいいいいいいいいいいいいいいいいいいいい ううううううううううううううううううううううううう えええええええええええええええええええええええええ おおおおおおおおおおおおおおおおおおおおおおお\n\nかきくけこ\n\nさしすせそ',
     { disableFormatHtml: true },

@@ -1,7 +1,8 @@
+import { test } from 'vitest';
 import { stripIndent } from 'common-tags';
 import { buildProcessorTestingCode } from './utils';
 
-it(
+test(
   'allows markdown context in new paragraph',
   buildProcessorTestingCode(
     stripIndent`
@@ -26,7 +27,7 @@ it(
   ),
 );
 
-it(
+test(
   'same paragraph',
   buildProcessorTestingCode(
     stripIndent`

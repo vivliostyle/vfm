@@ -6,10 +6,6 @@ Vivliostyle Flavored Markdown (VFM) は本の執筆のために最適化され�
 
 VFM の記法と機能を見出しカッコ内のアルファベット昇順（`A`〜`Z`）で並べています。
 
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
-
 - [コード (Code)](#%E3%82%B3%E3%83%BC%E3%83%89-code)
   - [キャプションをつける (with caption)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-caption)
 - [脚注 (Footnotes)](#%E8%84%9A%E6%B3%A8-footnotes)
@@ -26,8 +22,6 @@ VFM の記法と機能を見出しカッコ内のアルファベット昇順（`
 - [ルビ (Ruby)](#%E3%83%AB%E3%83%93-ruby)
   - [ルビにおけるパイプのエスケープ (Escape pipe in ruby body)](#%E3%83%AB%E3%83%93%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%91%E3%82%A4%E3%83%97%E3%81%AE%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97-escape-pipe-in-ruby-body)
 - [セクション分け (Sectionization)](#%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%86%E3%81%91-sectionization)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## コード (Code)
 

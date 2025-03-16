@@ -1,7 +1,8 @@
+import { test } from 'vitest';
 import { stripIndent } from 'common-tags';
 import { buildProcessorTestingCode } from './utils';
 
-it(
+test(
   'simple figure output',
   buildProcessorTestingCode(
     `![caption](./img.png)`,
@@ -17,7 +18,7 @@ it(
   ),
 );
 
-it(
+test(
   'image without caption',
   buildProcessorTestingCode(
     `![](./img.png)`,
@@ -33,7 +34,7 @@ it(
   ),
 );
 
-it(
+test(
   'Only single line',
   buildProcessorTestingCode(
     stripIndent`
@@ -62,7 +63,7 @@ it(
   ),
 );
 
-it(
+test(
   'Attributes',
   buildProcessorTestingCode(
     `![caption](./img.png "title"){id="image" data-sample="sample"}`,

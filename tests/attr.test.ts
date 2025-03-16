@@ -1,6 +1,7 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src/index';
 
-it('Heading with attributes', () => {
+test('Heading with attributes', () => {
   const received = stringify('# Heading {#foo}', {
     partial: true,
     disableFormatHtml: true,
@@ -9,7 +10,7 @@ it('Heading with attributes', () => {
   expect(received).toBe(expected);
 });
 
-it('Heading with attributes, specification by line break', () => {
+test('Heading with attributes, specification by line break', () => {
   const received = stringify('# Heading\n{#foo}', {
     partial: true,
     disableFormatHtml: true,
@@ -18,7 +19,7 @@ it('Heading with attributes, specification by line break', () => {
   expect(received).toBe(expected);
 });
 
-it('Heading with attributes and inline elements, specification by line break', () => {
+test('Heading with attributes and inline elements, specification by line break', () => {
   const received = stringify('# Heading *test*\n{#foo}', {
     partial: true,
     disableFormatHtml: true,

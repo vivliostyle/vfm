@@ -1,7 +1,8 @@
+import { test, expect } from 'vitest';
 import { stringify } from '../src';
 import { ReplaceRule } from '../src/plugins/replace';
 
-it('replace', () => {
+test('replace', () => {
   const rules = [
     {
       test: /\[(.+?)\]\[(.+?)\]/,
@@ -32,7 +33,7 @@ it('replace', () => {
 <p><div class="balloon"><img src="./img/person.png"><span>Nod nod</span></div></p>`);
 });
 
-it('empty replace', () => {
+test('empty replace', () => {
   const rules = [] as ReplaceRule[];
   expect(
     stringify(
@@ -50,7 +51,7 @@ it('empty replace', () => {
 <p>[person][Nod nod]</p>`);
 });
 
-it('<pre>', () => {
+test('<pre>', () => {
   const actual = stringify(`<pre>\n*    *    *\n   *    *    *\n</pre>`, {
     partial: true,
     disableFormatHtml: true,
@@ -63,7 +64,7 @@ it('<pre>', () => {
   expect(actual).toBe(expected);
 });
 
-it('Raw HTML', () => {
+test('Raw HTML', () => {
   const actual = stringify(
     `<div class="custom">
   <p>Hey</p>
@@ -80,7 +81,7 @@ it('Raw HTML', () => {
   expect(actual).toBe(expected);
 });
 
-it('Raw HTML with Markdown', () => {
+test('Raw HTML with Markdown', () => {
   const actual = stringify(
     `<div class="custom">
 
@@ -101,7 +102,7 @@ it('Raw HTML with Markdown', () => {
   expect(actual).toBe(expected);
 });
 
-it('User-specified metadata (without Frontmatter)', () => {
+test('User-specified metadata (without Frontmatter)', () => {
   const actual = stringify(
     '# Title',
     {},
