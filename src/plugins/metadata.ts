@@ -11,8 +11,8 @@ import { Node } from 'unist';
 import { select } from 'unist-util-select';
 import visit from 'unist-util-visit';
 import { VFile } from 'vfile';
-import { mdast as attr } from './attr';
-import { mdast as footnotes } from './footnotes';
+import { mdast as attr } from './attr.js';
+import { mdast as footnotes } from './footnotes.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {

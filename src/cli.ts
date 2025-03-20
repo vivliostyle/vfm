@@ -3,7 +3,7 @@
 import fs from 'fs';
 import meow from 'meow';
 import readline from 'readline';
-import { stringify } from '.';
+import { stringify } from './index.js';
 
 const cli = meow(
   `
