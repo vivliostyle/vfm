@@ -1,15 +1,15 @@
 import raw from 'rehype-raw';
 import remark2rehype from 'remark-rehype';
 import unified from 'unified';
-import { handler as code } from './plugins/code';
-import { hast as figure } from './plugins/figure';
-import { hast as footnotes } from './plugins/footnotes';
+import { handler as code } from './plugins/code.js';
+import { hast as figure } from './plugins/figure.js';
+import { hast as footnotes } from './plugins/footnotes.js';
 import {
   handlerDisplayMath as displayMath,
   handlerInlineMath as inlineMath,
-} from './plugins/math';
-import { handler as ruby } from './plugins/ruby';
-import { inspect } from './utils';
+} from './plugins/math.js';
+import { handler as ruby } from './plugins/ruby.js';
+import { inspect } from './utils.js';
 
 /**
  * Create Hypertext AST handlers and transformers.

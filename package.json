@@ -10,6 +10,7 @@
   "volta": {
     "node": "22.14.0"
   },
+  "type": "module",
   "main": "lib/index.js",
   "bin": {
     "vfm": "lib/cli.js"

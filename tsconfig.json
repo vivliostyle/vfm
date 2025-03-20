@@ -1,8 +1,10 @@
 {
   "exclude": ["tests", "lib"],
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext", "DOM"],
     "declaration": true,
     "outDir": "./lib",
     "rootDir": "./src",

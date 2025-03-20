@@ -2,15 +2,15 @@ import breaks from 'remark-breaks';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
 import unified from 'unified';
-import { mdast as attr } from './plugins/attr';
-import { mdast as code } from './plugins/code';
-import { mdast as footnotes } from './plugins/footnotes';
-import { mdast as math } from './plugins/math';
-import { mdast as ruby } from './plugins/ruby';
-import { mdast as section } from './plugins/section';
-import { mdast as slug } from './plugins/slug';
-import { mdast as toc } from './plugins/toc';
-import { inspect } from './utils';
+import { mdast as attr } from './plugins/attr.js';
+import { mdast as code } from './plugins/code.js';
+import { mdast as footnotes } from './plugins/footnotes.js';
+import { mdast as math } from './plugins/math.js';
+import { mdast as ruby } from './plugins/ruby.js';
+import { mdast as section } from './plugins/section.js';
+import { mdast as slug } from './plugins/slug.js';
+import { mdast as toc } from './plugins/toc.js';
+import { inspect } from './utils.js';
 
 /**
  * Create Markdown AST parsers.
