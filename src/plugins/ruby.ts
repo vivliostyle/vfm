@@ -1,5 +1,5 @@
 import { Handler } from 'mdast-util-to-hast';
-import all from 'mdast-util-to-hast/lib/all';
+import all from 'mdast-util-to-hast/lib/all.js';
 import { Plugin } from 'unified';
 import u from 'unist-builder';
 

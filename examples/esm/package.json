@@ -1,0 +1,24 @@
+{
+  "name": "vfm-esm",
+  "description": "This is a sample of using VFM as an ESM package.",
+  "version": "1.0.0",
+  "author": "Vivliostyle Foundation",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "volta": {
+    "node": "22.14.0"
+  },
+  "type": "module",
+  "main": "src/index.js",
+  "keywords": [
+    "ESM"
+  ],
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@vivliostyle/vfm": "file:vivliostyle-vfm-2.3.0.tgz"
+  }
+}
