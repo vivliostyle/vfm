@@ -7,7 +7,7 @@ test('Footnotes', () => {
 [^1]: [VFM](https://github.com/vivliostyle/vfm)`;
   const received = stringify(md, { partial: true });
   const expected = `
-<p>VFM is developed in the GitHub repository<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>VFM is developed in the GitHub repository<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
 <section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
@@ -22,7 +22,7 @@ test('Inline', () => {
   const md = `Footnotes can also be written inline^[This part is a footnote.].`;
   const received = stringify(md, { partial: true });
   const expected = `
-<p>Footnotes can also be written inline<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>Footnotes can also be written inline<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
 <section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
@@ -45,9 +45,9 @@ Footnotes can also be written inline^[This part is a footnote.].
   const received = stringify(md, { partial: true });
   const expected = `
 <p>
-  VFM is developed in the GitHub repository<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.
-  Issues are managed on GitHub<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>.
-  Footnotes can also be written inline<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.
+  VFM is developed in the GitHub repository<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.
+  Issues are managed on GitHub<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.
+  Footnotes can also be written inline<a id="fnref3" href="#fn3" class="footnote-ref" role="doc-noteref"><sup>3</sup></a>.
 </p>
 <section class="footnotes" role="doc-endnotes">
   <hr>
@@ -73,7 +73,7 @@ test('Heading title and section id without inline footnotes text', () => {
   </head>
   <body>
     <section class="level1" aria-labelledby="test">
-      <h1 id="test">Test<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></h1>
+      <h1 id="test">Test<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></h1>
     </section>
     <section class="footnotes" role="doc-endnotes">
       <hr>
