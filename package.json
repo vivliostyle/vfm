@@ -51,7 +51,7 @@
     "hast-util-find-and-replace": "^3.2.0",
     "hast-util-is-element": "^1.1.0",
     "hast-util-select": "^4.0.2",
-    "hastscript": "^6.0.0",
+    "hastscript": "^7.2.0",
     "js-yaml": "^4.1.0",
     "mdast-util-find-and-replace": "^1.1.1",
     "mdast-util-to-hast": "^10.1.1",
