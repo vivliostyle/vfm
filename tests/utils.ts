@@ -1,5 +1,5 @@
 import { expect } from 'vitest';
-import unistInspect from 'unist-util-inspect';
+import { inspectNoColor as unistInspectNoColor } from 'unist-util-inspect';
 import { StringifyMarkdownOptions, VFM } from '../src';
 
 /**
@@ -37,7 +37,7 @@ export const buildProcessorTestingCode =
       math,
     }).freeze();
     const R = / \(.+?\)$/gm; // Remove position information
-    expect(unistInspect.noColor(vfm.parse(input)).replace(R, '')).toBe(
+    expect(unistInspectNoColor(vfm.parse(input)).replace(R, '')).toBe(
       expectedMdast.trim(),
     );
     expect(String(vfm.processSync(input))).toBe(expectedHtml);
