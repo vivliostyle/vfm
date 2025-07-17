@@ -7,7 +7,7 @@
  */
 
 import GithubSlugger from 'github-slugger';
-import toString from 'mdast-util-to-string';
+import { toString } from 'mdast-util-to-string';
 import { Node } from 'unist';
 import { selectAll } from 'unist-util-select';
 
