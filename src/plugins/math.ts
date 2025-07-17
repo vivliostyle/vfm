@@ -4,7 +4,7 @@ import findReplace from 'mdast-util-find-and-replace';
 import { Handler } from 'mdast-util-to-hast';
 import { Plugin, Transformer } from 'unified';
 import { Node } from 'unist';
-import u from 'unist-builder';
+import { u } from 'unist-builder';
 import visit from 'unist-util-visit';
 
 /**

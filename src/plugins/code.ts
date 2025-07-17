@@ -2,7 +2,7 @@ import { Code } from 'mdast';
 import { Handler } from 'mdast-util-to-hast';
 import refractor from 'refractor';
 import { Node } from 'unist';
-import u from 'unist-builder';
+import { u } from 'unist-builder';
 import visit from 'unist-util-visit';
 
 export function mdast() {

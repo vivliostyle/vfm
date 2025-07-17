@@ -70,7 +70,7 @@
     "remark-shortcodes": "^0.3.1",
     "to-vfile": "^6.1.0",
     "unified": "^9.2.0",
-    "unist-builder": "^2.0.3",
+    "unist-builder": "^3.0.1",
     "unist-util-filter": "^2.0.3",
     "unist-util-find-after": "^3.0.0",
     "unist-util-inspect": "^6.0.1",
