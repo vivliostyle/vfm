@@ -8,7 +8,7 @@
 
 import { Parent } from 'mdast';
 import { VFile } from 'vfile';
-import findAfter from 'unist-util-find-after';
+import { findAfter } from 'unist-util-find-after';
 import visit from 'unist-util-visit-parents';
 
 /** Maximum depth of hierarchy to process headings. */
