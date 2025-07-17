@@ -1,5 +1,5 @@
 import doctype from 'doctype';
-import h from 'hastscript';
+import { h } from 'hastscript';
 import { Node } from 'unist';
 import { VFile } from 'vfile';
 import { Attribute, Metadata } from './metadata.js';
