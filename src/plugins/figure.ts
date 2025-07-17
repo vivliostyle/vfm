@@ -1,8 +1,9 @@
 import { Element } from 'hast';
 import is from 'hast-util-is-element';
 import h from 'hastscript';
+import { Root } from 'hast';
 import { Node, Parent } from 'unist';
-import visit from 'unist-util-visit';
+import { visit } from 'unist-util-visit';
 
 /**
  * Wrap the single line `<img>` in `<figure>` and generate `<figcaption>` from the `alt` attribute.
@@ -23,7 +24,7 @@ const wrapFigureImg = (img: Element, parent: Element) => {
 };
 
 export const hast = () => (tree: Node) => {
-  visit<Element>(tree, 'element', (node, index, parent) => {
+  visit(tree as Root, 'element', (node, index, parent) => {
     // handle captioned code block
     const maybeCode = node.children?.[0] as Element | undefined;
     if (
@@ -34,7 +35,7 @@ export const hast = () => (tree: Node) => {
       const maybeTitle = maybeCode.properties.title;
       delete maybeCode.properties.title;
       if (Array.isArray(maybeCode.properties.className)) {
-        (parent as Parent).children[index] = h(
+        (parent as Parent).children[(index as number)] = h(
           'figure',
           { class: maybeCode.properties.className[0] },
           h('figcaption', maybeTitle),

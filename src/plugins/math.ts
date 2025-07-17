@@ -1,11 +1,11 @@
-import { Element } from 'hast';
+import { Root } from 'hast';
 import { select } from 'hast-util-select';
 import findReplace from 'mdast-util-find-and-replace';
 import { Handler } from 'mdast-util-to-hast';
 import { Plugin, Transformer } from 'unified';
 import { Node } from 'unist';
 import { u } from 'unist-builder';
-import visit from 'unist-util-visit';
+import { visit } from 'unist-util-visit';
 
 /**
  * Inline math format, e.g. `$...$`.
@@ -205,7 +205,7 @@ export const hast = () => (tree: Node) => {
     return;
   }
 
-  visit<Element>(tree, 'element', (node) => {
+  visit(tree as Root, 'element', (node) => {
     switch (node.tagName) {
       case 'head':
         node.children.push({
