@@ -1,6 +1,6 @@
 import initDebug from 'debug';
 import { Node } from 'unist';
-import { inspect as unistInspect } from 'unist-util-inspect';
+import { default as unistInspect } from 'unist-util-inspect';
 
 export const debug = initDebug('vfm');
 

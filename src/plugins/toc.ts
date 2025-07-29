@@ -1,6 +1,6 @@
 import shortcodes from 'remark-shortcodes';
 import { Node } from 'unist';
-import { remove } from 'unist-util-remove';
+import remove from 'unist-util-remove';
 
 const keepToC = () => (tree: Node) => {
   remove(tree, { cascade: false }, (node: any) => {

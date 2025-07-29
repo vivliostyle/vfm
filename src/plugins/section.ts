@@ -6,10 +6,10 @@
  * @see https://github.com/jake-low/remark-sectionize
  */
 
-import { Parent, Root } from 'mdast';
+import { Parent } from 'mdast';
 import { VFile } from 'vfile';
-import { findAfter } from 'unist-util-find-after';
-import { visitParents as visit } from 'unist-util-visit-parents';
+import findAfter from 'unist-util-find-after';
+import visit from 'unist-util-visit-parents';
 
 /** Maximum depth of hierarchy to process headings. */
 const MAX_HEADING_DEPTH = 6;
@@ -172,17 +172,17 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
  * Process Markdown AST.
  * @returns Transformer.
  */
-export const mdast = () => (tree: Node, file: VFile) => {
+export const mdast = () => (tree: any, file: VFile) => {
   const sectionize = (node: Node, ancestors: Parent[]) => {
     sectionizeIfRequired(node, ancestors, file);
   };
   for (let depth = MAX_HEADING_DEPTH; depth > 0; depth--) {
     visit(
       tree,
-      (node) => {
+      (node: any) => {
         return node.type === 'heading' && node.depth === depth;
       },
-      sectionize,
+      sectionize as any,
     );
   }
 };

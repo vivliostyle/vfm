@@ -1,13 +1,13 @@
+import { Code } from 'mdast';
 import { Handler } from 'mdast-util-to-hast';
 import refractor from 'refractor';
 import { Node } from 'unist';
-import { u } from 'unist-builder';
-import { visit } from 'unist-util-visit';
-import { Root } from "mdast"
+import u from 'unist-builder';
+import visit from 'unist-util-visit';
 
 export function mdast() {
   return (tree: Node) => {
-    visit(tree as Root, 'code', (node) => {
+    visit<Code>(tree, 'code', (node) => {
       const match = /^(.+?):(.+)$/.exec(node.lang ?? '');
 
       // parse lang:title syntax
