@@ -1,7 +1,7 @@
 import { Element } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
 import { FrontmatterContent, Literal } from 'mdast';
-import toString from 'mdast-util-to-string';
+import { toString } from 'mdast-util-to-string';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
