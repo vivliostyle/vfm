@@ -70,14 +70,14 @@
     "remark-shortcodes": "^0.3.1",
     "to-vfile": "^6.1.0",
     "unified": "^9.2.0",
-    "unist-builder": "^2.0.3",
-    "unist-util-filter": "^2.0.3",
-    "unist-util-find-after": "^3.0.0",
-    "unist-util-inspect": "^6.0.1",
-    "unist-util-remove": "^2.0.1",
-    "unist-util-select": "^3.0.4",
-    "unist-util-visit": "^2.0.3",
-    "unist-util-visit-parents": "^3.1.1"
+    "unist-builder": "^3.0.1",
+    "unist-util-filter": "^4.0.1",
+    "unist-util-find-after": "^4.0.1",
+    "unist-util-inspect": "^7.0.2",
+    "unist-util-remove": "^3.1.1",
+    "unist-util-select": "^4.0.3",
+    "unist-util-visit": "^4.1.2",
+    "unist-util-visit-parents": "^5.1.3"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^2.0.0",
