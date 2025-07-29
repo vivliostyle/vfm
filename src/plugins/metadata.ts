@@ -1,6 +1,6 @@
 import { Element } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
-import { FrontmatterContent, Literal } from 'mdast';
+import { Literal, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
@@ -9,7 +9,7 @@ import remark2rehype from 'remark-rehype';
 import unified from 'unified';
 import { Node } from 'unist';
 import { select } from 'unist-util-select';
-import visit from 'unist-util-visit';
+import { visit } from 'unist-util-visit';
 import { VFile } from 'vfile';
 import { mdast as attr } from './attr.js';
 import { mdast as footnotes } from './footnotes.js';
@@ -120,7 +120,7 @@ const readTitleFromHeading = (tree: Node): string | undefined => {
  * @see https://github.com/Symbitic/remark-plugins/blob/master/packages/remark-meta/src/index.js
  */
 const mdast = () => (tree: Node, file: MetadataVFile) => {
-  visit<FrontmatterContent>(tree, ['yaml'], (node) => {
+  visit(tree as Root, 'yaml', (node) => {
     const value = yaml(node.value, { schema: JSON_SCHEMA });
     if (typeof value === 'object') {
       file.data = {
@@ -138,7 +138,7 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
     }
   }
 
-  visit<Literal>(tree, ['shortcode'], (node) => {
+  visit(tree as Root, 'shortcode', (node: Literal) => {
     if (node.identifier !== 'toc') {
       return;
     }

@@ -1,6 +1,6 @@
 import { Handler, all } from 'mdast-util-to-hast';
 import { Plugin } from 'unified';
-import u from 'unist-builder';
+import { u } from 'unist-builder';
 
 // remark
 function locateRuby(value: string, fromIndex: number) {
