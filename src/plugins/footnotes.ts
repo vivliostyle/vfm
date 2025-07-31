@@ -1,4 +1,4 @@
-import { Element, Node } from 'hast';
+import { Element, Node, Root as HastRoot } from 'hast';
 import { select, selectAll } from 'hast-util-select';
 import footnotes from 'remark-footnotes';
 
@@ -7,7 +7,7 @@ import footnotes from 'remark-footnotes';
  * @param tree Tree of Hypertext AST.
  */
 const replaceFootnoteLinks = (tree: Node) => {
-  const sups = (selectAll('sup[id^="fnref-"]', tree) as Element[]).filter(
+  const sups = (selectAll('sup[id^="fnref-"]', tree as HastRoot) as Element[]).filter(
     (node) => node.children.length === 1 && node.children[0].tagName === 'a',
   );
 
@@ -74,7 +74,7 @@ const replaceBackReference = (elements: any[], index: number) => {
  * @param tree Tree of Hypertext AST.
  */
 const replaceFootnotes = (tree: Node) => {
-  const area = select('div.footnotes', tree) as Element | undefined;
+  const area = select('div.footnotes', tree as HastRoot) as Element | undefined;
   if (area && area.properties) {
     area.tagName = 'section';
     area.properties.role = 'doc-endnotes';
@@ -82,7 +82,7 @@ const replaceFootnotes = (tree: Node) => {
     return;
   }
 
-  const items = selectAll('section.footnotes ol li', tree) as Element[];
+  const items = selectAll('section.footnotes ol li', tree as HastRoot) as Element[];
   for (let i = 0; i < items.length; ++i) {
     const item = items[i];
     if (!item.properties) {
