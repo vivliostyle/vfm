@@ -1,6 +1,7 @@
-import { Element, Root } from 'hast';
+import { Root as HastRoot } from 'hast';
 import { select } from 'hast-util-select';
-import findReplace from 'mdast-util-find-and-replace';
+import { Root as MdastRoot } from 'mdast';
+import { findAndReplace } from 'mdast-util-find-and-replace';
 import { Handler } from 'mdast-util-to-hast';
 import { Plugin, Transformer } from 'unified';
 import { Node } from 'unist';
@@ -122,27 +123,39 @@ export const mdast: Plugin = function (): Transformer | undefined {
   }
 
   return (tree: Node) => {
-    findReplace(tree, REGEXP_INLINE, (_: string, valueText: string) => {
-      return {
-        type: TYPE_INLINE,
-        data: {
-          hName: TYPE_INLINE,
-          value: valueText,
-        },
-        children: [],
-      };
-    });
+    findAndReplace(
+      tree as MdastRoot,
+      REGEXP_INLINE,
+      (_: string, valueText: string) => {
+        return {
+          // NOTE: Although `type: "inlineMath"` is not a permitted type literal value within mdast,
+          // it causes no issues because it is handled by the handlerInlineMath function via remark-rehype.
+          // See also ../revive-rehype.ts.
+          type: TYPE_INLINE as any,
+          data: {
+            hName: TYPE_INLINE,
+            value: valueText,
+          },
+          children: [],
+        };
+      },
+    );
 
-    findReplace(tree, REGEXP_DISPLAY, (_: string, valueText: string) => {
-      return {
-        type: TYPE_DISPLAY,
-        data: {
-          hName: TYPE_DISPLAY,
-          value: valueText,
-        },
-        children: [],
-      };
-    });
+    findAndReplace(
+      tree as MdastRoot,
+      REGEXP_DISPLAY,
+      (_: string, valueText: string) => {
+        return {
+          // NOTE: See the comment for inlineMath.
+          type: TYPE_DISPLAY as any,
+          data: {
+            hName: TYPE_DISPLAY,
+            value: valueText,
+          },
+          children: [],
+        };
+      },
+    );
   };
 };
 
@@ -205,7 +218,7 @@ export const hast = () => (tree: Node) => {
     return;
   }
 
-  visit(tree as Root, 'element', (node) => {
+  visit(tree as HastRoot, 'element', (node) => {
     switch (node.tagName) {
       case 'head':
         node.children.push({
