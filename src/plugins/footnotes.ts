@@ -7,7 +7,9 @@ import footnotes from 'remark-footnotes';
  * @param tree Tree of Hypertext AST.
  */
 const replaceFootnoteLinks = (tree: Node) => {
-  const sups = (selectAll('sup[id^="fnref-"]', tree as HastRoot) as Element[]).filter(
+  const sups = (
+    selectAll('sup[id^="fnref-"]', tree as HastRoot) as Element[]
+  ).filter(
     (node) => node.children.length === 1 && node.children[0].tagName === 'a',
   );
 
@@ -82,7 +84,10 @@ const replaceFootnotes = (tree: Node) => {
     return;
   }
 
-  const items = selectAll('section.footnotes ol li', tree as HastRoot) as Element[];
+  const items = selectAll(
+    'section.footnotes ol li',
+    tree as HastRoot,
+  ) as Element[];
   for (let i = 0; i < items.length; ++i) {
     const item = items[i];
     if (!item.properties) {

@@ -214,7 +214,12 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
  * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
 export const hast = () => (tree: Node) => {
-  if (!(select('[data-math-typeset="true"]', tree as HastRoot) || select('math', tree as HastRoot))) {
+  if (
+    !(
+      select('[data-math-typeset="true"]', tree as HastRoot) ||
+      select('math', tree as HastRoot)
+    )
+  ) {
     return;
   }
 
