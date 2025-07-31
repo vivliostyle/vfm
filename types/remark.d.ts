@@ -11,7 +11,7 @@ declare module 'hast-util-select';
 declare module 'hastscript';
 declare module 'mdast-util-to-hast/lib/all.js';
 declare module 'mdast-util-to-string';
-declare module 'mdast-util-find-and-replace';
+// declare module 'mdast-util-find-and-replace';
 declare module 'rehype-katex';
 declare module 'remark-slug';
 declare module 'rehype-slug';
