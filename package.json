@@ -47,7 +47,7 @@
   "dependencies": {
     "debug": "^4.4.1",
     "doctype": "^3.0.1",
-    "github-slugger": "^1.4.0",
+    "github-slugger": "^2.0.0",
     "hast-util-find-and-replace": "^3.2.1",
     "hast-util-is-element": "^2.1.3",
     "hast-util-select": "^5.0.5",
