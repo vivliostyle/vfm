@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
-import meow from 'meow';
+import meow, { Result } from 'meow';
 import readline from 'readline';
 import { stringify } from './index.js';
 
@@ -24,15 +24,16 @@ const cli = meow(
       $ vfm input.md
 `,
   {
+    importMeta: import.meta,
     flags: {
       style: {
         type: 'string',
-        alias: 's',
+        shortFlag: 's',
         isMultiple: true,
       },
       partial: {
         type: 'boolean',
-        alias: 'p',
+        shortFlag: 'p',
       },
       title: {
         type: 'string',
@@ -69,9 +70,9 @@ function compile(input: string) {
 }
 
 function main(
-  cli: meow.Result<{
-    style: { type: 'string'; alias: string };
-    partial: { type: 'boolean'; alias: string };
+  cli: Result<{
+    style: { type: 'string'; shortFlag: string };
+    partial: { type: 'boolean'; shortFlag: string };
     title: { type: 'string' };
     language: { type: 'string' };
     hardLineBreaks: { type: 'boolean' };
