@@ -1,6 +1,7 @@
 import doctype from 'doctype';
-import { h } from 'hastscript';
+import { h, Child } from 'hastscript';
 import { Node } from 'unist';
+import { u } from 'unist-builder';
 import { VFile } from 'vfile';
 import { Attribute, Metadata } from './metadata.js';
 
@@ -28,21 +29,21 @@ const createProperties = (attributes?: Array<Attribute>): KeyValue => {
  * @param vfile VFile.
  * @returns AST of `<head>`.
  */
-const createHead = (data: Metadata, vfile: VFile) => {
-  const head = [{ type: 'text', value: '\n' }, h('meta', { charset: 'utf-8' })];
+const createHead = (data: Metadata, vfile: VFile): Child[] => {
+  const head = [u('text', '\n'), h('meta', { charset: 'utf-8' })];
 
   // <title>...</title>
   {
     const title = typeof data.title === 'string' ? data.title : vfile.stem;
     if (typeof title === 'string') {
-      head.push({ type: 'text', value: '\n' }, h('title', [title]));
+      head.push(u('text', '\n'), h('title', [title]));
     }
   }
 
   // <base>
   if (data.base) {
     const props = createProperties(data.base);
-    head.push({ type: 'text', value: '\n' }, h('base', props));
+    head.push(u('text', '\n'), h('base', props));
   }
 
   // <meta>
@@ -56,30 +57,30 @@ const createHead = (data: Metadata, vfile: VFile) => {
 
     for (const attributes of meta) {
       const props = createProperties(attributes);
-      head.push({ type: 'text', value: '\n' }, h('meta', props));
+      head.push(u('text', '\n'), h('meta', props));
     }
 
-    head.push({ type: 'text', value: '\n' });
+    head.push(u('text', '\n'));
   }
 
   // <link>
   if (data.link) {
     for (const attributes of data.link) {
       const props = createProperties(attributes);
-      head.push({ type: 'text', value: '\n' }, h('link', props));
+      head.push(u('text', '\n'), h('link', props));
     }
 
-    head.push({ type: 'text', value: '\n' });
+    head.push(u('text', '\n'));
   }
 
   // <script>
   if (data.script) {
     for (const attributes of data.script) {
       const props = createProperties(attributes);
-      head.push({ type: 'text', value: '\n' }, h('script', props));
+      head.push(u('text', '\n'), h('script', props));
     }
 
-    head.push({ type: 'text', value: '\n' });
+    head.push(u('text', '\n'));
   }
 
   return head;
@@ -98,10 +99,10 @@ const createBody = (metadata: Metadata, tree: Node) => {
       ? tree.children.concat()
       : [tree];
   if (0 < contents.length) {
-    contents.unshift({ type: 'text', value: '\n' });
+    contents.unshift(u('text', '\n'));
   }
 
-  contents.push({ type: 'text', value: '\n' });
+  contents.push(u('text', '\n'));
 
   const props = createProperties(metadata.body);
 
@@ -147,11 +148,11 @@ const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
   }
 
   return h('html', props, [
-    { type: 'text', value: '\n' },
-    h('head', createHead(metadata, vfile)),
-    { type: 'text', value: '\n' },
+    u('text', '\n'),
+    h('head', ...createHead(metadata, vfile)),
+    u('text', '\n'),
     createBody(metadata, tree),
-    { type: 'text', value: '\n' },
+    u('text', '\n'),
   ]);
 };
 
@@ -165,9 +166,9 @@ export const mdast = (data: Metadata) => (tree: Node, vfile: VFile) => {
     type: 'root',
     children: [
       { type: 'doctype', name: doctype(5) },
-      { type: 'text', value: '\n' },
+      u('text', '\n'),
       createHTML(data, tree, vfile),
-      { type: 'text', value: '\n' },
+      u('text', '\n'),
     ],
   };
 };
