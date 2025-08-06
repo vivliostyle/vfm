@@ -81,10 +81,10 @@
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "^2.0.0",
-    "@types/common-tags": "^1.8.0",
-    "@types/debug": "^4.1.7",
+    "@types/common-tags": "^1.8.4",
+    "@types/debug": "^4.1.12",
     "@types/hast": "^2.3.10",
-    "@types/js-yaml": "^4.0.5",
+    "@types/js-yaml": "^4.0.9",
     "@types/mdast": "^3.0.10",
     "@types/node": "^18.7.21",
     "@types/refractor": "^3.0.2",
