@@ -1,4 +1,4 @@
-import doctype from 'doctype';
+import { doctype } from 'doctype';
 import { h } from 'hastscript';
 import { Node } from 'unist';
 import { VFile } from 'vfile';
