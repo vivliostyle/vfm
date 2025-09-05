@@ -4,6 +4,16 @@ import { h } from 'hastscript';
 import { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 
+const propertyToString = (
+  property: NonNullable<Element['properties']>[string],
+) => {
+  return typeof property === 'string' || typeof property === 'number'
+    ? String(property) // <tag prop="foo" /> || <tag prop=42 />
+    : Array.isArray(property)
+    ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
+    : ''; // <tag /> || <tag prop />
+};
+
 /**
  * Wrap the single line `<img>` in `<figure>` and generate `<figcaption>` from the `alt` attribute.
  *
@@ -18,7 +28,11 @@ const wrapFigureImg = (img: Element, parent: Element) => {
 
   parent.tagName = 'figure';
   parent.children.push(
-    h('figcaption', { 'aria-hidden': 'true' }, [img.properties.alt]),
+    h(
+      'figcaption',
+      { 'aria-hidden': 'true' },
+      propertyToString(img.properties.alt),
+    ),
   );
 };
 
@@ -37,7 +51,7 @@ export const hast = () => (tree: Node) => {
         (parent as Parent).children[index as number] = h(
           'figure',
           { class: maybeCode.properties.className[0] },
-          h('figcaption', maybeTitle),
+          h('figcaption', propertyToString(maybeTitle)),
           node,
         );
       }
