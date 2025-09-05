@@ -23,7 +23,7 @@ declare module 'remark-breaks';
 // declare module 'unist-util-remove';
 declare module 'remark-attr';
 // declare module 'unist-util-find-after';
-declare module 'doctype';
+// declare module 'doctype';
 
 interface Tokenizer {
   (
