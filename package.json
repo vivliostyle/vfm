@@ -80,7 +80,7 @@
     "unist-util-visit-parents": "^5.1.3"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "^2.0.0",
+    "@release-it/conventional-changelog": "^10.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/debug": "^4.1.12",
     "@types/hast": "^2.3.10",
