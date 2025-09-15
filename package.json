@@ -80,7 +80,7 @@
     "unist-util-visit-parents": "^5.1.3"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "^2.0.0",
+    "@release-it/conventional-changelog": "^10.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/debug": "^4.1.12",
     "@types/hast": "^2.3.10",
@@ -93,7 +93,7 @@
     "common-tags": "^1.8.2",
     "eslint": "^8.24.0",
     "prettier": "^2.7.1",
-    "release-it": "^14.2.2",
+    "release-it": "^19.0.4",
     "shx": "^0.3.4",
     "typescript": "^4.8.3",
     "vitest": "^3.0.8"
