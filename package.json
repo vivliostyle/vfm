@@ -45,7 +45,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "debug": "^4.4.1",
+    "debug": "^4.4.3",
     "doctype": "^3.0.1",
     "github-slugger": "^2.0.0",
     "hast-util-find-and-replace": "^3.2.1",
