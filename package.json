@@ -1,14 +1,14 @@
 {
   "name": "@vivliostyle/vfm",
   "description": "Custom Markdown syntax specialized in book authoring.",
-  "version": "2.3.0",
+  "version": "2.4.0",
   "author": "Vivliostyle Foundation",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">= 22"
+    "node": ">= 20"
   },
   "volta": {
-    "node": "22.14.0"
+    "node": "20.19.5"
   },
   "type": "module",
   "main": "lib/index.js",
@@ -39,9 +39,6 @@
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "dev": "tsc -w",
     "prepare": "npm run build",
-    "release": "release-it",
-    "release:dry": "release-it --dry-run",
-    "release:pre": "release-it --preRelease --npm.tag=latest",
     "test": "vitest"
   },
   "dependencies": {
@@ -93,7 +90,6 @@
     "common-tags": "^1.8.2",
     "eslint": "^8.24.0",
     "prettier": "^2.7.1",
-    "release-it": "^19.0.4",
     "shx": "^0.3.4",
     "typescript": "^4.8.3",
     "vitest": "^3.0.8"
