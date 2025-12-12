@@ -22,6 +22,19 @@ declare module 'remark-breaks';
 // declare module 'to-vfile';
 // declare module 'unist-util-remove';
 declare module 'remark-attr';
+declare module 'md-attr-parser' {
+  export default function (
+    value: string,
+    indexNext?: number,
+  ): {
+    prop: {
+      id?: string;
+      class?: string[];
+      [key: string]: unknown;
+    };
+    eaten: string;
+  };
+}
 // declare module 'unist-util-find-after';
 // declare module 'doctype';
 

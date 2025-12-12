@@ -37,8 +37,14 @@ export const buildProcessorTestingCode =
       math,
     }).freeze();
     const R = / \(.+?\)$/gm; // Remove position information
-    expect(unistInspectNoColor(vfm.parse(input)).replace(R, '')).toBe(
-      expectedMdast.trim(),
-    );
+    // Remove data field from MDAST comparison.
+    // The data field is not part of the MDAST structure itself, but is used for
+    // coordination with subsequent processing (e.g., hProperties for HAST conversion).
+    // Therefore, validating the final HTML output is sufficient to confirm that the data
+    // was applied correctly.
+    const D = /\n +data: .+/gm;
+    expect(
+      unistInspectNoColor(vfm.parse(input)).replace(R, '').replace(D, ''),
+    ).toBe(expectedMdast.trim().replace(D, ''));
     expect(String(vfm.processSync(input))).toBe(expectedHtml);
   };
