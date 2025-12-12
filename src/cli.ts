@@ -20,6 +20,7 @@ const cli = meow(
       --disable-format-html        Disable automatic HTML format
       --disable-math               Disable math syntax
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
+      --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
 
     Examples
       $ vfm input.md
@@ -55,6 +56,9 @@ const cli = meow(
         type: 'string',
         choices: ['img-figcaption', 'figcaption-img'],
       },
+      assignIdToFigcaption: {
+        type: 'boolean',
+      },
     },
   },
 );
@@ -74,6 +78,7 @@ function compile(input: string) {
         | 'img-figcaption'
         | 'figcaption-img'
         | undefined,
+      assignIdToFigcaption: cli.flags.assignIdToFigcaption,
     }),
   );
 }
@@ -88,6 +93,7 @@ function main(
     disableFormatHtml: { type: 'boolean' };
     disableMath: { type: 'boolean' };
     imgFigcaptionOrder: { type: 'string' };
+    assignIdToFigcaption: { type: 'boolean' };
   }>,
 ) {
   try {

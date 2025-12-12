@@ -124,6 +124,7 @@ other-meta2: 'other2'
       disableFormatHtml: true,
       toc: false,
       theme: 'theme.css',
+      assignIdToFigcaption: false,
     },
   };
 

@@ -34,6 +34,8 @@ export interface StringifyMarkdownOptions {
   math?: boolean;
   /** Order of img and figcaption elements in figure. */
   imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
+  /** Assign ID to figcaption instead of img/code. */
+  assignIdToFigcaption?: boolean;
 }
 
 export interface Hooks {
@@ -96,6 +98,7 @@ export function VFM(
     disableFormatHtml = false,
     math = true,
     imgFigcaptionOrder = undefined,
+    assignIdToFigcaption = false,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
 ): Processor {
@@ -118,12 +121,15 @@ export function VFM(
     if (metadata.vfm.imgFigcaptionOrder !== undefined) {
       imgFigcaptionOrder = metadata.vfm.imgFigcaptionOrder;
     }
+    if (metadata.vfm.assignIdToFigcaption !== undefined) {
+      assignIdToFigcaption = metadata.vfm.assignIdToFigcaption;
+    }
   }
 
   const processor = unified()
     .use(markdown(hardLineBreaks, math))
     .data('settings', { position: true })
-    .use(html({ imgFigcaptionOrder }));
+    .use(html({ imgFigcaptionOrder, assignIdToFigcaption }));
 
   if (replace) {
     processor.use(handleReplace, { rules: replace });

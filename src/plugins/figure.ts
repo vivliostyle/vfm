@@ -1,4 +1,4 @@
-import { Element, Root } from 'hast';
+import { Element, Properties, Root } from 'hast';
 import { isElement as is } from 'hast-util-is-element';
 import { h } from 'hastscript';
 import { Node, Parent } from 'unist';
@@ -15,7 +15,27 @@ const propertyToString = (
 };
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
-export type FigureOptions = { imgFigcaptionOrder?: ImgFigcaptionOrder };
+export type FigureOptions = {
+  imgFigcaptionOrder?: ImgFigcaptionOrder;
+  assignIdToFigcaption?: boolean;
+};
+
+/**
+ * Move ID from source element to target properties if assignIdToFigcaption is enabled.
+ * @param source Element to move ID from (img or code).
+ * @param targetProps Properties object to receive the ID.
+ * @param options Figure options.
+ */
+const moveIdToFigcaption = (
+  source: Element,
+  targetProps: Properties,
+  options: FigureOptions,
+) => {
+  if (options.assignIdToFigcaption && source.properties?.id) {
+    targetProps.id = propertyToString(source.properties.id);
+    delete source.properties.id;
+  }
+};
 
 /**
  * Wrap the single line `<img>` in `<figure>` and generate `<figcaption>` from the `alt` attribute.
@@ -35,9 +55,13 @@ const wrapFigureImg = (
   }
 
   parent.tagName = 'figure';
+
+  const figcaptionProps: Properties = { 'aria-hidden': 'true' };
+  moveIdToFigcaption(img, figcaptionProps, options);
+
   const figcaption = h(
     'figcaption',
-    { 'aria-hidden': 'true' },
+    figcaptionProps,
     propertyToString(img.properties.alt),
   );
 
@@ -62,10 +86,13 @@ export const hast =
         const maybeTitle = maybeCode.properties.title;
         delete maybeCode.properties.title;
         if (Array.isArray(maybeCode.properties.className)) {
+          const figcaptionProps: Properties = {};
+          moveIdToFigcaption(maybeCode, figcaptionProps, options);
+
           (parent as Parent).children[index as number] = h(
             'figure',
             { class: maybeCode.properties.className[0] },
-            h('figcaption', propertyToString(maybeTitle)),
+            h('figcaption', figcaptionProps, propertyToString(maybeTitle)),
             node,
           );
         }

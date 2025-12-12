@@ -38,6 +38,8 @@ export type VFMSettings = {
   toc?: boolean;
   /** Order of img and figcaption elements in figure. */
   imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
+  /** Assign ID to figcaption instead of img/code. */
+  assignIdToFigcaption?: boolean;
 };
 
 /** Metadata from Frontmatter. */
@@ -249,6 +251,10 @@ const readSettings = (data: any): VFMSettings => {
         : undefined,
     theme: typeof data.theme === 'string' ? data.theme : undefined,
     toc: typeof data.toc === 'boolean' ? data.toc : false,
+    assignIdToFigcaption:
+      typeof data.assignIdToFigcaption === 'boolean'
+        ? data.assignIdToFigcaption
+        : false,
   };
 };
 
