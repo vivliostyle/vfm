@@ -10,16 +10,17 @@ const cli = meow(
     Usage
       $ vfm <filename>
       $ echo <string> | vfm
- 
+
     Options
-      --style, -s            Custom stylesheet path/URL
-      --partial, -p          Output markdown fragments
-      --title                Document title (ignored in partial mode)
-      --language             Document language (ignored in partial mode)
-      --hard-line-breaks     Add <br> at the position of hard line breaks, without needing spaces
-      --disable-format-html  Disable automatic HTML format
-      --disable-math         Disable math syntax
- 
+      --style, -s                  Custom stylesheet path/URL
+      --partial, -p                Output markdown fragments
+      --title                      Document title (ignored in partial mode)
+      --language                   Document language (ignored in partial mode)
+      --hard-line-breaks           Add <br> at the position of hard line breaks, without needing spaces
+      --disable-format-html        Disable automatic HTML format
+      --disable-math               Disable math syntax
+      --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
+
     Examples
       $ vfm input.md
 `,
@@ -50,6 +51,10 @@ const cli = meow(
       disableMath: {
         type: 'boolean',
       },
+      imgFigcaptionOrder: {
+        type: 'string',
+        choices: ['img-figcaption', 'figcaption-img'],
+      },
     },
   },
 );
@@ -65,6 +70,10 @@ function compile(input: string) {
       hardLineBreaks: cli.flags.hardLineBreaks,
       disableFormatHtml: cli.flags.disableFormatHtml,
       math: cli.flags.disableMath === undefined ? true : !cli.flags.disableMath,
+      imgFigcaptionOrder: cli.flags.imgFigcaptionOrder as
+        | 'img-figcaption'
+        | 'figcaption-img'
+        | undefined,
     }),
   );
 }
@@ -78,6 +87,7 @@ function main(
     hardLineBreaks: { type: 'boolean' };
     disableFormatHtml: { type: 'boolean' };
     disableMath: { type: 'boolean' };
+    imgFigcaptionOrder: { type: 'string' };
   }>,
 ) {
   try {

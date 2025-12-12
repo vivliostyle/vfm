@@ -14,60 +14,74 @@ const propertyToString = (
     : ''; // <tag /> || <tag prop />
 };
 
+export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
+export type FigureOptions = { imgFigcaptionOrder?: ImgFigcaptionOrder };
+
 /**
  * Wrap the single line `<img>` in `<figure>` and generate `<figcaption>` from the `alt` attribute.
  *
  * A single line `<img>` is a child of `<p>` with no sibling elements. Also, `<figure>` cannot be a child of `<p>`. So convert the parent `<p>` to `<figure>`.
  * @param img `<img>` tag.
  * @param parent `<p>` tag.
+ * @param options Figure options.
  */
-const wrapFigureImg = (img: Element, parent: Element) => {
+const wrapFigureImg = (
+  img: Element,
+  parent: Element,
+  options: FigureOptions,
+) => {
   if (!(img.properties && parent.properties)) {
     return;
   }
 
   parent.tagName = 'figure';
-  parent.children.push(
-    h(
-      'figcaption',
-      { 'aria-hidden': 'true' },
-      propertyToString(img.properties.alt),
-    ),
+  const figcaption = h(
+    'figcaption',
+    { 'aria-hidden': 'true' },
+    propertyToString(img.properties.alt),
   );
+
+  if (options.imgFigcaptionOrder === 'figcaption-img') {
+    parent.children.unshift(figcaption);
+  } else {
+    parent.children.push(figcaption);
+  }
 };
 
-export const hast = () => (tree: Node) => {
-  visit(tree as Root, 'element', (node, index, parent) => {
-    // handle captioned code block
-    const maybeCode = node.children?.[0] as Element | undefined;
-    if (
-      is(node, 'pre') &&
-      maybeCode?.properties &&
-      maybeCode.properties.title
-    ) {
-      const maybeTitle = maybeCode.properties.title;
-      delete maybeCode.properties.title;
-      if (Array.isArray(maybeCode.properties.className)) {
-        (parent as Parent).children[index as number] = h(
-          'figure',
-          { class: maybeCode.properties.className[0] },
-          h('figcaption', propertyToString(maybeTitle)),
-          node,
-        );
+export const hast =
+  (options: FigureOptions = {}) =>
+  (tree: Node) => {
+    visit(tree as Root, 'element', (node, index, parent) => {
+      // handle captioned code block
+      const maybeCode = node.children?.[0] as Element | undefined;
+      if (
+        is(node, 'pre') &&
+        maybeCode?.properties &&
+        maybeCode.properties.title
+      ) {
+        const maybeTitle = maybeCode.properties.title;
+        delete maybeCode.properties.title;
+        if (Array.isArray(maybeCode.properties.className)) {
+          (parent as Parent).children[index as number] = h(
+            'figure',
+            { class: maybeCode.properties.className[0] },
+            h('figcaption', propertyToString(maybeTitle)),
+            node,
+          );
+        }
+
+        return;
       }
 
-      return;
-    }
-
-    // handle captioned and single line (like a block) img
-    if (
-      is(node, 'img') &&
-      node.properties?.alt &&
-      parent &&
-      parent.tagName === 'p' &&
-      parent.children.length === 1
-    ) {
-      wrapFigureImg(node, parent as Element);
-    }
-  });
-};
+      // handle captioned and single line (like a block) img
+      if (
+        is(node, 'img') &&
+        node.properties?.alt &&
+        parent &&
+        parent.tagName === 'p' &&
+        parent.children.length === 1
+      ) {
+        wrapFigureImg(node, parent as Element, options);
+      }
+    });
+  };

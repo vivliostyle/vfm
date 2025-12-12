@@ -32,6 +32,8 @@ export interface StringifyMarkdownOptions {
   disableFormatHtml?: boolean;
   /** Enable math syntax. */
   math?: boolean;
+  /** Order of img and figcaption elements in figure. */
+  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
 }
 
 export interface Hooks {
@@ -93,6 +95,7 @@ export function VFM(
     hardLineBreaks = false,
     disableFormatHtml = false,
     math = true,
+    imgFigcaptionOrder = undefined,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
 ): Processor {
@@ -112,12 +115,15 @@ export function VFM(
     if (metadata.vfm.disableFormatHtml !== undefined) {
       disableFormatHtml = metadata.vfm.disableFormatHtml;
     }
+    if (metadata.vfm.imgFigcaptionOrder !== undefined) {
+      imgFigcaptionOrder = metadata.vfm.imgFigcaptionOrder;
+    }
   }
 
   const processor = unified()
     .use(markdown(hardLineBreaks, math))
     .data('settings', { position: true })
-    .use(html);
+    .use(html({ imgFigcaptionOrder }));
 
   if (replace) {
     processor.use(handleReplace, { rules: replace });
