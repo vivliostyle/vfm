@@ -15,6 +15,7 @@ export const mdast = [
       'reference',
       'footnoteCall',
       'autoLink',
+      'fencedCode',
     ],
   },
 ];
