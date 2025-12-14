@@ -36,6 +36,8 @@ export type VFMSettings = {
   theme?: string;
   /** Enable TOC mode. */
   toc?: boolean;
+  /** Order of img and figcaption elements in figure. */
+  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
 };
 
 /** Metadata from Frontmatter. */

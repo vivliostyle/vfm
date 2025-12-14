@@ -23,6 +23,7 @@ export const buildProcessorTestingCode =
       hardLineBreaks = false,
       disableFormatHtml = true,
       math = false,
+      imgFigcaptionOrder = undefined,
     }: StringifyMarkdownOptions = {},
   ) =>
   (): any => {
@@ -35,6 +36,7 @@ export const buildProcessorTestingCode =
       hardLineBreaks,
       disableFormatHtml,
       math,
+      imgFigcaptionOrder,
     }).freeze();
     const R = / \(.+?\)$/gm; // Remove position information
     expect(unistInspectNoColor(vfm.parse(input)).replace(R, '')).toBe(

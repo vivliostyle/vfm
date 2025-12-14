@@ -79,3 +79,31 @@ test(
     `<figure><img src="./img.png" alt="caption" title="title" id="image" data-sample="sample"><figcaption aria-hidden="true">caption</figcaption></figure>`,
   ),
 );
+
+test(
+  'imgFigcaptionOrder: figcaption-img',
+  buildProcessorTestingCode(
+    `![caption](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+    `,
+    `<figure><figcaption aria-hidden="true">caption</figcaption><img src="./img.png" alt="caption"></figure>`,
+    { imgFigcaptionOrder: 'figcaption-img' },
+  ),
+);
+
+test(
+  'imgFigcaptionOrder should not affect raw HTML figure',
+  buildProcessorTestingCode(
+    `<figure><img src="./img.png" alt="caption"><figcaption>caption</figcaption></figure>`,
+    `root[1]
+└─0 html "<figure><img src=\\"./img.png\\" alt=\\"caption\\"><figcaption>caption</figcaption></figure>"`,
+    `<figure><img src="./img.png" alt="caption"><figcaption>caption</figcaption></figure>`,
+    { imgFigcaptionOrder: 'figcaption-img' },
+  ),
+);
