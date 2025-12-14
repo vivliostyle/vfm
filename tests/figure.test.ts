@@ -107,3 +107,54 @@ test(
     { imgFigcaptionOrder: 'figcaption-img' },
   ),
 );
+
+test(
+  'assignIdToFigcaption moves ID from img to figcaption',
+  buildProcessorTestingCode(
+    `![caption](./img.png){#id}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+    `,
+    `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true" id="id">caption</figcaption></figure>`,
+    { assignIdToFigcaption: true },
+  ),
+);
+
+test(
+  'assignIdToFigcaption with imgFigcaptionOrder: figcaption-img',
+  buildProcessorTestingCode(
+    `![caption](./img.png){#id}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+    `,
+    `<figure><figcaption aria-hidden="true" id="id">caption</figcaption><img src="./img.png" alt="caption"></figure>`,
+    { assignIdToFigcaption: true, imgFigcaptionOrder: 'figcaption-img' },
+  ),
+);
+
+test(
+  'assignIdToFigcaption: false keeps ID on img (default behavior)',
+  buildProcessorTestingCode(
+    `![caption](./img.png){#id}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+    `,
+    `<figure><img src="./img.png" alt="caption" id="id"><figcaption aria-hidden="true">caption</figcaption></figure>`,
+    { assignIdToFigcaption: false },
+  ),
+);

@@ -217,3 +217,60 @@ test(
     `<figure class="language-js"><figcaption>title {#not-attr}</figcaption><pre class="language-js"><code id="real-attr" class="language-js"><span class="token string">'Hello code'</span></code></pre></figure>`,
   ),
 );
+
+test(
+  'code with title and id: assignIdToFigcaption moves ID from code to figcaption',
+  buildProcessorTestingCode(
+    stripIndent`
+    \`\`\`js:app.js {#code-id}
+    'Hello code'
+    \`\`\`
+    `,
+    stripIndent`
+    root[1]
+    └─0 code "'Hello code'"
+          lang: "js:app.js"
+          meta: "{#code-id}"
+    `,
+    `<figure class="language-js"><figcaption id="code-id">app.js</figcaption><pre class="language-js"><code class="language-js"><span class="token string">'Hello code'</span></code></pre></figure>`,
+    { assignIdToFigcaption: true },
+  ),
+);
+
+test(
+  'code with title metadata and id: assignIdToFigcaption moves ID from code to figcaption',
+  buildProcessorTestingCode(
+    stripIndent`
+    \`\`\`js title=app.js {#code-id}
+    'Hello code'
+    \`\`\`
+    `,
+    stripIndent`
+    root[1]
+    └─0 code "'Hello code'"
+          lang: "js"
+          meta: "title=app.js {#code-id}"
+    `,
+    `<figure class="language-js"><figcaption id="code-id">app.js</figcaption><pre class="language-js"><code class="language-js"><span class="token string">'Hello code'</span></code></pre></figure>`,
+    { assignIdToFigcaption: true },
+  ),
+);
+
+test(
+  'code with id but no title: assignIdToFigcaption has no effect (no figcaption)',
+  buildProcessorTestingCode(
+    stripIndent`
+    \`\`\`js {#code-id}
+    'Hello code'
+    \`\`\`
+    `,
+    stripIndent`
+    root[1]
+    └─0 code "'Hello code'"
+          lang: "js"
+          meta: "{#code-id}"
+    `,
+    `<pre class="language-js"><code id="code-id" class="language-js"><span class="token string">'Hello code'</span></code></pre>`,
+    { assignIdToFigcaption: true },
+  ),
+);
