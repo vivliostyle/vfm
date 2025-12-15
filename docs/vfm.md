@@ -515,7 +515,7 @@ It also outputs `<script>` for processing MathJax if `math` is enabled and the m
 
 ```html
 <div class="custom">
-  <section class="level1" aria-labelledby="heading">
+  <section class="level1">
     <h1 id="heading">Heading</h1>
   </section>
 </div>
@@ -571,7 +571,6 @@ Make the heading a hierarchical section.
   - e.g., the section starting with `### Heading 3` can end with `###`.
 - Do not sectionize if parent is `blockquote`.
 - Set the `levelN` class in the section to match the heading depth.
-- Copy the value of the `id` attribute of the heading to the `aria-labelledby` attribute of the section. (**Deprecated**: See https://github.com/vivliostyle/vfm/issues/190)
 
 **VFM**
 
@@ -600,20 +599,20 @@ Level 2 was ended by `##`.
 **HTML**
 
 ```html
-<section class="level1" aria-labelledby="plain">
+<section class="level1">
   <h1 id="plain">Plain</h1>
 </section>
-<section class="level1" aria-labelledby="intro">
+<section class="level1">
   <h1 id="intro">Introduction</h1>
 </section>
-<section class="level1" aria-labelledby="welcome">
+<section class="level1">
   <h1 class="title" id="welcome">Welcome</h1>
 </section>
-<section class="level1" aria-labelledby="level-1">
+<section class="level1">
   <h1 id="level-1">Level 1</h1>
-  <section class="level2" aria-labelledby="level-2">
+  <section class="level2">
     <h2 id="level-2">Level 2</h2>
-    <section class="level3" aria-labelledby="level-3">
+    <section class="level3">
       <h3 id="level-3">Level 3</h3>
     </section>
   </section>
