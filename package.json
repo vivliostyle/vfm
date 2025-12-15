@@ -42,6 +42,8 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@types/hast": "^2.0.0",
+    "@types/mdast": "^3.0.0",
     "debug": "^4.4.3",
     "doctype": "^3.0.1",
     "github-slugger": "^2.0.0",
@@ -81,9 +83,7 @@
     "@release-it/conventional-changelog": "^10.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/debug": "^4.1.12",
-    "@types/hast": "^2.3.10",
     "@types/js-yaml": "^4.0.9",
-    "@types/mdast": "^3.0.10",
     "@types/node": "^18.7.21",
     "@types/refractor": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
