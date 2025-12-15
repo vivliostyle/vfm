@@ -26,7 +26,7 @@ $ npm start
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body>
-    <section class="level1" aria-labelledby="hello-vfm">
+    <section class="level1">
       <h1 id="hello-vfm">Hello, VFM!</h1>
       <p>This is a simple example of using VFM to render Markdown to HTML.</p>
     </section>

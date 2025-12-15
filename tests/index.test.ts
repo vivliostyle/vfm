@@ -94,7 +94,7 @@ test('Raw HTML with Markdown', () => {
   );
   const expected = `
 <div class="custom">
-  <section class="level1" aria-labelledby="heading">
+  <section class="level1">
     <h1 id="heading">Heading</h1>
   </section>
 </div>
@@ -116,7 +116,7 @@ test('User-specified metadata (without Frontmatter)', () => {
     <meta name="viewport" content="width=device-width, initial-scale=1">
   </head>
   <body id="page">
-    <section class="level1" aria-labelledby="title">
+    <section class="level1">
       <h1 id="title">Title</h1>
     </section>
   </body>

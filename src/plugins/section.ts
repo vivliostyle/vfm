@@ -24,11 +24,6 @@ const createProperties = (depth: number, node: any): KeyValue => {
   const properties: KeyValue = {
     class: [`level${depth}`],
   };
-
-  if (node?.data?.hProperties?.id) {
-    properties['aria-labelledby'] = node?.data.hProperties.id;
-  }
-
   return properties;
 };
 

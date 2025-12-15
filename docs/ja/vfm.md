@@ -509,7 +509,7 @@ display: $$1 + 1 = 2$$
 
 ```html
 <div class="custom">
-  <section class="level1" aria-labelledby="heading">
+  <section class="level1">
     <h1 id="heading">Heading</h1>
   </section>
 </div>
@@ -565,7 +565,6 @@ ruby rt {
   - 例: `### Heading 3` で開始したセクションは `###` で終了させられる
 - 親が `blockquote` の場合はセクションを分けません
 - 見出しの深さへ一致するように、セクションの `levelN` クラスを設定します
-- 見出しの `id` 属性値をセクションの `aria-labelledby` 属性へ値をコピーします（**廃止予定**: https://github.com/vivliostyle/vfm/issues/190 参照）
 
 **VFM**
 
@@ -594,20 +593,20 @@ Level 2 was ended by `##`.
 **HTML**
 
 ```html
-<section class="level1" aria-labelledby="plain">
+<section class="level1">
   <h1 id="plain">Plain</h1>
 </section>
-<section class="level1" aria-labelledby="intro">
+<section class="level1">
   <h1 id="intro">Introduction</h1>
 </section>
-<section class="level1" aria-labelledby="welcome">
+<section class="level1">
   <h1 class="title" id="welcome">Welcome</h1>
 </section>
-<section class="level1" aria-labelledby="level-1">
+<section class="level1">
   <h1 id="level-1">Level 1</h1>
-  <section class="level2" aria-labelledby="level-2">
+  <section class="level2">
     <h2 id="level-2">Level 2</h2>
-    <section class="level3" aria-labelledby="level-3">
+    <section class="level3">
       <h3 id="level-3">Level 3</h3>
     </section>
   </section>
