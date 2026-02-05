@@ -71,12 +71,10 @@ test('endnotesAsFootnotes: basic', () => {
     partial: true,
     endnotesAsFootnotes: true,
   });
-  expect(received).toContain('<span class="footnote">');
-  expect(received).toContain('https://github.com/vivliostyle/vfm');
-  expect(received).not.toContain('class="footnotes"');
-  expect(received).not.toContain('role="doc-endnotes"');
-  expect(received).not.toContain('footnote-back');
-  expect(received).not.toContain('footnote-backref');
+  const expected = `
+<p>VFM is developed in the GitHub repository<span class="footnote"><a href="https://github.com/vivliostyle/vfm">VFM</a></span>.</p>
+`;
+  expect(received).toBe(expected);
 });
 
 test('endnotesAsFootnotes: inline footnote', () => {
@@ -85,10 +83,10 @@ test('endnotesAsFootnotes: inline footnote', () => {
     partial: true,
     endnotesAsFootnotes: true,
   });
-  expect(received).toContain('<span class="footnote">');
-  expect(received).toContain('This part is a footnote.');
-  expect(received).not.toContain('class="footnotes"');
-  expect(received).not.toContain('role="doc-endnotes"');
+  const expected = `
+<p>Footnotes can also be written inline<span class="footnote">This part is a footnote.</span>.</p>
+`;
+  expect(received).toBe(expected);
 });
 
 test('endnotesAsFootnotes: multiple footnotes', () => {
@@ -102,12 +100,13 @@ Second reference[^2].
     partial: true,
     endnotesAsFootnotes: true,
   });
-  expect(received).toContain('First footnote content');
-  expect(received).toContain('Second footnote content');
-  expect(received).not.toContain('class="footnotes"');
-  // Each footnote is wrapped in its own span
-  const matches = received.match(/<span class="footnote">/g);
-  expect(matches).toHaveLength(2);
+  const expected = `
+<p>
+  First reference<span class="footnote">First footnote content</span>.
+  Second reference<span class="footnote">Second footnote content</span>.
+</p>
+`;
+  expect(received).toBe(expected);
 });
 
 test('endnotesAsFootnotes: custom properties', () => {
@@ -118,9 +117,10 @@ test('endnotesAsFootnotes: custom properties', () => {
     partial: true,
     endnotesAsFootnotes: { class: 'my-footnote', 'data-type': 'note' },
   });
-  expect(received).toContain('<span class="my-footnote" data-type="note">');
-  expect(received).toContain('Footnote with custom props');
-  expect(received).not.toContain('class="footnotes"');
+  const expected = `
+<p>Reference<span class="my-footnote" data-type="note">Footnote with custom props</span>.</p>
+`;
+  expect(received).toBe(expected);
 });
 
 test('endnotesAsFootnotes: custom factory', () => {
@@ -132,9 +132,12 @@ test('endnotesAsFootnotes: custom factory', () => {
     endnotesAsFootnotes: (hFn, children) =>
       hFn('aside', { class: 'custom-fn' }, ...children),
   });
-  expect(received).toContain('<aside class="custom-fn">');
-  expect(received).toContain('Custom footnote');
-  expect(received).not.toContain('class="footnotes"');
+  const expected = `
+<p>Reference
+  <aside class="custom-fn">Custom footnote</aside>.
+</p>
+`;
+  expect(received).toBe(expected);
 });
 
 test('endnotesAsFootnotes: via frontmatter', () => {
@@ -173,10 +176,16 @@ test('endnotesAsFootnotes: disabled by default', () => {
 
 [^1]: Footnote content`;
   const received = stringify(md, { partial: true });
-  // Should produce Pandoc format (existing behavior)
-  expect(received).toContain('class="footnote-ref"');
-  expect(received).toContain('role="doc-endnotes"');
-  expect(received).not.toContain('<span class="footnote">');
+  const expected = `
+<p>Reference<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
+<section class="footnotes" role="doc-endnotes">
+  <hr>
+  <ol>
+    <li id="fn1" role="doc-endnote">Footnote content<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>
+  </ol>
+</section>
+`;
+  expect(received).toBe(expected);
 });
 
 test('endnotesAsFootnotes: no footnotes present', () => {
@@ -185,9 +194,10 @@ test('endnotesAsFootnotes: no footnotes present', () => {
     partial: true,
     endnotesAsFootnotes: true,
   });
-  expect(received).toContain('Just plain text without footnotes.');
-  expect(received).not.toContain('class="footnotes"');
-  expect(received).not.toContain('<span class="footnote">');
+  const expected = `
+<p>Just plain text without footnotes.</p>
+`;
+  expect(received).toBe(expected);
 });
 
 test('Heading title and section id without inline footnotes text', () => {

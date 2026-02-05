@@ -83,8 +83,10 @@ type BackReference = Element & {
 const isBackReference = (node: ElementContent): node is BackReference =>
   node.type === 'element' &&
   node.tagName === 'a' &&
-  Array.isArray(node.properties?.className) &&
-  node.properties.className.includes('footnote-backref');
+  Array.isArray((node as Element).properties?.className) &&
+  ((node as Element).properties!.className as string[]).includes(
+    'footnote-backref',
+  );
 const selectBackReferences = (parent: Element) =>
   selectAll(backReferenceSelector, parent) as BackReference[];
 
