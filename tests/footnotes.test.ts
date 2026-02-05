@@ -111,14 +111,27 @@ Second reference[^2].
   expect(matches).toHaveLength(2);
 });
 
+test('endnotesAsFootnotes: custom properties', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote with custom props`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: { class: 'my-footnote', 'data-type': 'note' },
+  });
+  expect(received).toContain('<span class="my-footnote" data-type="note">');
+  expect(received).toContain('Footnote with custom props');
+  expect(received).not.toContain('class="footnotes"');
+});
+
 test('endnotesAsFootnotes: custom factory', () => {
   const md = `Reference[^1].
 
 [^1]: Custom footnote`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: (hFn) => (_selector, props, ...children) =>
-      hFn('aside', { ...props, class: 'custom-fn' }, ...children),
+    endnotesAsFootnotes: (hFn, children) =>
+      hFn('aside', { class: 'custom-fn' }, ...children),
   });
   expect(received).toContain('<aside class="custom-fn">');
   expect(received).toContain('Custom footnote');

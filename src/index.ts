@@ -4,6 +4,7 @@ import unified, { Processor } from 'unified';
 import { mdast as doc } from './plugins/document.js';
 import { hast as hastMath } from './plugins/math.js';
 import { FootnoteFactory } from './plugins/footnotes.js';
+import { Properties } from 'hast';
 import { Metadata, readMetadata } from './plugins/metadata.js';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
@@ -38,7 +39,7 @@ export interface StringifyMarkdownOptions {
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
   /** Convert endnotes to inline footnotes for CSS GCPM `float: footnote`. */
-  endnotesAsFootnotes?: boolean | FootnoteFactory;
+  endnotesAsFootnotes?: boolean | Properties | FootnoteFactory;
 }
 
 export interface Hooks {
