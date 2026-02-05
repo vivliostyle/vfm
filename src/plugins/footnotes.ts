@@ -162,6 +162,7 @@ const transformEndnoteAreas = (tree: HastRoot) => {
 
 export type FootnoteFactory = (
   h: typeof import('hastscript').h,
+  properties: Properties,
   children: ElementContent[],
 ) => Element;
 
@@ -184,8 +185,9 @@ const convertEndnotesToFootnotes = (
     typeof opt === 'function'
       ? opt
       : typeof opt === 'object'
-      ? (h, children) => h('span', opt, ...children)
-      : (h, children) => h('span', { class: 'footnote' }, ...children);
+      ? (h, props, children) => h('span', { ...props, ...opt }, ...children)
+      : (h, props, children) =>
+          h('span', { class: 'footnote', ...props }, ...children);
 
   const endnoteElements = new Map(
     selectEndnoteElements(tree).map((elem) => [
@@ -198,7 +200,7 @@ const convertEndnotesToFootnotes = (
     selectEndnoteCalls(tree).flatMap((call) => {
       const id = call.children[0].properties.href.slice(1);
       const elem = endnoteElements.get(id);
-      return !elem ? [] : [[call as Element, factory(h, elem)]];
+      return !elem ? [] : [[call as Element, factory(h, { id }, elem)]];
     }),
   );
 

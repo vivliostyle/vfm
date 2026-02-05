@@ -72,7 +72,7 @@ test('endnotesAsFootnotes: basic', () => {
     endnotesAsFootnotes: true,
   });
   const expected = `
-<p>VFM is developed in the GitHub repository<span class="footnote"><a href="https://github.com/vivliostyle/vfm">VFM</a></span>.</p>
+<p>VFM is developed in the GitHub repository<span class="footnote" id="fn-1"><a href="https://github.com/vivliostyle/vfm">VFM</a></span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -84,7 +84,7 @@ test('endnotesAsFootnotes: inline footnote', () => {
     endnotesAsFootnotes: true,
   });
   const expected = `
-<p>Footnotes can also be written inline<span class="footnote">This part is a footnote.</span>.</p>
+<p>Footnotes can also be written inline<span class="footnote" id="fn-1">This part is a footnote.</span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -102,8 +102,8 @@ Second reference[^2].
   });
   const expected = `
 <p>
-  First reference<span class="footnote">First footnote content</span>.
-  Second reference<span class="footnote">Second footnote content</span>.
+  First reference<span class="footnote" id="fn-1">First footnote content</span>.
+  Second reference<span class="footnote" id="fn-2">Second footnote content</span>.
 </p>
 `;
   expect(received).toBe(expected);
@@ -118,7 +118,21 @@ test('endnotesAsFootnotes: custom properties', () => {
     endnotesAsFootnotes: { class: 'my-footnote', 'data-type': 'note' },
   });
   const expected = `
-<p>Reference<span class="my-footnote" data-type="note">Footnote with custom props</span>.</p>
+<p>Reference<span id="fn-1" class="my-footnote" data-type="note">Footnote with custom props</span>.</p>
+`;
+  expect(received).toBe(expected);
+});
+
+test('endnotesAsFootnotes: custom properties with id override', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote with custom id`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: { id: 'custom-id', class: 'my-footnote' },
+  });
+  const expected = `
+<p>Reference<span id="custom-id" class="my-footnote">Footnote with custom id</span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -129,7 +143,7 @@ test('endnotesAsFootnotes: custom factory', () => {
 [^1]: Custom footnote`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: (hFn, children) =>
+    endnotesAsFootnotes: (hFn, _props, children) =>
       hFn('aside', { class: 'custom-fn' }, ...children),
   });
   const expected = `
@@ -150,7 +164,7 @@ Text with footnote[^1].
 
 [^1]: Footnote via frontmatter`;
   const received = stringify(md, { partial: true });
-  expect(received).toContain('<span class="footnote">');
+  expect(received).toContain('<span class="footnote" id="fn-1">');
   expect(received).not.toContain('class="footnotes"');
 });
 
@@ -166,7 +180,9 @@ Text with footnote[^1].
 
 [^1]: Footnote via frontmatter props`;
   const received = stringify(md, { partial: true });
-  expect(received).toContain('<span class="my-footnote" data-type="note">');
+  expect(received).toContain(
+    '<span id="fn-1" class="my-footnote" data-type="note">',
+  );
   expect(received).toContain('Footnote via frontmatter props');
   expect(received).not.toContain('class="footnotes"');
 });
