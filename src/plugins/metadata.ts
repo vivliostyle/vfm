@@ -1,4 +1,4 @@
-import { Element } from 'hast';
+import { Element, Properties } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
 import { Literal, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
@@ -41,7 +41,7 @@ export type VFMSettings = {
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
   /** Convert endnotes to inline footnotes for CSS GCPM. */
-  endnotesAsFootnotes?: boolean;
+  endnotesAsFootnotes?: boolean | Properties;
 };
 
 /** Metadata from Frontmatter. */
@@ -258,7 +258,9 @@ const readSettings = (data: any): VFMSettings => {
         ? data.assignIdToFigcaption
         : false,
     endnotesAsFootnotes:
-      typeof data.endnotesAsFootnotes === 'boolean'
+      typeof data.endnotesAsFootnotes === 'boolean' ||
+      (typeof data.endnotesAsFootnotes === 'object' &&
+        data.endnotesAsFootnotes !== null)
         ? data.endnotesAsFootnotes
         : undefined,
   };

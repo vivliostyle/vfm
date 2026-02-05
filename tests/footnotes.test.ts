@@ -1,5 +1,4 @@
 import { test, expect } from 'vitest';
-import { h } from 'hastscript';
 import { stringify } from '../src/index';
 
 test('Footnotes', () => {
@@ -149,6 +148,23 @@ Text with footnote[^1].
 [^1]: Footnote via frontmatter`;
   const received = stringify(md, { partial: true });
   expect(received).toContain('<span class="footnote">');
+  expect(received).not.toContain('class="footnotes"');
+});
+
+test('endnotesAsFootnotes: custom properties via frontmatter', () => {
+  const md = `---
+vfm:
+  endnotesAsFootnotes:
+    class: my-footnote
+    data-type: note
+---
+
+Text with footnote[^1].
+
+[^1]: Footnote via frontmatter props`;
+  const received = stringify(md, { partial: true });
+  expect(received).toContain('<span class="my-footnote" data-type="note">');
+  expect(received).toContain('Footnote via frontmatter props');
   expect(received).not.toContain('class="footnotes"');
 });
 

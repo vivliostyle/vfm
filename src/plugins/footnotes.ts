@@ -196,7 +196,7 @@ const convertEndnotesToFootnotes = (
     selectEndnoteCalls(tree).flatMap((call) => {
       const id = call.children[0].properties.href.slice(1);
       const elem = endnoteElements.get(id);
-      return !elem ? [] : [[call, factory(h, elem)]];
+      return !elem ? [] : [[call as Element, factory(h, elem)]];
     }),
   );
 
@@ -205,10 +205,7 @@ const convertEndnotesToFootnotes = (
     if (!parent) {
       return; // Root
     }
-    const replacement = endnoteCallReplacements.get(
-      // @ts-expect-error check membership
-      el,
-    );
+    const replacement = endnoteCallReplacements.get(el);
     if (!replacement) {
       return;
     }
