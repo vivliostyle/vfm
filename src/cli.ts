@@ -21,6 +21,7 @@ const cli = meow(
       --disable-math               Disable math syntax
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
       --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
+      --endnotes-as-footnotes      Convert endnotes to inline footnotes for CSS GCPM
 
     Examples
       $ vfm input.md
@@ -59,6 +60,9 @@ const cli = meow(
       assignIdToFigcaption: {
         type: 'boolean',
       },
+      endnotesAsFootnotes: {
+        type: 'boolean',
+      },
     },
   },
 );
@@ -79,6 +83,7 @@ function compile(input: string) {
         | 'figcaption-img'
         | undefined,
       assignIdToFigcaption: cli.flags.assignIdToFigcaption,
+      endnotesAsFootnotes: cli.flags.endnotesAsFootnotes,
     }),
   );
 }
@@ -94,6 +99,7 @@ function main(
     disableMath: { type: 'boolean' };
     imgFigcaptionOrder: { type: 'string' };
     assignIdToFigcaption: { type: 'boolean' };
+    endnotesAsFootnotes: { type: 'boolean' };
   }>,
 ) {
   try {

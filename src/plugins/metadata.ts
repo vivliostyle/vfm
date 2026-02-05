@@ -40,6 +40,8 @@ export type VFMSettings = {
   imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
+  /** Convert endnotes to inline footnotes for CSS GCPM. */
+  endnotesAsFootnotes?: boolean;
 };
 
 /** Metadata from Frontmatter. */
@@ -255,6 +257,10 @@ const readSettings = (data: any): VFMSettings => {
       typeof data.assignIdToFigcaption === 'boolean'
         ? data.assignIdToFigcaption
         : false,
+    endnotesAsFootnotes:
+      typeof data.endnotesAsFootnotes === 'boolean'
+        ? data.endnotesAsFootnotes
+        : undefined,
   };
 };
 

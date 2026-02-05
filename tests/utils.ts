@@ -25,6 +25,7 @@ export const buildProcessorTestingCode =
       math = false,
       imgFigcaptionOrder = undefined,
       assignIdToFigcaption = undefined,
+      endnotesAsFootnotes = undefined,
     }: StringifyMarkdownOptions = {},
   ) =>
   (): any => {
@@ -39,6 +40,7 @@ export const buildProcessorTestingCode =
       math,
       imgFigcaptionOrder,
       assignIdToFigcaption,
+      endnotesAsFootnotes,
     }).freeze();
     const R = / \(.+?\)$/gm; // Remove position information
     // Remove data field from MDAST comparison.
