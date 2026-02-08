@@ -11,44 +11,47 @@
  * note number, an "element" is the note content itself, and an "area" is the
  * region where notes are collected for display.
  *
- * VFM depends on two versions of mdast-util-to-hast;
- * endnote generation uses the one resolved via remark-rehype:
+ * VFM depends on two versions of mdast-util-to-hast:
  *  `- remark-rehype@8.1.0
- *  |   `- mdast-util-to-hast@10.2.0  <-- this one
- *  `- mdast-util-to-hast@11.3.0
+ *  |   `- mdast-util-to-hast@10.2.0  <-- endnote generation (internal)
+ *  `- mdast-util-to-hast@11.3.0      <-- Handler type & all() (direct import)
  */
 
-import { Element, ElementContent, Properties, Root as HastRoot } from 'hast';
+import type * as hast from 'hast';
 import { selectAll } from 'hast-util-select';
 import { h } from 'hastscript';
-import /* footnotes as */ endnotes from 'remark-footnotes';
+import {
+  type Handler as ToHastHandler,
+  all as convertToHast,
+} from 'mdast-util-to-hast';
+import footnotes from 'remark-footnotes';
+import type unified from 'unified';
 import { u } from 'unist-builder';
-import { EXIT, SKIP, visitParents } from 'unist-util-visit-parents';
 
-type ElementWithProps = Element & {
-  properties: NonNullable<Element['properties']>;
+type ElementWithProps = hast.Element & {
+  properties: NonNullable<hast.Element['properties']>;
 };
 
 /**
  * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L55-L66
  */
 const endnoteAreaSelector = 'div.footnotes';
-type EndnoteArea = Element & {
+type EndnoteArea = hast.Element & {
   tagName: 'div';
   properties: { className: ['footnotes'] };
 };
-const selectEndnoteAreas = (tree: HastRoot) =>
+const selectEndnoteAreas = (tree: hast.Root) =>
   selectAll(endnoteAreaSelector, tree) as EndnoteArea[];
-const endnoteElementSelector = `${endnoteAreaSelector} ol li[id^="fn-"]`;
 
 /**
  * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L43-L48
  */
-type EndnoteElement = Element & {
+const endnoteElementSelector = `${endnoteAreaSelector} ol li[id^="fn-"]`;
+type EndnoteElement = hast.Element & {
   tagName: 'li';
   properties: { id: `fn-${string}` };
 };
-const selectEndnoteElements = (tree: HastRoot) =>
+const selectEndnoteElements = (tree: hast.Root) =>
   selectAll(endnoteElementSelector, tree) as EndnoteElement[];
 
 /**
@@ -56,11 +59,11 @@ const selectEndnoteElements = (tree: HastRoot) =>
  */
 const endnoteCallSelector =
   'sup[id^="fnref-"]:has(a:only-child[href^="#fn-"].footnote-ref)';
-type EndnoteCall = Element & {
+type EndnoteCall = hast.Element & {
   tagName: 'sup';
   properties: { id: `fnref-${string}` };
   children: [
-    Element & {
+    hast.Element & {
       tagName: 'a';
       properties: {
         href: `#${string}`;
@@ -69,47 +72,25 @@ type EndnoteCall = Element & {
     },
   ];
 };
-const selectEndnoteCalls = (tree: HastRoot) =>
+const selectEndnoteCalls = (tree: hast.Root) =>
   selectAll(endnoteCallSelector, tree) as EndnoteCall[];
 
 /**
  * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L29-L34
  */
-const backReferenceSelector = 'a.footnote-backref';
-type BackReference = Element & {
+const endnoteBackReferenceSelector = 'a.footnote-backref';
+type EndnoteBackReference = hast.Element & {
   tagName: 'a';
   properties: { className: ['footnote-backref'] };
 };
-const isBackReference = (node: ElementContent): node is BackReference =>
-  node.type === 'element' &&
-  node.tagName === 'a' &&
-  Array.isArray((node as Element).properties?.className) &&
-  ((node as Element).properties!.className as string[]).includes(
-    'footnote-backref',
-  );
-const selectBackReferences = (parent: Element) =>
-  selectAll(backReferenceSelector, parent) as BackReference[];
-
-const removeElement = (tree: HastRoot, target: Element) => {
-  visitParents(tree, 'element', (node, ancestors) => {
-    const parent = ancestors.at(-1);
-    if (!parent) {
-      return; // Root
-    }
-    if (node !== target) {
-      return;
-    }
-    parent.children = parent.children.filter((c) => c !== node);
-    return EXIT;
-  });
-};
+const selectEndnoteBackReferences = (parent: hast.Element) =>
+  selectAll(endnoteBackReferenceSelector, parent) as EndnoteBackReference[];
 
 /**
  * Transform the endnote link with Pandoc format.
- * @param tree Tree of Hypertext AST.
  */
-const transformEndnoteCalls = (tree: HastRoot) => {
-  selectEndnoteCalls(tree).forEach((call, i) => {
+const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+  selectEndnoteCalls(tree as hast.Root).forEach((call, i) => {
     const sup: ElementWithProps = call;
     const [anchor]: [ElementWithProps] = call.children;
 
@@ -133,13 +114,14 @@ const transformEndnoteCalls = (tree: HastRoot) => {
 
 /**
  * Transform the endnote with Pandoc format.
- * @param tree Tree of Hypertext AST.
  */
-const transformEndnoteAreas = (tree: HastRoot) => {
-  // must be called before mutating area.tagName
-  const endnoteElements = selectEndnoteElements(tree);
+const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
+  const root = tree as hast.Root;
 
-  selectEndnoteAreas(tree).forEach((area: ElementWithProps) => {
+  // must be called before mutating area.tagName
+  const endnoteElements = selectEndnoteElements(root);
+
+  selectEndnoteAreas(root).forEach((area: ElementWithProps) => {
     area.tagName = 'section';
     area.properties.role = 'doc-endnotes';
   });
@@ -152,7 +134,7 @@ const transformEndnoteAreas = (tree: HastRoot) => {
 
     // Back reference is expected to be placed at the end of contents
     // @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L41
-    selectBackReferences(elem).forEach((backref: ElementWithProps) => {
+    selectEndnoteBackReferences(elem).forEach((backref: ElementWithProps) => {
       backref.properties.href = `#fnref${refIndex}`;
       backref.properties.className = ['footnote-back'];
       backref.properties.role = 'doc-backlink';
@@ -160,83 +142,196 @@ const transformEndnoteAreas = (tree: HastRoot) => {
   });
 };
 
+/**
+ * The returned Element is expected to be phrasing content per the HTML
+ * content model. If a flow content element (e.g. `<aside>`) is returned,
+ * it will be rewritten to `<span>` with a warning.
+ */
 export type FootnoteFactory = (
   h: typeof import('hastscript').h,
-  properties: Properties,
-  children: ElementContent[],
-) => Element;
+  properties: hast.Properties,
+  children: hast.ElementContent[],
+) => hast.Element;
 
 export type FootnoteOptions = {
-  endnotesAsFootnotes?: boolean | Properties | FootnoteFactory;
+  endnotesAsFootnotes?: boolean | hast.Properties | FootnoteFactory;
 };
 
 /**
- * Convert endnotes to inline footnotes for CSS GCPM `float: footnote`.
- *
- * @param tree HAST tree.
- * @param options Footnote options.
+ * Data attribute used to embed a warning message in the hast element itself.
+ * {@link reportFootnoteWarnings} picks it up, reports via `file.message()`,
+ * and removes it.
  */
-const convertEndnotesToFootnotes = (
-  tree: HastRoot,
-  options: FootnoteOptions,
-) => {
-  const opt = options.endnotesAsFootnotes;
-  const factory: FootnoteFactory =
+const warningAttr = 'data-vfm-warning';
+const warningProp = 'dataVfmWarning';
+const warningSelector = `[${warningAttr}]`;
+
+/**
+ * Pick up warnings embedded as {@link warningAttr} in hast elements,
+ * report them via `file.message()`, and remove the attribute.
+ */
+const reportFootnoteWarnings: unified.Plugin = () => (tree, file) => {
+  selectAll(warningSelector, tree as hast.Root).forEach((el) => {
+    const props = el.properties as Record<string, unknown> | undefined;
+    const msg = props?.[warningProp];
+    if (typeof msg === 'string') {
+      file.message(msg);
+      delete props![warningProp];
+    }
+  });
+};
+
+/**
+ * Elements whose start tag triggers implicit `<p>` end tag per the HTML
+ * parsing algorithm. A FootnoteFactory returning one of these will be
+ * rewritten to `<span>` with a warning.
+ * @see https://html.spec.whatwg.org/multipage/grouping-content.html#the-p-element
+ */
+const pClosingTagNames = new Set([
+  'address',
+  'article',
+  'aside',
+  'blockquote',
+  'details',
+  'dialog',
+  'div',
+  'dl',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'header',
+  'hgroup',
+  'hr',
+  'main',
+  'menu',
+  'nav',
+  'ol',
+  'p',
+  'pre',
+  'search',
+  'section',
+  'table',
+  'ul',
+]);
+
+type BuildFootnote = (
+  id: string,
+  children: hast.ElementContent[],
+) => hast.Element;
+
+const createBuildFootnote =
+  (factory: FootnoteFactory): BuildFootnote =>
+  (id, children) => {
+    const result = factory(h, { id }, children);
+    if (pClosingTagNames.has(result.tagName)) {
+      const msg =
+        `FootnoteFactory returned <${result.tagName}>, which triggers` +
+        ` <p> auto-closing. Rewriting to <span>.`;
+      result.tagName = 'span';
+      (result.properties as Record<string, unknown>)[warningProp] = msg;
+    }
+    return result;
+  };
+
+const createInlineFootnoteHandler =
+  (buildFootnote: BuildFootnote): ToHastHandler =>
+  (ctx, node) => {
+    let no = 1;
+    while (String(no) in ctx.footnoteById) {
+      no++;
+    }
+    const identifier = String(no);
+    ctx.footnoteById[identifier] = {
+      type: 'footnoteDefinition',
+      identifier,
+      children: [{ type: 'paragraph', children: node.children }],
+      position: node.position,
+    };
+    return buildFootnote(`fn-${identifier}`, convertToHast(ctx, node));
+  };
+
+const createFootnoteReferenceHandler =
+  (buildFootnote: BuildFootnote): ToHastHandler =>
+  (ctx, node) => {
+    const identifier = String(node.identifier);
+    const def = ctx.footnoteById[identifier.toUpperCase()];
+    return !def
+      ? null
+      : buildFootnote(
+          `fn-${identifier}`,
+          convertToHast(
+            ctx,
+            // Unwrap single-paragraph definitions to produce inline content
+            // (matches tight list-item behavior in footer.js).
+            def.children.length === 1 && def.children[0].type === 'paragraph'
+              ? def.children[0]
+              : def,
+          ),
+        );
+  };
+
+/**
+ * Create mdast-to-hast handlers and hast transformers for footnote processing.
+ *
+ * When `endnotesAsFootnotes` is disabled (default):
+ * - `toHastHandlers` is empty; the default mdast-util-to-hast handlers
+ *   generate endnote sections.
+ * - `hastTransformers` rewrites the endnote markup to Pandoc format.
+ *
+ * When `endnotesAsFootnotes` is enabled:
+ * - `toHastHandlers` provides custom `footnoteReference` and `footnote`
+ *   handlers that produce footnote elements at the call site, bypassing
+ *   endnote section generation.
+ * - If a {@link FootnoteFactory} returns a flow content element that would
+ *   trigger `<p>` auto-closing in rehype-raw, the element is rewritten to
+ *   `<span>` and a warning is reported via `VFile#messages`.
+ *
+ * @param options Footnote options.
+ * @returns `toHastHandlers` for remark-rehype and `hastTransformers` as
+ *   unified plugins to be spread into the pipeline.
+ */
+export const createFootnotePlugin = (
+  options?: FootnoteOptions,
+): {
+  toHastHandlers: Record<'footnoteReference' | 'footnote', ToHastHandler> | {};
+  hastTransformers: unified.PluggableList;
+} => {
+  const opt = options?.endnotesAsFootnotes;
+
+  if (!opt) {
+    return {
+      toHastHandlers: {},
+      hastTransformers: [endnoteCallsToPandoc, endnoteAreasToPandoc],
+    };
+  }
+
+  const buildFootnote = createBuildFootnote(
     typeof opt === 'function'
       ? opt
       : typeof opt === 'object'
-      ? (h, props, children) => h('span', { ...props, ...opt }, ...children)
-      : (h, props, children) =>
-          h('span', { class: 'footnote', ...props }, ...children);
-
-  const endnoteElements = new Map(
-    selectEndnoteElements(tree).map((elem) => [
-      elem.properties.id as string,
-      elem.children.filter((child) => !isBackReference(child)),
-    ]),
+      ? (hFn, props, children) => hFn('span', { ...props, ...opt }, ...children)
+      : (hFn, props, children) =>
+          hFn('span', { class: 'footnote', ...props }, ...children),
   );
 
-  const endnoteCallReplacements = new Map(
-    selectEndnoteCalls(tree).flatMap((call) => {
-      const id = call.children[0].properties.href.slice(1);
-      const elem = endnoteElements.get(id);
-      return !elem ? [] : [[call as Element, factory(h, { id }, elem)]];
-    }),
-  );
-
-  visitParents(tree, 'element', (el, ancestors) => {
-    const parent = ancestors.at(-1);
-    if (!parent) {
-      return; // Root
-    }
-    const replacement = endnoteCallReplacements.get(el);
-    if (!replacement) {
-      return;
-    }
-    parent.children = parent.children.map((c) => (c === el ? replacement : c));
-    return SKIP;
-  });
-
-  selectEndnoteAreas(tree).forEach((area) => removeElement(tree, area));
+  return {
+    toHastHandlers: {
+      footnoteReference: createFootnoteReferenceHandler(buildFootnote),
+      footnote: createInlineFootnoteHandler(buildFootnote),
+    },
+    hastTransformers: [reportFootnoteWarnings],
+  };
 };
 
 /**
  * Process Markdown AST.
  */
-export const mdast = [endnotes, { inlineNotes: true }];
-
-/**
- * Process footnote-related Hypertext AST.
- * When endnotesAsFootnotes is enabled, converts endnotes to inline GCPM footnotes.
- * Otherwise, resolves HTML diffs between `remark-footnotes` and Pandoc footnotes.
- */
-export const hast =
-  (options: FootnoteOptions = {}) =>
-  (tree: HastRoot) => {
-    if (options.endnotesAsFootnotes) {
-      convertEndnotesToFootnotes(tree, options);
-    } else {
-      transformEndnoteCalls(tree);
-      transformEndnoteAreas(tree);
-    }
-  };
+export const mdast = [footnotes, { inlineNotes: true }];

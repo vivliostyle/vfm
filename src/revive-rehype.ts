@@ -3,7 +3,7 @@ import remark2rehype from 'remark-rehype';
 import unified from 'unified';
 import { handler as code } from './plugins/code.js';
 import { hast as figure, FigureOptions } from './plugins/figure.js';
-import { hast as footnotes, FootnoteOptions } from './plugins/footnotes.js';
+import { createFootnotePlugin, FootnoteOptions } from './plugins/footnotes.js';
 import {
   handlerDisplayMath as displayMath,
   handlerInlineMath as inlineMath,
@@ -18,8 +18,12 @@ export type ReviveRehypeOptions = FigureOptions & FootnoteOptions;
  * @param options Options for rehype transformers.
  * @returns Handlers and transformers.
  */
-export const reviveRehype = (options?: ReviveRehypeOptions) =>
-  [
+export const reviveRehype = (options?: ReviveRehypeOptions) => {
+  const {
+    toHastHandlers: footnoteHandlers,
+    hastTransformers: footnoteTransformers,
+  } = createFootnotePlugin(options);
+  return [
     [
       remark2rehype,
       {
@@ -29,11 +33,13 @@ export const reviveRehype = (options?: ReviveRehypeOptions) =>
           inlineMath,
           ruby,
           code,
+          ...footnoteHandlers,
         },
       },
     ],
     raw,
     [figure, options],
-    [footnotes, { endnotesAsFootnotes: options?.endnotesAsFootnotes }],
+    ...footnoteTransformers,
     inspect('hast'),
   ] as unified.PluggableList<unified.Settings>;
+};

@@ -137,7 +137,7 @@ test('endnotesAsFootnotes: custom properties with id override', () => {
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: custom factory', () => {
+test('endnotesAsFootnotes: custom factory returning flow content is rewritten to span', () => {
   const md = `Reference[^1].
 
 [^1]: Custom footnote`;
@@ -147,9 +147,7 @@ test('endnotesAsFootnotes: custom factory', () => {
       hFn('aside', { class: 'custom-fn' }, ...children),
   });
   const expected = `
-<p>Reference
-  <aside class="custom-fn">Custom footnote</aside>.
-</p>
+<p>Reference<span class="custom-fn">Custom footnote</span>.</p>
 `;
   expect(received).toBe(expected);
 });
