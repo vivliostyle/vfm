@@ -6,11 +6,7 @@ import { buildProcessorTestingCode } from './utils';
 test(
   'default: GFM (EOL two-spaces)',
   buildProcessorTestingCode(
-    stripIndent`
-    a
-    b  
-    c
-    `,
+    `a\nb  \nc`,
     stripIndent`
     root[1]
     └─0 paragraph[3]
@@ -18,36 +14,22 @@ test(
         ├─1 break
         └─2 text "c"
     `,
-    stripIndent`
-    <p>a
-    b<br>
-    c</p>
-    `,
+    `<p>a\nb<br>\nc</p>`,
   ),
 );
 
 test(
   'optional: hard line breaks with GFM (EOL tow-spaces)',
   buildProcessorTestingCode(
-    stripIndent`
-    a
-    b  
-    c
-    `,
+    `a\nb  \nc`,
     stripIndent`
     root[1]
-    └─0 paragraph[5]
-        ├─0 text "a"
+    └─0 paragraph[3]
+        ├─0 text "a\\nb"
         ├─1 break
-        ├─2 text "b"
-        ├─3 break
-        └─4 text "c"
+        └─2 text "c"
     `,
-    stripIndent`
-    <p>a<br>
-    b<br>
-    c</p>
-    `,
+    `<p>a<br>\nb<br>\nc</p>`,
     { hardLineBreaks: true },
   ),
 );

@@ -28,9 +28,9 @@ test(
         └─0 image
               title: null
               url: "./img.png"
-              alt: null
+              alt: ""
     `,
-    `<p><img src="./img.png"></p>`,
+    `<p><img src="./img.png" alt=""></p>`,
   ),
 );
 
@@ -69,12 +69,12 @@ test(
     `![caption](./img.png "title"){id="image" data-sample="sample"}`,
     stripIndent`
     root[1]
-    └─0 paragraph[1]
-        └─0 image
-              title: "title"
-              url: "./img.png"
-              alt: "caption"
-              data: {"hProperties":{"id":"image","data-sample":"sample"}}
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: "title"
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 text "{id=\\"image\\" data-sample=\\"sample\\"}"
     `,
     `<figure><img src="./img.png" alt="caption" title="title" id="image" data-sample="sample"><figcaption aria-hidden="true">caption</figcaption></figure>`,
   ),
@@ -114,11 +114,12 @@ test(
     `![caption](./img.png){#id}`,
     stripIndent`
     root[1]
-    └─0 paragraph[1]
-        └─0 image
-              title: null
-              url: "./img.png"
-              alt: "caption"
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 text "{#id}"
     `,
     `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true" id="id">caption</figcaption></figure>`,
     { assignIdToFigcaption: true },
@@ -131,11 +132,12 @@ test(
     `![caption](./img.png){#id}`,
     stripIndent`
     root[1]
-    └─0 paragraph[1]
-        └─0 image
-              title: null
-              url: "./img.png"
-              alt: "caption"
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 text "{#id}"
     `,
     `<figure><figcaption aria-hidden="true" id="id">caption</figcaption><img src="./img.png" alt="caption"></figure>`,
     { assignIdToFigcaption: true, imgFigcaptionOrder: 'figcaption-img' },
@@ -148,11 +150,12 @@ test(
     `![caption](./img.png){#id}`,
     stripIndent`
     root[1]
-    └─0 paragraph[1]
-        └─0 image
-              title: null
-              url: "./img.png"
-              alt: "caption"
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 text "{#id}"
     `,
     `<figure><img src="./img.png" alt="caption" id="id"><figcaption aria-hidden="true">caption</figcaption></figure>`,
     { assignIdToFigcaption: false },

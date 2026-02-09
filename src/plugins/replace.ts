@@ -1,6 +1,6 @@
-import findAndReplace from 'hast-util-find-and-replace';
+import { findAndReplace } from 'hast-util-find-and-replace';
 import { h } from 'hastscript';
-import { Node } from 'unist';
+import type { Node } from 'unist';
 
 export interface ReplaceRule {
   test: RegExp;
@@ -16,5 +16,5 @@ export function replace({ rules }: { rules?: ReplaceRule[] } = {}) {
         (...result: RegExpMatchArray) => rule.match(result, h),
       ] as const,
   );
-  return (tree: Node) => findAndReplace(tree, search);
+  return (tree: Node) => findAndReplace(tree as any, search as any);
 }

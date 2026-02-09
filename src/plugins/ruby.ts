@@ -1,52 +1,47 @@
-import { Handler, all } from 'mdast-util-to-hast';
-import { Plugin } from 'unified';
+import type { Root as MdastRoot } from 'mdast';
+import { findAndReplace } from 'mdast-util-find-and-replace';
+import type { Handler, State } from 'mdast-util-to-hast';
+import type { Plugin } from 'unified';
 import { u } from 'unist-builder';
 
-// remark
-function locateRuby(value: string, fromIndex: number) {
-  return value.indexOf('{', fromIndex);
-}
-
-const tokenizer: Tokenizer = function (eat, value, silent) {
-  const now = eat.now();
-  const match = /^{(.+?)(?<=[^\\|])\|(.+?)}/.exec(value);
-  if (!match) return;
-
-  const [eaten, inlineContent, rubyText] = match;
-
-  if (silent) return true;
-
-  now.column += 1;
-  now.offset += 1;
-
-  return eat(eaten)({
-    type: 'ruby',
-    children: this.tokenizeInline(inlineContent, now),
-    data: { hName: 'ruby', rubyText },
-  });
+/**
+ * Process Markdown AST: detect ruby syntax {content|rubyText} and create ruby nodes.
+ * Supports escaped pipe `\|` in content (e.g., `{a\|b|c}` → ruby body "a|b", rt "c").
+ */
+export const mdast: Plugin = () => {
+  return (tree) => {
+    findAndReplace(tree as MdastRoot, [
+      /\{((?:[^{}|\\]|\\[|\\])*)\|((?:[^{}])*)\}/g,
+      (_: string, rawContent: string, rubyText: string) => {
+        // Unescape \| → |
+        const inlineContent = rawContent.replace(/\\\|/g, '|');
+        return {
+          type: 'ruby' as any,
+          data: { hName: 'ruby', rubyText },
+          children: [{ type: 'text', value: inlineContent }],
+        };
+      },
+    ]);
+  };
 };
 
-tokenizer.notInLink = true;
-tokenizer.locator = locateRuby;
-
-export const mdast: Plugin = function () {
-  if (!this.Parser) return;
-
-  const { inlineTokenizers, inlineMethods } = this.Parser.prototype;
-  inlineTokenizers.ruby = tokenizer;
-  inlineMethods.splice(inlineMethods.indexOf('text'), 0, 'ruby');
-};
-
-// rehype
-export const handler: Handler = (h, node) => {
+// rehype handler
+export const handler: Handler = (state, node) => {
   if (!node.data) node.data = {};
-  const rtNode = h(
-    {
-      type: 'element',
-    },
-    'rt',
-    [u('text', node.data.rubyText as string)],
-  );
+  const rtNode: import('hast').Element = {
+    type: 'element',
+    tagName: 'rt',
+    properties: {},
+    children: [u('text', node.data.rubyText as string)],
+  };
 
-  return h(node, 'ruby', [...all(h, node), rtNode]);
+  const children = state.all(node);
+  const result: import('hast').Element = {
+    type: 'element',
+    tagName: 'ruby',
+    properties: {},
+    children: [...children, rtNode],
+  };
+  state.patch(node, result);
+  return result;
 };

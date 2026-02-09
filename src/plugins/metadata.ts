@@ -1,18 +1,19 @@
-import { Element, Properties } from 'hast';
+import type { Element, Properties } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
-import { Literal, Root } from 'mdast';
+import type { Literal, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
-import stringify from 'rehype-stringify';
-import frontmatter from 'remark-frontmatter';
-import markdown from 'remark-parse';
-import remark2rehype from 'remark-rehype';
-import unified from 'unified';
-import { Node } from 'unist';
+import rehypeStringify from 'rehype-stringify';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import { unified } from 'unified';
+import type { PluggableList } from 'unified';
+import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import { VFile } from 'vfile';
 import { mdast as attr } from './attr.js';
-import { mdast as footnotes } from './footnotes.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -109,11 +110,12 @@ const readTitleFromHeading = (tree: Node): string | undefined => {
   // Create title string with footnotes removed
   const children = [...heading.children];
   heading.children = heading.children.filter(
-    (child: Node) => child.type !== 'footnote',
+    (child: Node) => child.type !== 'footnoteReference',
   );
-  // Remove ruby text and HTML tags
-  const text = toString(heading)
+  // Remove ruby text, inline footnotes, and HTML tags
+  const text = toString(heading as any)
     .replace(/{(.+?)(?<=[^\\|])\|(.+?)}/g, '$1')
+    .replace(/\^\[([^\]]*)\]/g, '')
     .replace(/<[^<>]*>/g, '');
   heading.children = children;
 
@@ -144,7 +146,7 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
     }
   }
 
-  visit(tree as Root, 'shortcode', (node: Literal) => {
+  visit(tree as Root, 'shortcode' as any, (node: any) => {
     if (node.identifier !== 'toc') {
       return;
     }
@@ -164,17 +166,13 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
  */
 const parseMarkdown = (md: string): KeyValue => {
   const processor = unified()
-    .use([
-      [markdown, { gfm: true, commonmark: true }],
-      // Remove footnotes when reading title from heading
-      footnotes,
-      attr,
-      frontmatter,
-      mdast,
-    ] as unified.PluggableList<unified.Settings>)
-    .data('settings', { position: false })
-    .use(remark2rehype)
-    .use(stringify);
+    .use(remarkParse)
+    .use(remarkGfm)
+    .use(attr)
+    .use(remarkFrontmatter)
+    .use(mdast)
+    .use(remarkRehype)
+    .use(rehypeStringify);
 
   return processor.processSync(md).data as KeyValue;
 };

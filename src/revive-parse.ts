@@ -1,7 +1,8 @@
-import breaks from 'remark-breaks';
-import frontmatter from 'remark-frontmatter';
-import markdown from 'remark-parse';
-import unified from 'unified';
+import remarkBreaks from 'remark-breaks';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
+import remarkParse from 'remark-parse';
+import type { PluggableList } from 'unified';
 import { mdast as attr } from './plugins/attr.js';
 import { mdast as code } from './plugins/code.js';
 import { mdast as footnotes } from './plugins/footnotes.js';
@@ -14,16 +15,17 @@ import { inspect } from './utils.js';
 
 /**
  * Create Markdown AST parsers.
- * @param hardLineBreaks Add `<br>` at the position of hard line breaks, without needing spaces..
+ * @param hardLineBreaks Add `<br>` at the position of hard line breaks, without needing spaces.
  * @param enableMath Enable math syntax.
  * @returns Parsers.
  */
 export const reviveParse = (
   hardLineBreaks: boolean,
   enableMath: boolean,
-): unified.PluggableList<unified.Settings> => [
-  [markdown, { gfm: true, commonmark: true }],
-  ...(hardLineBreaks ? [breaks] : []),
+): PluggableList => [
+  remarkParse,
+  remarkGfm,
+  ...(hardLineBreaks ? [remarkBreaks] : []),
   ...(enableMath ? [math] : []),
   ruby,
   footnotes,
@@ -32,6 +34,6 @@ export const reviveParse = (
   section,
   code,
   toc,
-  frontmatter,
+  remarkFrontmatter,
   inspect('mdast'),
 ];

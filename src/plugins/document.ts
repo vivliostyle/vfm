@@ -1,9 +1,9 @@
 import { doctype } from 'doctype';
-import { h, Child } from 'hastscript';
-import { Node } from 'unist';
+import { h, type Child } from 'hastscript';
+import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { VFile } from 'vfile';
-import { Attribute, Metadata } from './metadata.js';
+import type { Attribute, Metadata } from './metadata.js';
 
 /**
  * Create AST properties from attributes.
@@ -95,8 +95,8 @@ const createHead = (data: Metadata, vfile: VFile): Child[] => {
 const createBody = (metadata: Metadata, tree: Node) => {
   // <body>...</body>
   const contents =
-    tree.type === 'root' && Array.isArray(tree.children)
-      ? tree.children.concat()
+    tree.type === 'root' && Array.isArray((tree as any).children)
+      ? (tree as any).children.concat()
       : [tree];
   if (0 < contents.length) {
     contents.unshift(u('text', '\n'));
@@ -149,7 +149,12 @@ const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
 
   return h('html', props, [
     u('text', '\n'),
-    h('head', ...createHead(metadata, vfile)),
+    {
+      type: 'element' as const,
+      tagName: 'head',
+      properties: {},
+      children: createHead(metadata, vfile) as import('hast').ElementContent[],
+    },
     u('text', '\n'),
     createBody(metadata, tree),
     u('text', '\n'),

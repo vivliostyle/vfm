@@ -1,12 +1,12 @@
 import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
-import unified, { Processor } from 'unified';
+import { unified, type Processor } from 'unified';
 import { mdast as doc } from './plugins/document.js';
 import { hast as hastMath } from './plugins/math.js';
-import { FootnoteFactory } from './plugins/footnotes.js';
-import { Properties } from 'hast';
-import { Metadata, readMetadata } from './plugins/metadata.js';
-import { replace as handleReplace, ReplaceRule } from './plugins/replace.js';
+import type { FootnoteFactory } from './plugins/footnotes.js';
+import type { Properties } from 'hast';
+import { type Metadata, readMetadata } from './plugins/metadata.js';
+import { replace as handleReplace, type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
 import { debug } from './utils.js';
@@ -136,7 +136,6 @@ export function VFM(
 
   const processor = unified()
     .use(markdown(hardLineBreaks, math))
-    .data('settings', { position: true })
     .use(
       html({ imgFigcaptionOrder, assignIdToFigcaption, endnotesAsFootnotes }),
     );

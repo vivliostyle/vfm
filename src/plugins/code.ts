@@ -1,9 +1,9 @@
-import { ElementContent as HastElementContent } from 'hast';
-import { Code, Root } from 'mdast';
-import { Handler } from 'mdast-util-to-hast';
+import type { ElementContent as HastElementContent } from 'hast';
+import type { Code, Root } from 'mdast';
+import type { Handler, State } from 'mdast-util-to-hast';
 import parseAttr from 'md-attr-parser';
-import refractor from 'refractor';
-import { Node } from 'unist';
+import { refractor } from 'refractor';
+import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 
@@ -13,19 +13,12 @@ interface HProperties {
   title?: string;
   [key: string]: unknown;
 }
-declare module 'mdast' {
-  interface Code {
-    data?: {
-      hProperties?: HProperties;
-      hChildren?: HastElementContent[] | ReturnType<typeof refractor.highlight>;
-    };
-  }
-}
+
 function getHProperties(node: Code): HProperties {
-  return (node.data?.hProperties as HProperties) ?? {};
+  return ((node.data as any)?.hProperties as HProperties) ?? {};
 }
 function setHProperties(node: Code, props: HProperties): void {
-  node.data = { ...(node.data ?? {}), hProperties: props };
+  (node as any).data = { ...((node as any).data ?? {}), hProperties: props };
 }
 
 /**
@@ -141,34 +134,27 @@ function processMeta(node: Code): void {
 export function mdast() {
   return (tree: Node) => {
     visit(tree as Root, 'code', (node) => {
-      /**
-       * Workaround for remark-attr's "bad hack".
-       * When meta is null, remark-attr parses code content as attributes.
-       * @see https://github.com/arobase-che/remark-attr/blob/325f0ef730eafa601c9b631ea175b26c18c85a4a/src/index.js#L260-L263
-       */
-      if (!node.meta && node.data?.hProperties) {
-        delete node.data.hProperties;
-      }
-
       extractLangTitle(node);
       processMeta(node);
 
       // syntax highlight
       if (node.lang && refractor.registered(node.lang)) {
-        if (!node.data) node.data = {};
-        node.data.hChildren = refractor.highlight(node.value, node.lang);
+        if (!(node as any).data) (node as any).data = {};
+        const highlighted = refractor.highlight(node.value, node.lang);
+        // refractor v4 returns a Root node; extract its children
+        (node as any).data.hChildren = highlighted.children;
       }
     });
   };
 }
 
-export function handler(h: any, node: any): Handler {
+export const handler: Handler = (state, node) => {
   const value = node.value || '';
   const lang = node.lang ? node.lang.match(/^[^ \t]+(?=[ \t]|$)/) : 'text';
   const langClass = 'language-' + lang;
 
   // Merge language-* class with hProperties.class if present
-  const hProps = node.data?.hProperties ?? {};
+  const hProps = (node as any).data?.hProperties ?? {};
   const hClass = hProps.class;
   const className = hClass
     ? [langClass, ...(Array.isArray(hClass) ? hClass : [hClass])]
@@ -177,9 +163,22 @@ export function handler(h: any, node: any): Handler {
   const preProps = { className: [langClass] };
   const codeProps = { ...hProps, className };
   // Use hChildren for syntax highlighting if available, otherwise plain text
-  const children = node.data?.hChildren ?? [u('text', value)];
+  const children: HastElementContent[] = (node as any).data?.hChildren ?? [u('text', value)];
 
-  return h(node.position, 'pre', preProps, [
-    h(node.position, 'code', codeProps, children),
-  ]);
-}
+  const codeEl: import('hast').Element = {
+    type: 'element',
+    tagName: 'code',
+    properties: codeProps,
+    children,
+  };
+
+  const preEl: import('hast').Element = {
+    type: 'element',
+    tagName: 'pre',
+    properties: preProps,
+    children: [codeEl],
+  };
+
+  state.patch(node, preEl);
+  return preEl;
+};
