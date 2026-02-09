@@ -125,6 +125,7 @@ other-meta2: 'other2'
       toc: false,
       theme: 'theme.css',
       assignIdToFigcaption: false,
+      endnotesAsFootnotes: undefined,
     },
   };
 
