@@ -6,7 +6,7 @@
  * @see https://github.com/jake-low/remark-sectionize
  */
 
-import { Parent, Root } from 'mdast';
+import type { Parent, Root, RootContent } from 'mdast';
 import { VFile } from 'vfile';
 import { findAfter } from 'unist-util-find-after';
 import { visitParents as visit } from 'unist-util-visit-parents';
@@ -94,17 +94,17 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
     // it's HTML end tag, check if it has corresponding start tag
     const isHtmlStart = (node: any) =>
       node.type === 'html' && new RegExp(`<${tag}\\b[^>]*>`).test(node.value);
-    const htmlStart = findAfter(parent, start, isHtmlStart);
+    const htmlStart = findAfter(parent, start, isHtmlStart as any);
     if (
       !htmlStart ||
-      parent.children.indexOf(htmlStart) > parent.children.indexOf(node)
+      parent.children.indexOf(htmlStart as RootContent) > parent.children.indexOf(node)
     ) {
       // corresponding start tag is not found in this section level,
       // check if it is found earlier.
-      const htmlStart1 = findAfter(parent, 0, isHtmlStart);
+      const htmlStart1 = findAfter(parent, 0, isHtmlStart as any);
       if (
         htmlStart1 &&
-        parent.children.indexOf(htmlStart1) < parent.children.indexOf(start)
+        parent.children.indexOf(htmlStart1 as RootContent) < parent.children.indexOf(start)
       ) {
         return true;
       }
@@ -116,10 +116,10 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
     (node.type === 'heading' && node.depth <= depth) ||
     node.type === 'export' ||
     isHtmlEnd(node);
-  const end = findAfter(parent, start, isEnd);
+  const end = findAfter(parent, start, isEnd as any) as RootContent | undefined;
 
   const startIndex = parent.children.indexOf(start);
-  const endIndex = parent.children.indexOf(end);
+  const endIndex = end ? parent.children.indexOf(end) : -1;
 
   const between = parent.children.slice(
     startIndex,
@@ -158,7 +158,7 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
   parent.children.splice(
     startIndex,
     section.children.length +
-      (isSectionEndMark(end, file) && end.depth === depth ? 1 : 0),
+      (end && isSectionEndMark(end, file) && (end as any).depth === depth ? 1 : 0),
     section,
   );
 };
@@ -167,17 +167,17 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
  * Process Markdown AST.
  * @returns Transformer.
  */
-export const mdast = () => (tree: Node, file: VFile) => {
-  const sectionize = (node: Node, ancestors: Parent[]) => {
+export const mdast = () => (tree: any, file: VFile) => {
+  const sectionize = (node: any, ancestors: Parent[]) => {
     sectionizeIfRequired(node, ancestors, file);
   };
   for (let depth = MAX_HEADING_DEPTH; depth > 0; depth--) {
     visit(
-      tree,
-      (node) => {
+      tree as Root,
+      (node: any) => {
         return node.type === 'heading' && node.depth === depth;
       },
-      sectionize,
+      sectionize as any,
     );
   }
 };

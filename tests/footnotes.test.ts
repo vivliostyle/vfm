@@ -84,7 +84,7 @@ test('endnotesAsFootnotes: inline footnote', () => {
     endnotesAsFootnotes: true,
   });
   const expected = `
-<p>Footnotes can also be written inline<span class="footnote" id="fn-1">This part is a footnote.</span>.</p>
+<p>Footnotes can also be written inline<span class="footnote" id="fn-_inline_1">This part is a footnote.</span>.</p>
 `;
   expect(received).toBe(expected);
 });

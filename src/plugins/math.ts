@@ -1,10 +1,10 @@
-import { Root as HastRoot } from 'hast';
+import type { Root as HastRoot } from 'hast';
 import { select } from 'hast-util-select';
-import { Root as MdastRoot } from 'mdast';
+import type { Root as MdastRoot } from 'mdast';
 import { findAndReplace } from 'mdast-util-find-and-replace';
-import { Handler } from 'mdast-util-to-hast';
-import { Plugin, Transformer } from 'unified';
-import { Node } from 'unist';
+import type { Handler, State } from 'mdast-util-to-hast';
+import type { Plugin, Transformer } from 'unified';
+import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 
@@ -29,108 +29,15 @@ const MATH_URL =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML';
 
 /**
- * Create tokenizers for remark-parse.
- * @returns Tokenizers.
- */
-const createTokenizers = () => {
-  const tokenizerInlineMath: Tokenizer = function (eat, value, silent) {
-    if (
-      !value.startsWith('$') ||
-      value.startsWith('$ ') ||
-      value.startsWith('$$')
-    ) {
-      return;
-    }
-
-    const match = new RegExp(REGEXP_INLINE).exec(value);
-    if (!match) {
-      return;
-    }
-
-    if (silent) {
-      return true;
-    }
-
-    const [eaten, valueText] = match;
-    const now = eat.now();
-    now.column += 1;
-    now.offset += 1;
-
-    return eat(eaten)({
-      type: TYPE_INLINE,
-      children: [],
-      data: { hName: TYPE_INLINE, value: valueText },
-    });
-  };
-
-  tokenizerInlineMath.notInLink = true;
-  tokenizerInlineMath.locator = function (value: string, fromIndex: number) {
-    return value.indexOf('$', fromIndex);
-  };
-
-  const tokenizerDisplayMath: Tokenizer = function (eat, value, silent) {
-    if (!value.startsWith('$$') || value.startsWith('$$$')) {
-      return;
-    }
-
-    const match = new RegExp(REGEXP_DISPLAY).exec(value);
-    if (!match) {
-      return;
-    }
-
-    if (silent) {
-      return true;
-    }
-
-    const [eaten, valueText] = match;
-    const now = eat.now();
-    now.column += 1;
-    now.offset += 1;
-
-    return eat(eaten)({
-      type: TYPE_DISPLAY,
-      children: [],
-      data: { hName: TYPE_DISPLAY, value: valueText },
-    });
-  };
-
-  tokenizerDisplayMath.notInLink = true;
-  tokenizerDisplayMath.locator = function (value: string, fromIndex: number) {
-    return value.indexOf('$$', fromIndex);
-  };
-
-  return { tokenizerInlineMath, tokenizerDisplayMath };
-};
-
-/**
  * Process Markdown AST.
- * @returns Transformer or undefined (less than remark 13).
+ * @returns Transformer.
  */
-export const mdast: Plugin = function (): Transformer | undefined {
-  // For less than remark 13 with exclusive other markdown syntax
-  if (
-    this.Parser &&
-    this.Parser.prototype.inlineTokenizers &&
-    this.Parser.prototype.inlineMethods
-  ) {
-    const { inlineTokenizers, inlineMethods } = this.Parser.prototype;
-    const tokenizers = createTokenizers();
-    inlineTokenizers[TYPE_INLINE] = tokenizers.tokenizerInlineMath;
-    inlineTokenizers[TYPE_DISPLAY] = tokenizers.tokenizerDisplayMath;
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_INLINE);
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_DISPLAY);
-    return;
-  }
-
+export const mdast: Plugin = (): Transformer => {
   return (tree: Node) => {
-    findAndReplace(
-      tree as MdastRoot,
+    findAndReplace(tree as MdastRoot, [
       REGEXP_INLINE,
       (_: string, valueText: string) => {
         return {
-          // NOTE: Although `type: "inlineMath"` is not a permitted type literal value within mdast,
-          // it causes no issues because it is handled by the handlerInlineMath function via remark-rehype.
-          // See also ../revive-rehype.ts.
           type: TYPE_INLINE as any,
           data: {
             hName: TYPE_INLINE,
@@ -139,14 +46,12 @@ export const mdast: Plugin = function (): Transformer | undefined {
           children: [],
         };
       },
-    );
+    ]);
 
-    findAndReplace(
-      tree as MdastRoot,
+    findAndReplace(tree as MdastRoot, [
       REGEXP_DISPLAY,
       (_: string, valueText: string) => {
         return {
-          // NOTE: See the comment for inlineMath.
           type: TYPE_DISPLAY as any,
           data: {
             hName: TYPE_DISPLAY,
@@ -155,56 +60,50 @@ export const mdast: Plugin = function (): Transformer | undefined {
           children: [],
         };
       },
-    );
+    ]);
   };
 };
 
 /**
  * Handle inline math to Hypertext AST.
- * @param h Hypertext AST formatter.
- * @param node Node.
- * @returns Hypertext AST.
  */
-export const handlerInlineMath: Handler = (h, node: Node) => {
+export const handlerInlineMath: Handler = (state, node) => {
   if (!node.data) {
     node.data = {};
   }
 
-  return h(
-    {
-      type: 'element',
-    },
-    'span',
-    {
+  const result: import('hast').Element = {
+    type: 'element',
+    tagName: 'span',
+    properties: {
       class: 'math inline',
       'data-math-typeset': 'true',
     },
-    [u('text', `\\(${node.data.value as string}\\)`)],
-  );
+    children: [u('text', `\\(${node.data.value as string}\\)`)],
+  };
+  state.patch(node, result);
+  return result;
 };
 
 /**
  * Handle display math to Hypertext AST.
- * @param h Hypertext AST formatter.
- * @param node Node.
- * @returns Hypertext AST.
  */
-export const handlerDisplayMath: Handler = (h, node: Node) => {
+export const handlerDisplayMath: Handler = (state, node) => {
   if (!node.data) {
     node.data = {};
   }
 
-  return h(
-    {
-      type: 'element',
-    },
-    'span',
-    {
+  const result: import('hast').Element = {
+    type: 'element',
+    tagName: 'span',
+    properties: {
       class: 'math display',
       'data-math-typeset': 'true',
     },
-    [u('text', `$$${node.data.value as string}$$`)],
-  );
+    children: [u('text', `$$${node.data.value as string}$$`)],
+  };
+  state.patch(node, result);
+  return result;
 };
 
 /**

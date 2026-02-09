@@ -11,41 +11,38 @@
  * note number, an "element" is the note content itself, and an "area" is the
  * region where notes are collected for display.
  *
- * VFM depends on two versions of mdast-util-to-hast:
- *  `- remark-rehype@8.1.0
- *  |   `- mdast-util-to-hast@10.2.0  <-- endnote generation (internal)
- *  `- mdast-util-to-hast@11.3.0      <-- Handler type & all() (direct import)
+ * In remark 13+ / mdast-util-to-hast 13+, footnotes are handled via remark-gfm.
+ * The endnote HTML format has changed:
+ *   - area: <section data-footnotes class="footnotes">
+ *   - elements: <li id="user-content-fn-IDENTIFIER">
+ *   - calls: <sup><a href="#user-content-fn-..." id="user-content-fnref-..." ...>
+ *   - back references: <a href="#user-content-fnref-..." class="data-footnote-backref" ...>
  */
 
 import type * as hast from 'hast';
 import { selectAll } from 'hast-util-select';
 import { h } from 'hastscript';
-import {
-  type Handler as ToHastHandler,
-  all as convertToHast,
-} from 'mdast-util-to-hast';
-import footnotes from 'remark-footnotes';
-import type unified from 'unified';
+import type { Handler as ToHastHandler, State } from 'mdast-util-to-hast';
+import type { Plugin, PluggableList } from 'unified';
 import { u } from 'unist-builder';
+import { visit as visitTree } from 'unist-util-visit';
 
 type ElementWithProps = hast.Element & {
   properties: NonNullable<hast.Element['properties']>;
 };
 
 /**
- * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L55-L66
+ * Selectors for remark-gfm / mdast-util-to-hast v13 footnote output.
+ * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/main/lib/footer.js
  */
-const endnoteAreaSelector = 'div.footnotes';
+const endnoteAreaSelector = 'section[data-footnotes].footnotes';
 type EndnoteArea = hast.Element & {
-  tagName: 'div';
-  properties: { className: ['footnotes'] };
+  tagName: 'section';
+  properties: { className: ['footnotes']; dataFootnotes: true };
 };
 const selectEndnoteAreas = (tree: hast.Root) =>
   selectAll(endnoteAreaSelector, tree) as EndnoteArea[];
 
-/**
- * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L43-L48
- */
 const endnoteElementSelector = `${endnoteAreaSelector} ol li[id^="fn-"]`;
 type EndnoteElement = hast.Element & {
   tagName: 'li';
@@ -54,34 +51,18 @@ type EndnoteElement = hast.Element & {
 const selectEndnoteElements = (tree: hast.Root) =>
   selectAll(endnoteElementSelector, tree) as EndnoteElement[];
 
-/**
- * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/handlers/footnote-reference.js#L15-L19
- */
 const endnoteCallSelector =
-  'sup[id^="fnref-"]:has(a:only-child[href^="#fn-"].footnote-ref)';
+  'sup:has(a[href^="#fn-"][data-footnote-ref])';
 type EndnoteCall = hast.Element & {
   tagName: 'sup';
-  properties: { id: `fnref-${string}` };
-  children: [
-    hast.Element & {
-      tagName: 'a';
-      properties: {
-        href: `#${string}`;
-        className: ['footnote-ref'];
-      };
-    },
-  ];
 };
 const selectEndnoteCalls = (tree: hast.Root) =>
   selectAll(endnoteCallSelector, tree) as EndnoteCall[];
 
-/**
- * @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L29-L34
- */
-const endnoteBackReferenceSelector = 'a.footnote-backref';
+const endnoteBackReferenceSelector = 'a.data-footnote-backref';
 type EndnoteBackReference = hast.Element & {
   tagName: 'a';
-  properties: { className: ['footnote-backref'] };
+  properties: { className: ['data-footnote-backref'] };
 };
 const selectEndnoteBackReferences = (parent: hast.Element) =>
   selectAll(endnoteBackReferenceSelector, parent) as EndnoteBackReference[];
@@ -89,10 +70,15 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
 /**
  * Transform the endnote link with Pandoc format.
  */
-const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+const endnoteCallsToPandoc: Plugin = () => (tree) => {
   selectEndnoteCalls(tree as hast.Root).forEach((call, i) => {
-    const sup: ElementWithProps = call;
-    const [anchor]: [ElementWithProps] = call.children;
+    const sup: ElementWithProps = call as ElementWithProps;
+    // Find the anchor child
+    const anchor = sup.children.find(
+      (c): c is hast.Element & { tagName: 'a' } =>
+        c.type === 'element' && c.tagName === 'a',
+    );
+    if (!anchor) return;
 
     const refIndex = i + 1;
 
@@ -106,24 +92,46 @@ const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
     };
 
     // Mutate anchor into <sup>N</sup>
-    anchor.tagName = 'sup';
-    anchor.properties = {};
-    anchor.children = [u('text', `${refIndex}`)];
+    (anchor as ElementWithProps).tagName = 'sup';
+    (anchor as ElementWithProps).properties = {};
+    (anchor as ElementWithProps).children = [u('text', `${refIndex}`)];
   });
 };
 
 /**
  * Transform the endnote with Pandoc format.
  */
-const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
+const endnoteAreasToPandoc: Plugin = () => (tree) => {
   const root = tree as hast.Root;
 
-  // must be called before mutating area.tagName
+  // must be called before mutating area properties
   const endnoteElements = selectEndnoteElements(root);
 
   selectEndnoteAreas(root).forEach((area: ElementWithProps) => {
-    area.tagName = 'section';
     area.properties.role = 'doc-endnotes';
+    area.properties.className = ['footnotes'];
+    // Remove data-footnotes attribute
+    delete (area.properties as Record<string, unknown>).dataFootnotes;
+
+    // Replace <h2 class="sr-only" id="footnote-label">Footnotes</h2> with <hr>
+    const newChildren: hast.ElementContent[] = [];
+    for (const child of area.children) {
+      if (
+        child.type === 'element' &&
+        child.tagName === 'h2' &&
+        (child.properties as any)?.id === 'footnote-label'
+      ) {
+        newChildren.push({
+          type: 'element',
+          tagName: 'hr',
+          properties: {},
+          children: [],
+        });
+      } else {
+        newChildren.push(child);
+      }
+    }
+    area.children = newChildren;
   });
 
   endnoteElements.forEach((elem: ElementWithProps, i) => {
@@ -132,13 +140,48 @@ const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
     elem.properties.id = `fn${refIndex}`;
     elem.properties.role = 'doc-endnote';
 
-    // Back reference is expected to be placed at the end of contents
-    // @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L41
     selectEndnoteBackReferences(elem).forEach((backref: ElementWithProps) => {
-      backref.properties.href = `#fnref${refIndex}`;
-      backref.properties.className = ['footnote-back'];
-      backref.properties.role = 'doc-backlink';
+      backref.properties = {
+        href: `#fnref${refIndex}`,
+        className: ['footnote-back'],
+        role: 'doc-backlink',
+      };
+      // Set content to ↩
+      backref.children = [u('text', '↩')];
     });
+
+    // Unwrap single-paragraph content to match old format (tight list-item behavior)
+    // <li>\n<p>content <a>↩</a></p>\n</li> → <li>content<a>↩</a></li>
+    const nonWhitespace = elem.children.filter(
+      (c) => !(c.type === 'text' && /^\s*$/.test((c as hast.Text).value)),
+    );
+    if (
+      nonWhitespace.length === 1 &&
+      nonWhitespace[0].type === 'element' &&
+      (nonWhitespace[0] as hast.Element).tagName === 'p'
+    ) {
+      const p = nonWhitespace[0] as hast.Element;
+      // Remove or trim whitespace before backref links
+      elem.children = p.children.reduce<hast.ElementContent[]>((acc, c, idx) => {
+        const next = p.children[idx + 1];
+        const nextIsBackref =
+          next &&
+          next.type === 'element' &&
+          (next as hast.Element).tagName === 'a' &&
+          ((next as hast.Element).properties as any)?.role === 'doc-backlink';
+
+        if (c.type === 'text' && nextIsBackref) {
+          const trimmed = (c as hast.Text).value.replace(/\s+$/, '');
+          if (trimmed) {
+            acc.push({ ...c, value: trimmed } as hast.Text);
+          }
+          // Skip whitespace-only text nodes
+        } else {
+          acc.push(c);
+        }
+        return acc;
+      }, []);
+    }
   });
 };
 
@@ -170,7 +213,7 @@ const warningSelector = `[${warningAttr}]`;
  * Pick up warnings embedded as {@link warningAttr} in hast elements,
  * report them via `file.message()`, and remove the attribute.
  */
-const reportFootnoteWarnings: unified.Plugin = () => (tree, file) => {
+const reportFootnoteWarnings: Plugin = () => (tree, file) => {
   selectAll(warningSelector, tree as hast.Root).forEach((el) => {
     const props = el.properties as Record<string, unknown> | undefined;
     const msg = props?.[warningProp];
@@ -243,39 +286,36 @@ const createBuildFootnote =
 
 const createInlineFootnoteHandler =
   (buildFootnote: BuildFootnote): ToHastHandler =>
-  (ctx, node) => {
+  (ctx: State, node: any) => {
     let no = 1;
-    while (String(no) in ctx.footnoteById) {
+    while (ctx.footnoteById.has(String(no))) {
       no++;
     }
     const identifier = String(no);
-    ctx.footnoteById[identifier] = {
+    ctx.footnoteById.set(identifier, {
       type: 'footnoteDefinition',
       identifier,
       children: [{ type: 'paragraph', children: node.children }],
       position: node.position,
-    };
-    return buildFootnote(`fn-${identifier}`, convertToHast(ctx, node));
+    });
+    return buildFootnote(`fn-${identifier}`, ctx.all(node));
   };
 
 const createFootnoteReferenceHandler =
   (buildFootnote: BuildFootnote): ToHastHandler =>
-  (ctx, node) => {
+  (ctx: State, node: any) => {
     const identifier = String(node.identifier);
-    const def = ctx.footnoteById[identifier.toUpperCase()];
-    return !def
-      ? null
-      : buildFootnote(
-          `fn-${identifier}`,
-          convertToHast(
-            ctx,
-            // Unwrap single-paragraph definitions to produce inline content
-            // (matches tight list-item behavior in footer.js).
-            def.children.length === 1 && def.children[0].type === 'paragraph'
-              ? def.children[0]
-              : def,
-          ),
-        );
+    const def = ctx.footnoteById.get(identifier.toUpperCase());
+    if (!def) return undefined;
+    return buildFootnote(
+      `fn-${identifier}`,
+      ctx.all(
+        // Unwrap single-paragraph definitions to produce inline content
+        def.children.length === 1 && def.children[0].type === 'paragraph'
+          ? def.children[0]
+          : def,
+      ),
+    );
   };
 
 /**
@@ -301,8 +341,8 @@ const createFootnoteReferenceHandler =
 export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {
-  toHastHandlers: Record<'footnoteReference' | 'footnote', ToHastHandler> | {};
-  hastTransformers: unified.PluggableList;
+  toHastHandlers: Record<string, ToHastHandler> | {};
+  hastTransformers: PluggableList;
 } => {
   const opt = options?.endnotesAsFootnotes;
 
@@ -333,5 +373,75 @@ export const createFootnotePlugin = (
 
 /**
  * Process Markdown AST.
+ * Transforms inline footnotes `^[content]` into footnoteDefinition + footnoteReference
+ * nodes, since remark-gfm does not support inline footnote syntax.
  */
-export const mdast = [footnotes, { inlineNotes: true }];
+export const mdast: Plugin = () => (tree: any) => {
+  let counter = 0;
+  const definitions: any[] = [];
+
+  visitTree(tree, 'text', (node: any, index: number | undefined, parent: any) => {
+    if (!parent || typeof index !== 'number') return;
+    const value: string = node.value;
+    const parts: any[] = [];
+    let lastIndex = 0;
+    // Match ^[...] but handle nested brackets
+    const regex = /\^\[/g;
+    let match;
+    while ((match = regex.exec(value)) !== null) {
+      const start = match.index;
+      // Find matching closing bracket
+      let depth = 1;
+      let i = start + 2;
+      while (i < value.length && depth > 0) {
+        if (value[i] === '[') depth++;
+        else if (value[i] === ']') depth--;
+        i++;
+      }
+      if (depth !== 0) continue;
+      const end = i;
+      const content = value.slice(start + 2, end - 1);
+
+      // Add text before the footnote
+      if (start > lastIndex) {
+        parts.push({ type: 'text', value: value.slice(lastIndex, start) });
+      }
+
+      // Create unique identifier for this inline footnote
+      // Use a high-range counter to avoid collision with user-defined footnotes
+      counter++;
+      const id = `_inline_${counter}`;
+
+      // Create footnoteReference
+      parts.push({
+        type: 'footnoteReference',
+        identifier: id,
+        label: id,
+      });
+
+      // Create footnoteDefinition to be added to root
+      definitions.push({
+        type: 'footnoteDefinition',
+        identifier: id,
+        label: id,
+        children: [{ type: 'paragraph', children: [{ type: 'text', value: content }] }],
+      });
+
+      lastIndex = end;
+      regex.lastIndex = end;
+    }
+
+    if (parts.length > 0) {
+      if (lastIndex < value.length) {
+        parts.push({ type: 'text', value: value.slice(lastIndex) });
+      }
+      parent.children.splice(index, 1, ...parts);
+    }
+  });
+
+  // Add all inline footnote definitions to the root
+  if (definitions.length > 0) {
+    tree.children.push(...definitions);
+  }
+};
+

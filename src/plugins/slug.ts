@@ -38,7 +38,7 @@ const createSlug = (heading: Heading, slugger: GithubSlugger) => {
   // Create slug string with footnotes removed
   const children = [...heading.children];
   heading.children = heading.children.filter(
-    (child: Node) => child.type !== 'footnote',
+    (child: Node) => child.type !== 'footnoteReference',
   );
   const text = slugger.slug(toString(heading).replace(/<[^<>]*>/g, ''));
   heading.children = children;

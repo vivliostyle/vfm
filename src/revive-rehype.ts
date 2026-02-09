@@ -1,9 +1,9 @@
-import raw from 'rehype-raw';
-import remark2rehype from 'remark-rehype';
-import unified from 'unified';
+import rehypeRaw from 'rehype-raw';
+import remarkRehype from 'remark-rehype';
+import type { PluggableList } from 'unified';
 import { handler as code } from './plugins/code.js';
-import { hast as figure, FigureOptions } from './plugins/figure.js';
-import { createFootnotePlugin, FootnoteOptions } from './plugins/footnotes.js';
+import { hast as figure, type FigureOptions } from './plugins/figure.js';
+import { createFootnotePlugin, type FootnoteOptions } from './plugins/footnotes.js';
 import {
   handlerDisplayMath as displayMath,
   handlerInlineMath as inlineMath,
@@ -25,9 +25,10 @@ export const reviveRehype = (options?: ReviveRehypeOptions) => {
   } = createFootnotePlugin(options);
   return [
     [
-      remark2rehype,
+      remarkRehype,
       {
         allowDangerousHtml: true,
+        clobberPrefix: '',
         handlers: {
           displayMath,
           inlineMath,
@@ -37,9 +38,9 @@ export const reviveRehype = (options?: ReviveRehypeOptions) => {
         },
       },
     ],
-    raw,
+    rehypeRaw,
     [figure, options],
     ...footnoteTransformers,
     inspect('hast'),
-  ] as unified.PluggableList<unified.Settings>;
+  ] as PluggableList;
 };
