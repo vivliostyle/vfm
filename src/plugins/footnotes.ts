@@ -143,96 +143,47 @@ const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
 };
 
 /**
- * The returned Element is expected to be phrasing content per the HTML
- * content model. If a flow content element (e.g. `<aside>`) is returned,
- * it will be rewritten to `<span>` with a warning.
+ * Factory that customizes a footnote element. The returned element's
+ * `tagName` is ignored: the caller forces the appropriate tag
+ * (`<span>` for gcpm, `<a>` / `<aside>` for dpub).
+ * @template TProps Structural properties provided by the caller.
  */
-export type FootnoteFactory = (
+export type FootnoteFactory<TProps> = (
   h: typeof import('hastscript').h,
-  properties: hast.Properties,
+  properties: TProps,
   children: hast.ElementContent[],
-) => hast.Element;
+) => Omit<hast.Element, 'tagName'>;
 
 /**
- * - `"pandoc"`: endnote section at document end (default, same as `false`).
+ * - `"pandoc"`: endnote section at document end (default).
  * - `"dpub"`: `<a role="doc-noteref">` calls with `<aside role="doc-footnote">`
  *   elements placed after the containing block element.
- * - `"gcpm"`: inline `<span class="footnote">` at the call site (same as `true`).
+ * - `"gcpm"`: inline `<span class="footnote">` at the call site.
  */
 export type FootnoteMode = 'pandoc' | 'dpub' | 'gcpm';
 
 export type FootnoteOptions = {
-  endnotesAsFootnotes?:
-    | boolean
+  footnote?:
     | FootnoteMode
-    | hast.Properties
-    | FootnoteFactory;
+    | { mode: 'pandoc' }
+    | {
+        mode: 'dpub';
+        call?:
+          | hast.Properties
+          | FootnoteFactory<{
+              id: string;
+              href: string;
+              role: 'doc-noteref';
+            }>;
+        element?:
+          | hast.Properties
+          | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
+      }
+    | {
+        mode: 'gcpm';
+        element?: hast.Properties | FootnoteFactory<{ id: string }>;
+      };
 };
-
-/**
- * Data attribute used to embed a warning message in the hast element itself.
- * {@link reportFootnoteWarnings} picks it up, reports via `file.message()`,
- * and removes it.
- */
-const warningAttr = 'data-vfm-warning';
-const warningProp = 'dataVfmWarning';
-const warningSelector = `[${warningAttr}]`;
-
-/**
- * Pick up warnings embedded as {@link warningAttr} in hast elements,
- * report them via `file.message()`, and remove the attribute.
- */
-const reportFootnoteWarnings: unified.Plugin = () => (tree, file) => {
-  selectAll(warningSelector, tree as hast.Root).forEach((el) => {
-    const props = el.properties as Record<string, unknown> | undefined;
-    const msg = props?.[warningProp];
-    if (typeof msg === 'string') {
-      file.message(msg);
-      delete props![warningProp];
-    }
-  });
-};
-
-/**
- * Elements whose start tag triggers implicit `<p>` end tag per the HTML
- * parsing algorithm. A FootnoteFactory returning one of these will be
- * rewritten to `<span>` with a warning.
- * @see https://html.spec.whatwg.org/multipage/grouping-content.html#the-p-element
- */
-const pClosingTagNames = new Set([
-  'address',
-  'article',
-  'aside',
-  'blockquote',
-  'details',
-  'dialog',
-  'div',
-  'dl',
-  'fieldset',
-  'figcaption',
-  'figure',
-  'footer',
-  'form',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'header',
-  'hgroup',
-  'hr',
-  'main',
-  'menu',
-  'nav',
-  'ol',
-  'p',
-  'pre',
-  'search',
-  'section',
-  'table',
-  'ul',
-]);
 
 type BuildFootnote = (
   id: string,
@@ -240,17 +191,11 @@ type BuildFootnote = (
 ) => hast.Element;
 
 const createBuildFootnote =
-  (factory: FootnoteFactory): BuildFootnote =>
+  (factory: FootnoteFactory<{ id: string }>): BuildFootnote =>
   (id, children) => {
     const result = factory(h, { id }, children);
-    if (pClosingTagNames.has(result.tagName)) {
-      const msg =
-        `FootnoteFactory returned <${result.tagName}>, which triggers` +
-        ` <p> auto-closing. Rewriting to <span>.`;
-      result.tagName = 'span';
-      (result.properties as Record<string, unknown>)[warningProp] = msg;
-    }
-    return result;
+    (result as hast.Element).tagName = 'span';
+    return result as hast.Element;
   };
 
 const createInlineFootnoteHandler =
@@ -291,20 +236,46 @@ const createFootnoteReferenceHandler =
   };
 
 /**
+ * Build a hast element by applying a Properties-or-Factory customizer.
+ * The caller provides the fixed `tagName` and `structuralProps`;
+ * user-supplied Properties are spread after structural ones (user wins).
+ * For Factory, the factory receives structural props and its returned
+ * properties are merged with structural props winning only for `tagName`.
+ */
+const buildElement = <TProps extends hast.Properties>(
+  tagName: string,
+  structuralProps: TProps,
+  children: hast.ElementContent[],
+  customizer: hast.Properties | FootnoteFactory<TProps> | undefined,
+): hast.Element => {
+  if (typeof customizer === 'function') {
+    const result = customizer(h, structuralProps, children);
+    (result as hast.Element).tagName = tagName;
+    return result as hast.Element;
+  }
+  if (typeof customizer === 'object') {
+    return h(tagName, { ...structuralProps, ...customizer }, ...children);
+  }
+  return h(tagName, structuralProps, ...children);
+};
+
+/**
  * Create mdast-to-hast handlers and hast transformers for footnote processing.
  *
- * When `endnotesAsFootnotes` is disabled (default):
+ * When `footnote` is `"pandoc"` or unset (default):
  * - `toHastHandlers` is empty; the default mdast-util-to-hast handlers
  *   generate endnote sections.
  * - `hastTransformers` rewrites the endnote markup to Pandoc format.
  *
- * When `endnotesAsFootnotes` is enabled:
+ * When `footnote` is `"gcpm"`:
  * - `toHastHandlers` provides custom `footnoteReference` and `footnote`
- *   handlers that produce footnote elements at the call site, bypassing
- *   endnote section generation.
- * - If a {@link FootnoteFactory} returns a flow content element that would
- *   trigger `<p>` auto-closing in rehype-raw, the element is rewritten to
- *   `<span>` and a warning is reported via `VFile#messages`.
+ *   handlers that produce `<span>` footnote elements at the call site.
+ *
+ * When `footnote` is `"dpub"`:
+ * - `toHastHandlers` produces `<a role="doc-noteref">` calls and queues
+ *   `<aside role="doc-footnote">` elements for insertion.
+ * - `hastTransformers` inserts aside elements after the nearest
+ *   non-flow-container ancestor.
  *
  * @param options Footnote options.
  * @returns `toHastHandlers` for remark-rehype and `hastTransformers` as
@@ -314,6 +285,14 @@ const createDpubFootnoteReferenceHandler =
   (
     pending: Map<string, hast.Element>,
     nextIndex: () => number,
+    callCustomizer:
+      | hast.Properties
+      | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>
+      | undefined,
+    elementCustomizer:
+      | hast.Properties
+      | FootnoteFactory<{ id: string; role: 'doc-footnote' }>
+      | undefined,
   ): ToHastHandler =>
   (ctx, node) => {
     const identifier = String(node.identifier);
@@ -328,22 +307,24 @@ const createDpubFootnoteReferenceHandler =
 
     pending.set(
       callId,
-      h(
+      buildElement(
         'aside',
-        { id: fnId, role: 'doc-footnote' },
-        ...convertToHast(
+        { id: fnId, role: 'doc-footnote' as const },
+        convertToHast(
           ctx,
           def.children.length === 1 && def.children[0].type === 'paragraph'
             ? def.children[0]
             : def,
         ),
+        elementCustomizer,
       ),
     );
 
-    return h(
+    return buildElement(
       'a',
-      { id: callId, href: `#${fnId}`, role: 'doc-noteref' },
-      u('text', `${refIndex}`),
+      { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
+      [u('text', `${refIndex}`)],
+      callCustomizer,
     );
   };
 
@@ -351,6 +332,14 @@ const createDpubInlineFootnoteHandler =
   (
     pending: Map<string, hast.Element>,
     nextIndex: () => number,
+    callCustomizer:
+      | hast.Properties
+      | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>
+      | undefined,
+    elementCustomizer:
+      | hast.Properties
+      | FootnoteFactory<{ id: string; role: 'doc-footnote' }>
+      | undefined,
   ): ToHastHandler =>
   (ctx, node) => {
     let no = 1;
@@ -371,17 +360,19 @@ const createDpubInlineFootnoteHandler =
 
     pending.set(
       callId,
-      h(
+      buildElement(
         'aside',
-        { id: fnId, role: 'doc-footnote' },
-        ...convertToHast(ctx, node),
+        { id: fnId, role: 'doc-footnote' as const },
+        convertToHast(ctx, node),
+        elementCustomizer,
       ),
     );
 
-    return h(
+    return buildElement(
       'a',
-      { id: callId, href: `#${fnId}`, role: 'doc-noteref' },
-      u('text', `${refIndex}`),
+      { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
+      [u('text', `${refIndex}`)],
+      callCustomizer,
     );
   };
 
@@ -492,20 +483,30 @@ const createInsertDpubAsides =
     }
   };
 
-const resolveMode = (
-  opt: FootnoteOptions['endnotesAsFootnotes'],
-): FootnoteMode => {
-  if (!opt || opt === 'pandoc') {
-    return 'pandoc';
+type ResolvedOption =
+  | { mode: 'pandoc' }
+  | {
+      mode: 'dpub';
+      call?:
+        | hast.Properties
+        | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>;
+      element?:
+        | hast.Properties
+        | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
+    }
+  | {
+      mode: 'gcpm';
+      element?: hast.Properties | FootnoteFactory<{ id: string }>;
+    };
+
+const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
+  if (!opt) {
+    return { mode: 'pandoc' };
   }
-  if (opt === 'dpub') {
-    return 'dpub';
+  if (typeof opt === 'string') {
+    return { mode: opt };
   }
-  if (opt === 'gcpm' || opt === true) {
-    return 'gcpm';
-  }
-  // Properties or FootnoteFactory imply gcpm
-  return 'gcpm';
+  return opt;
 };
 
 export const createFootnotePlugin = (
@@ -514,17 +515,16 @@ export const createFootnotePlugin = (
   toHastHandlers: Record<'footnoteReference' | 'footnote', ToHastHandler> | {};
   hastTransformers: unified.PluggableList;
 } => {
-  const opt = options?.endnotesAsFootnotes;
-  const mode = resolveMode(opt);
+  const resolved = resolveOption(options?.footnote);
 
-  if (mode === 'pandoc') {
+  if (resolved.mode === 'pandoc') {
     return {
       toHastHandlers: {},
       hastTransformers: [endnoteCallsToPandoc, endnoteAreasToPandoc],
     };
   }
 
-  if (mode === 'dpub') {
+  if (resolved.mode === 'dpub') {
     const pending = new Map<string, hast.Element>();
     let counter = 0;
     const nextIndex = () => ++counter;
@@ -533,19 +533,28 @@ export const createFootnotePlugin = (
         footnoteReference: createDpubFootnoteReferenceHandler(
           pending,
           nextIndex,
+          resolved.call,
+          resolved.element,
         ),
-        footnote: createDpubInlineFootnoteHandler(pending, nextIndex),
+        footnote: createDpubInlineFootnoteHandler(
+          pending,
+          nextIndex,
+          resolved.call,
+          resolved.element,
+        ),
       },
       hastTransformers: [createInsertDpubAsides(pending)],
     };
   }
 
   // gcpm
+  const element = resolved.element;
   const buildFootnote = createBuildFootnote(
-    typeof opt === 'function'
-      ? opt
-      : typeof opt === 'object' && typeof opt !== 'string'
-      ? (hFn, props, children) => hFn('span', { ...props, ...opt }, ...children)
+    typeof element === 'function'
+      ? element
+      : typeof element === 'object'
+      ? (hFn, props, children) =>
+          hFn('span', { ...props, ...element }, ...children)
       : (hFn, props, children) =>
           hFn('span', { class: 'footnote', ...props }, ...children),
   );
@@ -555,7 +564,7 @@ export const createFootnotePlugin = (
       footnoteReference: createFootnoteReferenceHandler(buildFootnote),
       footnote: createInlineFootnoteHandler(buildFootnote),
     },
-    hastTransformers: [reportFootnoteWarnings],
+    hastTransformers: [],
   };
 };
 

@@ -61,15 +61,15 @@ Footnotes can also be written inline^[This part is a footnote.].
   expect(received).toBe(expected);
 });
 
-// endnotesAsFootnotes tests
+// gcpm mode tests
 
-test('endnotesAsFootnotes: basic', () => {
+test('gcpm: basic', () => {
   const md = `VFM is developed in the GitHub repository[^1].
 
 [^1]: [VFM](https://github.com/vivliostyle/vfm)`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: true,
+    footnote: 'gcpm',
   });
   const expected = `
 <p>VFM is developed in the GitHub repository<span class="footnote" id="fn-1"><a href="https://github.com/vivliostyle/vfm">VFM</a></span>.</p>
@@ -77,11 +77,11 @@ test('endnotesAsFootnotes: basic', () => {
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: inline footnote', () => {
+test('gcpm: inline footnote', () => {
   const md = `Footnotes can also be written inline^[This part is a footnote.].`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: true,
+    footnote: 'gcpm',
   });
   const expected = `
 <p>Footnotes can also be written inline<span class="footnote" id="fn-1">This part is a footnote.</span>.</p>
@@ -89,7 +89,7 @@ test('endnotesAsFootnotes: inline footnote', () => {
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: multiple footnotes', () => {
+test('gcpm: multiple footnotes', () => {
   const md = `First reference[^1].
 Second reference[^2].
 
@@ -98,7 +98,7 @@ Second reference[^2].
 [^2]: Second footnote content`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: true,
+    footnote: 'gcpm',
   });
   const expected = `
 <p>
@@ -109,13 +109,16 @@ Second reference[^2].
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: custom properties', () => {
+test('gcpm: custom properties', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote with custom props`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: { class: 'my-footnote', 'data-type': 'note' },
+    footnote: {
+      mode: 'gcpm',
+      element: { class: 'my-footnote', 'data-type': 'note' },
+    },
   });
   const expected = `
 <p>Reference<span id="fn-1" class="my-footnote" data-type="note">Footnote with custom props</span>.</p>
@@ -123,13 +126,16 @@ test('endnotesAsFootnotes: custom properties', () => {
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: custom properties with id override', () => {
+test('gcpm: custom properties with id override', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote with custom id`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: { id: 'custom-id', class: 'my-footnote' },
+    footnote: {
+      mode: 'gcpm',
+      element: { id: 'custom-id', class: 'my-footnote' },
+    },
   });
   const expected = `
 <p>Reference<span id="custom-id" class="my-footnote">Footnote with custom id</span>.</p>
@@ -137,14 +143,17 @@ test('endnotesAsFootnotes: custom properties with id override', () => {
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: custom factory returning flow content is rewritten to span', () => {
+test('gcpm: custom factory with tagName forced to span', () => {
   const md = `Reference[^1].
 
 [^1]: Custom footnote`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: (hFn, _props, children) =>
-      hFn('aside', { class: 'custom-fn' }, ...children),
+    footnote: {
+      mode: 'gcpm',
+      element: (hFn, _props, children) =>
+        hFn('aside', { class: 'custom-fn' }, ...children),
+    },
   });
   const expected = `
 <p>Reference<span class="custom-fn">Custom footnote</span>.</p>
@@ -152,10 +161,10 @@ test('endnotesAsFootnotes: custom factory returning flow content is rewritten to
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: via frontmatter', () => {
+test('gcpm: via frontmatter', () => {
   const md = `---
 vfm:
-  endnotesAsFootnotes: true
+  footnote: gcpm
 ---
 
 Text with footnote[^1].
@@ -166,12 +175,14 @@ Text with footnote[^1].
   expect(received).not.toContain('class="footnotes"');
 });
 
-test('endnotesAsFootnotes: custom properties via frontmatter', () => {
+test('gcpm: custom properties via frontmatter', () => {
   const md = `---
 vfm:
-  endnotesAsFootnotes:
-    class: my-footnote
-    data-type: note
+  footnote:
+    mode: gcpm
+    element:
+      class: my-footnote
+      data-type: note
 ---
 
 Text with footnote[^1].
@@ -185,7 +196,7 @@ Text with footnote[^1].
   expect(received).not.toContain('class="footnotes"');
 });
 
-test('endnotesAsFootnotes: disabled by default', () => {
+test('pandoc: disabled by default', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -202,11 +213,11 @@ test('endnotesAsFootnotes: disabled by default', () => {
   expect(received).toBe(expected);
 });
 
-test('endnotesAsFootnotes: no footnotes present', () => {
+test('gcpm: no footnotes present', () => {
   const md = `Just plain text without footnotes.`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: true,
+    footnote: 'gcpm',
   });
   const expected = `
 <p>Just plain text without footnotes.</p>
@@ -222,7 +233,7 @@ test('dpub: basic reference footnote', () => {
 [^1]: Footnote content`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'dpub',
+    footnote: 'dpub',
   });
   const expected = `
 <p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
@@ -235,7 +246,7 @@ test('dpub: inline footnote', () => {
   const md = `Text with inline^[Inline content].`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'dpub',
+    footnote: 'dpub',
   });
   const expected = `
 <p>Text with inline<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
@@ -252,7 +263,7 @@ test('dpub: multiple footnotes in same paragraph', () => {
 [^2]: Second note`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'dpub',
+    footnote: 'dpub',
   });
   const expected = `
 <p>First<a id="fnref1" href="#fn1" role="doc-noteref">1</a> and second<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
@@ -272,7 +283,7 @@ Second paragraph[^2].
 [^2]: Second note`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'dpub',
+    footnote: 'dpub',
   });
   const expected = `
 <p>First paragraph<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
@@ -286,7 +297,7 @@ Second paragraph[^2].
 test('dpub: via frontmatter', () => {
   const md = `---
 vfm:
-  endnotesAsFootnotes: dpub
+  footnote: dpub
 ---
 
 Text with footnote[^1].
@@ -304,7 +315,7 @@ test('dpub: no footnotes present', () => {
   const md = `Just plain text.`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'dpub',
+    footnote: 'dpub',
   });
   const expected = `
 <p>Just plain text.</p>
@@ -322,7 +333,7 @@ Text with footnote[^1].
 [^1]: Deleted footnote`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'dpub',
+    footnote: 'dpub',
   });
   const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p><aside id="fn1" role="doc-footnote">Deleted footnote</aside></del>`;
   expect(received).toBe(expected);
@@ -334,7 +345,7 @@ test('dpub: aside escapes recursively through nested transparent elements', () =
 [^1]: Nested footnote`;
   const received = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'dpub',
+    footnote: 'dpub',
   });
   const expected = `
 <p><del><ins>Text<a id="fnref1" href="#fn1" role="doc-noteref">1</a></ins></del> after.</p>
@@ -343,33 +354,156 @@ test('dpub: aside escapes recursively through nested transparent elements', () =
   expect(received).toBe(expected);
 });
 
+test('dpub: call props on reference', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: { mode: 'dpub', call: { class: 'my-ref' } },
+  });
+  const expected = `
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref" class="my-ref">1</a>.</p>
+<aside id="fn1" role="doc-footnote">Footnote content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: element props on aside', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: { mode: 'dpub', element: { class: 'my-note' } },
+  });
+  const expected = `
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside id="fn1" role="doc-footnote" class="my-note">Footnote content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: call factory on reference', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: {
+      mode: 'dpub',
+      call: (hFn, props, children) =>
+        hFn('span', { ...props, class: 'custom-ref' }, ...children),
+    },
+  });
+  const expected = `
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref" class="custom-ref">1</a>.</p>
+<aside id="fn1" role="doc-footnote">Footnote content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: element factory on aside', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: {
+      mode: 'dpub',
+      element: (hFn, props, children) =>
+        hFn('div', { ...props, class: 'custom-note' }, ...children),
+    },
+  });
+  const expected = `
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside id="fn1" role="doc-footnote" class="custom-note">Footnote content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+// factory tagName override tests
+
+test('gcpm: factory selector class preserved, tagName forced to span', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: {
+      mode: 'gcpm',
+      element: (hFn, props, children) => hFn('div.foobar', props, ...children),
+    },
+  });
+  const expected = `
+<p>Reference<span class="foobar" id="fn-1">Footnote content</span>.</p>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: call factory selector class preserved, tagName forced to a', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: {
+      mode: 'dpub',
+      call: (hFn, props, children) => hFn('div.foobar', props, ...children),
+    },
+  });
+  const expected = `
+<p>Reference<a class="foobar" id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside id="fn1" role="doc-footnote">Footnote content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: element factory selector class preserved, tagName forced to aside', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: {
+      mode: 'dpub',
+      element: (hFn, props, children) => hFn('div.foobar', props, ...children),
+    },
+  });
+  const expected = `
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside class="foobar" id="fn1" role="doc-footnote">Footnote content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
 // string alias tests
 
-test('endnotesAsFootnotes "pandoc" behaves like false', () => {
+test('"pandoc" string behaves like default', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
   const asDefault = stringify(md, { partial: true });
   const asPandoc = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'pandoc',
+    footnote: 'pandoc',
   });
   expect(asPandoc).toBe(asDefault);
 });
 
-test('endnotesAsFootnotes "gcpm" behaves like true', () => {
+test('"gcpm" string behaves like { mode: "gcpm" }', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
-  const asTrue = stringify(md, {
+  const asObject = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: true,
+    footnote: { mode: 'gcpm' },
   });
-  const asGcpm = stringify(md, {
+  const asString = stringify(md, {
     partial: true,
-    endnotesAsFootnotes: 'gcpm',
+    footnote: 'gcpm',
   });
-  expect(asGcpm).toBe(asTrue);
+  expect(asString).toBe(asObject);
 });
 
 test('Heading title and section id without inline footnotes text', () => {

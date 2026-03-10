@@ -40,8 +40,21 @@ export type VFMSettings = {
   imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
-  /** Convert endnotes to inline footnotes for CSS GCPM. */
-  endnotesAsFootnotes?: boolean | 'pandoc' | 'dpub' | 'gcpm' | Properties;
+  /** Footnote output mode. Default is `'pandoc'` (endnote section). */
+  footnote?:
+    | 'pandoc'
+    | 'dpub'
+    | 'gcpm'
+    | { mode: 'pandoc' }
+    | {
+        mode: 'dpub';
+        call?: Properties;
+        element?: Properties;
+      }
+    | {
+        mode: 'gcpm';
+        element?: Properties;
+      };
 };
 
 /** Metadata from Frontmatter. */
@@ -231,6 +244,57 @@ const readAttributesCollection = (
 };
 
 /**
+ * Parse the `footnote` value from frontmatter YAML.
+ * @param raw Raw YAML value.
+ * @returns Normalized footnote option, or `undefined`.
+ */
+const readFootnoteOption = (raw: unknown): VFMSettings['footnote'] => {
+  if (raw === true || raw === 'gcpm') {
+    return 'gcpm';
+  }
+  if (raw === 'pandoc') {
+    return 'pandoc';
+  }
+  if (raw === 'dpub') {
+    return 'dpub';
+  }
+  if (typeof raw === 'object' && raw !== null) {
+    if ('mode' in raw) {
+      const obj = raw as Record<string, unknown>;
+      const mode = obj.mode;
+      if (mode === 'pandoc') {
+        return { mode: 'pandoc' };
+      }
+      if (mode === 'dpub') {
+        return {
+          mode: 'dpub',
+          call:
+            typeof obj.call === 'object' && obj.call !== null
+              ? (obj.call as Properties)
+              : undefined,
+          element:
+            typeof obj.element === 'object' && obj.element !== null
+              ? (obj.element as Properties)
+              : undefined,
+        };
+      }
+      if (mode === 'gcpm') {
+        return {
+          mode: 'gcpm',
+          element:
+            typeof obj.element === 'object' && obj.element !== null
+              ? (obj.element as Properties)
+              : undefined,
+        };
+      }
+      return undefined;
+    }
+    return undefined;
+  }
+  return undefined;
+};
+
+/**
  * Read VFM settings from data object.
  * @param data Data object.
  * @returns Settings.
@@ -257,14 +321,7 @@ const readSettings = (data: any): VFMSettings => {
       typeof data.assignIdToFigcaption === 'boolean'
         ? data.assignIdToFigcaption
         : false,
-    endnotesAsFootnotes:
-      typeof data.endnotesAsFootnotes === 'boolean' ||
-      (typeof data.endnotesAsFootnotes === 'string' &&
-        ['pandoc', 'dpub', 'gcpm'].includes(data.endnotesAsFootnotes)) ||
-      (typeof data.endnotesAsFootnotes === 'object' &&
-        data.endnotesAsFootnotes !== null)
-        ? data.endnotesAsFootnotes
-        : undefined,
+    footnote: readFootnoteOption(data.footnote),
   };
 };
 
