@@ -4,6 +4,19 @@ import fs from 'fs';
 import meow, { Result } from 'meow';
 import readline from 'readline';
 import { stringify } from './index.js';
+import type { FootnoteMode } from './plugins/footnotes.js';
+
+// Normalize bare --endnotes-as-footnotes (no value) to gcpm for meow's string parser
+{
+  const flag = '--endnotes-as-footnotes';
+  const i = process.argv.indexOf(flag);
+  if (i !== -1) {
+    const next = process.argv[i + 1];
+    if (next === undefined || next.startsWith('-')) {
+      process.argv[i] = `${flag}=gcpm`;
+    }
+  }
+}
 
 const cli = meow(
   `
@@ -21,7 +34,7 @@ const cli = meow(
       --disable-math               Disable math syntax
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
       --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
-      --endnotes-as-footnotes      Convert endnotes to inline footnotes for CSS GCPM
+      --endnotes-as-footnotes      Convert endnotes to footnotes (true, pandoc, dpub, or gcpm)
 
     Examples
       $ vfm input.md
@@ -61,7 +74,7 @@ const cli = meow(
         type: 'boolean',
       },
       endnotesAsFootnotes: {
-        type: 'boolean',
+        type: 'string',
       },
     },
   },
@@ -83,7 +96,9 @@ function compile(input: string) {
         | 'figcaption-img'
         | undefined,
       assignIdToFigcaption: cli.flags.assignIdToFigcaption,
-      endnotesAsFootnotes: cli.flags.endnotesAsFootnotes,
+      endnotesAsFootnotes: cli.flags.endnotesAsFootnotes as
+        | FootnoteMode
+        | undefined,
     }),
   );
 }
@@ -99,7 +114,7 @@ function main(
     disableMath: { type: 'boolean' };
     imgFigcaptionOrder: { type: 'string' };
     assignIdToFigcaption: { type: 'boolean' };
-    endnotesAsFootnotes: { type: 'boolean' };
+    endnotesAsFootnotes: { type: 'string' };
   }>,
 ) {
   try {

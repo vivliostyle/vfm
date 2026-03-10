@@ -153,8 +153,20 @@ export type FootnoteFactory = (
   children: hast.ElementContent[],
 ) => hast.Element;
 
+/**
+ * - `"pandoc"`: endnote section at document end (default, same as `false`).
+ * - `"dpub"`: `<a role="doc-noteref">` calls with `<aside role="doc-footnote">`
+ *   elements placed after the containing block element.
+ * - `"gcpm"`: inline `<span class="footnote">` at the call site (same as `true`).
+ */
+export type FootnoteMode = 'pandoc' | 'dpub' | 'gcpm';
+
 export type FootnoteOptions = {
-  endnotesAsFootnotes?: boolean | hast.Properties | FootnoteFactory;
+  endnotesAsFootnotes?:
+    | boolean
+    | FootnoteMode
+    | hast.Properties
+    | FootnoteFactory;
 };
 
 /**
@@ -298,6 +310,204 @@ const createFootnoteReferenceHandler =
  * @returns `toHastHandlers` for remark-rehype and `hastTransformers` as
  *   unified plugins to be spread into the pipeline.
  */
+const createDpubFootnoteReferenceHandler =
+  (
+    pending: Map<string, hast.Element>,
+    nextIndex: () => number,
+  ): ToHastHandler =>
+  (ctx, node) => {
+    const identifier = String(node.identifier);
+    const def = ctx.footnoteById[identifier.toUpperCase()];
+    if (!def) {
+      return null;
+    }
+
+    const refIndex = nextIndex();
+    const callId = `fnref${refIndex}`;
+    const fnId = `fn${refIndex}`;
+
+    pending.set(
+      callId,
+      h(
+        'aside',
+        { id: fnId, role: 'doc-footnote' },
+        ...convertToHast(
+          ctx,
+          def.children.length === 1 && def.children[0].type === 'paragraph'
+            ? def.children[0]
+            : def,
+        ),
+      ),
+    );
+
+    return h(
+      'a',
+      { id: callId, href: `#${fnId}`, role: 'doc-noteref' },
+      u('text', `${refIndex}`),
+    );
+  };
+
+const createDpubInlineFootnoteHandler =
+  (
+    pending: Map<string, hast.Element>,
+    nextIndex: () => number,
+  ): ToHastHandler =>
+  (ctx, node) => {
+    let no = 1;
+    while (String(no) in ctx.footnoteById) {
+      no++;
+    }
+    const identifier = String(no);
+    ctx.footnoteById[identifier] = {
+      type: 'footnoteDefinition',
+      identifier,
+      children: [{ type: 'paragraph', children: node.children }],
+      position: node.position,
+    };
+
+    const refIndex = nextIndex();
+    const callId = `fnref${refIndex}`;
+    const fnId = `fn${refIndex}`;
+
+    pending.set(
+      callId,
+      h(
+        'aside',
+        { id: fnId, role: 'doc-footnote' },
+        ...convertToHast(ctx, node),
+      ),
+    );
+
+    return h(
+      'a',
+      { id: callId, href: `#${fnId}`, role: 'doc-noteref' },
+      u('text', `${refIndex}`),
+    );
+  };
+
+/**
+ * Elements that accept flow content as children, into which aside
+ * insertion recurses to find a more precise insertion point.
+ * For all other elements the aside is placed immediately after the
+ * element in its parent.
+ *
+ * Transparent elements are included because this set is only consulted
+ * from within a flow container context, so they inherit flow content
+ * model from their parent.
+ * @see https://html.spec.whatwg.org/multipage/dom.html#flow-content
+ * @see https://html.spec.whatwg.org/multipage/dom.html#transparent-content-models
+ */
+const flowContainerTagNames = new Set([
+  'address',
+  'article',
+  'aside',
+  'blockquote',
+  'body',
+  'dd',
+  'details',
+  'dialog',
+  'div',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'header',
+  'li',
+  'main',
+  'nav',
+  'search',
+  'section',
+  'td',
+  'th',
+  // Transparent content model
+  'a',
+  'audio',
+  'canvas',
+  'del',
+  'ins',
+  'map',
+  'object',
+  'slot',
+  'video',
+]);
+
+/**
+ * Insert each pending aside after the nearest non-flow-container
+ * ancestor of its call element.
+ */
+const createInsertDpubAsides =
+  (pending: Map<string, hast.Element>): unified.Plugin =>
+  () =>
+  (tree) => {
+    if (pending.size === 0) {
+      return;
+    }
+
+    const remaining = new Set(pending.keys());
+
+    function containsCall(
+      node: hast.RootContent | hast.ElementContent,
+    ): string[] {
+      if (remaining.size === 0 || node.type !== 'element') {
+        return [];
+      }
+      const id = node.properties?.id;
+      return [
+        ...(typeof id === 'string' && remaining.has(id) ? [id] : []),
+        ...node.children.flatMap((child) => containsCall(child)),
+      ];
+    }
+
+    function processParent(parent: hast.Element | hast.Root) {
+      const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
+      for (const child of parent.children) {
+        newChildren.push(child);
+        if (child.type !== 'element') {
+          continue;
+        }
+        if (flowContainerTagNames.has(child.tagName)) {
+          processParent(child);
+        } else {
+          for (const callId of containsCall(child)) {
+            const aside = pending.get(callId);
+            if (aside) {
+              newChildren.push(aside);
+              remaining.delete(callId);
+            }
+          }
+        }
+      }
+      parent.children = newChildren;
+    }
+
+    const root = tree as hast.Root;
+    processParent(root);
+
+    for (const callId of remaining) {
+      const aside = pending.get(callId);
+      if (aside) {
+        root.children.push(aside);
+      }
+    }
+  };
+
+const resolveMode = (
+  opt: FootnoteOptions['endnotesAsFootnotes'],
+): FootnoteMode => {
+  if (!opt || opt === 'pandoc') {
+    return 'pandoc';
+  }
+  if (opt === 'dpub') {
+    return 'dpub';
+  }
+  if (opt === 'gcpm' || opt === true) {
+    return 'gcpm';
+  }
+  // Properties or FootnoteFactory imply gcpm
+  return 'gcpm';
+};
+
 export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {
@@ -305,18 +515,36 @@ export const createFootnotePlugin = (
   hastTransformers: unified.PluggableList;
 } => {
   const opt = options?.endnotesAsFootnotes;
+  const mode = resolveMode(opt);
 
-  if (!opt) {
+  if (mode === 'pandoc') {
     return {
       toHastHandlers: {},
       hastTransformers: [endnoteCallsToPandoc, endnoteAreasToPandoc],
     };
   }
 
+  if (mode === 'dpub') {
+    const pending = new Map<string, hast.Element>();
+    let counter = 0;
+    const nextIndex = () => ++counter;
+    return {
+      toHastHandlers: {
+        footnoteReference: createDpubFootnoteReferenceHandler(
+          pending,
+          nextIndex,
+        ),
+        footnote: createDpubInlineFootnoteHandler(pending, nextIndex),
+      },
+      hastTransformers: [createInsertDpubAsides(pending)],
+    };
+  }
+
+  // gcpm
   const buildFootnote = createBuildFootnote(
     typeof opt === 'function'
       ? opt
-      : typeof opt === 'object'
+      : typeof opt === 'object' && typeof opt !== 'string'
       ? (hFn, props, children) => hFn('span', { ...props, ...opt }, ...children)
       : (hFn, props, children) =>
           hFn('span', { class: 'footnote', ...props }, ...children),

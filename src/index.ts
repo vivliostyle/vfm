@@ -3,7 +3,7 @@ import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { mdast as doc } from './plugins/document.js';
 import { hast as hastMath } from './plugins/math.js';
-import { FootnoteFactory } from './plugins/footnotes.js';
+import { FootnoteFactory, FootnoteMode } from './plugins/footnotes.js';
 import { Properties } from 'hast';
 import { Metadata, readMetadata } from './plugins/metadata.js';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace.js';
@@ -39,7 +39,7 @@ export interface StringifyMarkdownOptions {
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
   /** Convert endnotes to inline footnotes for CSS GCPM `float: footnote`. */
-  endnotesAsFootnotes?: boolean | Properties | FootnoteFactory;
+  endnotesAsFootnotes?: boolean | FootnoteMode | Properties | FootnoteFactory;
 }
 
 export interface Hooks {

@@ -41,7 +41,7 @@ export type VFMSettings = {
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
   /** Convert endnotes to inline footnotes for CSS GCPM. */
-  endnotesAsFootnotes?: boolean | Properties;
+  endnotesAsFootnotes?: boolean | 'pandoc' | 'dpub' | 'gcpm' | Properties;
 };
 
 /** Metadata from Frontmatter. */
@@ -259,6 +259,8 @@ const readSettings = (data: any): VFMSettings => {
         : false,
     endnotesAsFootnotes:
       typeof data.endnotesAsFootnotes === 'boolean' ||
+      (typeof data.endnotesAsFootnotes === 'string' &&
+        ['pandoc', 'dpub', 'gcpm'].includes(data.endnotesAsFootnotes)) ||
       (typeof data.endnotesAsFootnotes === 'object' &&
         data.endnotesAsFootnotes !== null)
         ? data.endnotesAsFootnotes

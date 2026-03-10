@@ -214,6 +214,164 @@ test('endnotesAsFootnotes: no footnotes present', () => {
   expect(received).toBe(expected);
 });
 
+// dpub mode tests
+
+test('dpub: basic reference footnote', () => {
+  const md = `Text with footnote[^1].
+
+[^1]: Footnote content`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'dpub',
+  });
+  const expected = `
+<p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside id="fn1" role="doc-footnote">Footnote content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: inline footnote', () => {
+  const md = `Text with inline^[Inline content].`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'dpub',
+  });
+  const expected = `
+<p>Text with inline<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside id="fn1" role="doc-footnote">Inline content</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: multiple footnotes in same paragraph', () => {
+  const md = `First[^1] and second[^2].
+
+[^1]: First note
+
+[^2]: Second note`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'dpub',
+  });
+  const expected = `
+<p>First<a id="fnref1" href="#fn1" role="doc-noteref">1</a> and second<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
+<aside id="fn1" role="doc-footnote">First note</aside>
+<aside id="fn2" role="doc-footnote">Second note</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: footnotes in different paragraphs', () => {
+  const md = `First paragraph[^1].
+
+Second paragraph[^2].
+
+[^1]: First note
+
+[^2]: Second note`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'dpub',
+  });
+  const expected = `
+<p>First paragraph<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside id="fn1" role="doc-footnote">First note</aside>
+<p>Second paragraph<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
+<aside id="fn2" role="doc-footnote">Second note</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: via frontmatter', () => {
+  const md = `---
+vfm:
+  endnotesAsFootnotes: dpub
+---
+
+Text with footnote[^1].
+
+[^1]: Footnote via frontmatter`;
+  const received = stringify(md, { partial: true });
+  const expected = `
+<p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<aside id="fn1" role="doc-footnote">Footnote via frontmatter</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: no footnotes present', () => {
+  const md = `Just plain text.`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'dpub',
+  });
+  const expected = `
+<p>Just plain text.</p>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: aside escapes transparent element to nearest flow container', () => {
+  const md = `<del>
+
+Text with footnote[^1].
+
+</del>
+
+[^1]: Deleted footnote`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'dpub',
+  });
+  const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p><aside id="fn1" role="doc-footnote">Deleted footnote</aside></del>`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: aside escapes recursively through nested transparent elements', () => {
+  const md = `<del><ins>Text[^1]</ins></del> after.
+
+[^1]: Nested footnote`;
+  const received = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'dpub',
+  });
+  const expected = `
+<p><del><ins>Text<a id="fnref1" href="#fn1" role="doc-noteref">1</a></ins></del> after.</p>
+<aside id="fn1" role="doc-footnote">Nested footnote</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+// string alias tests
+
+test('endnotesAsFootnotes "pandoc" behaves like false', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const asDefault = stringify(md, { partial: true });
+  const asPandoc = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'pandoc',
+  });
+  expect(asPandoc).toBe(asDefault);
+});
+
+test('endnotesAsFootnotes "gcpm" behaves like true', () => {
+  const md = `Reference[^1].
+
+[^1]: Footnote content`;
+  const asTrue = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: true,
+  });
+  const asGcpm = stringify(md, {
+    partial: true,
+    endnotesAsFootnotes: 'gcpm',
+  });
+  expect(asGcpm).toBe(asTrue);
+});
+
 test('Heading title and section id without inline footnotes text', () => {
   const md = '# Test^[Test]';
   const received = stringify(md);
