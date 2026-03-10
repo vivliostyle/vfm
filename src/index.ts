@@ -51,13 +51,13 @@ export interface StringifyMarkdownOptions {
               href: string;
               role: 'doc-noteref';
             }>;
-        element?:
+        body?:
           | hast.Properties
           | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
       }
     | {
         mode: 'gcpm';
-        element?: hast.Properties | FootnoteFactory<{ id: string }>;
+        body?: hast.Properties | FootnoteFactory<{ id: string }>;
       };
 }
 

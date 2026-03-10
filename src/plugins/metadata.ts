@@ -49,11 +49,11 @@ export type VFMSettings = {
     | {
         mode: 'dpub';
         call?: Properties;
-        element?: Properties;
+        body?: Properties;
       }
     | {
         mode: 'gcpm';
-        element?: Properties;
+        body?: Properties;
       };
 };
 
@@ -272,18 +272,18 @@ const readFootnoteOption = (raw: unknown): VFMSettings['footnote'] => {
             typeof obj.call === 'object' && obj.call !== null
               ? (obj.call as Properties)
               : undefined,
-          element:
-            typeof obj.element === 'object' && obj.element !== null
-              ? (obj.element as Properties)
+          body:
+            typeof obj.body === 'object' && obj.body !== null
+              ? (obj.body as Properties)
               : undefined,
         };
       }
       if (mode === 'gcpm') {
         return {
           mode: 'gcpm',
-          element:
-            typeof obj.element === 'object' && obj.element !== null
-              ? (obj.element as Properties)
+          body:
+            typeof obj.body === 'object' && obj.body !== null
+              ? (obj.body as Properties)
               : undefined,
         };
       }

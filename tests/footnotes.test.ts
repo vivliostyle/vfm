@@ -117,7 +117,7 @@ test('gcpm: custom properties', () => {
     partial: true,
     footnote: {
       mode: 'gcpm',
-      element: { class: 'my-footnote', 'data-type': 'note' },
+      body: { class: 'my-footnote', 'data-type': 'note' },
     },
   });
   const expected = `
@@ -134,7 +134,7 @@ test('gcpm: custom properties with id override', () => {
     partial: true,
     footnote: {
       mode: 'gcpm',
-      element: { id: 'custom-id', class: 'my-footnote' },
+      body: { id: 'custom-id', class: 'my-footnote' },
     },
   });
   const expected = `
@@ -151,7 +151,7 @@ test('gcpm: custom factory with tagName forced to span', () => {
     partial: true,
     footnote: {
       mode: 'gcpm',
-      element: (hFn, _props, children) =>
+      body: (hFn, _props, children) =>
         hFn('aside', { class: 'custom-fn' }, ...children),
     },
   });
@@ -180,7 +180,7 @@ test('gcpm: custom properties via frontmatter', () => {
 vfm:
   footnote:
     mode: gcpm
-    element:
+    body:
       class: my-footnote
       data-type: note
 ---
@@ -369,13 +369,13 @@ test('dpub: call props on reference', () => {
   expect(received).toBe(expected);
 });
 
-test('dpub: element props on aside', () => {
+test('dpub: body props on aside', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
   const received = stringify(md, {
     partial: true,
-    footnote: { mode: 'dpub', element: { class: 'my-note' } },
+    footnote: { mode: 'dpub', body: { class: 'my-note' } },
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
@@ -403,7 +403,7 @@ test('dpub: call factory on reference', () => {
   expect(received).toBe(expected);
 });
 
-test('dpub: element factory on aside', () => {
+test('dpub: body factory on aside', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -411,7 +411,7 @@ test('dpub: element factory on aside', () => {
     partial: true,
     footnote: {
       mode: 'dpub',
-      element: (hFn, props, children) =>
+      body: (hFn, props, children) =>
         hFn('div', { ...props, class: 'custom-note' }, ...children),
     },
   });
@@ -432,7 +432,7 @@ test('gcpm: factory selector class preserved, tagName forced to span', () => {
     partial: true,
     footnote: {
       mode: 'gcpm',
-      element: (hFn, props, children) => hFn('div.foobar', props, ...children),
+      body: (hFn, props, children) => hFn('div.foobar', props, ...children),
     },
   });
   const expected = `
@@ -459,7 +459,7 @@ test('dpub: call factory selector class preserved, tagName forced to a', () => {
   expect(received).toBe(expected);
 });
 
-test('dpub: element factory selector class preserved, tagName forced to aside', () => {
+test('dpub: body factory selector class preserved, tagName forced to aside', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -467,7 +467,7 @@ test('dpub: element factory selector class preserved, tagName forced to aside', 
     partial: true,
     footnote: {
       mode: 'dpub',
-      element: (hFn, props, children) => hFn('div.foobar', props, ...children),
+      body: (hFn, props, children) => hFn('div.foobar', props, ...children),
     },
   });
   const expected = `

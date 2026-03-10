@@ -7,9 +7,10 @@
  * [css-gcpm](https://www.w3.org/TR/css-gcpm-3/#footnotes).
  * This does not match the export names or attribute naming used by remark.
  *
- * Terminology follows css-gcpm: a "call" is the in-text marker showing the
- * note number, an "element" is the note content itself, and an "area" is the
- * region where notes are collected for display.
+ * Terminology follows css-gcpm: a "call" is the in-text reference showing the
+ * note number, a "marker" is the note number rendered in the footnote area,
+ * an "element" is the note content, a "body" is the marker and element
+ * combined, and an "area" is the region where notes are collected for display.
  *
  * VFM depends on two versions of mdast-util-to-hast:
  *  `- remark-rehype@8.1.0
@@ -175,13 +176,13 @@ export type FootnoteOptions = {
               href: string;
               role: 'doc-noteref';
             }>;
-        element?:
+        body?:
           | hast.Properties
           | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
       }
     | {
         mode: 'gcpm';
-        element?: hast.Properties | FootnoteFactory<{ id: string }>;
+        body?: hast.Properties | FootnoteFactory<{ id: string }>;
       };
 };
 
@@ -289,7 +290,7 @@ const createDpubFootnoteReferenceHandler =
       | hast.Properties
       | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>
       | undefined,
-    elementCustomizer:
+    bodyCustomizer:
       | hast.Properties
       | FootnoteFactory<{ id: string; role: 'doc-footnote' }>
       | undefined,
@@ -316,7 +317,7 @@ const createDpubFootnoteReferenceHandler =
             ? def.children[0]
             : def,
         ),
-        elementCustomizer,
+        bodyCustomizer,
       ),
     );
 
@@ -336,7 +337,7 @@ const createDpubInlineFootnoteHandler =
       | hast.Properties
       | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>
       | undefined,
-    elementCustomizer:
+    bodyCustomizer:
       | hast.Properties
       | FootnoteFactory<{ id: string; role: 'doc-footnote' }>
       | undefined,
@@ -364,7 +365,7 @@ const createDpubInlineFootnoteHandler =
         'aside',
         { id: fnId, role: 'doc-footnote' as const },
         convertToHast(ctx, node),
-        elementCustomizer,
+        bodyCustomizer,
       ),
     );
 
@@ -490,13 +491,13 @@ type ResolvedOption =
       call?:
         | hast.Properties
         | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>;
-      element?:
+      body?:
         | hast.Properties
         | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
     }
   | {
       mode: 'gcpm';
-      element?: hast.Properties | FootnoteFactory<{ id: string }>;
+      body?: hast.Properties | FootnoteFactory<{ id: string }>;
     };
 
 const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
@@ -534,13 +535,13 @@ export const createFootnotePlugin = (
           pending,
           nextIndex,
           resolved.call,
-          resolved.element,
+          resolved.body,
         ),
         footnote: createDpubInlineFootnoteHandler(
           pending,
           nextIndex,
           resolved.call,
-          resolved.element,
+          resolved.body,
         ),
       },
       hastTransformers: [createInsertDpubAsides(pending)],
@@ -548,13 +549,13 @@ export const createFootnotePlugin = (
   }
 
   // gcpm
-  const element = resolved.element;
+  const body = resolved.body;
   const buildFootnote = createBuildFootnote(
-    typeof element === 'function'
-      ? element
-      : typeof element === 'object'
+    typeof body === 'function'
+      ? body
+      : typeof body === 'object'
       ? (hFn, props, children) =>
-          hFn('span', { ...props, ...element }, ...children)
+          hFn('span', { ...props, ...body }, ...children)
       : (hFn, props, children) =>
           hFn('span', { class: 'footnote', ...props }, ...children),
   );
