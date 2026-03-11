@@ -143,24 +143,6 @@ test('gcpm: custom properties with id override', () => {
   expect(received).toBe(expected);
 });
 
-test('gcpm: custom factory with tagName forced to span', () => {
-  const md = `Reference[^1].
-
-[^1]: Custom footnote`;
-  const received = stringify(md, {
-    partial: true,
-    footnote: {
-      mode: 'gcpm',
-      body: (hFn, _props, children) =>
-        hFn('aside', { class: 'custom-fn' }, ...children),
-    },
-  });
-  const expected = `
-<p>Reference<span class="custom-fn">Custom footnote</span>.</p>
-`;
-  expect(received).toBe(expected);
-});
-
 test('gcpm: via frontmatter', () => {
   const md = `---
 vfm:
@@ -237,7 +219,7 @@ test('dpub: basic reference footnote', () => {
   });
   const expected = `
 <p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote">Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -250,7 +232,7 @@ test('dpub: inline footnote', () => {
   });
   const expected = `
 <p>Text with inline<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote">Inline content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Inline content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -267,8 +249,8 @@ test('dpub: multiple footnotes in same paragraph', () => {
   });
   const expected = `
 <p>First<a id="fnref1" href="#fn1" role="doc-noteref">1</a> and second<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
-<aside id="fn1" role="doc-footnote">First note</aside>
-<aside id="fn2" role="doc-footnote">Second note</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
+<aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink">2</a>. Second note</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -287,9 +269,9 @@ Second paragraph[^2].
   });
   const expected = `
 <p>First paragraph<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote">First note</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
 <p>Second paragraph<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
-<aside id="fn2" role="doc-footnote">Second note</aside>
+<aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink">2</a>. Second note</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -306,7 +288,7 @@ Text with footnote[^1].
   const received = stringify(md, { partial: true });
   const expected = `
 <p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote">Footnote via frontmatter</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote via frontmatter</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -335,7 +317,7 @@ Text with footnote[^1].
     partial: true,
     footnote: 'dpub',
   });
-  const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p><aside id="fn1" role="doc-footnote">Deleted footnote</aside></del>`;
+  const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p><aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Deleted footnote</aside></del>`;
   expect(received).toBe(expected);
 });
 
@@ -349,7 +331,7 @@ test('dpub: aside escapes recursively through nested transparent elements', () =
   });
   const expected = `
 <p><del><ins>Text<a id="fnref1" href="#fn1" role="doc-noteref">1</a></ins></del> after.</p>
-<aside id="fn1" role="doc-footnote">Nested footnote</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Nested footnote</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -364,7 +346,7 @@ test('dpub: call props on reference', () => {
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref" class="my-ref">1</a>.</p>
-<aside id="fn1" role="doc-footnote">Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -379,12 +361,12 @@ test('dpub: body props on aside', () => {
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote" class="my-note">Footnote content</aside>
+<aside id="fn1" role="doc-footnote" class="my-note"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
 
-test('dpub: call factory on reference', () => {
+test('dpub: body factory can change marker separator', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -392,39 +374,22 @@ test('dpub: call factory on reference', () => {
     partial: true,
     footnote: {
       mode: 'dpub',
-      call: (hFn, props, children) =>
-        hFn('span', { ...props, class: 'custom-ref' }, ...children),
-    },
-  });
-  const expected = `
-<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref" class="custom-ref">1</a>.</p>
-<aside id="fn1" role="doc-footnote">Footnote content</aside>
-`;
-  expect(received).toBe(expected);
-});
-
-test('dpub: body factory on aside', () => {
-  const md = `Reference[^1].
-
-[^1]: Footnote content`;
-  const received = stringify(md, {
-    partial: true,
-    footnote: {
-      mode: 'dpub',
-      body: (hFn, props, children) =>
-        hFn('div', { ...props, class: 'custom-note' }, ...children),
+      // backlink is typed as DpubBacklink and _sep as DpubMarkerSeparator,
+      // so the separator can be replaced in a type-safe manner
+      body: (hFn, props, [backlink, _sep, ...content]) =>
+        hFn('aside', props, backlink, ') ', ...content),
     },
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote" class="custom-note">Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>) Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
 
-// factory tagName override tests
+// factory selector class tests
 
-test('gcpm: factory selector class preserved, tagName forced to span', () => {
+test('gcpm: factory selector class via shorthand', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -432,7 +397,7 @@ test('gcpm: factory selector class preserved, tagName forced to span', () => {
     partial: true,
     footnote: {
       mode: 'gcpm',
-      body: (hFn, props, children) => hFn('div.foobar', props, ...children),
+      body: (hFn, props, children) => hFn('.foobar', props, ...children),
     },
   });
   const expected = `
@@ -441,7 +406,7 @@ test('gcpm: factory selector class preserved, tagName forced to span', () => {
   expect(received).toBe(expected);
 });
 
-test('dpub: call factory selector class preserved, tagName forced to a', () => {
+test('dpub: call factory selector class via shorthand', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -449,17 +414,17 @@ test('dpub: call factory selector class preserved, tagName forced to a', () => {
     partial: true,
     footnote: {
       mode: 'dpub',
-      call: (hFn, props, children) => hFn('div.foobar', props, ...children),
+      call: (hFn, props, children) => hFn('.foobar', props, ...children),
     },
   });
   const expected = `
 <p>Reference<a class="foobar" id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote">Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
 
-test('dpub: body factory selector class preserved, tagName forced to aside', () => {
+test('dpub: body factory selector class via shorthand', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -467,12 +432,12 @@ test('dpub: body factory selector class preserved, tagName forced to aside', () 
     partial: true,
     footnote: {
       mode: 'dpub',
-      body: (hFn, props, children) => hFn('div.foobar', props, ...children),
+      body: (hFn, props, children) => hFn('.foobar', props, ...children),
     },
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside class="foobar" id="fn1" role="doc-footnote">Footnote content</aside>
+<aside class="foobar" id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });

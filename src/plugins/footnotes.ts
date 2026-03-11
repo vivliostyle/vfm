@@ -20,7 +20,11 @@
 
 import type * as hast from 'hast';
 import { selectAll } from 'hast-util-select';
-import { h } from 'hastscript';
+import {
+  h,
+  type Properties as HProperties,
+  type Child as HChild,
+} from 'hastscript';
 import {
   type Handler as ToHastHandler,
   all as convertToHast,
@@ -144,16 +148,66 @@ const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
 };
 
 /**
+ * Selector type constraining the tag name to TTag, optionally followed
+ * by hastscript id/class shorthand (e.g. `"aside#my-id"`, `"aside.my-class"`).
+ * Tag-less shorthand (e.g. `".my-class"`) is also accepted; hastscript
+ * produces a `div` in that case, which the caller overwrites with TTag.
+ * hastscript recognizes only `#` and `.` as selector shorthand delimiters.
+ * @see https://github.com/syntax-tree/hast-util-parse-selector/blob/3.1.1/lib/index.js#L6
+ */
+type TaggedSelector<TTag extends string> =
+  | TTag
+  | `${TTag}${'.' | '#'}${string}`
+  | `${'.' | '#'}${string}`;
+
+/**
+ * Constrained `h` function passed to {@link FootnoteFactory}.
+ * Only the element-creating overloads are exposed since the
+ * Root-creating ones are never useful in this context.
+ */
+type ConstrainedH<TTag extends string> = {
+  (
+    selector: TaggedSelector<TTag>,
+    properties?: HProperties,
+    ...children: HChild[]
+  ): hast.Element;
+  (selector: TaggedSelector<TTag>, ...children: HChild[]): hast.Element;
+};
+
+/**
  * Factory that customizes a footnote element. The returned element's
  * `tagName` is ignored: the caller forces the appropriate tag
  * (`<span>` for gcpm, `<a>` / `<aside>` for dpub).
+ * @template TTag The tag name forced by the caller.
  * @template TProps Structural properties provided by the caller.
+ * @template TChildren Children tuple provided by the caller.
  */
-export type FootnoteFactory<TProps> = (
-  h: typeof import('hastscript').h,
+export type FootnoteFactory<
+  TTag extends string,
+  TProps,
+  TChildren extends hast.ElementContent[] = hast.ElementContent[],
+> = (
+  h: ConstrainedH<TTag>,
   properties: TProps,
-  children: hast.ElementContent[],
+  children: TChildren,
 ) => Omit<hast.Element, 'tagName'>;
+
+/** Backlink element placed at the head of a DPUB footnote body. */
+type DpubBacklink = hast.Element & {
+  tagName: 'a';
+  children: [hast.Text & { value: `${number}` }];
+  properties: { href: `#fnref${number}`; role: 'doc-backlink' };
+};
+
+/** Separator text between backlink and footnote content. */
+type DpubMarkerSeparator = hast.Text & { value: '. ' };
+
+/** Children tuple passed to DPUB body factory / buildElement. */
+export type DpubBodyChildren = [
+  DpubBacklink,
+  DpubMarkerSeparator,
+  ...hast.ElementContent[],
+];
 
 /**
  * - `"pandoc"`: endnote section at document end (default).
@@ -163,38 +217,43 @@ export type FootnoteFactory<TProps> = (
  */
 export type FootnoteMode = 'pandoc' | 'dpub' | 'gcpm';
 
+export type DpubCallFactory = FootnoteFactory<
+  'a',
+  { id: `fnref${number}`; href: `#fn${number}`; role: 'doc-noteref' }
+>;
+
+export type DpubBodyFactory = FootnoteFactory<
+  'aside',
+  { id: `fn${number}`; role: 'doc-footnote' },
+  DpubBodyChildren
+>;
+
+export type GcpmBodyFactory = FootnoteFactory<'span', { id: `fn-${string}` }>;
+
 export type FootnoteOptions = {
   footnote?:
     | FootnoteMode
     | { mode: 'pandoc' }
     | {
         mode: 'dpub';
-        call?:
-          | hast.Properties
-          | FootnoteFactory<{
-              id: string;
-              href: string;
-              role: 'doc-noteref';
-            }>;
-        body?:
-          | hast.Properties
-          | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
+        call?: hast.Properties | DpubCallFactory;
+        body?: hast.Properties | DpubBodyFactory;
       }
     | {
         mode: 'gcpm';
-        body?: hast.Properties | FootnoteFactory<{ id: string }>;
+        body?: hast.Properties | GcpmBodyFactory;
       };
 };
 
 type BuildFootnote = (
-  id: string,
+  id: `fn-${string}`,
   children: hast.ElementContent[],
 ) => hast.Element;
 
 const createBuildFootnote =
-  (factory: FootnoteFactory<{ id: string }>): BuildFootnote =>
+  (factory: GcpmBodyFactory): BuildFootnote =>
   (id, children) => {
-    const result = factory(h, { id }, children);
+    const result = factory(h as ConstrainedH<'span'>, { id }, children);
     (result as hast.Element).tagName = 'span';
     return result as hast.Element;
   };
@@ -243,14 +302,25 @@ const createFootnoteReferenceHandler =
  * For Factory, the factory receives structural props and its returned
  * properties are merged with structural props winning only for `tagName`.
  */
-const buildElement = <TProps extends hast.Properties>(
-  tagName: string,
+const buildElement = <
+  TTag extends string,
+  TProps extends hast.Properties,
+  TChildren extends hast.ElementContent[] = hast.ElementContent[],
+>(
+  tagName: TTag,
   structuralProps: TProps,
-  children: hast.ElementContent[],
-  customizer: hast.Properties | FootnoteFactory<TProps> | undefined,
+  children: TChildren,
+  customizer:
+    | hast.Properties
+    | FootnoteFactory<TTag, TProps, TChildren>
+    | undefined,
 ): hast.Element => {
   if (typeof customizer === 'function') {
-    const result = customizer(h, structuralProps, children);
+    const result = customizer(
+      h as ConstrainedH<TTag>,
+      structuralProps,
+      children,
+    );
     (result as hast.Element).tagName = tagName;
     return result as hast.Element;
   }
@@ -286,14 +356,8 @@ const createDpubFootnoteReferenceHandler =
   (
     pending: Map<string, hast.Element>,
     nextIndex: () => number,
-    callCustomizer:
-      | hast.Properties
-      | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>
-      | undefined,
-    bodyCustomizer:
-      | hast.Properties
-      | FootnoteFactory<{ id: string; role: 'doc-footnote' }>
-      | undefined,
+    callCustomizer: hast.Properties | DpubCallFactory | undefined,
+    bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
   ): ToHastHandler =>
   (ctx, node) => {
     const identifier = String(node.identifier);
@@ -303,20 +367,36 @@ const createDpubFootnoteReferenceHandler =
     }
 
     const refIndex = nextIndex();
-    const callId = `fnref${refIndex}`;
-    const fnId = `fn${refIndex}`;
+    const callId = `fnref${refIndex}` as `fnref${number}`;
+    const fnId = `fn${refIndex}` as `fn${number}`;
+
+    const backlink: DpubBacklink = h(
+      'a',
+      { href: `#${callId}`, role: 'doc-backlink' },
+      u('text', `${refIndex}`),
+    ) as DpubBacklink;
+    const separator: DpubMarkerSeparator = u(
+      'text',
+      '. ',
+    ) as DpubMarkerSeparator;
+
+    const bodyChildren: DpubBodyChildren = [
+      backlink,
+      separator,
+      ...convertToHast(
+        ctx,
+        def.children.length === 1 && def.children[0].type === 'paragraph'
+          ? def.children[0]
+          : def,
+      ),
+    ];
 
     pending.set(
       callId,
       buildElement(
         'aside',
         { id: fnId, role: 'doc-footnote' as const },
-        convertToHast(
-          ctx,
-          def.children.length === 1 && def.children[0].type === 'paragraph'
-            ? def.children[0]
-            : def,
-        ),
+        bodyChildren,
         bodyCustomizer,
       ),
     );
@@ -333,14 +413,8 @@ const createDpubInlineFootnoteHandler =
   (
     pending: Map<string, hast.Element>,
     nextIndex: () => number,
-    callCustomizer:
-      | hast.Properties
-      | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>
-      | undefined,
-    bodyCustomizer:
-      | hast.Properties
-      | FootnoteFactory<{ id: string; role: 'doc-footnote' }>
-      | undefined,
+    callCustomizer: hast.Properties | DpubCallFactory | undefined,
+    bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
   ): ToHastHandler =>
   (ctx, node) => {
     let no = 1;
@@ -356,15 +430,31 @@ const createDpubInlineFootnoteHandler =
     };
 
     const refIndex = nextIndex();
-    const callId = `fnref${refIndex}`;
-    const fnId = `fn${refIndex}`;
+    const callId = `fnref${refIndex}` as `fnref${number}`;
+    const fnId = `fn${refIndex}` as `fn${number}`;
+
+    const backlink: DpubBacklink = h(
+      'a',
+      { href: `#${callId}`, role: 'doc-backlink' },
+      u('text', `${refIndex}`),
+    ) as DpubBacklink;
+    const separator: DpubMarkerSeparator = u(
+      'text',
+      '. ',
+    ) as DpubMarkerSeparator;
+
+    const bodyChildren: DpubBodyChildren = [
+      backlink,
+      separator,
+      ...convertToHast(ctx, node),
+    ];
 
     pending.set(
       callId,
       buildElement(
         'aside',
         { id: fnId, role: 'doc-footnote' as const },
-        convertToHast(ctx, node),
+        bodyChildren,
         bodyCustomizer,
       ),
     );
@@ -488,16 +578,12 @@ type ResolvedOption =
   | { mode: 'pandoc' }
   | {
       mode: 'dpub';
-      call?:
-        | hast.Properties
-        | FootnoteFactory<{ id: string; href: string; role: 'doc-noteref' }>;
-      body?:
-        | hast.Properties
-        | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
+      call?: hast.Properties | DpubCallFactory;
+      body?: hast.Properties | DpubBodyFactory;
     }
   | {
       mode: 'gcpm';
-      body?: hast.Properties | FootnoteFactory<{ id: string }>;
+      body?: hast.Properties | GcpmBodyFactory;
     };
 
 const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
@@ -554,10 +640,14 @@ export const createFootnotePlugin = (
     typeof body === 'function'
       ? body
       : typeof body === 'object'
-      ? (hFn, props, children) =>
-          hFn('span', { ...props, ...body }, ...children)
-      : (hFn, props, children) =>
-          hFn('span', { class: 'footnote', ...props }, ...children),
+      ? (((hFn, props, children) =>
+          hFn('span', { ...props, ...body }, ...children)) as GcpmBodyFactory)
+      : (((hFn, props, children) =>
+          hFn(
+            'span',
+            { class: 'footnote', ...props },
+            ...children,
+          )) as GcpmBodyFactory),
   );
 
   return {

@@ -1,10 +1,9 @@
-import * as hast from 'hast';
 import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { mdast as doc } from './plugins/document.js';
 import { hast as hastMath } from './plugins/math.js';
-import { FootnoteFactory, FootnoteMode } from './plugins/footnotes.js';
+import type { FootnoteOptions } from './plugins/footnotes.js';
 import { Metadata, readMetadata } from './plugins/metadata.js';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
@@ -39,26 +38,7 @@ export interface StringifyMarkdownOptions {
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
   /** Footnote output mode. Default is `'pandoc'` (endnote section). */
-  footnote?:
-    | FootnoteMode
-    | { mode: 'pandoc' }
-    | {
-        mode: 'dpub';
-        call?:
-          | hast.Properties
-          | FootnoteFactory<{
-              id: string;
-              href: string;
-              role: 'doc-noteref';
-            }>;
-        body?:
-          | hast.Properties
-          | FootnoteFactory<{ id: string; role: 'doc-footnote' }>;
-      }
-    | {
-        mode: 'gcpm';
-        body?: hast.Properties | FootnoteFactory<{ id: string }>;
-      };
+  footnote?: FootnoteOptions['footnote'];
 }
 
 export interface Hooks {
