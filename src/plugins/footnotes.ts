@@ -148,37 +148,64 @@ const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
 };
 
 /**
- * Selector type constraining the tag name to TTag, optionally followed
- * by hastscript id/class shorthand (e.g. `"aside#my-id"`, `"aside.my-class"`).
- * Tag-less shorthand (e.g. `".my-class"`) is also accepted; hastscript
- * produces a `div` in that case, which the caller overwrites with TTag.
+ * Extract the tag name from a hastscript CSS selector string.
  * hastscript recognizes only `#` and `.` as selector shorthand delimiters.
+ *
+ * - `"aside"` → `"aside"`
+ * - `"aside.foo"` → `"aside"`
+ * - `".foo"` → `ShorthandTagName` (implicit div, distinguished from explicit `"div"`)
+ * - `""` → `ShorthandTagName`
+ *
  * @see https://github.com/syntax-tree/hast-util-parse-selector/blob/3.1.1/lib/index.js#L6
  */
-type TaggedSelector<TTag extends string> =
-  | TTag
-  | `${TTag}${'.' | '#'}${string}`
-  | `${'.' | '#'}${string}`;
+type ExtractTagName<S extends string> = S extends `${infer Tag}${
+  | '.'
+  | '#'}${string}`
+  ? Tag extends ''
+    ? ShorthandTagName
+    : Tag
+  : S extends ''
+  ? ShorthandTagName
+  : S;
+
+const shorthandTagBrand = Symbol();
 
 /**
- * Constrained `h` function passed to {@link FootnoteFactory}.
- * Only the element-creating overloads are exposed since the
- * Root-creating ones are never useful in this context.
+ * Branded `"div"` produced when hastscript receives a tag-less shorthand
+ * selector (e.g. `".foo"`).  Distinguished from an explicit `"div"` so that
+ * {@link FootnoteFactory} can accept shorthand at the top level while
+ * rejecting an explicit wrong tag name.
  */
-type ConstrainedH<TTag extends string> = {
-  (
-    selector: TaggedSelector<TTag>,
+type ShorthandTagName = 'div' & { [shorthandTagBrand]: unknown };
+
+/**
+ * Tag-aware `h` function passed to {@link FootnoteFactory}.
+ * Accepts any selector freely (enabling child element creation with
+ * arbitrary tags), but preserves the tag name extracted from the selector
+ * in the return type.
+ */
+type TagAwareH = {
+  <S extends string>(
+    selector: S,
     properties?: HProperties,
     ...children: HChild[]
-  ): hast.Element;
-  (selector: TaggedSelector<TTag>, ...children: HChild[]): hast.Element;
+  ): hast.Element & { tagName: ExtractTagName<S> };
+  <S extends string>(selector: S, ...children: HChild[]): hast.Element & {
+    tagName: ExtractTagName<S>;
+  };
 };
 
 /**
- * Factory that customizes a footnote element. The returned element's
- * `tagName` is ignored: the caller forces the appropriate tag
- * (`<span>` for gcpm, `<a>` / `<aside>` for dpub).
- * @template TTag The tag name forced by the caller.
+ * Factory that customizes a footnote element.
+ *
+ * The `h` parameter is a {@link TagAwareH} that accepts any selector
+ * (including child-element creation like `h('span.wrap', ...)`), but
+ * the return type must have `tagName` matching `TTag` or
+ * {@link ShorthandTagName} (tag-less shorthand like `".foo"`).
+ * When a shorthand selector is used, the caller overwrites `tagName`
+ * at runtime.
+ *
+ * @template TTag The expected root tag name.
  * @template TProps Structural properties provided by the caller.
  * @template TChildren Children tuple provided by the caller.
  */
@@ -187,10 +214,10 @@ export type FootnoteFactory<
   TProps,
   TChildren extends hast.ElementContent[] = hast.ElementContent[],
 > = (
-  h: ConstrainedH<TTag>,
+  h: TagAwareH,
   properties: TProps,
   children: TChildren,
-) => Omit<hast.Element, 'tagName'>;
+) => hast.Element & { tagName: TTag | ShorthandTagName };
 
 /** Backlink element placed at the head of a DPUB footnote body. */
 type DpubBacklink = hast.Element & {
@@ -253,9 +280,9 @@ type BuildFootnote = (
 const createBuildFootnote =
   (factory: GcpmBodyFactory): BuildFootnote =>
   (id, children) => {
-    const result = factory(h as ConstrainedH<'span'>, { id }, children);
-    (result as hast.Element).tagName = 'span';
-    return result as hast.Element;
+    const result = factory(h as TagAwareH, { id }, children);
+    result.tagName = 'span';
+    return result;
   };
 
 const createInlineFootnoteHandler =
@@ -316,13 +343,9 @@ const buildElement = <
     | undefined,
 ): hast.Element => {
   if (typeof customizer === 'function') {
-    const result = customizer(
-      h as ConstrainedH<TTag>,
-      structuralProps,
-      children,
-    );
-    (result as hast.Element).tagName = tagName;
-    return result as hast.Element;
+    const result = customizer(h as TagAwareH, structuralProps, children);
+    result.tagName = tagName;
+    return result;
   }
   if (typeof customizer === 'object') {
     return h(tagName, { ...structuralProps, ...customizer }, ...children);
