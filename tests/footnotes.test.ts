@@ -269,8 +269,8 @@ Second paragraph[^2].
   });
   const expected = `
 <p>First paragraph<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
 <p>Second paragraph<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
 <aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink">2</a>. Second note</aside>
 `;
   expect(received).toBe(expected);
@@ -305,7 +305,25 @@ test('dpub: no footnotes present', () => {
   expect(received).toBe(expected);
 });
 
-test('dpub: aside escapes transparent element to nearest flow container', () => {
+test('dpub: aside at definition position, not call position', () => {
+  const md = `test[^1]
+
+one more line
+
+[^1]: footnote body`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: 'dpub',
+  });
+  const expected = `
+<p>test<a id="fnref1" href="#fn1" role="doc-noteref">1</a></p>
+<p>one more line</p>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. footnote body</aside>
+`;
+  expect(received).toBe(expected);
+});
+
+test('dpub: aside placed at definition position outside transparent element', () => {
   const md = `<del>
 
 Text with footnote[^1].
@@ -317,7 +335,9 @@ Text with footnote[^1].
     partial: true,
     footnote: 'dpub',
   });
-  const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p><aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Deleted footnote</aside></del>`;
+  const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p></del>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Deleted footnote</aside>
+`;
   expect(received).toBe(expected);
 });
 

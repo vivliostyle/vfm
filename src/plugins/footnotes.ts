@@ -366,10 +366,12 @@ const buildElement = <
  *   handlers that produce `<span>` footnote elements at the call site.
  *
  * When `footnote` is `"dpub"`:
- * - `toHastHandlers` produces `<a role="doc-noteref">` calls and queues
- *   `<aside role="doc-footnote">` elements for insertion.
- * - `hastTransformers` inserts aside elements after the nearest
- *   non-flow-container ancestor.
+ * - `toHastHandlers` produces `<a role="doc-noteref">` calls, queues
+ *   `<aside role="doc-footnote">` elements, and emits placeholders at
+ *   footnote definition positions.
+ * - `hastTransformers` replaces placeholders with the queued asides.
+ *   Inline footnotes (no definition position) are inserted after their
+ *   nearest non-flow-container ancestor.
  *
  * @param options Footnote options.
  * @returns `toHastHandlers` for remark-rehype and `hastTransformers` as
@@ -415,7 +417,7 @@ const createDpubFootnoteReferenceHandler =
     ];
 
     pending.set(
-      callId,
+      identifier,
       buildElement(
         'aside',
         { id: fnId, role: 'doc-footnote' as const },
@@ -434,7 +436,7 @@ const createDpubFootnoteReferenceHandler =
 
 const createDpubInlineFootnoteHandler =
   (
-    pending: Map<string, hast.Element>,
+    inlinePending: Map<string, hast.Element>,
     nextIndex: () => number,
     callCustomizer: hast.Properties | DpubCallFactory | undefined,
     bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
@@ -472,7 +474,7 @@ const createDpubInlineFootnoteHandler =
       ...convertToHast(ctx, node),
     ];
 
-    pending.set(
+    inlinePending.set(
       callId,
       buildElement(
         'aside',
@@ -488,6 +490,110 @@ const createDpubInlineFootnoteHandler =
       [u('text', `${refIndex}`)],
       callCustomizer,
     );
+  };
+
+/**
+ * Emit a placeholder element at the footnote definition position.
+ * The default mdast-util-to-hast handler ignores footnoteDefinition nodes;
+ * this override preserves the position in the hast tree so the transformer
+ * can replace the placeholder with the queued aside.
+ */
+const createDpubFootnoteDefinitionHandler =
+  (): ToHastHandler => (_ctx, node) => {
+    const identifier = String(node.identifier);
+    return h('div', { dataFootnotePlaceholder: identifier });
+  };
+
+/**
+ * Replace definition-position placeholders with queued asides, and insert
+ * inline-footnote asides after their nearest non-flow-container ancestor.
+ */
+const createReplaceDpubPlaceholders =
+  (
+    pending: Map<string, hast.Element>,
+    inlinePending: Map<string, hast.Element>,
+  ): unified.Plugin =>
+  () =>
+  (tree) => {
+    const root = tree as hast.Root;
+    const placed = new Set<string>();
+
+    // Phase 1: Replace placeholders with asides from reference footnotes
+    function walkAndReplace(parent: hast.Element | hast.Root) {
+      const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
+      for (const child of parent.children) {
+        if (
+          child.type === 'element' &&
+          child.tagName === 'div' &&
+          child.properties?.dataFootnotePlaceholder
+        ) {
+          const id = String(child.properties.dataFootnotePlaceholder);
+          const aside = pending.get(id);
+          if (aside) {
+            newChildren.push(aside);
+            placed.add(id);
+          }
+          // Unreferenced definition: drop placeholder
+          continue;
+        }
+        newChildren.push(child);
+        if (child.type === 'element') {
+          walkAndReplace(child);
+        }
+      }
+      parent.children = newChildren;
+    }
+
+    walkAndReplace(root);
+
+    // Phase 2: Insert inline footnote asides after nearest non-flow-container
+    if (inlinePending.size > 0) {
+      const remaining = new Set(inlinePending.keys());
+
+      function containsCall(
+        node: hast.RootContent | hast.ElementContent,
+      ): string[] {
+        if (remaining.size === 0 || node.type !== 'element') {
+          return [];
+        }
+        const id = node.properties?.id;
+        return [
+          ...(typeof id === 'string' && remaining.has(id) ? [id] : []),
+          ...node.children.flatMap((child) => containsCall(child)),
+        ];
+      }
+
+      function processParent(parent: hast.Element | hast.Root) {
+        const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
+        for (const child of parent.children) {
+          newChildren.push(child);
+          if (child.type !== 'element') {
+            continue;
+          }
+          if (flowContainerTagNames.has(child.tagName)) {
+            processParent(child);
+          } else {
+            for (const callId of containsCall(child)) {
+              const aside = inlinePending.get(callId);
+              if (aside) {
+                newChildren.push(aside);
+                remaining.delete(callId);
+              }
+            }
+          }
+        }
+        parent.children = newChildren;
+      }
+
+      processParent(root);
+
+      for (const callId of remaining) {
+        const aside = inlinePending.get(callId);
+        if (aside) {
+          root.children.push(aside);
+        }
+      }
+    }
   };
 
 /**
@@ -537,66 +643,6 @@ const flowContainerTagNames = new Set([
   'video',
 ]);
 
-/**
- * Insert each pending aside after the nearest non-flow-container
- * ancestor of its call element.
- */
-const createInsertDpubAsides =
-  (pending: Map<string, hast.Element>): unified.Plugin =>
-  () =>
-  (tree) => {
-    if (pending.size === 0) {
-      return;
-    }
-
-    const remaining = new Set(pending.keys());
-
-    function containsCall(
-      node: hast.RootContent | hast.ElementContent,
-    ): string[] {
-      if (remaining.size === 0 || node.type !== 'element') {
-        return [];
-      }
-      const id = node.properties?.id;
-      return [
-        ...(typeof id === 'string' && remaining.has(id) ? [id] : []),
-        ...node.children.flatMap((child) => containsCall(child)),
-      ];
-    }
-
-    function processParent(parent: hast.Element | hast.Root) {
-      const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
-      for (const child of parent.children) {
-        newChildren.push(child);
-        if (child.type !== 'element') {
-          continue;
-        }
-        if (flowContainerTagNames.has(child.tagName)) {
-          processParent(child);
-        } else {
-          for (const callId of containsCall(child)) {
-            const aside = pending.get(callId);
-            if (aside) {
-              newChildren.push(aside);
-              remaining.delete(callId);
-            }
-          }
-        }
-      }
-      parent.children = newChildren;
-    }
-
-    const root = tree as hast.Root;
-    processParent(root);
-
-    for (const callId of remaining) {
-      const aside = pending.get(callId);
-      if (aside) {
-        root.children.push(aside);
-      }
-    }
-  };
-
 type ResolvedOption =
   | { mode: 'pandoc' }
   | {
@@ -622,7 +668,7 @@ const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
 export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {
-  toHastHandlers: Record<'footnoteReference' | 'footnote', ToHastHandler> | {};
+  toHastHandlers: Record<string, ToHastHandler> | {};
   hastTransformers: unified.PluggableList;
 } => {
   const resolved = resolveOption(options?.footnote);
@@ -636,10 +682,12 @@ export const createFootnotePlugin = (
 
   if (resolved.mode === 'dpub') {
     const pending = new Map<string, hast.Element>();
+    const inlinePending = new Map<string, hast.Element>();
     let counter = 0;
     const nextIndex = () => ++counter;
     return {
       toHastHandlers: {
+        footnoteDefinition: createDpubFootnoteDefinitionHandler(),
         footnoteReference: createDpubFootnoteReferenceHandler(
           pending,
           nextIndex,
@@ -647,13 +695,13 @@ export const createFootnotePlugin = (
           resolved.body,
         ),
         footnote: createDpubInlineFootnoteHandler(
-          pending,
+          inlinePending,
           nextIndex,
           resolved.call,
           resolved.body,
         ),
       },
-      hastTransformers: [createInsertDpubAsides(pending)],
+      hastTransformers: [createReplaceDpubPlaceholders(pending, inlinePending)],
     };
   }
 
