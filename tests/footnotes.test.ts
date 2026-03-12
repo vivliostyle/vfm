@@ -218,7 +218,7 @@ test('dpub: basic reference footnote', () => {
     footnote: 'dpub',
   });
   const expected = `
-<p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
@@ -231,7 +231,7 @@ test('dpub: inline footnote', () => {
     footnote: 'dpub',
   });
   const expected = `
-<p>Text with inline<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<p>Text with inline<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Inline content</aside>
 `;
   expect(received).toBe(expected);
@@ -248,7 +248,7 @@ test('dpub: multiple footnotes in same paragraph', () => {
     footnote: 'dpub',
   });
   const expected = `
-<p>First<a id="fnref1" href="#fn1" role="doc-noteref">1</a> and second<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
+<p>First<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a> and second<a id="fnref2" href="#fn2" role="doc-noteref"><sup>2</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
 <aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink">2</a>. Second note</aside>
 `;
@@ -268,8 +268,8 @@ Second paragraph[^2].
     footnote: 'dpub',
   });
   const expected = `
-<p>First paragraph<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
-<p>Second paragraph<a id="fnref2" href="#fn2" role="doc-noteref">2</a>.</p>
+<p>First paragraph<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
+<p>Second paragraph<a id="fnref2" href="#fn2" role="doc-noteref"><sup>2</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
 <aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink">2</a>. Second note</aside>
 `;
@@ -287,7 +287,7 @@ Text with footnote[^1].
 [^1]: Footnote via frontmatter`;
   const received = stringify(md, { partial: true });
   const expected = `
-<p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote via frontmatter</aside>
 `;
   expect(received).toBe(expected);
@@ -316,7 +316,7 @@ one more line
     footnote: 'dpub',
   });
   const expected = `
-<p>test<a id="fnref1" href="#fn1" role="doc-noteref">1</a></p>
+<p>test<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a></p>
 <p>one more line</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. footnote body</aside>
 `;
@@ -335,7 +335,7 @@ Text with footnote[^1].
     partial: true,
     footnote: 'dpub',
   });
-  const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p></del>
+  const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p></del>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Deleted footnote</aside>
 `;
   expect(received).toBe(expected);
@@ -350,7 +350,7 @@ test('dpub: aside escapes recursively through nested transparent elements', () =
     footnote: 'dpub',
   });
   const expected = `
-<p><del><ins>Text<a id="fnref1" href="#fn1" role="doc-noteref">1</a></ins></del> after.</p>
+<p><del><ins>Text<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a></ins></del> after.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Nested footnote</aside>
 `;
   expect(received).toBe(expected);
@@ -365,7 +365,7 @@ test('dpub: call props on reference', () => {
     footnote: { mode: 'dpub', call: { class: 'my-ref' } },
   });
   const expected = `
-<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref" class="my-ref">1</a>.</p>
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref" class="my-ref"><sup>1</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
@@ -380,7 +380,7 @@ test('dpub: body props on aside', () => {
     footnote: { mode: 'dpub', body: { class: 'my-note' } },
   });
   const expected = `
-<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <aside id="fn1" role="doc-footnote" class="my-note"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
@@ -401,7 +401,7 @@ test('dpub: body factory can change marker separator', () => {
     },
   });
   const expected = `
-<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>) Footnote content</aside>
 `;
   expect(received).toBe(expected);
@@ -438,7 +438,7 @@ test('dpub: call factory selector class via shorthand', () => {
     },
   });
   const expected = `
-<p>Reference<a class="foobar" id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<p>Reference<a class="foobar" id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);
@@ -456,7 +456,7 @@ test('dpub: body factory selector class via shorthand', () => {
     },
   });
   const expected = `
-<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref">1</a>.</p>
+<p>Reference<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <aside class="foobar" id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
 `;
   expect(received).toBe(expected);

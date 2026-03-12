@@ -244,9 +244,19 @@ export type DpubBodyChildren = [
  */
 export type FootnoteMode = 'pandoc' | 'dpub' | 'gcpm';
 
+/** Sup element wrapping the reference number in a DPUB noteref. */
+type DpubCallSup = hast.Element & {
+  tagName: 'sup';
+  children: [hast.Text & { value: `${number}` }];
+};
+
+/** Children tuple passed to DPUB call factory / buildElement. */
+export type DpubCallChildren = [DpubCallSup];
+
 export type DpubCallFactory = FootnoteFactory<
   'a',
-  { id: `fnref${number}`; href: `#fn${number}`; role: 'doc-noteref' }
+  { id: `fnref${number}`; href: `#fn${number}`; role: 'doc-noteref' },
+  DpubCallChildren
 >;
 
 export type DpubBodyFactory = FootnoteFactory<
@@ -429,7 +439,7 @@ const createDpubFootnoteReferenceHandler =
     return buildElement(
       'a',
       { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
-      [u('text', `${refIndex}`)],
+      [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
       callCustomizer,
     );
   };
@@ -487,7 +497,7 @@ const createDpubInlineFootnoteHandler =
     return buildElement(
       'a',
       { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
-      [u('text', `${refIndex}`)],
+      [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
       callCustomizer,
     );
   };
