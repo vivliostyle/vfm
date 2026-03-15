@@ -1,0 +1,94 @@
+{
+  "name": "@vivliostyle/vfm",
+  "description": "Custom Markdown syntax specialized in book authoring.",
+  "version": "2.5.0",
+  "author": "Vivliostyle Foundation",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 20"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "bin": {
+    "vfm": "lib/cli.js"
+  },
+  "keywords": [
+    "markdown",
+    "vfm",
+    "vivliostyle"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vivliostyle/vfm.git"
+  },
+  "homepage": "https://github.com/vivliostyle/vfm",
+  "bugs": {
+    "url": "https://github.com/vivliostyle/vfm/issues"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
+    "dev": "tsc -w",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@types/hast": "^2.0.0",
+    "@types/mdast": "^3.0.0",
+    "debug": "^4.4.3",
+    "doctype": "^3.0.1",
+    "github-slugger": "^2.0.0",
+    "hast-util-find-and-replace": "^3.2.1",
+    "hast-util-is-element": "^2.1.3",
+    "hast-util-select": "^5.0.5",
+    "hastscript": "^7.2.0",
+    "js-yaml": "^4.1.0",
+    "md-attr-parser": "^1.3.0",
+    "mdast-util-find-and-replace": "^2.2.2",
+    "mdast-util-to-hast": "^11.3.0",
+    "mdast-util-to-string": "^3.2.0",
+    "meow": "^13.2.0",
+    "refractor": "^3.6.0",
+    "rehype-format": "^3.1.0",
+    "rehype-raw": "^5.1.0",
+    "rehype-stringify": "^8.0.0",
+    "remark-attr": "^0.11.1",
+    "remark-breaks": "^1.0.5",
+    "remark-footnotes": "^2.0.0",
+    "remark-frontmatter": "^2.0.0",
+    "remark-parse": "^8.0.2",
+    "remark-rehype": "^8.1.0",
+    "remark-shortcodes": "^0.3.1",
+    "to-vfile": "^6.1.0",
+    "unified": "^9.2.0",
+    "unist-builder": "^3.0.1",
+    "unist-util-filter": "^4.0.1",
+    "unist-util-find-after": "^4.0.1",
+    "unist-util-inspect": "^7.0.2",
+    "unist-util-remove": "^3.1.1",
+    "unist-util-select": "^4.0.3",
+    "unist-util-visit": "^4.1.2",
+    "unist-util-visit-parents": "^5.1.3"
+  },
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^10.0.1",
+    "@types/common-tags": "^1.8.4",
+    "@types/debug": "^4.1.12",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^18.7.21",
+    "@types/refractor": "^3.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "common-tags": "^1.8.2",
+    "eslint": "^8.24.0",
+    "prettier": "^2.7.1",
+    "shx": "^0.3.4",
+    "typescript": "~4.8.3",
+    "vitest": "^3.0.8"
+  }
+}
