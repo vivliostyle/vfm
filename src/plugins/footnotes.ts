@@ -389,6 +389,7 @@ const createDpubFootnoteReferenceHandler =
   (
     pending: Map<string, hast.Element>,
     nextIndex: () => number,
+    assigned: Map<string, { refIndex: number; dupCount: number }>,
     callCustomizer: hast.Properties | DpubCallFactory | undefined,
     bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
   ): ToHastHandler =>
@@ -399,7 +400,27 @@ const createDpubFootnoteReferenceHandler =
       return null;
     }
 
+    const existing = assigned.get(identifier);
+
+    if (existing) {
+      // Duplicate reference: reuse the same footnote number
+      const refIndex = existing.refIndex;
+      const fnId = `fn${refIndex}` as `fn${number}`;
+      existing.dupCount++;
+      const callId =
+        `fnref${refIndex}-${existing.dupCount}` as `fnref${number}`;
+
+      return buildElement(
+        'a',
+        { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
+        [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
+        callCustomizer,
+      );
+    }
+
+    // First reference: assign a new number and create the aside
     const refIndex = nextIndex();
+    assigned.set(identifier, { refIndex, dupCount: 0 });
     const callId = `fnref${refIndex}` as `fnref${number}`;
     const fnId = `fn${refIndex}` as `fn${number}`;
 
@@ -681,6 +702,7 @@ export const createFootnotePlugin = (
   if (resolved.mode === 'dpub') {
     const pending = new Map<string, hast.Element>();
     const inlinePending = new Map<string, hast.Element>();
+    const assigned = new Map<string, { refIndex: number; dupCount: number }>();
     let counter = 0;
     const nextIndex = () => ++counter;
     return {
@@ -689,6 +711,7 @@ export const createFootnotePlugin = (
         footnoteReference: createDpubFootnoteReferenceHandler(
           pending,
           nextIndex,
+          assigned,
           resolved.call,
           resolved.body,
         ),
