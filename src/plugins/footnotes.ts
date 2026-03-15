@@ -222,19 +222,17 @@ export type FootnoteFactory<
 /** Backlink element placed at the head of a DPUB footnote body. */
 type DpubBacklink = hast.Element & {
   tagName: 'a';
-  children: [hast.Text & { value: `${number}` }];
+  children: [
+    hast.Element & {
+      tagName: 'sup';
+      children: [hast.Text & { value: `${number}` }];
+    },
+  ];
   properties: { href: `#fnref${number}`; role: 'doc-backlink' };
 };
 
-/** Separator text between backlink and footnote content. */
-type DpubMarkerSeparator = hast.Text & { value: '. ' };
-
 /** Children tuple passed to DPUB body factory / buildElement. */
-export type DpubBodyChildren = [
-  DpubBacklink,
-  DpubMarkerSeparator,
-  ...hast.ElementContent[],
-];
+export type DpubBodyChildren = [DpubBacklink, ...hast.ElementContent[]];
 
 /**
  * - `"pandoc"`: endnote section at document end (default).
@@ -408,16 +406,11 @@ const createDpubFootnoteReferenceHandler =
     const backlink: DpubBacklink = h(
       'a',
       { href: `#${callId}`, role: 'doc-backlink' },
-      u('text', `${refIndex}`),
+      h('sup', u('text', `${refIndex}`)),
     ) as DpubBacklink;
-    const separator: DpubMarkerSeparator = u(
-      'text',
-      '. ',
-    ) as DpubMarkerSeparator;
 
     const bodyChildren: DpubBodyChildren = [
       backlink,
-      separator,
       ...convertToHast(
         ctx,
         def.children.length === 1 && def.children[0].type === 'paragraph'
@@ -471,16 +464,11 @@ const createDpubInlineFootnoteHandler =
     const backlink: DpubBacklink = h(
       'a',
       { href: `#${callId}`, role: 'doc-backlink' },
-      u('text', `${refIndex}`),
+      h('sup', u('text', `${refIndex}`)),
     ) as DpubBacklink;
-    const separator: DpubMarkerSeparator = u(
-      'text',
-      '. ',
-    ) as DpubMarkerSeparator;
 
     const bodyChildren: DpubBodyChildren = [
       backlink,
-      separator,
       ...convertToHast(ctx, node),
     ];
 

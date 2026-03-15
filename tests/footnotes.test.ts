@@ -219,7 +219,7 @@ test('dpub: basic reference footnote', () => {
   });
   const expected = `
 <p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -232,7 +232,7 @@ test('dpub: inline footnote', () => {
   });
   const expected = `
 <p>Text with inline<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Inline content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Inline content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -249,8 +249,8 @@ test('dpub: multiple footnotes in same paragraph', () => {
   });
   const expected = `
 <p>First<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a> and second<a id="fnref2" href="#fn2" role="doc-noteref"><sup>2</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
-<aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink">2</a>. Second note</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>First note</aside>
+<aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink"><sup>2</sup></a>Second note</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -270,8 +270,8 @@ Second paragraph[^2].
   const expected = `
 <p>First paragraph<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
 <p>Second paragraph<a id="fnref2" href="#fn2" role="doc-noteref"><sup>2</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. First note</aside>
-<aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink">2</a>. Second note</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>First note</aside>
+<aside id="fn2" role="doc-footnote"><a href="#fnref2" role="doc-backlink"><sup>2</sup></a>Second note</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -288,7 +288,7 @@ Text with footnote[^1].
   const received = stringify(md, { partial: true });
   const expected = `
 <p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote via frontmatter</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Footnote via frontmatter</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -318,7 +318,7 @@ one more line
   const expected = `
 <p>test<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a></p>
 <p>one more line</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. footnote body</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>footnote body</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -336,7 +336,7 @@ Text with footnote[^1].
     footnote: 'dpub',
   });
   const expected = `<del><p>Text with footnote<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p></del>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Deleted footnote</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Deleted footnote</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -351,7 +351,7 @@ test('dpub: aside escapes recursively through nested transparent elements', () =
   });
   const expected = `
 <p><del><ins>Text<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a></ins></del> after.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Nested footnote</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Nested footnote</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -366,7 +366,7 @@ test('dpub: call props on reference', () => {
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref" class="my-ref"><sup>1</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -381,12 +381,12 @@ test('dpub: body props on aside', () => {
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
-<aside id="fn1" role="doc-footnote" class="my-note"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
+<aside id="fn1" role="doc-footnote" class="my-note"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
 
-test('dpub: body factory can change marker separator', () => {
+test('dpub: body factory can customize backlink', () => {
   const md = `Reference[^1].
 
 [^1]: Footnote content`;
@@ -394,15 +394,15 @@ test('dpub: body factory can change marker separator', () => {
     partial: true,
     footnote: {
       mode: 'dpub',
-      // backlink is typed as DpubBacklink and _sep as DpubMarkerSeparator,
-      // so the separator can be replaced in a type-safe manner
-      body: (hFn, props, [backlink, _sep, ...content]) =>
+      // backlink is typed as DpubBacklink, so it can be customized
+      // in a type-safe manner
+      body: (hFn, props, [backlink, ...content]) =>
         hFn('aside', props, backlink, ') ', ...content),
     },
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>) Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>) Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -439,7 +439,7 @@ test('dpub: call factory selector class via shorthand', () => {
   });
   const expected = `
 <p>Reference<a class="foobar" id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
-<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
+<aside id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
@@ -457,7 +457,7 @@ test('dpub: body factory selector class via shorthand', () => {
   });
   const expected = `
 <p>Reference<a id="fnref1" href="#fn1" role="doc-noteref"><sup>1</sup></a>.</p>
-<aside class="foobar" id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink">1</a>. Footnote content</aside>
+<aside class="foobar" id="fn1" role="doc-footnote"><a href="#fnref1" role="doc-backlink"><sup>1</sup></a>Footnote content</aside>
 `;
   expect(received).toBe(expected);
 });
