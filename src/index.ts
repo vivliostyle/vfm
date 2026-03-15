@@ -3,8 +3,7 @@ import rehypeStringify from 'rehype-stringify';
 import unified, { Processor } from 'unified';
 import { mdast as doc } from './plugins/document.js';
 import { hast as hastMath } from './plugins/math.js';
-import { FootnoteFactory } from './plugins/footnotes.js';
-import { Properties } from 'hast';
+import type { FootnoteOptions } from './plugins/footnotes.js';
 import { Metadata, readMetadata } from './plugins/metadata.js';
 import { replace as handleReplace, ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
@@ -38,8 +37,8 @@ export interface StringifyMarkdownOptions {
   imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean;
-  /** Convert endnotes to inline footnotes for CSS GCPM `float: footnote`. */
-  endnotesAsFootnotes?: boolean | Properties | FootnoteFactory;
+  /** Footnote output mode. Default is `'pandoc'` (endnote section). */
+  footnote?: FootnoteOptions['footnote'];
 }
 
 export interface Hooks {
@@ -103,7 +102,7 @@ export function VFM(
     math = true,
     imgFigcaptionOrder = undefined,
     assignIdToFigcaption = false,
-    endnotesAsFootnotes = undefined,
+    footnote = undefined,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
 ): Processor {
@@ -129,17 +128,15 @@ export function VFM(
     if (metadata.vfm.assignIdToFigcaption !== undefined) {
       assignIdToFigcaption = metadata.vfm.assignIdToFigcaption;
     }
-    if (metadata.vfm.endnotesAsFootnotes !== undefined) {
-      endnotesAsFootnotes = metadata.vfm.endnotesAsFootnotes;
+    if (metadata.vfm.footnote !== undefined) {
+      footnote = metadata.vfm.footnote;
     }
   }
 
   const processor = unified()
     .use(markdown(hardLineBreaks, math))
     .data('settings', { position: true })
-    .use(
-      html({ imgFigcaptionOrder, assignIdToFigcaption, endnotesAsFootnotes }),
-    );
+    .use(html({ imgFigcaptionOrder, assignIdToFigcaption, footnote }));
 
   if (replace) {
     processor.use(handleReplace, { rules: replace });
