@@ -1,4 +1,5 @@
 .vscode
+.claude/settings.local.json
 lib/
 
 # Created by https://www.gitignore.io/api/node
