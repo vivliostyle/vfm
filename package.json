@@ -15,9 +15,5 @@
     "build": "npm run build -w @vivliostyle/vfm",
     "dev": "npm run dev -w @vivliostyle/vfm",
     "test": "npm run test -w @vivliostyle/vfm"
-  },
-  "devDependencies": {
-    "@types/unist": "2.0.3",
-    "@types/mdast": "3.0.10"
   }
 }
