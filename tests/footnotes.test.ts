@@ -484,6 +484,62 @@ Ccc aaa[^a].
   expect(received).toBe(expected);
 });
 
+// gcpm duplicate reference tests
+//
+// CSS GCPM (https://www.w3.org/TR/css-gcpm-3/#footnotes) has no concept of
+// multiple calls to the same footnote definition. Each `float: footnote`
+// element is its own footnote with its own ::footnote-call and
+// ::footnote-marker. When the same [^id] appears more than once, we
+// duplicate the <span> content and give each copy a unique id so the HTML
+// stays valid.
+//
+// Authors who want a single footnote body with multiple call sites can
+// place an `<a href="#fn-..."></a>` at each call site and use
+// `a::after { content: target-text(attr(href)) }` to pull in the
+// referenced text. This avoids duplicating the body while producing a
+// similar typeset result.
+
+test('gcpm: same footnote referenced from multiple locations', () => {
+  const md = `Aaa[^a] bbb[^b].
+
+Ccc aaa[^a].
+
+[^a]: Aaaaaa
+[^b]: Bbbbbb`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: 'gcpm',
+  });
+  const expected = `
+<p>Aaa<span class="footnote" id="fn-a">Aaaaaa</span> bbb<span class="footnote" id="fn-b">Bbbbbb</span>.</p>
+<p>Ccc aaa<span class="footnote" id="fn-a-1">Aaaaaa</span>.</p>
+`;
+  expect(received).toBe(expected);
+});
+
+test('gcpm: duplicate ids skip suffixes reserved by other definitions', () => {
+  const md = `Aaa[^foobar] bbb[^foobar-1] ccc[^foobar-3].
+
+Ddd[^foobar].
+
+Eee[^foobar].
+
+[^foobar]: Foobar
+[^foobar-1]: Foobar-1
+[^foobar-3]: Foobar-3`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: 'gcpm',
+  });
+  // -1 and -3 are reserved, so duplicates take -2 and -4.
+  const expected = `
+<p>Aaa<span class="footnote" id="fn-foobar">Foobar</span> bbb<span class="footnote" id="fn-foobar-1">Foobar-1</span> ccc<span class="footnote" id="fn-foobar-3">Foobar-3</span>.</p>
+<p>Ddd<span class="footnote" id="fn-foobar-2">Foobar</span>.</p>
+<p>Eee<span class="footnote" id="fn-foobar-4">Foobar</span>.</p>
+`;
+  expect(received).toBe(expected);
+});
+
 // string alias tests
 
 test('"pandoc" string behaves like default', () => {

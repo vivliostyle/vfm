@@ -310,25 +310,54 @@ const createInlineFootnoteHandler =
     return buildFootnote(`fn-${identifier}`, convertToHast(ctx, node));
   };
 
-const createFootnoteReferenceHandler =
-  (buildFootnote: BuildFootnote): ToHastHandler =>
-  (ctx, node) => {
+const createFootnoteReferenceHandler = (
+  buildFootnote: BuildFootnote,
+): ToHastHandler => {
+  const seen = new Map<string, number>();
+  let reserved: Set<string> | undefined;
+  return (ctx, node) => {
     const identifier = String(node.identifier);
     const def = ctx.footnoteById[identifier.toUpperCase()];
-    return !def
-      ? null
-      : buildFootnote(
-          `fn-${identifier}`,
-          convertToHast(
-            ctx,
-            // Unwrap single-paragraph definitions to produce inline content
-            // (matches tight list-item behavior in footer.js).
-            def.children.length === 1 && def.children[0].type === 'paragraph'
-              ? def.children[0]
-              : def,
-          ),
-        );
+    if (!def) {
+      return null;
+    }
+
+    // Lazily collect all definition identifiers so that duplicate-call ids
+    // never collide with ids reserved by other definitions.
+    if (!reserved) {
+      reserved = new Set(
+        Object.keys(ctx.footnoteById).map((k) => k.toLowerCase()),
+      );
+    }
+
+    const count = seen.get(identifier) ?? 0;
+
+    let id: `fn-${string}`;
+    if (count === 0) {
+      seen.set(identifier, count + 1);
+      id = `fn-${identifier}`;
+    } else {
+      let suffix = count;
+      while (reserved.has(`${identifier}-${suffix}`)) {
+        suffix++;
+      }
+      seen.set(identifier, suffix + 1);
+      id = `fn-${identifier}-${suffix}`;
+    }
+
+    return buildFootnote(
+      id,
+      convertToHast(
+        ctx,
+        // Unwrap single-paragraph definitions to produce inline content
+        // (matches tight list-item behavior in footer.js).
+        def.children.length === 1 && def.children[0].type === 'paragraph'
+          ? def.children[0]
+          : def,
+      ),
+    );
   };
+};
 
 /**
  * Build a hast element by applying a Properties-or-Factory customizer.
