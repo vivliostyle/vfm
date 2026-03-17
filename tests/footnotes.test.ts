@@ -464,6 +464,31 @@ test('dpub: body factory selector class via shorthand', () => {
 
 // duplicate reference tests
 
+test('pandoc: same footnote referenced from multiple locations', () => {
+  const md = `Aaa[^a] bbb[^b].
+
+Ccc aaa[^a].
+
+[^a]: Aaaaaa
+[^b]: Bbbbbb`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: 'pandoc',
+  });
+  const expected = `
+<p>Aaa<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a> bbb<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.</p>
+<p>Ccc aaa<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.</p>
+<section class="footnotes" role="doc-endnotes">
+  <hr>
+  <ol>
+    <li id="fn1" role="doc-endnote">Aaaaaa<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>
+    <li id="fn2" role="doc-endnote">Bbbbbb<a href="#fnref2" class="footnote-back" role="doc-backlink">↩</a></li>
+  </ol>
+</section>
+`;
+  expect(received).toBe(expected);
+});
+
 test('dpub: same footnote referenced from multiple locations', () => {
   const md = `Aaa[^a] bbb[^b].
 

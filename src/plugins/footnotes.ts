@@ -95,16 +95,38 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
  * Transform the endnote link with Pandoc format.
  */
 const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
-  selectEndnoteCalls(tree as hast.Root).forEach((call, i) => {
+  const calls = selectEndnoteCalls(tree as hast.Root);
+
+  // Build a stable mapping from definition identifier to endnote number.
+  // Duplicate references to the same definition reuse that number.
+  const identifierToIndex = new Map<string, number>();
+  const dupCount = new Map<string, number>();
+  let counter = 0;
+
+  calls.forEach((call) => {
     const sup: ElementWithProps = call;
     const [anchor]: [ElementWithProps] = call.children;
 
-    const refIndex = i + 1;
+    const href = String(anchor.properties.href);
+    const identifier = href.replace(/^#fn-/, '');
+
+    let refIndex = identifierToIndex.get(identifier);
+    let callId: string;
+
+    if (refIndex === undefined) {
+      refIndex = ++counter;
+      identifierToIndex.set(identifier, refIndex);
+      callId = `fnref${refIndex}`;
+    } else {
+      const dup = (dupCount.get(identifier) ?? 0) + 1;
+      dupCount.set(identifier, dup);
+      callId = `fnref${refIndex}-${dup}`;
+    }
 
     // Mutate sup into <a class="footnote-ref">
     sup.tagName = 'a';
     sup.properties = {
-      id: `fnref${refIndex}`,
+      id: callId,
       href: `#fn${refIndex}`,
       className: ['footnote-ref'],
       role: 'doc-noteref',
