@@ -37,7 +37,12 @@
     "dev": "tsc -w",
     "test": "vitest"
   },
+  "//": "@types/hast, @types/mdast は vfm の公開 API に現れるため、ユーザーにも型パッケージをインストールさせる必要がある",
+  "//": "さらにバージョンを Major 固定し、依存ツリー内で異なる Minor/Patch バージョンの重複インストール発生を防ぐ。これは unified の作者も使用しているパターン",
+  "//": "see: https://github.com/wooorm/refractor/blob/ed824ac801ef4bb5b25f73a4bcd6ce46b7eec8c9/package.json#L14",
   "dependencies": {
+    "@types/hast": "^2.0.0",
+    "@types/mdast": "^3.0.0",
     "debug": "^4.4.3",
     "doctype": "^3.0.1",
     "github-slugger": "^2.0.0",
@@ -78,8 +83,6 @@
     "@types/common-tags": "^1.8.4",
     "@types/debug": "^4.1.12",
     "@types/js-yaml": "^4.0.9",
-    "@types/hast": "^2.0.0",
-    "@types/mdast": "^3.0.10",
     "@types/node": "^18.7.21",
     "@types/refractor": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
