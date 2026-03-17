@@ -511,18 +511,19 @@ Ccc aaa[^a].
 
 // gcpm duplicate reference tests
 //
-// CSS GCPM (https://www.w3.org/TR/css-gcpm-3/#footnotes) has no concept of
-// multiple calls to the same footnote definition. Each `float: footnote`
-// element is its own footnote with its own ::footnote-call and
-// ::footnote-marker. When the same [^id] appears more than once, we
-// duplicate the <span> content and give each copy a unique id so the HTML
-// stays valid.
+// Each `float: footnote` element is its own footnote with its own
+// ::footnote-call and ::footnote-marker, so duplicating the <span> would
+// produce multiple footnotes with the same text.  Instead, VFM emits the
+// <span class="footnote"> only once and uses
+// <a class="footnote-duplicated-call"> for later references.
 //
-// Authors who want a single footnote body with multiple call sites can
-// place an `<a href="#fn-..."></a>` at each call site and use
-// `a::after { content: target-text(attr(href)) }` to pull in the
-// referenced text. This avoids duplicating the body while producing a
-// similar typeset result.
+// CSS to show the same number at the duplicated call site:
+//
+//   .footnote-duplicated-call::before {
+//     content: target-counter(attr(href url), footnote);
+//   }
+//
+// Style it to match .footnote::footnote-call.
 
 test('gcpm: same footnote referenced from multiple locations', () => {
   const md = `Aaa[^a] bbb[^b].
@@ -537,30 +538,48 @@ Ccc aaa[^a].
   });
   const expected = `
 <p>Aaa<span class="footnote" id="fn-a">Aaaaaa</span> bbb<span class="footnote" id="fn-b">Bbbbbb</span>.</p>
-<p>Ccc aaa<span class="footnote" id="fn-a-1">Aaaaaa</span>.</p>
+<p>Ccc aaa<a href="#fn-a" class="footnote-duplicated-call"></a>.</p>
 `;
   expect(received).toBe(expected);
 });
 
-test('gcpm: duplicate ids skip suffixes reserved by other definitions', () => {
-  const md = `Aaa[^foobar] bbb[^foobar-1] ccc[^foobar-3].
+test('gcpm: duplicatedCall with Properties customization', () => {
+  const md = `Aaa[^a].
 
-Ddd[^foobar].
+Bbb[^a].
 
-Eee[^foobar].
-
-[^foobar]: Foobar
-[^foobar-1]: Foobar-1
-[^foobar-3]: Foobar-3`;
+[^a]: Aaaaaa`;
   const received = stringify(md, {
     partial: true,
-    footnote: 'gcpm',
+    footnote: {
+      mode: 'gcpm',
+      duplicatedCall: { 'data-custom': 'true' },
+    },
   });
-  // -1 and -3 are reserved, so duplicates take -2 and -4.
   const expected = `
-<p>Aaa<span class="footnote" id="fn-foobar">Foobar</span> bbb<span class="footnote" id="fn-foobar-1">Foobar-1</span> ccc<span class="footnote" id="fn-foobar-3">Foobar-3</span>.</p>
-<p>Ddd<span class="footnote" id="fn-foobar-2">Foobar</span>.</p>
-<p>Eee<span class="footnote" id="fn-foobar-4">Foobar</span>.</p>
+<p>Aaa<span class="footnote" id="fn-a">Aaaaaa</span>.</p>
+<p>Bbb<a href="#fn-a" class="footnote-duplicated-call" data-custom="true"></a>.</p>
+`;
+  expect(received).toBe(expected);
+});
+
+test('gcpm: duplicatedCall with factory customization', () => {
+  const md = `Aaa[^a].
+
+Bbb[^a].
+
+[^a]: Aaaaaa`;
+  const received = stringify(md, {
+    partial: true,
+    footnote: {
+      mode: 'gcpm',
+      duplicatedCall: (hFn, props) =>
+        hFn('a', { ...props, 'data-factory': 'yes' }),
+    },
+  });
+  const expected = `
+<p>Aaa<span class="footnote" id="fn-a">Aaaaaa</span>.</p>
+<p>Bbb<a href="#fn-a" class="footnote-duplicated-call" data-factory="yes"></a>.</p>
 `;
   expect(received).toBe(expected);
 });

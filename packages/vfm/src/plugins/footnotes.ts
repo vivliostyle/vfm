@@ -287,6 +287,11 @@ export type DpubBodyFactory = FootnoteFactory<
 
 export type GcpmBodyFactory = FootnoteFactory<'span', { id: `fn-${string}` }>;
 
+export type GcpmDuplicatedCallFactory = FootnoteFactory<
+  'a',
+  { href: `#fn-${string}`; class: 'footnote-duplicated-call' }
+>;
+
 export type FootnoteOptions = {
   footnote?:
     | FootnoteMode
@@ -299,6 +304,7 @@ export type FootnoteOptions = {
     | {
         mode: 'gcpm';
         body?: hast.Properties | GcpmBodyFactory;
+        duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
       };
 };
 
@@ -314,6 +320,23 @@ const createBuildFootnote =
     result.tagName = 'span';
     return result;
   };
+
+type BuildDuplicatedCall = (targetId: `fn-${string}`) => hast.Element;
+
+const createBuildDuplicatedCall =
+  (
+    customizer: hast.Properties | GcpmDuplicatedCallFactory | undefined,
+  ): BuildDuplicatedCall =>
+  (targetId) =>
+    buildElement(
+      'a',
+      {
+        href: `#${targetId}`,
+        class: 'footnote-duplicated-call',
+      } as { href: `#fn-${string}`; class: 'footnote-duplicated-call' },
+      [],
+      customizer,
+    );
 
 const createInlineFootnoteHandler =
   (buildFootnote: BuildFootnote): ToHastHandler =>
@@ -334,9 +357,9 @@ const createInlineFootnoteHandler =
 
 const createFootnoteReferenceHandler = (
   buildFootnote: BuildFootnote,
+  buildDuplicatedCall: BuildDuplicatedCall,
 ): ToHastHandler => {
-  const seen = new Map<string, number>();
-  let reserved: Set<string> | undefined;
+  const seen = new Set<string>();
   return (ctx, node) => {
     const identifier = String(node.identifier);
     const def = ctx.footnoteById[identifier.toUpperCase()];
@@ -344,31 +367,13 @@ const createFootnoteReferenceHandler = (
       return null;
     }
 
-    // Lazily collect all definition identifiers so that duplicate-call ids
-    // never collide with ids reserved by other definitions.
-    if (!reserved) {
-      reserved = new Set(
-        Object.keys(ctx.footnoteById).map((k) => k.toLowerCase()),
-      );
+    if (seen.has(identifier)) {
+      return buildDuplicatedCall(`fn-${identifier}`);
     }
 
-    const count = seen.get(identifier) ?? 0;
-
-    let id: `fn-${string}`;
-    if (count === 0) {
-      seen.set(identifier, count + 1);
-      id = `fn-${identifier}`;
-    } else {
-      let suffix = count;
-      while (reserved.has(`${identifier}-${suffix}`)) {
-        suffix++;
-      }
-      seen.set(identifier, suffix + 1);
-      id = `fn-${identifier}-${suffix}`;
-    }
-
+    seen.add(identifier);
     return buildFootnote(
-      id,
+      `fn-${identifier}`,
       convertToHast(
         ctx,
         // Unwrap single-paragraph definitions to produce inline content
@@ -423,6 +428,8 @@ const buildElement = <
  * When `footnote` is `"gcpm"`:
  * - `toHastHandlers` provides custom `footnoteReference` and `footnote`
  *   handlers that produce `<span>` footnote elements at the call site.
+ *   A second reference to the same definition produces an
+ *   `<a class="footnote-duplicated-call">` instead of another `<span>`.
  *
  * When `footnote` is `"dpub"`:
  * - `toHastHandlers` produces `<a role="doc-noteref">` calls, queues
@@ -723,6 +730,7 @@ type ResolvedOption =
   | {
       mode: 'gcpm';
       body?: hast.Properties | GcpmBodyFactory;
+      duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
     };
 
 const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
@@ -792,10 +800,16 @@ export const createFootnotePlugin = (
             ...children,
           )) as GcpmBodyFactory),
   );
+  const buildDuplicatedCall = createBuildDuplicatedCall(
+    resolved.duplicatedCall,
+  );
 
   return {
     toHastHandlers: {
-      footnoteReference: createFootnoteReferenceHandler(buildFootnote),
+      footnoteReference: createFootnoteReferenceHandler(
+        buildFootnote,
+        buildDuplicatedCall,
+      ),
       footnote: createInlineFootnoteHandler(buildFootnote),
     },
     hastTransformers: [],
