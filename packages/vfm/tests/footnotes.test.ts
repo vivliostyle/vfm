@@ -481,7 +481,7 @@ Ccc aaa[^a].
 <section class="footnotes" role="doc-endnotes">
   <hr>
   <ol>
-    <li id="fn1" role="doc-endnote">Aaaaaa<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>
+    <li id="fn1" role="doc-endnote">Aaaaaa<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a><a href="#fnref1-1" class="footnote-back" role="doc-backlink">↩</a></li>
     <li id="fn2" role="doc-endnote">Bbbbbb<a href="#fnref2" class="footnote-back" role="doc-backlink">↩</a></li>
   </ol>
 </section>

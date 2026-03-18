@@ -92,81 +92,108 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
   selectAll(endnoteBackReferenceSelector, parent) as EndnoteBackReference[];
 
 /**
- * Transform the endnote link with Pandoc format.
+ * Create paired Pandoc transformer plugins that share duplicate-reference
+ * state.  The first plugin rewrites endnote calls; the second rewrites
+ * endnote areas and adds extra backlinks for duplicate references.
  */
-const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
-  const calls = selectEndnoteCalls(tree as hast.Root);
+const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
+  // Shared between the two plugins: how many duplicate calls each
+  // refIndex has.  Populated by the calls transformer, read by the
+  // areas transformer.
+  const dupCountByRefIndex = new Map<number, number>();
 
-  // Build a stable mapping from definition identifier to endnote number.
-  // Duplicate references to the same definition reuse that number.
-  const identifierToIndex = new Map<string, number>();
-  const dupCount = new Map<string, number>();
-  let counter = 0;
+  const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+    const calls = selectEndnoteCalls(tree as hast.Root);
 
-  calls.forEach((call) => {
-    const sup: ElementWithProps = call;
-    const [anchor]: [ElementWithProps] = call.children;
+    // Build a stable mapping from definition identifier to endnote number.
+    // Duplicate references to the same definition reuse that number.
+    const identifierToIndex = new Map<string, number>();
+    const dupCount = new Map<string, number>();
+    let counter = 0;
 
-    const href = String(anchor.properties.href);
-    const identifier = href.replace(/^#fn-/, '');
+    calls.forEach((call) => {
+      const sup: ElementWithProps = call;
+      const [anchor]: [ElementWithProps] = call.children;
 
-    let refIndex = identifierToIndex.get(identifier);
-    let callId: string;
+      const href = String(anchor.properties.href);
+      const identifier = href.replace(/^#fn-/, '');
 
-    if (refIndex === undefined) {
-      refIndex = ++counter;
-      identifierToIndex.set(identifier, refIndex);
-      callId = `fnref${refIndex}`;
-    } else {
-      const dup = (dupCount.get(identifier) ?? 0) + 1;
-      dupCount.set(identifier, dup);
-      callId = `fnref${refIndex}-${dup}`;
-    }
+      let refIndex = identifierToIndex.get(identifier);
+      let callId: string;
 
-    // Mutate sup into <a class="footnote-ref">
-    sup.tagName = 'a';
-    sup.properties = {
-      id: callId,
-      href: `#fn${refIndex}`,
-      className: ['footnote-ref'],
-      role: 'doc-noteref',
-    };
+      if (refIndex === undefined) {
+        refIndex = ++counter;
+        identifierToIndex.set(identifier, refIndex);
+        callId = `fnref${refIndex}`;
+      } else {
+        const dup = (dupCount.get(identifier) ?? 0) + 1;
+        dupCount.set(identifier, dup);
+        dupCountByRefIndex.set(refIndex, dup);
+        callId = `fnref${refIndex}-${dup}`;
+      }
 
-    // Mutate anchor into <sup>N</sup>
-    anchor.tagName = 'sup';
-    anchor.properties = {};
-    anchor.children = [u('text', `${refIndex}`)];
-  });
-};
+      // Mutate sup into <a class="footnote-ref">
+      sup.tagName = 'a';
+      sup.properties = {
+        id: callId,
+        href: `#fn${refIndex}`,
+        className: ['footnote-ref'],
+        role: 'doc-noteref',
+      };
 
-/**
- * Transform the endnote with Pandoc format.
- */
-const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
-  const root = tree as hast.Root;
-
-  // must be called before mutating area.tagName
-  const endnoteElements = selectEndnoteElements(root);
-
-  selectEndnoteAreas(root).forEach((area: ElementWithProps) => {
-    area.tagName = 'section';
-    area.properties.role = 'doc-endnotes';
-  });
-
-  endnoteElements.forEach((elem: ElementWithProps, i) => {
-    const refIndex = i + 1;
-
-    elem.properties.id = `fn${refIndex}`;
-    elem.properties.role = 'doc-endnote';
-
-    // Back reference is expected to be placed at the end of contents
-    // @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L41
-    selectEndnoteBackReferences(elem).forEach((backref: ElementWithProps) => {
-      backref.properties.href = `#fnref${refIndex}`;
-      backref.properties.className = ['footnote-back'];
-      backref.properties.role = 'doc-backlink';
+      // Mutate anchor into <sup>N</sup>
+      anchor.tagName = 'sup';
+      anchor.properties = {};
+      anchor.children = [u('text', `${refIndex}`)];
     });
-  });
+  };
+
+  const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
+    const root = tree as hast.Root;
+
+    // must be called before mutating area.tagName
+    const endnoteElements = selectEndnoteElements(root);
+
+    selectEndnoteAreas(root).forEach((area: ElementWithProps) => {
+      area.tagName = 'section';
+      area.properties.role = 'doc-endnotes';
+    });
+
+    endnoteElements.forEach((elem: ElementWithProps, i) => {
+      const refIndex = i + 1;
+
+      elem.properties.id = `fn${refIndex}`;
+      elem.properties.role = 'doc-endnote';
+
+      // Back reference is expected to be placed at the end of contents
+      // @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L41
+      selectEndnoteBackReferences(elem).forEach((backref: ElementWithProps) => {
+        backref.properties.href = `#fnref${refIndex}`;
+        backref.properties.className = ['footnote-back'];
+        backref.properties.role = 'doc-backlink';
+      });
+
+      // Add extra backlinks for duplicate references
+      const dups = dupCountByRefIndex.get(refIndex);
+      if (dups) {
+        for (let d = 1; d <= dups; d++) {
+          elem.children.push(
+            h(
+              'a',
+              {
+                href: `#fnref${refIndex}-${d}`,
+                className: ['footnote-back'],
+                role: 'doc-backlink',
+              },
+              '↩',
+            ),
+          );
+        }
+      }
+    });
+  };
+
+  return [endnoteCallsToPandoc, endnoteAreasToPandoc];
 };
 
 /**
@@ -752,6 +779,8 @@ export const createFootnotePlugin = (
   const resolved = resolveOption(options?.footnote);
 
   if (resolved.mode === 'pandoc') {
+    const [endnoteCallsToPandoc, endnoteAreasToPandoc] =
+      createPandocTransformers();
     return {
       toHastHandlers: {},
       hastTransformers: [endnoteCallsToPandoc, endnoteAreasToPandoc],
