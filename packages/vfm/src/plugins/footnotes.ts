@@ -654,9 +654,9 @@ const createReplaceDpubPlaceholders =
     if (inlinePending.size > 0) {
       const remaining = new Set(inlinePending.keys());
 
-      function containsCall(
+      const containsCall = (
         node: hast.RootContent | hast.ElementContent,
-      ): string[] {
+      ): string[] => {
         if (remaining.size === 0 || node.type !== 'element') {
           return [];
         }
@@ -665,9 +665,9 @@ const createReplaceDpubPlaceholders =
           ...(typeof id === 'string' && remaining.has(id) ? [id] : []),
           ...node.children.flatMap((child) => containsCall(child)),
         ];
-      }
+      };
 
-      function processParent(parent: hast.Element | hast.Root) {
+      const processParent = (parent: hast.Element | hast.Root) => {
         const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
         for (const child of parent.children) {
           newChildren.push(child);
@@ -687,7 +687,7 @@ const createReplaceDpubPlaceholders =
           }
         }
         parent.children = newChildren;
-      }
+      };
 
       processParent(root);
 
@@ -773,7 +773,7 @@ const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
 export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {
-  toHastHandlers: Record<string, ToHastHandler> | {};
+  toHastHandlers: Record<string, ToHastHandler> | Record<string, never>;
   hastTransformers: unified.PluggableList;
 } => {
   const resolved = resolveOption(options?.footnote);
