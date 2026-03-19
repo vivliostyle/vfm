@@ -34,6 +34,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
+    "prepare": "npm run build",
     "dev": "tsc -w",
     "test": "vitest"
   },
