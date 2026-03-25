@@ -95,6 +95,26 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
  * Create paired Pandoc transformer plugins that share duplicate-reference
  * state.  The first plugin rewrites endnote calls; the second rewrites
  * endnote areas and adds extra backlinks for duplicate references.
+ *
+ * This style is named "pandoc" because the original implementation
+ * (commit 146abea) was described as Pandoc-like. The closest versions
+ * are 2.7 and 2.8-2.13 (which added the variant selector U+FE0E to
+ * the backlink U+21A9). No Pandoc version is an exact match (checked
+ * up to 3.9.0, the latest release as of 2026-03). Footnote body text
+ * here is not wrapped in <p>.
+ *
+ *   $ printf 'Text[^1].\n\n[^1]: Footnote.' | docker run --rm -i pandoc/core:2.7 -f markdown -t html
+ *   <p>Text<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+ *   <section class="footnotes" role="doc-endnotes">
+ *   <hr />
+ *   <ol>
+ *   <li id="fn1" role="doc-endnote"><p>Footnote.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
+ *   </ol>
+ *   </section>
+ *
+ * Duplicate references to the same footnote definition are handled
+ * differently from both Pandoc and GFM (tested via remark-gfm@4.0.1,
+ * the latest as of 2026-03), though closer to the latter.
  */
 const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
   // Shared between the two plugins: how many duplicate calls each
