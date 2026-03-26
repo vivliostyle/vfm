@@ -72,7 +72,7 @@ test('gcpm: basic', () => {
     footnote: 'gcpm',
   });
   const expected = `
-<p>VFM is developed in the GitHub repository<span class="footnote" id="fn-1"><a href="https://github.com/vivliostyle/vfm">VFM</a></span>.</p>
+<p>VFM is developed in the GitHub repository<span class="footnote" id="fn-1" role="doc-footnote"><a href="https://github.com/vivliostyle/vfm">VFM</a></span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -84,7 +84,7 @@ test('gcpm: inline footnote', () => {
     footnote: 'gcpm',
   });
   const expected = `
-<p>Footnotes can also be written inline<span class="footnote" id="fn-1">This part is a footnote.</span>.</p>
+<p>Footnotes can also be written inline<span class="footnote" id="fn-1" role="doc-footnote">This part is a footnote.</span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -102,8 +102,8 @@ Second reference[^2].
   });
   const expected = `
 <p>
-  First reference<span class="footnote" id="fn-1">First footnote content</span>.
-  Second reference<span class="footnote" id="fn-2">Second footnote content</span>.
+  First reference<span class="footnote" id="fn-1" role="doc-footnote">First footnote content</span>.
+  Second reference<span class="footnote" id="fn-2" role="doc-footnote">Second footnote content</span>.
 </p>
 `;
   expect(received).toBe(expected);
@@ -121,7 +121,7 @@ test('gcpm: custom properties', () => {
     },
   });
   const expected = `
-<p>Reference<span id="fn-1" class="my-footnote" data-type="note">Footnote with custom props</span>.</p>
+<p>Reference<span id="fn-1" role="doc-footnote" class="my-footnote" data-type="note">Footnote with custom props</span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -138,7 +138,7 @@ test('gcpm: custom properties with id override', () => {
     },
   });
   const expected = `
-<p>Reference<span id="custom-id" class="my-footnote">Footnote with custom id</span>.</p>
+<p>Reference<span id="custom-id" role="doc-footnote" class="my-footnote">Footnote with custom id</span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -153,7 +153,9 @@ Text with footnote[^1].
 
 [^1]: Footnote via frontmatter`;
   const received = stringify(md, { partial: true });
-  expect(received).toContain('<span class="footnote" id="fn-1">');
+  expect(received).toContain(
+    '<span class="footnote" id="fn-1" role="doc-footnote">',
+  );
   expect(received).not.toContain('class="footnotes"');
 });
 
@@ -172,7 +174,7 @@ Text with footnote[^1].
 [^1]: Footnote via frontmatter props`;
   const received = stringify(md, { partial: true });
   expect(received).toContain(
-    '<span id="fn-1" class="my-footnote" data-type="note">',
+    '<span id="fn-1" role="doc-footnote" class="my-footnote" data-type="note">',
   );
   expect(received).toContain('Footnote via frontmatter props');
   expect(received).not.toContain('class="footnotes"');
@@ -421,7 +423,7 @@ test('gcpm: factory selector class via shorthand', () => {
     },
   });
   const expected = `
-<p>Reference<span class="foobar" id="fn-1">Footnote content</span>.</p>
+<p>Reference<span class="foobar" id="fn-1" role="doc-footnote">Footnote content</span>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -537,8 +539,8 @@ Ccc aaa[^a].
     footnote: 'gcpm',
   });
   const expected = `
-<p>Aaa<span class="footnote" id="fn-a">Aaaaaa</span> bbb<span class="footnote" id="fn-b">Bbbbbb</span>.</p>
-<p>Ccc aaa<a href="#fn-a" class="footnote-duplicated-call"></a>.</p>
+<p>Aaa<span class="footnote" id="fn-a" role="doc-footnote">Aaaaaa</span> bbb<span class="footnote" id="fn-b" role="doc-footnote">Bbbbbb</span>.</p>
+<p>Ccc aaa<a href="#fn-a" class="footnote-duplicated-call" role="doc-noteref"></a>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -557,8 +559,8 @@ Bbb[^a].
     },
   });
   const expected = `
-<p>Aaa<span class="footnote" id="fn-a">Aaaaaa</span>.</p>
-<p>Bbb<a href="#fn-a" class="footnote-duplicated-call" data-custom="true"></a>.</p>
+<p>Aaa<span class="footnote" id="fn-a" role="doc-footnote">Aaaaaa</span>.</p>
+<p>Bbb<a href="#fn-a" class="footnote-duplicated-call" role="doc-noteref" data-custom="true"></a>.</p>
 `;
   expect(received).toBe(expected);
 });
@@ -578,8 +580,8 @@ Bbb[^a].
     },
   });
   const expected = `
-<p>Aaa<span class="footnote" id="fn-a">Aaaaaa</span>.</p>
-<p>Bbb<a href="#fn-a" class="footnote-duplicated-call" data-factory="yes"></a>.</p>
+<p>Aaa<span class="footnote" id="fn-a" role="doc-footnote">Aaaaaa</span>.</p>
+<p>Bbb<a href="#fn-a" class="footnote-duplicated-call" role="doc-noteref" data-factory="yes"></a>.</p>
 `;
   expect(received).toBe(expected);
 });

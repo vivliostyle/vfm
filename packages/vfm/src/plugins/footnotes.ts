@@ -341,11 +341,18 @@ export type DpubBodyFactory = FootnoteFactory<
   DpubBodyChildren
 >;
 
-export type GcpmBodyFactory = FootnoteFactory<'span', { id: `fn-${string}` }>;
+export type GcpmBodyFactory = FootnoteFactory<
+  'span',
+  { id: `fn-${string}`; role: 'doc-footnote' }
+>;
 
 export type GcpmDuplicatedCallFactory = FootnoteFactory<
   'a',
-  { href: `#fn-${string}`; class: 'footnote-duplicated-call' }
+  {
+    href: `#fn-${string}`;
+    class: 'footnote-duplicated-call';
+    role: 'doc-noteref';
+  }
 >;
 
 export type FootnoteOptions = {
@@ -372,7 +379,11 @@ type BuildFootnote = (
 const createBuildFootnote =
   (factory: GcpmBodyFactory): BuildFootnote =>
   (id, children) => {
-    const result = factory(h as TagAwareH, { id }, children);
+    const result = factory(
+      h as TagAwareH,
+      { id, role: 'doc-footnote' as const },
+      children,
+    );
     result.tagName = 'span';
     return result;
   };
@@ -389,7 +400,12 @@ const createBuildDuplicatedCall =
       {
         href: `#${targetId}`,
         class: 'footnote-duplicated-call',
-      } as { href: `#fn-${string}`; class: 'footnote-duplicated-call' },
+        role: 'doc-noteref',
+      } as {
+        href: `#fn-${string}`;
+        class: 'footnote-duplicated-call';
+        role: 'doc-noteref';
+      },
       [],
       customizer,
     );
