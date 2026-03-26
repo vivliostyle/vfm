@@ -297,7 +297,11 @@ type DpubBacklink = hast.Element & {
       children: [hast.Text & { value: `${number}` }];
     },
   ];
-  properties: { href: `#fnref${number}`; role: 'doc-backlink' };
+  properties: {
+    href: `#fnref${number}`;
+    className: ['footnote-back'];
+    role: 'doc-backlink';
+  };
 };
 
 /** Children tuple passed to DPUB body factory / buildElement. */
@@ -322,13 +326,18 @@ export type DpubCallChildren = [DpubCallSup];
 
 export type DpubCallFactory = FootnoteFactory<
   'a',
-  { id: `fnref${number}`; href: `#fn${number}`; role: 'doc-noteref' },
+  {
+    id: `fnref${number}`;
+    href: `#fn${number}`;
+    class: 'footnote-ref';
+    role: 'doc-noteref';
+  },
   DpubCallChildren
 >;
 
 export type DpubBodyFactory = FootnoteFactory<
   'aside',
-  { id: `fn${number}`; role: 'doc-footnote' },
+  { id: `fn${number}`; class: 'footnote'; role: 'doc-footnote' },
   DpubBodyChildren
 >;
 
@@ -517,7 +526,12 @@ const createDpubFootnoteReferenceHandler =
 
       return buildElement(
         'a',
-        { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
+        {
+          id: callId,
+          href: `#${fnId}`,
+          class: 'footnote-ref' as const,
+          role: 'doc-noteref' as const,
+        },
         [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
         callCustomizer,
       );
@@ -531,7 +545,7 @@ const createDpubFootnoteReferenceHandler =
 
     const backlink: DpubBacklink = h(
       'a',
-      { href: `#${callId}`, role: 'doc-backlink' },
+      { href: `#${callId}`, class: 'footnote-back', role: 'doc-backlink' },
       h('sup', u('text', `${refIndex}`)),
     ) as DpubBacklink;
 
@@ -549,7 +563,7 @@ const createDpubFootnoteReferenceHandler =
       identifier,
       buildElement(
         'aside',
-        { id: fnId, role: 'doc-footnote' as const },
+        { id: fnId, class: 'footnote' as const, role: 'doc-footnote' as const },
         bodyChildren,
         bodyCustomizer,
       ),
@@ -557,7 +571,12 @@ const createDpubFootnoteReferenceHandler =
 
     return buildElement(
       'a',
-      { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
+      {
+        id: callId,
+        href: `#${fnId}`,
+        class: 'footnote-ref' as const,
+        role: 'doc-noteref' as const,
+      },
       [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
       callCustomizer,
     );
@@ -589,7 +608,7 @@ const createDpubInlineFootnoteHandler =
 
     const backlink: DpubBacklink = h(
       'a',
-      { href: `#${callId}`, role: 'doc-backlink' },
+      { href: `#${callId}`, class: 'footnote-back', role: 'doc-backlink' },
       h('sup', u('text', `${refIndex}`)),
     ) as DpubBacklink;
 
@@ -602,7 +621,7 @@ const createDpubInlineFootnoteHandler =
       callId,
       buildElement(
         'aside',
-        { id: fnId, role: 'doc-footnote' as const },
+        { id: fnId, class: 'footnote' as const, role: 'doc-footnote' as const },
         bodyChildren,
         bodyCustomizer,
       ),
@@ -610,7 +629,12 @@ const createDpubInlineFootnoteHandler =
 
     return buildElement(
       'a',
-      { id: callId, href: `#${fnId}`, role: 'doc-noteref' as const },
+      {
+        id: callId,
+        href: `#${fnId}`,
+        class: 'footnote-ref' as const,
+        role: 'doc-noteref' as const,
+      },
       [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
       callCustomizer,
     );
