@@ -100,7 +100,7 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
  * (commit 146abea) was described as Pandoc-like. The closest versions
  * are 2.7 and 2.8-2.13 (which added the variant selector U+FE0E to
  * the backlink U+21A9). No Pandoc version is an exact match (checked
- * up to 3.9.0, the latest release as of 2026-03). Footnote body text
+ * up to 3.9.0, the latest release as of 2026-03). Endnote body text
  * here is not wrapped in <p>.
  *
  *   $ printf 'Text[^1].\n\n[^1]: Footnote.' | docker run --rm -i pandoc/core:2.7 -f markdown -t html
@@ -112,7 +112,7 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
  *   </ol>
  *   </section>
  *
- * Duplicate references to the same footnote definition are handled
+ * Duplicate references to the same endnote definition are handled
  * differently from both Pandoc and GFM (tested via remark-gfm@4.0.1,
  * the latest as of 2026-03), though closer to the latter.
  */
