@@ -7,9 +7,10 @@
  * [css-gcpm](https://www.w3.org/TR/css-gcpm-3/#footnotes).
  * This does not match the export names or attribute naming used by remark.
  *
- * Terminology follows css-gcpm: a "call" is the in-text marker showing the
- * note number, an "element" is the note content itself, and an "area" is the
- * region where notes are collected for display.
+ * Terminology follows css-gcpm: a "call" is the in-text reference showing the
+ * note number, a "marker" is the note number rendered in the footnote area,
+ * an "element" is the note content, a "body" is the marker and element
+ * combined, and an "area" is the region where notes are collected for display.
  *
  * VFM depends on two versions of mdast-util-to-hast:
  *  `- remark-rehype@8.1.0
@@ -19,7 +20,11 @@
 
 import type * as hast from 'hast';
 import { selectAll } from 'hast-util-select';
-import { h } from 'hastscript';
+import {
+  h,
+  type Properties as HProperties,
+  type Child as HChild,
+} from 'hastscript';
 import {
   type Handler as ToHastHandler,
   all as convertToHast,
@@ -87,159 +92,323 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
   selectAll(endnoteBackReferenceSelector, parent) as EndnoteBackReference[];
 
 /**
- * Transform the endnote link with Pandoc format.
+ * Create paired Pandoc transformer plugins that share duplicate-reference
+ * state.  The first plugin rewrites endnote calls; the second rewrites
+ * endnote areas and adds extra backlinks for duplicate references.
+ *
+ * This style is named "pandoc" because the original implementation
+ * (commit 146abea) was described as Pandoc-like. The closest versions
+ * are 2.7 and 2.8-2.13 (which added the variant selector U+FE0E to
+ * the backlink U+21A9). No Pandoc version is an exact match (checked
+ * up to 3.9.0, the latest release as of 2026-03). Endnote body text
+ * here is not wrapped in <p>.
+ *
+ *   $ printf 'Text[^1].\n\n[^1]: Footnote.' | docker run --rm -i pandoc/core:2.7 -f markdown -t html
+ *   <p>Text<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+ *   <section class="footnotes" role="doc-endnotes">
+ *   <hr />
+ *   <ol>
+ *   <li id="fn1" role="doc-endnote"><p>Footnote.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></p></li>
+ *   </ol>
+ *   </section>
+ *
+ * Duplicate references to the same endnote definition are handled
+ * differently from both Pandoc and GFM (tested via remark-gfm@4.0.1,
+ * the latest as of 2026-03), though closer to the latter.
  */
-const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
-  selectEndnoteCalls(tree as hast.Root).forEach((call, i) => {
-    const sup: ElementWithProps = call;
-    const [anchor]: [ElementWithProps] = call.children;
+const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
+  // Shared between the two plugins: how many duplicate calls each
+  // refIndex has.  Populated by the calls transformer, read by the
+  // areas transformer.
+  const dupCountByRefIndex = new Map<number, number>();
 
-    const refIndex = i + 1;
+  const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+    const calls = selectEndnoteCalls(tree as hast.Root);
 
-    // Mutate sup into <a class="footnote-ref">
-    sup.tagName = 'a';
-    sup.properties = {
-      id: `fnref${refIndex}`,
-      href: `#fn${refIndex}`,
-      className: ['footnote-ref'],
-      role: 'doc-noteref',
-    };
+    // Build a stable mapping from definition identifier to endnote number.
+    // Duplicate references to the same definition reuse that number.
+    const identifierToIndex = new Map<string, number>();
+    const dupCount = new Map<string, number>();
+    let counter = 0;
 
-    // Mutate anchor into <sup>N</sup>
-    anchor.tagName = 'sup';
-    anchor.properties = {};
-    anchor.children = [u('text', `${refIndex}`)];
-  });
-};
+    calls.forEach((call) => {
+      const sup: ElementWithProps = call;
+      const [anchor]: [ElementWithProps] = call.children;
 
-/**
- * Transform the endnote with Pandoc format.
- */
-const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
-  const root = tree as hast.Root;
+      const href = String(anchor.properties.href);
+      const identifier = href.replace(/^#fn-/, '');
 
-  // must be called before mutating area.tagName
-  const endnoteElements = selectEndnoteElements(root);
+      let refIndex = identifierToIndex.get(identifier);
+      let callId: string;
 
-  selectEndnoteAreas(root).forEach((area: ElementWithProps) => {
-    area.tagName = 'section';
-    area.properties.role = 'doc-endnotes';
-  });
+      if (refIndex === undefined) {
+        refIndex = ++counter;
+        identifierToIndex.set(identifier, refIndex);
+        callId = `fnref${refIndex}`;
+      } else {
+        const dup = (dupCount.get(identifier) ?? 0) + 1;
+        dupCount.set(identifier, dup);
+        dupCountByRefIndex.set(refIndex, dup);
+        callId = `fnref${refIndex}-${dup}`;
+      }
 
-  endnoteElements.forEach((elem: ElementWithProps, i) => {
-    const refIndex = i + 1;
+      // Mutate sup into <a class="footnote-ref">
+      sup.tagName = 'a';
+      sup.properties = {
+        id: callId,
+        href: `#fn${refIndex}`,
+        className: ['footnote-ref'],
+        role: 'doc-noteref',
+      };
 
-    elem.properties.id = `fn${refIndex}`;
-    elem.properties.role = 'doc-endnote';
-
-    // Back reference is expected to be placed at the end of contents
-    // @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L41
-    selectEndnoteBackReferences(elem).forEach((backref: ElementWithProps) => {
-      backref.properties.href = `#fnref${refIndex}`;
-      backref.properties.className = ['footnote-back'];
-      backref.properties.role = 'doc-backlink';
+      // Mutate anchor into <sup>N</sup>
+      anchor.tagName = 'sup';
+      anchor.properties = {};
+      anchor.children = [u('text', `${refIndex}`)];
     });
-  });
+  };
+
+  const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
+    const root = tree as hast.Root;
+
+    // must be called before mutating area.tagName
+    const endnoteElements = selectEndnoteElements(root);
+
+    selectEndnoteAreas(root).forEach((area: ElementWithProps) => {
+      area.tagName = 'section';
+      area.properties.role = 'doc-endnotes';
+    });
+
+    endnoteElements.forEach((elem: ElementWithProps, i) => {
+      const refIndex = i + 1;
+
+      elem.properties.id = `fn${refIndex}`;
+      elem.properties.role = 'doc-endnote';
+
+      // Back reference is expected to be placed at the end of contents
+      // @see https://github.com/syntax-tree/mdast-util-to-hast/blob/10.2.0/lib/footer.js#L41
+      selectEndnoteBackReferences(elem).forEach((backref: ElementWithProps) => {
+        backref.properties.href = `#fnref${refIndex}`;
+        backref.properties.className = ['footnote-back'];
+        backref.properties.role = 'doc-backlink';
+      });
+
+      // Add extra backlinks for duplicate references
+      const dups = dupCountByRefIndex.get(refIndex);
+      if (dups) {
+        for (let d = 1; d <= dups; d++) {
+          elem.children.push(
+            h(
+              'a',
+              {
+                href: `#fnref${refIndex}-${d}`,
+                className: ['footnote-back'],
+                role: 'doc-backlink',
+              },
+              '↩',
+            ),
+          );
+        }
+      }
+    });
+  };
+
+  return [endnoteCallsToPandoc, endnoteAreasToPandoc];
 };
 
 /**
- * The returned Element is expected to be phrasing content per the HTML
- * content model. If a flow content element (e.g. `<aside>`) is returned,
- * it will be rewritten to `<span>` with a warning.
+ * Extract the tag name from a hastscript CSS selector string.
+ * hastscript recognizes only `#` and `.` as selector shorthand delimiters.
+ *
+ * - `"aside"` → `"aside"`
+ * - `"aside.foo"` → `"aside"`
+ * - `".foo"` → `ShorthandTagName` (implicit div, distinguished from explicit `"div"`)
+ * - `""` → `ShorthandTagName`
+ *
+ * @see https://github.com/syntax-tree/hast-util-parse-selector/blob/3.1.1/lib/index.js#L6
  */
-export type FootnoteFactory = (
-  h: typeof import('hastscript').h,
-  properties: hast.Properties,
-  children: hast.ElementContent[],
-) => hast.Element;
+type ExtractTagName<S extends string> = S extends `${infer Tag}${
+  | '.'
+  | '#'}${string}`
+  ? Tag extends ''
+    ? ShorthandTagName
+    : Tag
+  : S extends ''
+  ? ShorthandTagName
+  : S;
+
+const shorthandTagBrand = Symbol();
+
+/**
+ * Branded `"div"` produced when hastscript receives a tag-less shorthand
+ * selector (e.g. `".foo"`).  Distinguished from an explicit `"div"` so that
+ * {@link FootnoteFactory} can accept shorthand at the top level while
+ * rejecting an explicit wrong tag name.
+ */
+type ShorthandTagName = 'div' & { [shorthandTagBrand]: unknown };
+
+/**
+ * Tag-aware `h` function passed to {@link FootnoteFactory}.
+ * Accepts any selector freely (enabling child element creation with
+ * arbitrary tags), but preserves the tag name extracted from the selector
+ * in the return type.
+ */
+type TagAwareH = {
+  <S extends string>(
+    selector: S,
+    properties?: HProperties,
+    ...children: HChild[]
+  ): hast.Element & { tagName: ExtractTagName<S> };
+  <S extends string>(selector: S, ...children: HChild[]): hast.Element & {
+    tagName: ExtractTagName<S>;
+  };
+};
+
+/**
+ * Factory that customizes a footnote element.
+ *
+ * The `h` parameter is a {@link TagAwareH} that accepts any selector
+ * (including child-element creation like `h('span.wrap', ...)`), but
+ * the return type must have `tagName` matching `TTag` or
+ * {@link ShorthandTagName} (tag-less shorthand like `".foo"`).
+ * When a shorthand selector is used, the caller overwrites `tagName`
+ * at runtime.
+ *
+ * @template TTag The expected root tag name.
+ * @template TProps Structural properties provided by the caller.
+ * @template TChildren Children tuple provided by the caller.
+ */
+export type FootnoteFactory<
+  TTag extends string,
+  TProps,
+  TChildren extends hast.ElementContent[] = hast.ElementContent[],
+> = (
+  h: TagAwareH,
+  properties: TProps,
+  children: TChildren,
+) => hast.Element & { tagName: TTag | ShorthandTagName };
+
+/** Backlink element placed at the head of a DPUB footnote body. */
+type DpubBacklink = hast.Element & {
+  tagName: 'a';
+  children: [
+    hast.Element & {
+      tagName: 'sup';
+      children: [hast.Text & { value: `${number}` }];
+    },
+  ];
+  properties: {
+    href: `#fnref${number}`;
+    className: ['footnote-back'];
+    role: 'doc-backlink';
+  };
+};
+
+/** Children tuple passed to DPUB body factory / buildElement. */
+export type DpubBodyChildren = [DpubBacklink, ...hast.ElementContent[]];
+
+/**
+ * - `"pandoc"`: endnote section at document end (default).
+ * - `"dpub"`: `<a role="doc-noteref">` calls with `<aside role="doc-footnote">`
+ *   elements placed after the containing block element.
+ * - `"gcpm"`: inline `<span class="footnote">` at the call site.
+ */
+export type FootnoteMode = 'pandoc' | 'dpub' | 'gcpm';
+
+/** Sup element wrapping the reference number in a DPUB noteref. */
+type DpubCallSup = hast.Element & {
+  tagName: 'sup';
+  children: [hast.Text & { value: `${number}` }];
+};
+
+/** Children tuple passed to DPUB call factory / buildElement. */
+export type DpubCallChildren = [DpubCallSup];
+
+export type DpubCallFactory = FootnoteFactory<
+  'a',
+  {
+    id: `fnref${number}`;
+    href: `#fn${number}`;
+    class: 'footnote-ref';
+    role: 'doc-noteref';
+  },
+  DpubCallChildren
+>;
+
+export type DpubBodyFactory = FootnoteFactory<
+  'aside',
+  { id: `fn${number}`; class: 'footnote'; role: 'doc-footnote' },
+  DpubBodyChildren
+>;
+
+export type GcpmBodyFactory = FootnoteFactory<
+  'span',
+  { id: `fn-${string}`; role: 'doc-footnote' }
+>;
+
+export type GcpmDuplicatedCallFactory = FootnoteFactory<
+  'a',
+  {
+    href: `#fn-${string}`;
+    class: 'footnote-duplicated-call';
+    role: 'doc-noteref';
+  }
+>;
 
 export type FootnoteOptions = {
-  endnotesAsFootnotes?: boolean | hast.Properties | FootnoteFactory;
+  footnote?:
+    | FootnoteMode
+    | { mode: 'pandoc' }
+    | {
+        mode: 'dpub';
+        call?: hast.Properties | DpubCallFactory;
+        body?: hast.Properties | DpubBodyFactory;
+      }
+    | {
+        mode: 'gcpm';
+        body?: hast.Properties | GcpmBodyFactory;
+        duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
+      };
 };
-
-/**
- * Data attribute used to embed a warning message in the hast element itself.
- * {@link reportFootnoteWarnings} picks it up, reports via `file.message()`,
- * and removes it.
- */
-const warningAttr = 'data-vfm-warning';
-const warningProp = 'dataVfmWarning';
-const warningSelector = `[${warningAttr}]`;
-
-/**
- * Pick up warnings embedded as {@link warningAttr} in hast elements,
- * report them via `file.message()`, and remove the attribute.
- */
-const reportFootnoteWarnings: unified.Plugin = () => (tree, file) => {
-  selectAll(warningSelector, tree as hast.Root).forEach((el) => {
-    const props = el.properties as Record<string, unknown> | undefined;
-    const msg = props?.[warningProp];
-    if (typeof msg === 'string') {
-      file.message(msg);
-      delete props![warningProp];
-    }
-  });
-};
-
-/**
- * Elements whose start tag triggers implicit `<p>` end tag per the HTML
- * parsing algorithm. A FootnoteFactory returning one of these will be
- * rewritten to `<span>` with a warning.
- * @see https://html.spec.whatwg.org/multipage/grouping-content.html#the-p-element
- */
-const pClosingTagNames = new Set([
-  'address',
-  'article',
-  'aside',
-  'blockquote',
-  'details',
-  'dialog',
-  'div',
-  'dl',
-  'fieldset',
-  'figcaption',
-  'figure',
-  'footer',
-  'form',
-  'h1',
-  'h2',
-  'h3',
-  'h4',
-  'h5',
-  'h6',
-  'header',
-  'hgroup',
-  'hr',
-  'main',
-  'menu',
-  'nav',
-  'ol',
-  'p',
-  'pre',
-  'search',
-  'section',
-  'table',
-  'ul',
-]);
 
 type BuildFootnote = (
-  id: string,
+  id: `fn-${string}`,
   children: hast.ElementContent[],
 ) => hast.Element;
 
 const createBuildFootnote =
-  (factory: FootnoteFactory): BuildFootnote =>
+  (factory: GcpmBodyFactory): BuildFootnote =>
   (id, children) => {
-    const result = factory(h, { id }, children);
-    if (pClosingTagNames.has(result.tagName)) {
-      const msg =
-        `FootnoteFactory returned <${result.tagName}>, which triggers` +
-        ` <p> auto-closing. Rewriting to <span>.`;
-      result.tagName = 'span';
-      (result.properties as Record<string, unknown>)[warningProp] = msg;
-    }
+    const result = factory(
+      h as TagAwareH,
+      { id, role: 'doc-footnote' as const },
+      children,
+    );
+    result.tagName = 'span';
     return result;
   };
+
+type BuildDuplicatedCall = (targetId: `fn-${string}`) => hast.Element;
+
+const createBuildDuplicatedCall =
+  (
+    customizer: hast.Properties | GcpmDuplicatedCallFactory | undefined,
+  ): BuildDuplicatedCall =>
+  (targetId) =>
+    buildElement(
+      'a',
+      {
+        href: `#${targetId}`,
+        class: 'footnote-duplicated-call',
+        role: 'doc-noteref',
+      } as {
+        href: `#fn-${string}`;
+        class: 'footnote-duplicated-call';
+        role: 'doc-noteref';
+      },
+      [],
+      customizer,
+    );
 
 const createInlineFootnoteHandler =
   (buildFootnote: BuildFootnote): ToHastHandler =>
@@ -258,76 +427,481 @@ const createInlineFootnoteHandler =
     return buildFootnote(`fn-${identifier}`, convertToHast(ctx, node));
   };
 
-const createFootnoteReferenceHandler =
-  (buildFootnote: BuildFootnote): ToHastHandler =>
-  (ctx, node) => {
+const createFootnoteReferenceHandler = (
+  buildFootnote: BuildFootnote,
+  buildDuplicatedCall: BuildDuplicatedCall,
+): ToHastHandler => {
+  const seen = new Set<string>();
+  return (ctx, node) => {
     const identifier = String(node.identifier);
     const def = ctx.footnoteById[identifier.toUpperCase()];
-    return !def
-      ? null
-      : buildFootnote(
-          `fn-${identifier}`,
-          convertToHast(
-            ctx,
-            // Unwrap single-paragraph definitions to produce inline content
-            // (matches tight list-item behavior in footer.js).
-            def.children.length === 1 && def.children[0].type === 'paragraph'
-              ? def.children[0]
-              : def,
-          ),
-        );
+    if (!def) {
+      return null;
+    }
+
+    if (seen.has(identifier)) {
+      return buildDuplicatedCall(`fn-${identifier}`);
+    }
+
+    seen.add(identifier);
+    return buildFootnote(
+      `fn-${identifier}`,
+      convertToHast(
+        ctx,
+        // Unwrap single-paragraph definitions to produce inline content
+        // (matches tight list-item behavior in footer.js).
+        def.children.length === 1 && def.children[0].type === 'paragraph'
+          ? def.children[0]
+          : def,
+      ),
+    );
   };
+};
+
+/**
+ * Build a hast element by applying a Properties-or-Factory customizer.
+ * The caller provides the fixed `tagName` and `structuralProps`;
+ * user-supplied Properties are spread after structural ones (user wins).
+ * For Factory, the factory receives structural props and its returned
+ * properties are merged with structural props winning only for `tagName`.
+ */
+const buildElement = <
+  TTag extends string,
+  TProps extends hast.Properties,
+  TChildren extends hast.ElementContent[] = hast.ElementContent[],
+>(
+  tagName: TTag,
+  structuralProps: TProps,
+  children: TChildren,
+  customizer:
+    | hast.Properties
+    | FootnoteFactory<TTag, TProps, TChildren>
+    | undefined,
+): hast.Element => {
+  if (typeof customizer === 'function') {
+    const result = customizer(h as TagAwareH, structuralProps, children);
+    result.tagName = tagName;
+    return result;
+  }
+  if (typeof customizer === 'object') {
+    return h(tagName, { ...structuralProps, ...customizer }, ...children);
+  }
+  return h(tagName, structuralProps, ...children);
+};
 
 /**
  * Create mdast-to-hast handlers and hast transformers for footnote processing.
  *
- * When `endnotesAsFootnotes` is disabled (default):
+ * When `footnote` is `"pandoc"` or unset (default):
  * - `toHastHandlers` is empty; the default mdast-util-to-hast handlers
  *   generate endnote sections.
  * - `hastTransformers` rewrites the endnote markup to Pandoc format.
  *
- * When `endnotesAsFootnotes` is enabled:
+ * When `footnote` is `"gcpm"`:
  * - `toHastHandlers` provides custom `footnoteReference` and `footnote`
- *   handlers that produce footnote elements at the call site, bypassing
- *   endnote section generation.
- * - If a {@link FootnoteFactory} returns a flow content element that would
- *   trigger `<p>` auto-closing in rehype-raw, the element is rewritten to
- *   `<span>` and a warning is reported via `VFile#messages`.
+ *   handlers that produce `<span>` footnote elements at the call site.
+ *   A second reference to the same definition produces an
+ *   `<a class="footnote-duplicated-call">` instead of another `<span>`.
+ *
+ * When `footnote` is `"dpub"`:
+ * - `toHastHandlers` produces `<a role="doc-noteref">` calls, queues
+ *   `<aside role="doc-footnote">` elements, and emits placeholders at
+ *   footnote definition positions.
+ * - `hastTransformers` replaces placeholders with the queued asides.
+ *   Inline footnotes (no definition position) are inserted after their
+ *   nearest non-flow-container ancestor.
  *
  * @param options Footnote options.
  * @returns `toHastHandlers` for remark-rehype and `hastTransformers` as
  *   unified plugins to be spread into the pipeline.
  */
+const createDpubFootnoteReferenceHandler =
+  (
+    pending: Map<string, hast.Element>,
+    nextIndex: () => number,
+    assigned: Map<string, { refIndex: number; dupCount: number }>,
+    callCustomizer: hast.Properties | DpubCallFactory | undefined,
+    bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
+  ): ToHastHandler =>
+  (ctx, node) => {
+    const identifier = String(node.identifier);
+    const def = ctx.footnoteById[identifier.toUpperCase()];
+    if (!def) {
+      return null;
+    }
+
+    const existing = assigned.get(identifier);
+
+    if (existing) {
+      // Duplicate reference: reuse the same footnote number
+      const refIndex = existing.refIndex;
+      const fnId = `fn${refIndex}` as `fn${number}`;
+      existing.dupCount++;
+      const callId =
+        `fnref${refIndex}-${existing.dupCount}` as `fnref${number}`;
+
+      return buildElement(
+        'a',
+        {
+          id: callId,
+          href: `#${fnId}`,
+          class: 'footnote-ref' as const,
+          role: 'doc-noteref' as const,
+        },
+        [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
+        callCustomizer,
+      );
+    }
+
+    // First reference: assign a new number and create the aside
+    const refIndex = nextIndex();
+    assigned.set(identifier, { refIndex, dupCount: 0 });
+    const callId = `fnref${refIndex}` as `fnref${number}`;
+    const fnId = `fn${refIndex}` as `fn${number}`;
+
+    const backlink: DpubBacklink = h(
+      'a',
+      { href: `#${callId}`, class: 'footnote-back', role: 'doc-backlink' },
+      h('sup', u('text', `${refIndex}`)),
+    ) as DpubBacklink;
+
+    const bodyChildren: DpubBodyChildren = [
+      backlink,
+      ...convertToHast(
+        ctx,
+        def.children.length === 1 && def.children[0].type === 'paragraph'
+          ? def.children[0]
+          : def,
+      ),
+    ];
+
+    pending.set(
+      identifier,
+      buildElement(
+        'aside',
+        { id: fnId, class: 'footnote' as const, role: 'doc-footnote' as const },
+        bodyChildren,
+        bodyCustomizer,
+      ),
+    );
+
+    return buildElement(
+      'a',
+      {
+        id: callId,
+        href: `#${fnId}`,
+        class: 'footnote-ref' as const,
+        role: 'doc-noteref' as const,
+      },
+      [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
+      callCustomizer,
+    );
+  };
+
+const createDpubInlineFootnoteHandler =
+  (
+    inlinePending: Map<string, hast.Element>,
+    nextIndex: () => number,
+    callCustomizer: hast.Properties | DpubCallFactory | undefined,
+    bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
+  ): ToHastHandler =>
+  (ctx, node) => {
+    let no = 1;
+    while (String(no) in ctx.footnoteById) {
+      no++;
+    }
+    const identifier = String(no);
+    ctx.footnoteById[identifier] = {
+      type: 'footnoteDefinition',
+      identifier,
+      children: [{ type: 'paragraph', children: node.children }],
+      position: node.position,
+    };
+
+    const refIndex = nextIndex();
+    const callId = `fnref${refIndex}` as `fnref${number}`;
+    const fnId = `fn${refIndex}` as `fn${number}`;
+
+    const backlink: DpubBacklink = h(
+      'a',
+      { href: `#${callId}`, class: 'footnote-back', role: 'doc-backlink' },
+      h('sup', u('text', `${refIndex}`)),
+    ) as DpubBacklink;
+
+    const bodyChildren: DpubBodyChildren = [
+      backlink,
+      ...convertToHast(ctx, node),
+    ];
+
+    inlinePending.set(
+      callId,
+      buildElement(
+        'aside',
+        { id: fnId, class: 'footnote' as const, role: 'doc-footnote' as const },
+        bodyChildren,
+        bodyCustomizer,
+      ),
+    );
+
+    return buildElement(
+      'a',
+      {
+        id: callId,
+        href: `#${fnId}`,
+        class: 'footnote-ref' as const,
+        role: 'doc-noteref' as const,
+      },
+      [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
+      callCustomizer,
+    );
+  };
+
+/**
+ * Emit a placeholder element at the footnote definition position.
+ * The default mdast-util-to-hast handler ignores footnoteDefinition nodes;
+ * this override preserves the position in the hast tree so the transformer
+ * can replace the placeholder with the queued aside.
+ */
+const createDpubFootnoteDefinitionHandler =
+  (): ToHastHandler => (_ctx, node) => {
+    const identifier = String(node.identifier);
+    return h('div', { dataFootnotePlaceholder: identifier });
+  };
+
+/**
+ * Replace definition-position placeholders with queued asides, and insert
+ * inline-footnote asides after their nearest non-flow-container ancestor.
+ */
+const createReplaceDpubPlaceholders =
+  (
+    pending: Map<string, hast.Element>,
+    inlinePending: Map<string, hast.Element>,
+  ): unified.Plugin =>
+  () =>
+  (tree) => {
+    const root = tree as hast.Root;
+    const placed = new Set<string>();
+
+    // Phase 1: Replace placeholders with asides from reference footnotes
+    function walkAndReplace(parent: hast.Element | hast.Root) {
+      const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
+      for (const child of parent.children) {
+        if (
+          child.type === 'element' &&
+          child.tagName === 'div' &&
+          child.properties?.dataFootnotePlaceholder
+        ) {
+          const id = String(child.properties.dataFootnotePlaceholder);
+          const aside = pending.get(id);
+          if (aside) {
+            newChildren.push(aside);
+            placed.add(id);
+          }
+          // Unreferenced definition: drop placeholder
+          continue;
+        }
+        newChildren.push(child);
+        if (child.type === 'element') {
+          walkAndReplace(child);
+        }
+      }
+      parent.children = newChildren;
+    }
+
+    walkAndReplace(root);
+
+    // Phase 2: Insert inline footnote asides after nearest non-flow-container
+    if (inlinePending.size > 0) {
+      const remaining = new Set(inlinePending.keys());
+
+      const containsCall = (
+        node: hast.RootContent | hast.ElementContent,
+      ): string[] => {
+        if (remaining.size === 0 || node.type !== 'element') {
+          return [];
+        }
+        const id = node.properties?.id;
+        return [
+          ...(typeof id === 'string' && remaining.has(id) ? [id] : []),
+          ...node.children.flatMap((child) => containsCall(child)),
+        ];
+      };
+
+      const processParent = (parent: hast.Element | hast.Root) => {
+        const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
+        for (const child of parent.children) {
+          newChildren.push(child);
+          if (child.type !== 'element') {
+            continue;
+          }
+          if (flowContainerTagNames.has(child.tagName)) {
+            processParent(child);
+          } else {
+            for (const callId of containsCall(child)) {
+              const aside = inlinePending.get(callId);
+              if (aside) {
+                newChildren.push(aside);
+                remaining.delete(callId);
+              }
+            }
+          }
+        }
+        parent.children = newChildren;
+      };
+
+      processParent(root);
+
+      for (const callId of remaining) {
+        const aside = inlinePending.get(callId);
+        if (aside) {
+          root.children.push(aside);
+        }
+      }
+    }
+  };
+
+/**
+ * Elements that accept flow content as children, into which aside
+ * insertion recurses to find a more precise insertion point.
+ * For all other elements the aside is placed immediately after the
+ * element in its parent.
+ *
+ * Transparent elements are included because this set is only consulted
+ * from within a flow container context, so they inherit flow content
+ * model from their parent.
+ * @see https://html.spec.whatwg.org/multipage/dom.html#flow-content
+ * @see https://html.spec.whatwg.org/multipage/dom.html#transparent-content-models
+ */
+const flowContainerTagNames = new Set([
+  'address',
+  'article',
+  'aside',
+  'blockquote',
+  'body',
+  'dd',
+  'details',
+  'dialog',
+  'div',
+  'fieldset',
+  'figcaption',
+  'figure',
+  'footer',
+  'form',
+  'header',
+  'li',
+  'main',
+  'nav',
+  'search',
+  'section',
+  'td',
+  'th',
+  // Transparent content model
+  'a',
+  'audio',
+  'canvas',
+  'del',
+  'ins',
+  'map',
+  'object',
+  'slot',
+  'video',
+]);
+
+type ResolvedOption =
+  | { mode: 'pandoc' }
+  | {
+      mode: 'dpub';
+      call?: hast.Properties | DpubCallFactory;
+      body?: hast.Properties | DpubBodyFactory;
+    }
+  | {
+      mode: 'gcpm';
+      body?: hast.Properties | GcpmBodyFactory;
+      duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
+    };
+
+const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
+  if (!opt) {
+    return { mode: 'pandoc' };
+  }
+  if (typeof opt === 'string') {
+    return { mode: opt };
+  }
+  return opt;
+};
+
 export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {
-  toHastHandlers: Record<'footnoteReference' | 'footnote', ToHastHandler> | {};
+  toHastHandlers: Record<string, ToHastHandler> | Record<string, never>;
   hastTransformers: unified.PluggableList;
 } => {
-  const opt = options?.endnotesAsFootnotes;
+  const resolved = resolveOption(options?.footnote);
 
-  if (!opt) {
+  if (resolved.mode === 'pandoc') {
+    const [endnoteCallsToPandoc, endnoteAreasToPandoc] =
+      createPandocTransformers();
     return {
       toHastHandlers: {},
       hastTransformers: [endnoteCallsToPandoc, endnoteAreasToPandoc],
     };
   }
 
+  if (resolved.mode === 'dpub') {
+    const pending = new Map<string, hast.Element>();
+    const inlinePending = new Map<string, hast.Element>();
+    const assigned = new Map<string, { refIndex: number; dupCount: number }>();
+    let counter = 0;
+    const nextIndex = () => ++counter;
+    return {
+      toHastHandlers: {
+        footnoteDefinition: createDpubFootnoteDefinitionHandler(),
+        footnoteReference: createDpubFootnoteReferenceHandler(
+          pending,
+          nextIndex,
+          assigned,
+          resolved.call,
+          resolved.body,
+        ),
+        footnote: createDpubInlineFootnoteHandler(
+          inlinePending,
+          nextIndex,
+          resolved.call,
+          resolved.body,
+        ),
+      },
+      hastTransformers: [createReplaceDpubPlaceholders(pending, inlinePending)],
+    };
+  }
+
+  // gcpm
+  const body = resolved.body;
   const buildFootnote = createBuildFootnote(
-    typeof opt === 'function'
-      ? opt
-      : typeof opt === 'object'
-      ? (hFn, props, children) => hFn('span', { ...props, ...opt }, ...children)
-      : (hFn, props, children) =>
-          hFn('span', { class: 'footnote', ...props }, ...children),
+    typeof body === 'function'
+      ? body
+      : typeof body === 'object'
+      ? (((hFn, props, children) =>
+          hFn('span', { ...props, ...body }, ...children)) as GcpmBodyFactory)
+      : (((hFn, props, children) =>
+          hFn(
+            'span',
+            { class: 'footnote', ...props },
+            ...children,
+          )) as GcpmBodyFactory),
+  );
+  const buildDuplicatedCall = createBuildDuplicatedCall(
+    resolved.duplicatedCall,
   );
 
   return {
     toHastHandlers: {
-      footnoteReference: createFootnoteReferenceHandler(buildFootnote),
+      footnoteReference: createFootnoteReferenceHandler(
+        buildFootnote,
+        buildDuplicatedCall,
+      ),
       footnote: createInlineFootnoteHandler(buildFootnote),
     },
-    hastTransformers: [reportFootnoteWarnings],
+    hastTransformers: [],
   };
 };
 
