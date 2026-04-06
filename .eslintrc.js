@@ -15,4 +15,8 @@ module.exports = {
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     'no-console': 'error',
   },
+  ignorePatterns: [
+    'packages/remark-attribute/src/code-fenced.js',
+    'packages/remark-attribute/src/factory-attributes.js',
+  ],
 };

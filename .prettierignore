@@ -1,1 +1,4 @@
 *.md
+
+packages/remark-attribute/src/code-fenced.js
+packages/remark-attribute/src/factory-attributes.js
