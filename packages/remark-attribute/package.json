@@ -17,11 +17,9 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
-    "@types/node": "^20.19.39",
     "rehype-stringify": "^10.0.1",
     "remark-parse": "^11.0.0",
     "remark-rehype": "^11.1.2",
-    "typescript": "^6.0.2",
     "unified": "^11.0.5"
   },
   "dependencies": {

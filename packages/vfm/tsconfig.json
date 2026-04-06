@@ -5,6 +5,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "lib": ["ESNext", "DOM"],
+    "types": ["node"],
     "declaration": true,
     "outDir": "./lib",
     "rootDir": "./src",
