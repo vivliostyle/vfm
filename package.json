@@ -1,6 +1,7 @@
 {
   "name": "@vivliostyle/vfm-root",
   "private": true,
+  "type": "module",
   "description": "Custom Markdown syntax specialized in book authoring.",
   "engines": {
     "node": ">= 20"
@@ -11,6 +12,13 @@
   "workspaces": [
     "packages/*"
   ],
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.2.0",
+    "globals": "^17.4.0",
+    "jiti": "^2.6.1",
+    "typescript-eslint": "^8.58.0"
+  },
   "scripts": {
     "build": "npm run build --workspaces --if-present",
     "dev": "npm run dev --workspaces --if-present",

@@ -6,7 +6,7 @@
  * @see https://github.com/jake-low/remark-sectionize
  */
 
-import { Parent, Root } from 'mdast';
+import { Parent } from 'mdast';
 import { VFile } from 'vfile';
 import { findAfter } from 'unist-util-find-after';
 import { visitParents as visit } from 'unist-util-visit-parents';
@@ -20,7 +20,7 @@ const MAX_HEADING_DEPTH = 6;
  * @param node - Node of Markdown AST.
  * @returns Properties.
  */
-const createProperties = (depth: number, node: any): KeyValue => {
+const createProperties = (depth: number): KeyValue => {
   const properties: KeyValue = {
     class: [`level${depth}`],
   };
@@ -126,7 +126,7 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
     endIndex > 0 ? endIndex : undefined,
   );
 
-  const hProperties = createProperties(depth, node);
+  const hProperties = createProperties(depth);
 
   // {hidden} specifier
   if (Object.keys(node.data.hProperties).includes('hidden')) {

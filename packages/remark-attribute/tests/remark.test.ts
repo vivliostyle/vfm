@@ -350,7 +350,6 @@ test('remark-attribute (extended with Dangerous)', async function (t) {
 test('remark-attribute (extended invalid scope fallthrough)', async function (t) {
   await t.test('should treat invalid scope like extended', async function () {
     const renderExtended = renderWith({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- testing invalid scope value
       scope: 'invalid' as any,
       extend: { strong: ['ex-attr'] },
     });

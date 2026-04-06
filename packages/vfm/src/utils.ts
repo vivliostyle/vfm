@@ -6,7 +6,6 @@ export const debug = initDebug('vfm');
 
 export const inspect = (header?: string) => () => (tree: Node) => {
   if (debug.enabled) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     if (header) debug(`\n### ${header} ###`);
     debug(unistInspect(tree));
   }
