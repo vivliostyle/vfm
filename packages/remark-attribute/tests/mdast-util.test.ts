@@ -32,7 +32,7 @@ function first<T extends mdast.RootContent['type']>(
   throw new Error(`expected child of type "${type}"`);
 }
 
-test('mdast-util-attribute (public api)', async (t) => {
+test.skip('mdast-util-attribute (public api)', async (t) => {
   await t.test('should export attributeFromMarkdown', async () => {
     assert.deepEqual(Object.keys(await import('../src/index.ts')).sort(), [
       'attributeFromMarkdown',

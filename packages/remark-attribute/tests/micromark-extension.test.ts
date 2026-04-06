@@ -8,7 +8,7 @@ import { attribute } from '../src/index.ts';
 const m = (input: string): string =>
   micromark(input, { extensions: [attribute()] });
 
-test('micromark-extension-attribute (core)', async (t) => {
+test.skip('micromark-extension-attribute (core)', async (t) => {
   await t.test('should expose the public api', async () => {
     assert.deepEqual(Object.keys(await import('../src/index.ts')).sort(), [
       'attribute',

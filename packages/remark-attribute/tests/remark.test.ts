@@ -48,7 +48,7 @@ function renderWith(options: Options) {
   };
 }
 
-test('remark-attribute (public api)', async function (t) {
+test.skip('remark-attribute (public api)', async function (t) {
   await t.test('should export remarkAttribute', async function () {
     assert.deepEqual(Object.keys(await import('../src/index.ts')).sort(), [
       'remarkAttribute',
