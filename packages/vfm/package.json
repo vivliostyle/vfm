@@ -41,6 +41,7 @@
   "//": "@types/hast, @types/mdast は vfm の公開 API に現れるため、ユーザーにも型パッケージをインストールさせる必要がある",
   "//": "さらにバージョンを Major 固定し、依存ツリー内で異なる Minor/Patch バージョンの重複インストール発生を防ぐ。これは unified の作者も使用しているパターン",
   "//": "see: https://github.com/wooorm/refractor/blob/ed824ac801ef4bb5b25f73a4bcd6ce46b7eec8c9/package.json#L14",
+  "//": "@types/unist は本来 @types/hast, @types/mdast の間接依存だが、remark-attribute が @types/unist@3 を要求するため、npm の hoist 解決で @types/unist@2.0.11 が選ばれる。2.0.11 は 2.0.3 と型定義に破壊的変更（Node のジェネリック化、index signature の削除等）があり vfm のビルドが壊れるため、2.0.3 を明示的に固定している",
   "dependencies": {
     "@types/hast": "^2.0.0",
     "@types/mdast": "^3.0.0",
