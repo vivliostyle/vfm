@@ -1,7 +1,5 @@
-// This file is copied verbatim from micromark/micromark-extension-directive,
-// based on commit f3ad96c51330dd57b6d40cd865cb23fdce29d833.
-//
 // MIT (c) Titus Wormer <https://wooorm.com>
+// from: https://github.com/micromark/micromark-extension-directive/blob/d19906200feba667b351ce60ee511f6204b662e0/dev/lib/factory-attributes.js
 
 /**
  * @import {Code, Effects, State, TokenType} from 'micromark-util-types'

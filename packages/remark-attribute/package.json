@@ -7,9 +7,10 @@
     "test": "tests"
   },
   "scripts": {
+    "build": "tsc && tsc --project tests/tsconfig.json",
     "format": "prettier --write \"{src,tests}/**/*.ts\"",
     "lint": "eslint --fix \"{src,tests}/**/*.ts\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test \"tests/**/*.ts\""
   },
   "keywords": [],
   "author": "",
@@ -24,7 +25,8 @@
     "unified": "^11.0.5"
   },
   "dependencies": {
-    "@types/mdast": "^4.0.4",
+    "@types/mdast": "^4.0.0",
+    "@types/unist": "^3.0.0",
     "html-element-attributes": "^3.5.0",
     "mdast-util-from-markdown": "^2.0.3",
     "mdast-util-to-hast": "^13.2.1",

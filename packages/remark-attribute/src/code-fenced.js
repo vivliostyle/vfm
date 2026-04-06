@@ -1,10 +1,8 @@
-// Based on code-fenced.js from micromark/micromark,
-// commit 774a70c6bae6dd94486d3385dbd9a0f14550b709.
+// MIT (c) Titus Wormer <https://wooorm.com>
+// from: https://github.com/micromark/micromark/blob/774a70c6bae6dd94486d3385dbd9a0f14550b709/packages/micromark-core-commonmark/dev/lib/code-fenced.js
 //
 // Insertions marked with "// [attribute]" attempt to parse trailing
 // {#id .class key=value} in the meta string as structured attribute tokens.
-//
-// MIT (c) Titus Wormer <https://wooorm.com>
 
 /**
  * @import {

@@ -12,8 +12,10 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @vivliostyle/vfm",
-    "dev": "npm run dev -w @vivliostyle/vfm",
-    "test": "npm run test -w @vivliostyle/vfm"
+    "build": "npm run build --workspaces --if-present",
+    "dev": "npm run dev --workspaces --if-present",
+    "format": "npm run format --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
   }
 }

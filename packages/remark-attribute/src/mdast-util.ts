@@ -1,7 +1,7 @@
 import { htmlElementAttributes } from 'html-element-attributes';
 import type * as mdast from 'mdast';
 import type * as fromMarkdown from 'mdast-util-from-markdown';
-import type {} from 'mdast-util-to-hast'; // Load Data.hProperties augmentation
+import type {} from 'mdast-util-to-hast'; // declare module 'mdast' { interface Data { hProperties?: Properties | undefined } }
 import { parseEntities } from 'parse-entities';
 import { visitParents } from 'unist-util-visit-parents';
 

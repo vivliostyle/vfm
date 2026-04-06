@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { fromMarkdown } from 'mdast-util-from-markdown';
-import type { Root, RootContent } from 'mdast';
+import type * as mdast from 'mdast';
 import {
   attribute,
   attributeFromMarkdown,
@@ -21,12 +21,13 @@ function parse(input: string, options?: Options) {
 /**
  * Get the first child of given type from the tree.
  */
-function first<T extends RootContent['type']>(
-  tree: Root,
+function first<T extends mdast.RootContent['type']>(
+  tree: mdast.Root,
   type: T,
-): Extract<RootContent, { type: T }> {
+): Extract<mdast.RootContent, { type: T }> {
   for (const child of tree.children) {
-    if (child.type === type) return child as Extract<RootContent, { type: T }>;
+    if (child.type === type)
+      return child as Extract<mdast.RootContent, { type: T }>;
   }
   throw new Error(`expected child of type "${type}"`);
 }
