@@ -44,6 +44,7 @@
   "dependencies": {
     "@types/hast": "^2.0.0",
     "@types/mdast": "^3.0.0",
+    "@types/unist": "2.0.3",
     "debug": "^4.4.3",
     "doctype": "^3.0.1",
     "github-slugger": "^2.0.0",
