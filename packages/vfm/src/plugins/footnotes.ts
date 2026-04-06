@@ -234,8 +234,8 @@ type ExtractTagName<S extends string> = S extends `${infer Tag}${
     ? ShorthandTagName
     : Tag
   : S extends ''
-  ? ShorthandTagName
-  : S;
+    ? ShorthandTagName
+    : S;
 
 const shorthandTagBrand = Symbol();
 
@@ -259,7 +259,10 @@ type TagAwareH = {
     properties?: HProperties,
     ...children: HChild[]
   ): hast.Element & { tagName: ExtractTagName<S> };
-  <S extends string>(selector: S, ...children: HChild[]): hast.Element & {
+  <S extends string>(
+    selector: S,
+    ...children: HChild[]
+  ): hast.Element & {
     tagName: ExtractTagName<S>;
   };
 };
@@ -880,14 +883,14 @@ export const createFootnotePlugin = (
     typeof body === 'function'
       ? body
       : typeof body === 'object'
-      ? (((hFn, props, children) =>
-          hFn('span', { ...props, ...body }, ...children)) as GcpmBodyFactory)
-      : (((hFn, props, children) =>
-          hFn(
-            'span',
-            { class: 'footnote', ...props },
-            ...children,
-          )) as GcpmBodyFactory),
+        ? (((hFn, props, children) =>
+            hFn('span', { ...props, ...body }, ...children)) as GcpmBodyFactory)
+        : (((hFn, props, children) =>
+            hFn(
+              'span',
+              { class: 'footnote', ...props },
+              ...children,
+            )) as GcpmBodyFactory),
   );
   const buildDuplicatedCall = createBuildDuplicatedCall(
     resolved.duplicatedCall,

@@ -58,8 +58,8 @@ const afterAttrs = (
         types.whitespace,
       )(code)
     : code === codes.eof || markdownLineEnding(code)
-    ? ok(code)
-    : undefined;
+      ? ok(code)
+      : undefined;
 
 /**
  * Partial construct for when `{` is the first meta character

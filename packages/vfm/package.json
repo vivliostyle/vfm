@@ -36,6 +36,7 @@
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "prepare": "npm run build",
     "dev": "tsc -w",
+    "format": "prettier --write \"src/**/*.ts\"",
     "lint": "eslint --fix \"src/**/*.ts\"",
     "test": "vitest"
   },
@@ -90,7 +91,6 @@
     "@types/node": "^18.7.21",
     "@types/refractor": "^3.0.2",
     "common-tags": "^1.8.2",
-    "prettier": "^2.7.1",
     "shx": "^0.3.4",
     "typescript": "^4.8.3",
     "vitest": "^3.0.8"

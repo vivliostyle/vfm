@@ -102,7 +102,8 @@ type TokenSelfMap<T extends Record<string, string>> = {
 
 declare module 'micromark-util-types' {
   interface TokenTypeMap
-    extends TokenSelfMap<typeof inlineTokenTypes>,
+    extends
+      TokenSelfMap<typeof inlineTokenTypes>,
       TokenSelfMap<typeof blockTokenTypes>,
       TokenSelfMap<typeof codeMetaTokenTypes> {}
 }

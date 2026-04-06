@@ -17,6 +17,7 @@
     "eslint": "^10.2.0",
     "globals": "^17.4.0",
     "jiti": "^2.6.1",
+    "prettier": "^3.8.1",
     "typescript-eslint": "^8.58.0"
   },
   "scripts": {

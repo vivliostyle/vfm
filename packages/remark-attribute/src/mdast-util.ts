@@ -106,14 +106,17 @@ function exitAttributeValue(
  * Clean raw attribute list into a map, merging classes.
  */
 const cleanAttributes = (list: [string, string][]) =>
-  list.reduce((cleaned, [key, value]) => {
-    if (key === 'class' && cleaned.class) {
-      cleaned.class += ' ' + value;
-    } else {
-      cleaned[key] = value;
-    }
-    return cleaned;
-  }, {} as Record<string, string>);
+  list.reduce(
+    (cleaned, [key, value]) => {
+      if (key === 'class' && cleaned.class) {
+        cleaned.class += ' ' + value;
+      } else {
+        cleaned[key] = value;
+      }
+      return cleaned;
+    },
+    {} as Record<string, string>,
+  );
 
 const exitAttributes = (type: (AttributeInline | AttributeBlock)['type']) =>
   function (this: fromMarkdown.CompileContext, token: fromMarkdown.Token) {
@@ -226,13 +229,13 @@ const serializeAttributes = (attributes: Record<string, string>) =>
       key === 'id'
         ? ['#' + value]
         : key === 'class'
-        ? value
-            .split(/\s+/)
-            .filter(Boolean)
-            .map((cls) => '.' + cls)
-        : value
-        ? [key + '="' + value + '"']
-        : [key],
+          ? value
+              .split(/\s+/)
+              .filter(Boolean)
+              .map((cls) => '.' + cls)
+          : value
+            ? [key + '="' + value + '"']
+            : [key],
     )
     .join(' ') +
   '}';
@@ -526,10 +529,13 @@ function filteredAttributes(
     default: {
       const extendTag = (
         extend && typeof extend === 'object' ? Object.keys(extend) : []
-      ).reduce((acc, p) => {
-        acc[convTypeTag.get(p) ?? p] = extend[p] ?? [];
-        return acc;
-      }, {} as Record<string, string[]>);
+      ).reduce(
+        (acc, p) => {
+          acc[convTypeTag.get(p) ?? p] = extend[p] ?? [];
+          return acc;
+        },
+        {} as Record<string, string[]>,
+      );
       inScope = (p) =>
         extendTag[htmlTag]?.includes(p) || extendTag['*']?.includes(p);
     }
