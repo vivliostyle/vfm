@@ -35,7 +35,7 @@
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "dev": "tsc -w",
-    "test": "vitest",
+    "test": "vitest run",
     "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
     "lint": "eslint --fix ."
   },
@@ -90,7 +90,6 @@
     "@types/debug": "^4.1.12",
     "@types/js-yaml": "^4.0.9",
     "@types/refractor": "^3.0.2",
-    "common-tags": "^1.8.2",
-    "vitest": "^3.0.8"
+    "common-tags": "^1.8.2"
   }
 }
