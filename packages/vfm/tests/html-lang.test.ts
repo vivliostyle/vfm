@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { stringify } from '../src/index';
+import { stringify } from '../src/index.js';
 
 test('undefined', () => {
   const received = stringify('text', { disableFormatHtml: true });

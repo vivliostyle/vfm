@@ -16,8 +16,8 @@ const propertyToString = (
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
 export type FigureOptions = {
-  imgFigcaptionOrder?: ImgFigcaptionOrder;
-  assignIdToFigcaption?: boolean;
+  imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
+  assignIdToFigcaption?: boolean | undefined;
 };
 
 /**

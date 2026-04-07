@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { stringify } from '../src/index';
-import { Metadata, readMetadata } from '../src/plugins/metadata';
+import { stringify } from '../src/index.js';
+import { type Metadata, readMetadata } from '../src/plugins/metadata.js';
 
 test('Read all', () => {
   const received = readMetadata(

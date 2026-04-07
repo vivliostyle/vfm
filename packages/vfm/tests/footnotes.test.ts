@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { stringify } from '../src/index';
+import { stringify } from '../src/index.js';
 
 test('Footnotes', () => {
   const md = `VFM is developed in the GitHub repository[^1].

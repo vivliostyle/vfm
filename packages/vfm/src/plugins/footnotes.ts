@@ -364,14 +364,18 @@ export type FootnoteOptions = {
     | { mode: 'pandoc' }
     | {
         mode: 'dpub';
-        call?: hast.Properties | DpubCallFactory;
-        body?: hast.Properties | DpubBodyFactory;
+        call?: hast.Properties | DpubCallFactory | undefined;
+        body?: hast.Properties | DpubBodyFactory | undefined;
       }
     | {
         mode: 'gcpm';
-        body?: hast.Properties | GcpmBodyFactory;
-        duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
-      };
+        body?: hast.Properties | GcpmBodyFactory | undefined;
+        duplicatedCall?:
+          | hast.Properties
+          | GcpmDuplicatedCallFactory
+          | undefined;
+      }
+    | undefined;
 };
 
 type BuildFootnote = (
@@ -812,13 +816,13 @@ type ResolvedOption =
   | { mode: 'pandoc' }
   | {
       mode: 'dpub';
-      call?: hast.Properties | DpubCallFactory;
-      body?: hast.Properties | DpubBodyFactory;
+      call?: hast.Properties | DpubCallFactory | undefined;
+      body?: hast.Properties | DpubBodyFactory | undefined;
     }
   | {
       mode: 'gcpm';
-      body?: hast.Properties | GcpmBodyFactory;
-      duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
+      body?: hast.Properties | GcpmBodyFactory | undefined;
+      duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory | undefined;
     };
 
 const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {

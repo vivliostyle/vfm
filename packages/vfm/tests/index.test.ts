@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
-import { stringify } from '../src';
-import { ReplaceRule } from '../src/plugins/replace';
+import { stringify } from '../src/index.js';
+import type { ReplaceRule } from '../src/plugins/replace.js';
 
 test('replace', () => {
   const rules = [

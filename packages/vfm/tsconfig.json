@@ -4,9 +4,6 @@
   "exclude": ["tests"],
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./lib",
-
-    // TODO: fix existing code to be compatible with exactOptionalPropertyTypes (tsc --init default since TS 5)
-    "exactOptionalPropertyTypes": false
+    "outDir": "./lib"
   }
 }

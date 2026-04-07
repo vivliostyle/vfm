@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { VFM } from '../src';
+import { VFM } from '../src/index.js';
 
 test('has valid inlineMethods', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
