@@ -37,7 +37,8 @@
     "prepare": "npm run build",
     "dev": "tsc -w",
     "test": "vitest",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "lint": "eslint --fix ."
   },
   "//": {
     "dependencies.{@types/hast,@types/mdast}": [
@@ -90,10 +91,7 @@
     "@types/debug": "^4.1.12",
     "@types/js-yaml": "^4.0.9",
     "@types/refractor": "^3.0.2",
-    "@typescript-eslint/eslint-plugin": "^5.38.0",
-    "@typescript-eslint/parser": "^5.38.0",
     "common-tags": "^1.8.2",
-    "eslint": "^8.24.0",
     "shx": "^0.3.4",
     "typescript": "^4.8.3",
     "vitest": "^3.0.8"

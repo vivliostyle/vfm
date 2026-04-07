@@ -15,11 +15,17 @@
     "build": "npm run build -w @vivliostyle/vfm",
     "dev": "npm run dev -w @vivliostyle/vfm",
     "test": "npm run test -w @vivliostyle/vfm",
-    "format": "npm --workspaces run format --if-present -- --ignore-path ../../.gitignore --ignore-path ../../.prettierignore"
+    "format": "npm --workspaces run format --if-present -- --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+    "lint": "npm --workspaces run lint --if-present"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^20.19.39",
-    "prettier": "^3.8.1"
+    "eslint": "^10.2.0",
+    "eslint-config-flat-gitignore": "^2.3.0",
+    "globals": "^17.4.0",
+    "prettier": "^3.8.1",
+    "typescript-eslint": "^8.58.0"
   },
   "type": "module"
 }
