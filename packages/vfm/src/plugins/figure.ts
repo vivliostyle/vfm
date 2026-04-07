@@ -10,8 +10,8 @@ const propertyToString = (
   return typeof property === 'string' || typeof property === 'number'
     ? String(property) // <tag prop="foo" /> || <tag prop=42 />
     : Array.isArray(property)
-    ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
-    : ''; // <tag /> || <tag prop />
+      ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
+      : ''; // <tag /> || <tag prop />
 };
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
