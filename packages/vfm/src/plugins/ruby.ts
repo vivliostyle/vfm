@@ -1,5 +1,5 @@
-import { Handler, all } from 'mdast-util-to-hast';
-import { Plugin } from 'unified';
+import { type Handler, all } from 'mdast-util-to-hast';
+import { type Plugin } from 'unified';
 import { u } from 'unist-builder';
 
 // remark
@@ -12,7 +12,10 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
   const match = /^{(.+?)(?<=[^\\|])\|(.+?)}/.exec(value);
   if (!match) return;
 
-  const [eaten, inlineContent, rubyText] = match;
+  // The regex has exactly 2 capture groups
+  const eaten = match[0]!;
+  const inlineContent = match[1]!;
+  const rubyText = match[2]!;
 
   if (silent) return true;
 

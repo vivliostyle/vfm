@@ -1,5 +1,5 @@
 import shortcodes from 'remark-shortcodes';
-import { Node } from 'unist';
+import type { Node } from 'unist';
 import { remove } from 'unist-util-remove';
 
 const keepToC = () => (tree: Node) => {

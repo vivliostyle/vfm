@@ -2,8 +2,11 @@ import raw from 'rehype-raw';
 import remark2rehype from 'remark-rehype';
 import unified from 'unified';
 import { handler as code } from './plugins/code.js';
-import { hast as figure, FigureOptions } from './plugins/figure.js';
-import { createFootnotePlugin, FootnoteOptions } from './plugins/footnotes.js';
+import { hast as figure, type FigureOptions } from './plugins/figure.js';
+import {
+  createFootnotePlugin,
+  type FootnoteOptions,
+} from './plugins/footnotes.js';
 import {
   handlerDisplayMath as displayMath,
   handlerInlineMath as inlineMath,

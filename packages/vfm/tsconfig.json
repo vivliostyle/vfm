@@ -1,16 +1,12 @@
 {
-  "exclude": ["tests", "lib"],
+  "extends": "../../tsconfig.json",
+  "include": ["src", "types"],
+  "exclude": ["tests"],
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "lib": ["ESNext", "DOM"],
-    "declaration": true,
-    "outDir": "./lib",
     "rootDir": "./src",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "skipLibCheck": true
+    "outDir": "./lib",
+
+    // TODO: fix existing code to be compatible with exactOptionalPropertyTypes (tsc --init default since TS 5)
+    "exactOptionalPropertyTypes": false
   }
 }

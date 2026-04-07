@@ -1,16 +1,16 @@
-import { Element, Properties } from 'hast';
+import type { Element, Properties } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
-import { Literal, Root } from 'mdast';
+import type { Literal, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
 import remark2rehype from 'remark-rehype';
 import unified from 'unified';
-import { Node } from 'unist';
+import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
-import { VFile } from 'vfile';
+import type { VFile } from 'vfile';
 import { mdast as attr } from './attr.js';
 import { mdast as footnotes } from './footnotes.js';
 

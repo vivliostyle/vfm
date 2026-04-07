@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
-import meow, { Result } from 'meow';
+import meow, { type Result } from 'meow';
 import readline from 'readline';
 import { stringify } from './index.js';
 import type { FootnoteMode } from './plugins/footnotes.js';

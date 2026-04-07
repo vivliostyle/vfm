@@ -1,7 +1,7 @@
-import { Element, Properties, Root } from 'hast';
+import type { Element, Properties, Root } from 'hast';
 import { isElement as is } from 'hast-util-is-element';
 import { h } from 'hastscript';
-import { Node, Parent } from 'unist';
+import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 
 const propertyToString = (

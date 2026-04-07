@@ -453,9 +453,8 @@ const createFootnoteReferenceHandler = (
         ctx,
         // Unwrap single-paragraph definitions to produce inline content
         // (matches tight list-item behavior in footer.js).
-        def.children.length === 1 && def.children[0].type === 'paragraph'
-          ? def.children[0]
-          : def,
+        ((child = def.children[0]) =>
+          child && child.type === 'paragraph' ? child : def)(),
       ),
     );
   };
@@ -572,9 +571,8 @@ const createDpubFootnoteReferenceHandler =
       backlink,
       ...convertToHast(
         ctx,
-        def.children.length === 1 && def.children[0].type === 'paragraph'
-          ? def.children[0]
-          : def,
+        ((child = def.children[0]) =>
+          child && child.type === 'paragraph' ? child : def)(),
       ),
     ];
 

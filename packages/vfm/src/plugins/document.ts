@@ -1,9 +1,9 @@
 import { doctype } from 'doctype';
-import { h, Child } from 'hastscript';
-import { Node } from 'unist';
+import { h, type Child } from 'hastscript';
+import type { Node } from 'unist';
 import { u } from 'unist-builder';
-import { VFile } from 'vfile';
-import { Attribute, Metadata } from './metadata.js';
+import type { VFile } from 'vfile';
+import { type Attribute, type Metadata } from './metadata.js';
 
 /**
  * Create AST properties from attributes.

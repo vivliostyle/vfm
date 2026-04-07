@@ -1,6 +1,6 @@
 import findAndReplace from 'hast-util-find-and-replace';
 import { h } from 'hastscript';
-import { Node } from 'unist';
+import type { Node } from 'unist';
 
 export interface ReplaceRule {
   test: RegExp;

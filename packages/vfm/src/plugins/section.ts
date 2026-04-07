@@ -6,8 +6,9 @@
  * @see https://github.com/jake-low/remark-sectionize
  */
 
-import { Parent } from 'mdast';
-import { VFile } from 'vfile';
+import type { Parent } from 'mdast';
+import type { Node } from 'unist';
+import type { VFile } from 'vfile';
 import { findAfter } from 'unist-util-find-after';
 import { visitParents as visit } from 'unist-util-visit-parents';
 
@@ -73,7 +74,7 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
     return;
   }
   const parent = ancestors[ancestors.length - 1];
-  if (parent.type === 'blockquote') {
+  if (!parent || parent.type === 'blockquote') {
     return;
   }
 

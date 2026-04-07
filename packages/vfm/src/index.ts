@@ -1,11 +1,14 @@
 import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
-import unified, { Processor } from 'unified';
+import unified, { type Processor } from 'unified';
 import { mdast as doc } from './plugins/document.js';
 import { hast as hastMath } from './plugins/math.js';
 import type { FootnoteOptions } from './plugins/footnotes.js';
-import { Metadata, readMetadata } from './plugins/metadata.js';
-import { replace as handleReplace, ReplaceRule } from './plugins/replace.js';
+import { type Metadata, readMetadata } from './plugins/metadata.js';
+import {
+  replace as handleReplace,
+  type ReplaceRule,
+} from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
 import { debug } from './utils.js';
