@@ -35,7 +35,7 @@
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
     "dev": "tsc -w",
-    "test": "vitest run",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
     "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
     "lint": "eslint --fix ."
   },
