@@ -13,9 +13,8 @@
   ],
   "scripts": {
     "build": "npm --workspaces run build --if-present",
-    "dev": "npm run dev -w @vivliostyle/vfm",
-    "test": "npm run test -w @vivliostyle/vfm",
-    "format": "npm --workspaces run format --if-present -- --ignore-path ../../.gitignore --ignore-path ../../.prettierignore",
+    "test": "npm --workspaces run test --if-present",
+    "format": "npm --workspaces run format --if-present",
     "lint": "npm --workspaces run lint --if-present"
   },
   "devDependencies": {
@@ -25,6 +24,7 @@
     "eslint-config-flat-gitignore": "^2.3.0",
     "globals": "^17.4.0",
     "prettier": "^3.8.1",
+    "shx": "^0.4.0",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.0"
   },

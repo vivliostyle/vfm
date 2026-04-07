@@ -34,10 +34,9 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "shx rm -rf lib && tsc && shx chmod +x lib/cli.js",
-    "prepare": "npm run build",
     "dev": "tsc -w",
     "test": "vitest",
-    "format": "prettier --write .",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
     "lint": "eslint --fix ."
   },
   "//": {
@@ -92,7 +91,6 @@
     "@types/js-yaml": "^4.0.9",
     "@types/refractor": "^3.0.2",
     "common-tags": "^1.8.2",
-    "shx": "^0.3.4",
     "vitest": "^3.0.8"
   }
 }
