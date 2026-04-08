@@ -18,7 +18,6 @@ const MAX_HEADING_DEPTH = 6;
 /**
  * Create the attribute properties of a section.
  * @param depth - Depth of heading elements that are sections.
- * @param node - Node of Markdown AST.
  * @returns Properties.
  */
 const createProperties = (depth: number): KeyValue => {
