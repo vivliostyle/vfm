@@ -3,7 +3,7 @@ import { h, type Child } from 'hastscript';
 import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import type { VFile } from 'vfile';
-import { type Attribute, type Metadata } from './metadata.js';
+import type { Attribute, Metadata } from './metadata.js';
 
 /**
  * Create AST properties from attributes.

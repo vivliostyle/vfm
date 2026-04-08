@@ -1,5 +1,5 @@
 import { type Handler, all } from 'mdast-util-to-hast';
-import { type Plugin } from 'unified';
+import type { Plugin } from 'unified';
 import { u } from 'unist-builder';
 
 // remark

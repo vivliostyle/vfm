@@ -1,6 +1,6 @@
 import type { ElementContent as HastElementContent } from 'hast';
 import type { Code, Root } from 'mdast';
-import { type Handler } from 'mdast-util-to-hast';
+import type { Handler } from 'mdast-util-to-hast';
 import parseAttr from 'md-attr-parser';
 import refractor from 'refractor';
 import type { Node } from 'unist';
