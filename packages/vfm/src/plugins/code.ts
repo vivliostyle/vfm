@@ -1,9 +1,9 @@
-import { ElementContent as HastElementContent } from 'hast';
-import { Code, Root } from 'mdast';
-import { Handler } from 'mdast-util-to-hast';
+import type { ElementContent as HastElementContent } from 'hast';
+import type { Code, Root } from 'mdast';
+import type { Handler } from 'mdast-util-to-hast';
 import parseAttr from 'md-attr-parser';
 import refractor from 'refractor';
-import { Node } from 'unist';
+import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 
@@ -35,7 +35,9 @@ function extractLangTitle(node: Code): void {
   const match = /^(.+?):(.+)$/.exec(node.lang ?? '');
   if (!match) return;
 
-  const [, lang, title] = match;
+  // The regex has exactly 2 capture groups
+  const lang = match[1]!;
+  const title = match[2]!;
   setHProperties(node, { ...getHProperties(node), title });
   node.lang = lang;
   if (node.position?.end.offset) {
@@ -52,7 +54,8 @@ function parseMetadata(meta: string): Record<string, string> {
 
   return Object.fromEntries(
     matches.map((str) => {
-      const [k, v] = str.split('=');
+      // Each pattern captures one group before and after '='
+      const [k, v] = str.split('=') as [string, string];
       return [k, v.replace(/(^"|"$)/g, '')];
     }),
   );
@@ -91,7 +94,7 @@ function findValidAttrBlock(
 
     // Attribute block must be at start or preceded by whitespace
     // This prevents matching `{...}` inside values like `title=foo{#bar}`
-    if (braceIndex > 0 && !/\s/.test(meta[braceIndex - 1])) {
+    if (braceIndex > 0 && !/\s/.test(meta[braceIndex - 1]!)) {
       searchStart = braceIndex + 1;
       continue;
     }

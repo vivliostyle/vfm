@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
 import { inspectNoColor as unistInspectNoColor } from 'unist-util-inspect';
-import { StringifyMarkdownOptions, VFM } from '../src';
+import { type StringifyMarkdownOptions, VFM } from '../src/index.js';
 
 /**
  * Utility for testing MDAST and HTML strings generated from Markdown.

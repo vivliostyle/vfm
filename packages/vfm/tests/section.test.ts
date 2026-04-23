@@ -1,5 +1,5 @@
 import { test, expect } from 'vitest';
-import { stringify } from '../src/index';
+import { stringify } from '../src/index.js';
 
 // This test always fails, `remark-attr` does not handle empty headings.
 /*

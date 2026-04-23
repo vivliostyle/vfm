@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { stripIndent } from 'common-tags';
-import { buildProcessorTestingCode } from './utils';
+import { buildProcessorTestingCode } from './utils.js';
 
 test(
   'allows markdown context in new paragraph',

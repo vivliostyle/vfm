@@ -1,10 +1,10 @@
-import { Root as HastRoot } from 'hast';
+import type { Root as HastRoot } from 'hast';
 import { select } from 'hast-util-select';
-import { Root as MdastRoot } from 'mdast';
+import type { Root as MdastRoot } from 'mdast';
 import { findAndReplace } from 'mdast-util-find-and-replace';
-import { Handler } from 'mdast-util-to-hast';
-import { Plugin, Transformer } from 'unified';
-import { Node } from 'unist';
+import type { Handler } from 'mdast-util-to-hast';
+import type { Plugin, Transformer } from 'unified';
+import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 

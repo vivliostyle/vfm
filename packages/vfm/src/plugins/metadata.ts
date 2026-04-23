@@ -1,16 +1,16 @@
-import { Element, Properties } from 'hast';
+import type { Element, Properties } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
-import { Literal, Root } from 'mdast';
+import type { Literal, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
 import remark2rehype from 'remark-rehype';
 import unified from 'unified';
-import { Node } from 'unist';
+import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
-import { VFile } from 'vfile';
+import type { VFile } from 'vfile';
 import { mdast as attr } from './attr.js';
 import { mdast as footnotes } from './footnotes.js';
 
@@ -25,21 +25,21 @@ export type Attribute = {
 /** Settings of VFM. */
 export type VFMSettings = {
   /** Enable math syntax. */
-  math?: boolean;
+  math?: boolean | undefined;
   /** Output markdown fragments.  */
-  partial?: boolean;
+  partial?: boolean | undefined;
   /** Add `<br>` at the position of hard line breaks, without needing spaces. */
-  hardLineBreaks?: boolean;
+  hardLineBreaks?: boolean | undefined;
   /** Disable automatic HTML format. */
-  disableFormatHtml?: boolean;
+  disableFormatHtml?: boolean | undefined;
   /** Path of theme. */
-  theme?: string;
+  theme?: string | undefined;
   /** Enable TOC mode. */
-  toc?: boolean;
+  toc?: boolean | undefined;
   /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
+  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
   /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean;
+  assignIdToFigcaption?: boolean | undefined;
   /** Footnote output mode. Default is `'pandoc'` (endnote section). */
   footnote?:
     | 'pandoc'
@@ -48,57 +48,60 @@ export type VFMSettings = {
     | { mode: 'pandoc' }
     | {
         mode: 'dpub';
-        call?: Properties;
-        body?: Properties;
+        call?: Properties | undefined;
+        body?: Properties | undefined;
       }
     | {
         mode: 'gcpm';
-        body?: Properties;
-      };
+        body?: Properties | undefined;
+      }
+    | undefined;
 };
 
 /** Metadata from Frontmatter. */
 export type Metadata = {
   /** Value of `<html id="...">`. */
-  id?: string;
+  id?: string | undefined;
   /** Value of `<html lang="...">`. */
-  lang?: string;
+  lang?: string | undefined;
   /** Value of `<html dir="...">`. e.g. `ltr`, `rtl`, `auto`. */
-  dir?: string;
+  dir?: string | undefined;
   /** Value of `<html class="...">`. */
-  class?: string;
+  class?: string | undefined;
   /** Value of `<title>...</title>`. */
-  title?: string;
+  title?: string | undefined;
   /**
    * Attributes of `<html>`.
    * The `id`,` lang`, `dir`, and` class` specified in the root take precedence over the value of this property.
    */
-  html?: Array<Attribute>;
+  html?: Array<Attribute> | undefined;
   /** Attributes of `<body>`. */
-  body?: Array<Attribute>;
+  body?: Array<Attribute> | undefined;
   /** Attributes of `<base>`. */
-  base?: Array<Attribute>;
+  base?: Array<Attribute> | undefined;
   /** Attribute collection of `<meta>`. */
-  meta?: Array<Array<Attribute>>;
+  meta?: Array<Array<Attribute>> | undefined;
   /** Attribute collection of `<link>`. */
-  link?: Array<Array<Attribute>>;
+  link?: Array<Array<Attribute>> | undefined;
   /** Attribute collection of `<script>`. */
-  script?: Array<Array<Attribute>>;
+  script?: Array<Array<Attribute>> | undefined;
   /** VFM settings. */
-  vfm?: VFMSettings;
+  vfm?: VFMSettings | undefined;
   /** `<style>...</style>`, reserved for future use. */
-  style?: string;
+  style?: string | undefined;
   /** `<head>...</head>`, reserved for future use. */
-  head?: string;
+  head?: string | undefined;
 
   /**
    * A set of key-value pairs that are specified in `readMetadata` not to be processed as `<meta>`.
    * The data types converted from Frontmatter's YAML are retained.
    * Use this if want to add custom metadata with a third party tool.
    */
-  custom?: {
-    [key: string]: any;
-  };
+  custom?:
+    | {
+        [key: string]: any;
+      }
+    | undefined;
 };
 
 /**

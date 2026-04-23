@@ -1,6 +1,6 @@
 import { test } from 'vitest';
 import { stripIndent } from 'common-tags';
-import { buildProcessorTestingCode } from './utils';
+import { buildProcessorTestingCode } from './utils.js';
 
 // remark-parse GFM seems to support only EOL two-spaces, so backslash is excluded.
 test(

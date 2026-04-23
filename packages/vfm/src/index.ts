@@ -1,11 +1,14 @@
 import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
-import unified, { Processor } from 'unified';
+import unified, { type Processor } from 'unified';
 import { mdast as doc } from './plugins/document.js';
 import { hast as hastMath } from './plugins/math.js';
 import type { FootnoteOptions } from './plugins/footnotes.js';
-import { Metadata, readMetadata } from './plugins/metadata.js';
-import { replace as handleReplace, ReplaceRule } from './plugins/replace.js';
+import { type Metadata, readMetadata } from './plugins/metadata.js';
+import {
+  replace as handleReplace,
+  type ReplaceRule,
+} from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
 import { debug } from './utils.js';
@@ -18,25 +21,25 @@ export * from './plugins/metadata.js';
  */
 export interface StringifyMarkdownOptions {
   /** Custom stylesheet path/URL. */
-  style?: string | string[];
+  style?: string | string[] | undefined;
   /** Output markdown fragments. */
-  partial?: boolean;
+  partial?: boolean | undefined;
   /** Document title (ignored in partial mode). */
-  title?: string;
+  title?: string | undefined;
   /** Document language (ignored in partial mode). */
-  language?: string;
+  language?: string | undefined;
   /** Replacement handler for HTML string. */
-  replace?: ReplaceRule[];
+  replace?: ReplaceRule[] | undefined;
   /** Add `<br>` at the position of hard line breaks, without needing spaces. */
-  hardLineBreaks?: boolean;
+  hardLineBreaks?: boolean | undefined;
   /** Disable automatic HTML format. */
-  disableFormatHtml?: boolean;
+  disableFormatHtml?: boolean | undefined;
   /** Enable math syntax. */
-  math?: boolean;
+  math?: boolean | undefined;
   /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img';
+  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
   /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean;
+  assignIdToFigcaption?: boolean | undefined;
   /** Footnote output mode. Default is `'pandoc'` (endnote section). */
   footnote?: FootnoteOptions['footnote'];
 }

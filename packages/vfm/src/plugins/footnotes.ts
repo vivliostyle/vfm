@@ -287,8 +287,8 @@ type ExtractTagName<S extends string> = S extends `${infer Tag}${
     ? ShorthandTagName
     : Tag
   : S extends ''
-  ? ShorthandTagName
-  : S;
+    ? ShorthandTagName
+    : S;
 
 const shorthandTagBrand = Symbol();
 
@@ -312,7 +312,10 @@ type TagAwareH = {
     properties?: HProperties,
     ...children: HChild[]
   ): hast.Element & { tagName: ExtractTagName<S> };
-  <S extends string>(selector: S, ...children: HChild[]): hast.Element & {
+  <S extends string>(
+    selector: S,
+    ...children: HChild[]
+  ): hast.Element & {
     tagName: ExtractTagName<S>;
   };
 };
@@ -414,14 +417,18 @@ export type FootnoteOptions = {
     | { mode: 'pandoc' }
     | {
         mode: 'dpub';
-        call?: hast.Properties | DpubCallFactory;
-        body?: hast.Properties | DpubBodyFactory;
+        call?: hast.Properties | DpubCallFactory | undefined;
+        body?: hast.Properties | DpubBodyFactory | undefined;
       }
     | {
         mode: 'gcpm';
-        body?: hast.Properties | GcpmBodyFactory;
-        duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
-      };
+        body?: hast.Properties | GcpmBodyFactory | undefined;
+        duplicatedCall?:
+          | hast.Properties
+          | GcpmDuplicatedCallFactory
+          | undefined;
+      }
+    | undefined;
 };
 
 type BuildFootnote = (
@@ -503,9 +510,7 @@ const createFootnoteReferenceHandler = (
         ctx,
         // Unwrap single-paragraph definitions to produce inline content
         // (matches tight list-item behavior in footer.js).
-        def.children.length === 1 && def.children[0].type === 'paragraph'
-          ? def.children[0]
-          : def,
+        def.children[0]?.type === 'paragraph' ? def.children[0] : def,
       ),
     );
   };
@@ -622,9 +627,7 @@ const createDpubFootnoteReferenceHandler =
       backlink,
       ...convertToHast(
         ctx,
-        def.children.length === 1 && def.children[0].type === 'paragraph'
-          ? def.children[0]
-          : def,
+        def.children[0]?.type === 'paragraph' ? def.children[0] : def,
       ),
     ];
 
@@ -940,13 +943,13 @@ type ResolvedOption =
   | { mode: 'pandoc' }
   | {
       mode: 'dpub';
-      call?: hast.Properties | DpubCallFactory;
-      body?: hast.Properties | DpubBodyFactory;
+      call?: hast.Properties | DpubCallFactory | undefined;
+      body?: hast.Properties | DpubBodyFactory | undefined;
     }
   | {
       mode: 'gcpm';
-      body?: hast.Properties | GcpmBodyFactory;
-      duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory;
+      body?: hast.Properties | GcpmBodyFactory | undefined;
+      duplicatedCall?: hast.Properties | GcpmDuplicatedCallFactory | undefined;
     };
 
 const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
@@ -1009,14 +1012,14 @@ export const createFootnotePlugin = (
     typeof body === 'function'
       ? body
       : typeof body === 'object'
-      ? (((hFn, props, children) =>
-          hFn('span', { ...props, ...body }, ...children)) as GcpmBodyFactory)
-      : (((hFn, props, children) =>
-          hFn(
-            'span',
-            { class: 'footnote', ...props },
-            ...children,
-          )) as GcpmBodyFactory),
+        ? (((hFn, props, children) =>
+            hFn('span', { ...props, ...body }, ...children)) as GcpmBodyFactory)
+        : (((hFn, props, children) =>
+            hFn(
+              'span',
+              { class: 'footnote', ...props },
+              ...children,
+            )) as GcpmBodyFactory),
   );
   const buildDuplicatedCall = createBuildDuplicatedCall(
     resolved.duplicatedCall,

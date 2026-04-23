@@ -1,7 +1,7 @@
-import { Element, Properties, Root } from 'hast';
+import type { Element, Properties, Root } from 'hast';
 import { isElement as is } from 'hast-util-is-element';
 import { h } from 'hastscript';
-import { Node, Parent } from 'unist';
+import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 
 const propertyToString = (
@@ -10,14 +10,14 @@ const propertyToString = (
   return typeof property === 'string' || typeof property === 'number'
     ? String(property) // <tag prop="foo" /> || <tag prop=42 />
     : Array.isArray(property)
-    ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
-    : ''; // <tag /> || <tag prop />
+      ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
+      : ''; // <tag /> || <tag prop />
 };
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
 export type FigureOptions = {
-  imgFigcaptionOrder?: ImgFigcaptionOrder;
-  assignIdToFigcaption?: boolean;
+  imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
+  assignIdToFigcaption?: boolean | undefined;
 };
 
 /**
