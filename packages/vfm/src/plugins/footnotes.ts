@@ -129,6 +129,11 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
   const identifierToRefIndex = new Map<string, number>();
 
   const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+    // Reset closure-level maps so each document processed by a shared
+    // processor instance starts from a clean slate.
+    identifierToRefIndex.clear();
+    dupCountByRefIndex.clear();
+
     const calls = selectEndnoteCalls(tree as hast.Root);
 
     // Build a stable mapping from definition identifier to endnote number.
