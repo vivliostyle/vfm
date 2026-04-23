@@ -615,6 +615,80 @@ test('"gcpm" string behaves like { mode: "gcpm" }', () => {
   expect(asString).toBe(asObject);
 });
 
+// Regression tests for https://github.com/vivliostyle/vfm/issues/129
+// Footnote references placed inside table cells must resolve to the
+// matching footnote body in definition order across all three modes.
+
+const issue129Md = `| Label     | Col |
+|-----------|-----|
+| bar[^fn1] | x   |
+| baz[^fn2] | x   |
+| bee[^fn3] | x   |
+
+[^fn1]: fn1
+[^fn2]: fn2
+[^fn3]: fn3
+`;
+
+// Assert that each fragment is present and appears in strictly ascending
+// order within `received`.  Catches partial fixes that relabel ids
+// correctly but leave the physical ordering of <ol>/<aside> reversed.
+const expectInOrder = (received: string, fragments: string[]) => {
+  const positions = fragments.map((f) => {
+    const pos = received.indexOf(f);
+    expect(pos, `fragment not found: ${f}`).toBeGreaterThanOrEqual(0);
+    return pos;
+  });
+  for (let i = 1; i < positions.length; i++) {
+    expect(
+      positions[i],
+      `fragments out of order at index ${i}: ${fragments[i]}`,
+    ).toBeGreaterThan(positions[i - 1]);
+  }
+};
+
+test('issue #129 pandoc: table footnote calls resolve to matching bodies', () => {
+  const received = stringify(issue129Md, {
+    partial: true,
+    footnote: 'pandoc',
+  });
+  expectInOrder(received, [
+    '<td>bar<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></td>',
+    '<td>baz<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a></td>',
+    '<td>bee<a id="fnref3" href="#fn3" class="footnote-ref" role="doc-noteref"><sup>3</sup></a></td>',
+    '<li id="fn1" role="doc-endnote">fn1<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>',
+    '<li id="fn2" role="doc-endnote">fn2<a href="#fnref2" class="footnote-back" role="doc-backlink">↩</a></li>',
+    '<li id="fn3" role="doc-endnote">fn3<a href="#fnref3" class="footnote-back" role="doc-backlink">↩</a></li>',
+  ]);
+});
+
+test('issue #129 dpub: table footnote calls resolve to matching bodies', () => {
+  const received = stringify(issue129Md, {
+    partial: true,
+    footnote: 'dpub',
+  });
+  expectInOrder(received, [
+    '<td>bar<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></td>',
+    '<td>baz<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a></td>',
+    '<td>bee<a id="fnref3" href="#fn3" class="footnote-ref" role="doc-noteref"><sup>3</sup></a></td>',
+    '<aside id="fn1" class="footnote" role="doc-footnote"><a href="#fnref1" class="footnote-back" role="doc-backlink"><sup>1</sup></a>fn1</aside>',
+    '<aside id="fn2" class="footnote" role="doc-footnote"><a href="#fnref2" class="footnote-back" role="doc-backlink"><sup>2</sup></a>fn2</aside>',
+    '<aside id="fn3" class="footnote" role="doc-footnote"><a href="#fnref3" class="footnote-back" role="doc-backlink"><sup>3</sup></a>fn3</aside>',
+  ]);
+});
+
+test('issue #129 gcpm: table footnote calls resolve to matching bodies', () => {
+  const received = stringify(issue129Md, {
+    partial: true,
+    footnote: 'gcpm',
+  });
+  expectInOrder(received, [
+    '<td>bar<span class="footnote" id="fn-fn1" role="doc-footnote">fn1</span></td>',
+    '<td>baz<span class="footnote" id="fn-fn2" role="doc-footnote">fn2</span></td>',
+    '<td>bee<span class="footnote" id="fn-fn3" role="doc-footnote">fn3</span></td>',
+  ]);
+});
+
 test('Heading title and section id without inline footnotes text', () => {
   const md = '# Test^[Test]';
   const received = stringify(md);

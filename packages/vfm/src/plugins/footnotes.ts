@@ -121,13 +121,23 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
   // refIndex has.  Populated by the calls transformer, read by the
   // areas transformer.
   const dupCountByRefIndex = new Map<number, number>();
+  // identifier to refIndex, established by the calls transformer from
+  // document-order of references.  The areas transformer uses this to
+  // rebind endnote bodies regardless of the order mdast-util-to-hast
+  // emitted them (issue #129: table cells are walked in reverse by
+  // mdast-util-to-hast <12.1.1, producing a reversed endnote list).
+  const identifierToRefIndex = new Map<string, number>();
 
   const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+    // Reset closure-level maps so each document processed by a shared
+    // processor instance starts from a clean slate.
+    identifierToRefIndex.clear();
+    dupCountByRefIndex.clear();
+
     const calls = selectEndnoteCalls(tree as hast.Root);
 
     // Build a stable mapping from definition identifier to endnote number.
     // Duplicate references to the same definition reuse that number.
-    const identifierToIndex = new Map<string, number>();
     const dupCount = new Map<string, number>();
     let counter = 0;
 
@@ -138,12 +148,12 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
       const href = String(anchor.properties.href);
       const identifier = href.replace(/^#fn-/, '');
 
-      let refIndex = identifierToIndex.get(identifier);
+      let refIndex = identifierToRefIndex.get(identifier);
       let callId: string;
 
       if (refIndex === undefined) {
         refIndex = ++counter;
-        identifierToIndex.set(identifier, refIndex);
+        identifierToRefIndex.set(identifier, refIndex);
         callId = `fnref${refIndex}`;
       } else {
         const dup = (dupCount.get(identifier) ?? 0) + 1;
@@ -179,9 +189,23 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
       area.properties.role = 'doc-endnotes';
     });
 
-    endnoteElements.forEach((elem: ElementWithProps, i) => {
-      const refIndex = i + 1;
+    // Resolve each endnote element's true refIndex from the identifier
+    // assigned during the calls pass, then relabel and reorder by refIndex.
+    // When the upstream emitter is already fixed, this pass is idempotent
+    // (the order and ids converge to the same values either way).
+    const resolved = endnoteElements
+      .map((elem: ElementWithProps) => {
+        const originalId = String(elem.properties.id ?? '');
+        const identifier = originalId.replace(/^fn-/, '');
+        const refIndex = identifierToRefIndex.get(identifier);
+        return { elem, refIndex };
+      })
+      .filter(
+        (x): x is { elem: ElementWithProps; refIndex: number } =>
+          x.refIndex !== undefined,
+      );
 
+    resolved.forEach(({ elem, refIndex }) => {
       elem.properties.id = `fn${refIndex}`;
       elem.properties.role = 'doc-endnote';
 
@@ -211,6 +235,35 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
         }
       }
     });
+
+    // Reorder <li> within each <ol> to match refIndex ascending so the
+    // rendered list counter matches the id.  Non-<li> siblings keep their
+    // relative positions among <li> slots.
+    const refIndexByElem = new Map<hast.Element, number>(
+      resolved.map((r) => [r.elem, r.refIndex]),
+    );
+    selectAll('section[role="doc-endnotes"] ol', root).forEach(
+      (ol: hast.Element) => {
+        const liSlots = ol.children
+          .map((child, index) =>
+            child.type === 'element' &&
+            child.tagName === 'li' &&
+            refIndexByElem.has(child)
+              ? index
+              : -1,
+          )
+          .filter((i) => i !== -1);
+        const sortedLis = liSlots
+          .map((i) => ol.children[i] as hast.Element)
+          .sort(
+            (a, b) =>
+              (refIndexByElem.get(a) ?? 0) - (refIndexByElem.get(b) ?? 0),
+          );
+        liSlots.forEach((slotIndex, i) => {
+          ol.children[slotIndex] = sortedLis[i];
+        });
+      },
+    );
   };
 
   return [endnoteCallsToPandoc, endnoteAreasToPandoc];
@@ -758,6 +811,82 @@ const createReplaceDpubPlaceholders =
         }
       }
     }
+
+    // Phase 3: Renumber refIndex based on DOM order of calls.
+    //
+    // The footnote handlers assign refIndex at handler-invocation time,
+    // which mdast-util-to-hast <12.1.1 walks in reverse inside table
+    // cells (issue #129).  Now that the tree is fully built, rewrite
+    // every fnref${N}[-${dup}] / fn${N} using a mapping derived from
+    // the document order of call sites.  When the upstream walker is
+    // already fixed this mapping is the identity, making the pass a
+    // no-op.
+    const oldToNewRefIndex = new Map<number, number>();
+    let newCounter = 0;
+
+    (selectAll('a.footnote-ref', root) as ElementWithProps[]).forEach(
+      (anchor) => {
+        const callId = String(anchor.properties.id ?? '');
+        const match = /^fnref(\d+)(?:-(\d+))?$/.exec(callId);
+        if (!match) return;
+        const oldRefIndex = Number(match[1]);
+        const dupSuffix = match[2];
+
+        if (!oldToNewRefIndex.has(oldRefIndex)) {
+          newCounter++;
+          oldToNewRefIndex.set(oldRefIndex, newCounter);
+        }
+        const newRefIndex = oldToNewRefIndex.get(oldRefIndex) as number;
+
+        anchor.properties.id =
+          dupSuffix === undefined
+            ? `fnref${newRefIndex}`
+            : `fnref${newRefIndex}-${dupSuffix}`;
+        anchor.properties.href = `#fn${newRefIndex}`;
+        const sup = anchor.children.find(
+          (c): c is hast.Element => c.type === 'element' && c.tagName === 'sup',
+        );
+        if (sup && sup.children[0]?.type === 'text') {
+          sup.children[0].value = String(newRefIndex);
+        }
+      },
+    );
+
+    (
+      selectAll('aside[role="doc-footnote"]', root) as ElementWithProps[]
+    ).forEach((aside) => {
+      const id = String(aside.properties.id ?? '');
+      const match = /^fn(\d+)$/.exec(id);
+      if (!match) return;
+      const oldRefIndex = Number(match[1]);
+      const newRefIndex = oldToNewRefIndex.get(oldRefIndex);
+      if (newRefIndex === undefined) return;
+
+      aside.properties.id = `fn${newRefIndex}`;
+
+      const backlink = aside.children.find((c): c is hast.Element => {
+        if (c.type !== 'element' || c.tagName !== 'a') return false;
+        const className = c.properties?.className;
+        return (
+          Array.isArray(className) &&
+          (className as unknown[]).includes('footnote-back')
+        );
+      });
+      if (backlink) {
+        const oldHref = String(backlink.properties?.href ?? '');
+        const backMatch = /^#fnref(\d+)(-\d+)?$/.exec(oldHref);
+        if (backMatch && backlink.properties) {
+          const suffix = backMatch[2] ?? '';
+          backlink.properties.href = `#fnref${newRefIndex}${suffix}`;
+        }
+        const backSup = backlink.children.find(
+          (c): c is hast.Element => c.type === 'element' && c.tagName === 'sup',
+        );
+        if (backSup && backSup.children[0]?.type === 'text') {
+          backSup.children[0].value = String(newRefIndex);
+        }
+      }
+    });
   };
 
 /**
