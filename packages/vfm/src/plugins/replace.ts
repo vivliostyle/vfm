@@ -7,10 +7,10 @@ export interface ReplaceRule {
   match: (result: RegExpMatchArray, h: any) => Node | string;
 }
 
-export type ReplaceOptions = { replace: ReplaceRule[] };
+export type ReplaceOptions = { replace?: ReplaceRule[] | undefined };
 
-export function replace({ replace: rules }: ReplaceOptions) {
-  if (!rules || rules.length == 0) return;
+export function replace({ replace: rules = [] }: ReplaceOptions = {}) {
+  if (rules.length === 0) return;
   const search = rules.map(
     (rule) =>
       [

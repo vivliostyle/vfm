@@ -1,10 +1,4 @@
 /**
- * Like `Partial<T>` but also permits explicit `undefined` assignment under
- * `exactOptionalPropertyTypes: true`.
- */
-export type LaxPartial<T> = { [K in keyof T]?: T[K] | undefined };
-
-/**
  * Recursively remove function members from a type. Distributes over unions
  * and recurses into arrays and object types. Useful for deriving
  * YAML-serializable variants of types that otherwise admit factory callbacks.

@@ -10,7 +10,6 @@ import { type Metadata, readMetadata } from './plugins/metadata.js';
 import { type ReplaceOptions, type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
-import type { LaxPartial } from './types.js';
 import { debug } from './utils.js';
 
 // Expose metadata reading by VFM
@@ -26,15 +25,13 @@ export type StringifyMarkdownOptions = {
   title?: string | undefined;
   /** Document language (ignored in partial mode). */
   language?: string | undefined;
-} & LaxPartial<
-  LineBreaksOptions &
-    MathOptions &
-    Pick<DocumentOptions, 'partial'> &
-    FormatOptions &
-    FigureOptions &
-    ReplaceOptions &
-    FootnoteOptions
->;
+} & LineBreaksOptions &
+  MathOptions &
+  Pick<DocumentOptions, 'partial'> &
+  FormatOptions &
+  FigureOptions &
+  ReplaceOptions &
+  FootnoteOptions;
 
 export interface Hooks {
   afterParse: ReplaceRule[];
@@ -88,16 +85,16 @@ const checkMetadata = (
 export function VFM(
   {
     style = undefined,
-    partial = false,
+    partial,
     title = undefined,
     language = undefined,
-    replace = [],
-    hardLineBreaks = false,
-    disableFormatHtml = false,
-    math = true,
-    imgFigcaptionOrder = 'img-figcaption',
-    assignIdToFigcaption = false,
-    footnote = undefined,
+    replace,
+    hardLineBreaks,
+    disableFormatHtml,
+    math,
+    imgFigcaptionOrder,
+    assignIdToFigcaption,
+    footnote,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
 ): Processor {

@@ -11,7 +11,7 @@ import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
-import type { LaxPartial, StripFunctions } from '../types.js';
+import type { StripFunctions } from '../types.js';
 import { mdast as attr } from './attr.js';
 import type { DocumentOptions } from './document.js';
 import type { FigureOptions } from './figure.js';
@@ -34,14 +34,12 @@ export type VFMSettings = {
   theme?: string | undefined;
   /** Enable TOC mode. */
   toc?: boolean | undefined;
-} & LaxPartial<
-  LineBreaksOptions &
-    MathOptions &
-    Pick<DocumentOptions, 'partial'> &
-    FormatOptions &
-    FigureOptions &
-    StripFunctions<FootnoteOptions>
->;
+} & LineBreaksOptions &
+  MathOptions &
+  Pick<DocumentOptions, 'partial'> &
+  FormatOptions &
+  FigureOptions &
+  StripFunctions<FootnoteOptions>;
 
 /** Metadata from Frontmatter. */
 export type Metadata = {

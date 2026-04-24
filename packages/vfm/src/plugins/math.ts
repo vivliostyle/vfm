@@ -30,7 +30,7 @@ const MATH_URL =
 
 export type MathOptions = {
   /** Enable math syntax. */
-  math: boolean;
+  math?: boolean | undefined;
 };
 
 /**
@@ -112,8 +112,8 @@ const createTokenizers = () => {
  * @returns Transformer or undefined (less than remark 13).
  */
 export const mdast: Plugin<[MathOptions]> = function ({
-  math,
-}: MathOptions): Transformer | undefined {
+  math = true,
+}: MathOptions = {}): Transformer | undefined {
   if (!math) return;
 
   // For less than remark 13 with exclusive other markdown syntax
@@ -223,7 +223,7 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
  * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
 export const hast =
-  ({ math }: MathOptions) =>
+  ({ math = true }: MathOptions = {}) =>
   (tree: Node) => {
     if (
       !math ||

@@ -15,33 +15,14 @@ export const buildProcessorTestingCode =
     expectedMdast: string,
     expectedHtml: string,
     {
-      style = undefined,
       partial = true,
-      title = undefined,
-      language = undefined,
-      replace = undefined,
-      hardLineBreaks = false,
       disableFormatHtml = true,
       math = false,
-      imgFigcaptionOrder = undefined,
-      assignIdToFigcaption = undefined,
-      footnote = undefined,
+      ...rest
     }: StringifyMarkdownOptions = {},
   ) =>
   (): any => {
-    const vfm = VFM({
-      style,
-      partial,
-      title,
-      language,
-      replace,
-      hardLineBreaks,
-      disableFormatHtml,
-      math,
-      imgFigcaptionOrder,
-      assignIdToFigcaption,
-      footnote,
-    }).freeze();
+    const vfm = VFM({ partial, disableFormatHtml, math, ...rest }).freeze();
     const R = / \(.+?\)$/gm; // Remove position information
     // Remove data field from MDAST comparison.
     // The data field is not part of the MDAST structure itself, but is used for

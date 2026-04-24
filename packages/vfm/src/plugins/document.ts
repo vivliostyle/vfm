@@ -159,7 +159,7 @@ const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
 export type DocumentOptions = {
   metadata: Metadata;
   /** Output markdown fragments. */
-  partial: boolean;
+  partial?: boolean | undefined;
 };
 
 /**
@@ -167,7 +167,7 @@ export type DocumentOptions = {
  * @param data Options.
  * @returns Transformer.
  */
-export const mdast = ({ metadata: data, partial }: DocumentOptions) =>
+export const mdast = ({ metadata: data, partial = false }: DocumentOptions) =>
   partial
     ? () => {}
     : (tree: Node, vfile: VFile) => {

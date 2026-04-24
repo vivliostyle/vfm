@@ -17,9 +17,9 @@ const propertyToString = (
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
 export type FigureOptions = {
   /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder: ImgFigcaptionOrder;
+  imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
   /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption: boolean;
+  assignIdToFigcaption?: boolean | undefined;
 };
 
 /**
@@ -74,41 +74,47 @@ const wrapFigureImg = (
   }
 };
 
-export const hast = (options: FigureOptions) => (tree: Node) => {
-  visit(tree as Root, 'element', (node, index, parent) => {
-    // handle captioned code block
-    const maybeCode = node.children?.[0] as Element | undefined;
-    if (
-      is(node, 'pre') &&
-      maybeCode?.properties &&
-      maybeCode.properties.title
-    ) {
-      const maybeTitle = maybeCode.properties.title;
-      delete maybeCode.properties.title;
-      if (Array.isArray(maybeCode.properties.className)) {
-        const figcaptionProps: Properties = {};
-        moveIdToFigcaption(maybeCode, figcaptionProps, options);
+export const hast = ({
+  imgFigcaptionOrder = 'img-figcaption',
+  assignIdToFigcaption = false,
+}: FigureOptions = {}) => {
+  const options: FigureOptions = { imgFigcaptionOrder, assignIdToFigcaption };
+  return (tree: Node) => {
+    visit(tree as Root, 'element', (node, index, parent) => {
+      // handle captioned code block
+      const maybeCode = node.children?.[0] as Element | undefined;
+      if (
+        is(node, 'pre') &&
+        maybeCode?.properties &&
+        maybeCode.properties.title
+      ) {
+        const maybeTitle = maybeCode.properties.title;
+        delete maybeCode.properties.title;
+        if (Array.isArray(maybeCode.properties.className)) {
+          const figcaptionProps: Properties = {};
+          moveIdToFigcaption(maybeCode, figcaptionProps, options);
 
-        (parent as Parent).children[index as number] = h(
-          'figure',
-          { class: maybeCode.properties.className[0] },
-          h('figcaption', figcaptionProps, propertyToString(maybeTitle)),
-          node,
-        );
+          (parent as Parent).children[index as number] = h(
+            'figure',
+            { class: maybeCode.properties.className[0] },
+            h('figcaption', figcaptionProps, propertyToString(maybeTitle)),
+            node,
+          );
+        }
+
+        return;
       }
 
-      return;
-    }
-
-    // handle captioned and single line (like a block) img
-    if (
-      is(node, 'img') &&
-      node.properties?.alt &&
-      parent &&
-      parent.tagName === 'p' &&
-      parent.children.length === 1
-    ) {
-      wrapFigureImg(node, parent as Element, options);
-    }
-  });
+      // handle captioned and single line (like a block) img
+      if (
+        is(node, 'img') &&
+        node.properties?.alt &&
+        parent &&
+        parent.tagName === 'p' &&
+        parent.children.length === 1
+      ) {
+        wrapFigureImg(node, parent as Element, options);
+      }
+    });
+  };
 };
