@@ -634,17 +634,22 @@ const issue129Md = `| Label     | Col |
 // order within `received`.  Catches partial fixes that relabel ids
 // correctly but leave the physical ordering of <ol>/<aside> reversed.
 const expectInOrder = (received: string, fragments: string[]) => {
-  const positions = fragments.map((f) => {
-    const pos = received.indexOf(f);
-    expect(pos, `fragment not found: ${f}`).toBeGreaterThanOrEqual(0);
-    return pos;
-  });
-  for (let i = 1; i < positions.length; i++) {
-    expect(
-      positions[i],
-      `fragments out of order at index ${i}: ${fragments[i]}`,
-    ).toBeGreaterThan(positions[i - 1]);
-  }
+  fragments
+    .map((fragment) => {
+      const pos = received.indexOf(fragment);
+      expect(pos, `fragment not found: ${fragment}`).toBeGreaterThanOrEqual(0);
+      return { fragment, pos };
+    })
+    .flatMap((curr, i, arr) => {
+      const prev = arr[i - 1];
+      return prev === undefined ? [] : [{ prev, curr }];
+    })
+    .forEach(({ prev, curr }, i) => {
+      expect(
+        curr.pos,
+        `fragments out of order at index ${i + 1}: ${curr.fragment}`,
+      ).toBeGreaterThan(prev.pos);
+    });
 };
 
 test('issue #129 pandoc: table footnote calls resolve to matching bodies', () => {
