@@ -11,8 +11,12 @@ import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
+import type { LaxPartial } from '../types.js';
 import { mdast as attr } from './attr.js';
+import type { DocumentOptions } from './document.js';
 import { mdast as footnotes } from './footnotes.js';
+import type { FormatOptions } from './format.js';
+import type { MathOptions } from './math.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -24,14 +28,8 @@ export type Attribute = {
 
 /** Settings of VFM. */
 export type VFMSettings = {
-  /** Enable math syntax. */
-  math?: boolean | undefined;
-  /** Output markdown fragments.  */
-  partial?: boolean | undefined;
   /** Add `<br>` at the position of hard line breaks, without needing spaces. */
   hardLineBreaks?: boolean | undefined;
-  /** Disable automatic HTML format. */
-  disableFormatHtml?: boolean | undefined;
   /** Path of theme. */
   theme?: string | undefined;
   /** Enable TOC mode. */
@@ -56,7 +54,7 @@ export type VFMSettings = {
         body?: Properties | undefined;
       }
     | undefined;
-};
+} & LaxPartial<Pick<DocumentOptions, 'partial'> & MathOptions & FormatOptions>;
 
 /** Metadata from Frontmatter. */
 export type Metadata = {

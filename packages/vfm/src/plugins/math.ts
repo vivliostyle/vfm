@@ -207,36 +207,44 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
   );
 };
 
+export type MathOptions = {
+  /** Enable math syntax. */
+  math: boolean;
+};
+
 /**
  * Process math related Hypertext AST.
  * Set the `<script>` to load MathJax and `<body>` attribute that enable math typesetting.
  *
  * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
-export const hast = () => (tree: Node) => {
-  if (
-    !(
-      select('[data-math-typeset="true"]', tree as HastRoot) ||
-      select('math', tree as HastRoot)
-    )
-  ) {
-    return;
-  }
-
-  visit(tree as HastRoot, 'element', (node) => {
-    switch (node.tagName) {
-      case 'head':
-        node.children.push({
-          type: 'element',
-          tagName: 'script',
-          properties: {
-            async: true,
-            src: MATH_URL,
-          },
-          children: [],
-        });
-        node.children.push({ type: 'text', value: '\n' });
-        break;
+export const hast =
+  ({ math }: MathOptions) =>
+  (tree: Node) => {
+    if (
+      !math ||
+      !(
+        select('[data-math-typeset="true"]', tree as HastRoot) ||
+        select('math', tree as HastRoot)
+      )
+    ) {
+      return;
     }
-  });
-};
+
+    visit(tree as HastRoot, 'element', (node) => {
+      switch (node.tagName) {
+        case 'head':
+          node.children.push({
+            type: 'element',
+            tagName: 'script',
+            properties: {
+              async: true,
+              src: MATH_URL,
+            },
+            children: [],
+          });
+          node.children.push({ type: 'text', value: '\n' });
+          break;
+      }
+    });
+  };

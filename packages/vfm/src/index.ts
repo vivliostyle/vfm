@@ -1,10 +1,14 @@
 import rehypeStringify from 'rehype-stringify';
 import unified, { type Processor } from 'unified';
+import type { DocumentOptions } from './plugins/document.js';
 import type { FootnoteOptions } from './plugins/footnotes.js';
+import type { FormatOptions } from './plugins/format.js';
+import type { MathOptions } from './plugins/math.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
 import { type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
+import type { LaxPartial } from './types.js';
 import { debug } from './utils.js';
 
 // Expose metadata reading by VFM
@@ -13,11 +17,9 @@ export * from './plugins/metadata.js';
 /**
  * Option for convert Markdown to a stringify (HTML).
  */
-export interface StringifyMarkdownOptions {
+export type StringifyMarkdownOptions = {
   /** Custom stylesheet path/URL. */
   style?: string | string[] | undefined;
-  /** Output markdown fragments. */
-  partial?: boolean | undefined;
   /** Document title (ignored in partial mode). */
   title?: string | undefined;
   /** Document language (ignored in partial mode). */
@@ -26,17 +28,13 @@ export interface StringifyMarkdownOptions {
   replace?: ReplaceRule[] | undefined;
   /** Add `<br>` at the position of hard line breaks, without needing spaces. */
   hardLineBreaks?: boolean | undefined;
-  /** Disable automatic HTML format. */
-  disableFormatHtml?: boolean | undefined;
-  /** Enable math syntax. */
-  math?: boolean | undefined;
   /** Order of img and figcaption elements in figure. */
   imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean | undefined;
   /** Footnote output mode. Default is `'pandoc'` (endnote section). */
   footnote?: FootnoteOptions['footnote'];
-}
+} & LaxPartial<Pick<DocumentOptions, 'partial'> & MathOptions & FormatOptions>;
 
 export interface Hooks {
   afterParse: ReplaceRule[];
@@ -93,7 +91,7 @@ export function VFM(
     partial = false,
     title = undefined,
     language = undefined,
-    replace = undefined,
+    replace = [],
     hardLineBreaks = false,
     disableFormatHtml = false,
     math = true,
@@ -135,12 +133,12 @@ export function VFM(
     .data('settings', { position: true })
     .use(
       html({
-        partial,
-        metadata,
         imgFigcaptionOrder,
         assignIdToFigcaption,
         footnote,
-        replaceRules: replace,
+        replace,
+        partial,
+        metadata,
         math,
         disableFormatHtml,
       }),

@@ -156,19 +156,28 @@ const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
   ]);
 };
 
+export type DocumentOptions = {
+  metadata: Metadata;
+  /** Output markdown fragments. */
+  partial: boolean;
+};
+
 /**
  * Process Markdown AST.
  * @param data Options.
  * @returns Transformer.
  */
-export const mdast = (data: Metadata) => (tree: Node, vfile: VFile) => {
-  return {
-    type: 'root',
-    children: [
-      { type: 'doctype', name: doctype(5) },
-      u('text', '\n'),
-      createHTML(data, tree, vfile),
-      u('text', '\n'),
-    ],
-  };
-};
+export const mdast = ({ metadata: data, partial }: DocumentOptions) =>
+  partial
+    ? () => {}
+    : (tree: Node, vfile: VFile) => {
+        return {
+          type: 'root',
+          children: [
+            { type: 'doctype', name: doctype(5) },
+            u('text', '\n'),
+            createHTML(data, tree, vfile),
+            u('text', '\n'),
+          ],
+        };
+      };
