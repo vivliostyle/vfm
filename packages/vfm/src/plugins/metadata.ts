@@ -11,10 +11,11 @@ import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
-import type { LaxPartial } from '../types.js';
+import type { LaxPartial, StripFunctions } from '../types.js';
 import { mdast as attr } from './attr.js';
 import type { DocumentOptions } from './document.js';
-import { mdast as footnotes } from './footnotes.js';
+import type { FigureOptions } from './figure.js';
+import { mdast as footnotes, type FootnoteOptions } from './footnotes.js';
 import type { FormatOptions } from './format.js';
 import type { LineBreaksOptions } from './line-breaks.js';
 import type { MathOptions } from './math.js';
@@ -33,31 +34,13 @@ export type VFMSettings = {
   theme?: string | undefined;
   /** Enable TOC mode. */
   toc?: boolean | undefined;
-  /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
-  /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean | undefined;
-  /** Footnote output mode. Default is `'pandoc'` (endnote section). */
-  footnote?:
-    | 'pandoc'
-    | 'dpub'
-    | 'gcpm'
-    | { mode: 'pandoc' }
-    | {
-        mode: 'dpub';
-        call?: Properties | undefined;
-        body?: Properties | undefined;
-      }
-    | {
-        mode: 'gcpm';
-        body?: Properties | undefined;
-      }
-    | undefined;
 } & LaxPartial<
   LineBreaksOptions &
     MathOptions &
     Pick<DocumentOptions, 'partial'> &
-    FormatOptions
+    FormatOptions &
+    FigureOptions &
+    StripFunctions<FootnoteOptions>
 >;
 
 /** Metadata from Frontmatter. */
@@ -289,6 +272,11 @@ const readFootnoteOption = (raw: unknown): VFMSettings['footnote'] => {
           body:
             typeof obj.body === 'object' && obj.body !== null
               ? (obj.body as Properties)
+              : undefined,
+          duplicatedCall:
+            typeof obj.duplicatedCall === 'object' &&
+            obj.duplicatedCall !== null
+              ? (obj.duplicatedCall as Properties)
               : undefined,
         };
       }

@@ -1,12 +1,13 @@
 import rehypeStringify from 'rehype-stringify';
 import unified, { type Processor } from 'unified';
 import type { DocumentOptions } from './plugins/document.js';
+import type { FigureOptions } from './plugins/figure.js';
 import type { FootnoteOptions } from './plugins/footnotes.js';
 import type { FormatOptions } from './plugins/format.js';
 import type { LineBreaksOptions } from './plugins/line-breaks.js';
 import type { MathOptions } from './plugins/math.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
-import { type ReplaceRule } from './plugins/replace.js';
+import { type ReplaceOptions, type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
 import type { LaxPartial } from './types.js';
@@ -25,19 +26,14 @@ export type StringifyMarkdownOptions = {
   title?: string | undefined;
   /** Document language (ignored in partial mode). */
   language?: string | undefined;
-  /** Replacement handler for HTML string. */
-  replace?: ReplaceRule[] | undefined;
-  /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
-  /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean | undefined;
-  /** Footnote output mode. Default is `'pandoc'` (endnote section). */
-  footnote?: FootnoteOptions['footnote'];
 } & LaxPartial<
   LineBreaksOptions &
     MathOptions &
     Pick<DocumentOptions, 'partial'> &
-    FormatOptions
+    FormatOptions &
+    FigureOptions &
+    ReplaceOptions &
+    FootnoteOptions
 >;
 
 export interface Hooks {
@@ -99,7 +95,7 @@ export function VFM(
     hardLineBreaks = false,
     disableFormatHtml = false,
     math = true,
-    imgFigcaptionOrder = undefined,
+    imgFigcaptionOrder = 'img-figcaption',
     assignIdToFigcaption = false,
     footnote = undefined,
   }: StringifyMarkdownOptions = {},
