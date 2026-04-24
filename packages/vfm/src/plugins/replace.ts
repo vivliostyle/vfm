@@ -7,7 +7,9 @@ export interface ReplaceRule {
   match: (result: RegExpMatchArray, h: any) => Node | string;
 }
 
-export function replace({ rules }: { rules?: ReplaceRule[] } = {}) {
+export type ReplaceOptions = { replaceRules?: ReplaceRule[] | undefined };
+
+export function replace({ replaceRules: rules }: ReplaceOptions = {}) {
   if (!rules || rules.length == 0) return;
   const search = rules.map(
     (rule) =>

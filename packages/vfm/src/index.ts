@@ -1,14 +1,8 @@
-import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
 import unified, { type Processor } from 'unified';
-import { mdast as doc } from './plugins/document.js';
-import { hast as hastMath } from './plugins/math.js';
 import type { FootnoteOptions } from './plugins/footnotes.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
-import {
-  replace as handleReplace,
-  type ReplaceRule,
-} from './plugins/replace.js';
+import { type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
 import { debug } from './utils.js';
@@ -136,32 +130,22 @@ export function VFM(
     }
   }
 
-  const processor = unified()
+  return unified()
     .use(markdown(hardLineBreaks, math))
     .data('settings', { position: true })
-    .use(html({ imgFigcaptionOrder, assignIdToFigcaption, footnote }));
-
-  if (replace) {
-    processor.use(handleReplace, { rules: replace });
-  }
-
-  if (!partial) {
-    processor.use(doc, metadata);
-  }
-
-  processor.use(rehypeStringify);
-
-  // Must be run after `rehype-document` to write to `<head>`
-  if (math) {
-    processor.use(hastMath);
-  }
-
-  // Explicitly specify true if want unformatted HTML during development or debug
-  if (!disableFormatHtml) {
-    processor.use(rehypeFormat);
-  }
-
-  return processor;
+    .use(
+      html({
+        partial,
+        metadata,
+        imgFigcaptionOrder,
+        assignIdToFigcaption,
+        footnote,
+        replaceRules: replace,
+        math,
+        disableFormatHtml,
+      }),
+    )
+    .use(rehypeStringify);
 }
 
 /**
