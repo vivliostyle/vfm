@@ -3,6 +3,7 @@ import unified, { type Processor } from 'unified';
 import type { DocumentOptions } from './plugins/document.js';
 import type { FootnoteOptions } from './plugins/footnotes.js';
 import type { FormatOptions } from './plugins/format.js';
+import type { LineBreaksOptions } from './plugins/line-breaks.js';
 import type { MathOptions } from './plugins/math.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
 import { type ReplaceRule } from './plugins/replace.js';
@@ -26,15 +27,18 @@ export type StringifyMarkdownOptions = {
   language?: string | undefined;
   /** Replacement handler for HTML string. */
   replace?: ReplaceRule[] | undefined;
-  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
-  hardLineBreaks?: boolean | undefined;
   /** Order of img and figcaption elements in figure. */
   imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean | undefined;
   /** Footnote output mode. Default is `'pandoc'` (endnote section). */
   footnote?: FootnoteOptions['footnote'];
-} & LaxPartial<Pick<DocumentOptions, 'partial'> & MathOptions & FormatOptions>;
+} & LaxPartial<
+  LineBreaksOptions &
+    MathOptions &
+    Pick<DocumentOptions, 'partial'> &
+    FormatOptions
+>;
 
 export interface Hooks {
   afterParse: ReplaceRule[];
@@ -129,7 +133,7 @@ export function VFM(
   }
 
   return unified()
-    .use(markdown(hardLineBreaks, math))
+    .use(markdown({ hardLineBreaks, math }))
     .data('settings', { position: true })
     .use(
       html({

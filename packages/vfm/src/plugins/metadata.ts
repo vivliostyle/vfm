@@ -16,6 +16,7 @@ import { mdast as attr } from './attr.js';
 import type { DocumentOptions } from './document.js';
 import { mdast as footnotes } from './footnotes.js';
 import type { FormatOptions } from './format.js';
+import type { LineBreaksOptions } from './line-breaks.js';
 import type { MathOptions } from './math.js';
 
 /** Attribute of HTML tag. */
@@ -28,8 +29,6 @@ export type Attribute = {
 
 /** Settings of VFM. */
 export type VFMSettings = {
-  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
-  hardLineBreaks?: boolean | undefined;
   /** Path of theme. */
   theme?: string | undefined;
   /** Enable TOC mode. */
@@ -54,7 +53,12 @@ export type VFMSettings = {
         body?: Properties | undefined;
       }
     | undefined;
-} & LaxPartial<Pick<DocumentOptions, 'partial'> & MathOptions & FormatOptions>;
+} & LaxPartial<
+  LineBreaksOptions &
+    MathOptions &
+    Pick<DocumentOptions, 'partial'> &
+    FormatOptions
+>;
 
 /** Metadata from Frontmatter. */
 export type Metadata = {

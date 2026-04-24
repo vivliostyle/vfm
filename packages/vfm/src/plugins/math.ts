@@ -28,6 +28,11 @@ const TYPE_DISPLAY = 'displayMath';
 const MATH_URL =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML';
 
+export type MathOptions = {
+  /** Enable math syntax. */
+  math: boolean;
+};
+
 /**
  * Create tokenizers for remark-parse.
  * @returns Tokenizers.
@@ -106,7 +111,11 @@ const createTokenizers = () => {
  * Process Markdown AST.
  * @returns Transformer or undefined (less than remark 13).
  */
-export const mdast: Plugin = function (): Transformer | undefined {
+export const mdast: Plugin<[MathOptions]> = function ({
+  math,
+}: MathOptions): Transformer | undefined {
+  if (!math) return;
+
   // For less than remark 13 with exclusive other markdown syntax
   if (
     this.Parser &&
@@ -205,11 +214,6 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
     },
     [u('text', `$$${node.data.value as string}$$`)],
   );
-};
-
-export type MathOptions = {
-  /** Enable math syntax. */
-  math: boolean;
 };
 
 /**
