@@ -1,5 +1,4 @@
 import frontmatter from 'remark-frontmatter';
-import markdown from 'remark-parse';
 import unified from 'unified';
 import { mdast as attr } from './plugins/attr.js';
 import { mdast as code } from './plugins/code.js';
@@ -22,9 +21,8 @@ export type ReviveParseOptions = LineBreaksOptions & MathOptions;
  * @param options Options for mdast parsers.
  * @returns Parsers.
  */
-export const reviveParse = (options: ReviveParseOptions) =>
-  [
-    [markdown, { gfm: true, commonmark: true }],
+export const reviveParse = (options: ReviveParseOptions) => ({
+  mdastPlugins: [
     [lineBreaks, options],
     [math, options],
     ruby,
@@ -36,4 +34,5 @@ export const reviveParse = (options: ReviveParseOptions) =>
     toc,
     frontmatter,
     inspect('mdast'),
-  ] as unified.PluggableList<unified.Settings>;
+  ] as unified.PluggableList<unified.Settings>,
+});

@@ -165,7 +165,7 @@ export function mdast() {
   };
 }
 
-export function handler(h: any, node: any): Handler {
+export const handler: Handler = (h, node) => {
   const value = node.value || '';
   const lang = node.lang ? node.lang.match(/^[^ \t]+(?=[ \t]|$)/) : 'text';
   const langClass = 'language-' + lang;
@@ -185,4 +185,4 @@ export function handler(h: any, node: any): Handler {
   return h(node.position, 'pre', preProps, [
     h(node.position, 'code', codeProps, children),
   ]);
-}
+};

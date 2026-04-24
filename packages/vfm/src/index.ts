@@ -1,4 +1,6 @@
 import rehypeStringify from 'rehype-stringify';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
 import unified, { type Processor } from 'unified';
 import type { SerializablePluginOptions } from './plugins/options.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
@@ -115,22 +117,33 @@ export function VFM(
     }
   }
 
+  const { mdastPlugins } = markdown({ hardLineBreaks, math });
+  const { toHastHandlers, hastPlugins } = html({
+    imgFigcaptionOrder,
+    assignIdToFigcaption,
+    footnote,
+    replace,
+    partial,
+    metadata,
+    math,
+    disableFormatHtml,
+  });
+
   return unified()
-    .use(markdown({ hardLineBreaks, math }))
     .data('settings', { position: true })
-    .use(
-      html({
-        imgFigcaptionOrder,
-        assignIdToFigcaption,
-        footnote,
-        replace,
-        partial,
-        metadata,
-        math,
-        disableFormatHtml,
-      }),
-    )
-    .use(rehypeStringify);
+    .use([
+      [remarkParse, { gfm: true, commonmark: true }],
+      ...mdastPlugins,
+      [
+        remarkRehype,
+        {
+          allowDangerousHtml: true,
+          handlers: toHastHandlers,
+        },
+      ],
+      ...hastPlugins,
+      rehypeStringify,
+    ]);
 }
 
 /**

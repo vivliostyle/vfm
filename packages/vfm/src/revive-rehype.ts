@@ -1,5 +1,5 @@
+import { type Handlers as ToHastHandlers } from 'mdast-util-to-hast';
 import raw from 'rehype-raw';
-import remark2rehype from 'remark-rehype';
 import unified from 'unified';
 import { handler as code } from './plugins/code.js';
 import { mdast as doc, type DocumentOptions } from './plugins/document.js';
@@ -36,29 +36,25 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
     toHastHandlers: footnoteHandlers,
     hastTransformers: footnoteTransformers,
   } = createFootnotePlugin(options);
-  return [
-    [
-      remark2rehype,
-      {
-        allowDangerousHtml: true,
-        handlers: {
-          displayMath,
-          inlineMath,
-          ruby,
-          code,
-          ...footnoteHandlers,
-        },
-      },
-    ],
-    raw,
-    [figure, options],
-    ...footnoteTransformers,
-    [replace, options],
-    [doc, options],
-    // Must be run after `rehype-document` to write to `<head>`
-    [math, options],
-    // Explicitly specify true if want unformatted HTML during development or debug
-    [format, options],
-    inspect('hast'),
-  ] as unified.PluggableList<unified.Settings>;
+  return {
+    toHastHandlers: {
+      displayMath,
+      inlineMath,
+      ruby,
+      code,
+      ...footnoteHandlers,
+    } as ToHastHandlers,
+    hastPlugins: [
+      raw,
+      [figure, options],
+      ...footnoteTransformers,
+      [replace, options],
+      [doc, options],
+      // Must be run after `rehype-document` to write to `<head>`
+      [math, options],
+      // Explicitly specify true if want unformatted HTML during development or debug
+      [format, options],
+      inspect('hast'),
+    ] as unified.PluggableList<unified.Settings>,
+  };
 };
