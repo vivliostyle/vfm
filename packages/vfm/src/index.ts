@@ -1,11 +1,6 @@
 import rehypeStringify from 'rehype-stringify';
 import unified, { type Processor } from 'unified';
-import type { DocumentOptions } from './plugins/document.js';
-import type { FigureOptions } from './plugins/figure.js';
-import type { FootnoteOptions } from './plugins/footnotes.js';
-import type { FormatOptions } from './plugins/format.js';
-import type { LineBreaksOptions } from './plugins/line-breaks.js';
-import type { MathOptions } from './plugins/math.js';
+import type { SerializablePluginOptions } from './plugins/options.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
 import { type ReplaceOptions, type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
@@ -25,13 +20,8 @@ export type StringifyMarkdownOptions = {
   title?: string | undefined;
   /** Document language (ignored in partial mode). */
   language?: string | undefined;
-} & LineBreaksOptions &
-  MathOptions &
-  Pick<DocumentOptions, 'partial'> &
-  FormatOptions &
-  FigureOptions &
-  ReplaceOptions &
-  FootnoteOptions;
+} & SerializablePluginOptions &
+  ReplaceOptions;
 
 export interface Hooks {
   afterParse: ReplaceRule[];

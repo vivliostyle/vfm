@@ -11,14 +11,10 @@ import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
-import type { StripFunctions } from '../types.js';
+import type { StripFunctions } from '../utils.js';
+import type { SerializablePluginOptions } from './options.js';
 import { mdast as attr } from './attr.js';
-import type { DocumentOptions } from './document.js';
-import type { FigureOptions } from './figure.js';
-import { mdast as footnotes, type FootnoteOptions } from './footnotes.js';
-import type { FormatOptions } from './format.js';
-import type { LineBreaksOptions } from './line-breaks.js';
-import type { MathOptions } from './math.js';
+import { mdast as footnotes } from './footnotes.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -34,12 +30,7 @@ export type VFMSettings = {
   theme?: string | undefined;
   /** Enable TOC mode. */
   toc?: boolean | undefined;
-} & LineBreaksOptions &
-  MathOptions &
-  Pick<DocumentOptions, 'partial'> &
-  FormatOptions &
-  FigureOptions &
-  StripFunctions<FootnoteOptions>;
+} & StripFunctions<SerializablePluginOptions>;
 
 /** Metadata from Frontmatter. */
 export type Metadata = {
