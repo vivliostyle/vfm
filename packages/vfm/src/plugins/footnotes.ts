@@ -980,11 +980,46 @@ const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
   return opt;
 };
 
+/**
+ * Merge multiple unified plugins into a single plugin whose transformer runs
+ * each of the underlying transformers in order. Zero plugins yields a no-op.
+ */
+const mergePlugins = (...plugins: unified.Plugin[]): unified.Plugin =>
+  function mergedAttacher(this: unknown, ...opts: unknown[]) {
+    const transformers = plugins
+      .map((plugin) =>
+        (plugin as (this: unknown, ...args: unknown[]) => unknown).apply(
+          this,
+          opts,
+        ),
+      )
+      .filter(
+        (t): t is (tree: unknown, file: unknown) => void =>
+          typeof t === 'function',
+      );
+    return (tree: unknown, file: unknown) => {
+      for (const t of transformers) t(tree, file);
+    };
+  };
+
+/**
+ * Handlers returned by `createFootnotePlugin` for each footnote-related mdast
+ * node type. A value of `undefined` means "fall through to
+ * mdast-util-to-hast's default handler"; consumers are responsible for
+ * omitting undefined entries when merging into remark-rehype's `handlers`
+ * option (explicit undefined would otherwise overwrite the default).
+ */
+export type FootnoteToHastHandlers = {
+  footnoteDefinition: ToHastHandler | undefined;
+  footnoteReference: ToHastHandler | undefined;
+  footnote: ToHastHandler | undefined;
+};
+
 export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {
-  toHastHandlers: Record<string, ToHastHandler> | Record<string, never>;
-  hastTransformers: unified.PluggableList;
+  toHastHandlers: FootnoteToHastHandlers;
+  hastTransformer: unified.Plugin;
 } => {
   const resolved = resolveOption(options?.footnote);
 
@@ -992,8 +1027,12 @@ export const createFootnotePlugin = (
     const [endnoteCallsToPandoc, endnoteAreasToPandoc] =
       createPandocTransformers();
     return {
-      toHastHandlers: {},
-      hastTransformers: [endnoteCallsToPandoc, endnoteAreasToPandoc],
+      toHastHandlers: {
+        footnoteDefinition: undefined,
+        footnoteReference: undefined,
+        footnote: undefined,
+      },
+      hastTransformer: mergePlugins(endnoteCallsToPandoc, endnoteAreasToPandoc),
     };
   }
 
@@ -1020,7 +1059,7 @@ export const createFootnotePlugin = (
           resolved.body,
         ),
       },
-      hastTransformers: [createReplaceDpubPlaceholders(pending, inlinePending)],
+      hastTransformer: createReplaceDpubPlaceholders(pending, inlinePending),
     };
   }
 
@@ -1045,13 +1084,14 @@ export const createFootnotePlugin = (
 
   return {
     toHastHandlers: {
+      footnoteDefinition: undefined,
       footnoteReference: createFootnoteReferenceHandler(
         buildFootnote,
         buildDuplicatedCall,
       ),
       footnote: createInlineFootnoteHandler(buildFootnote),
     },
-    hastTransformers: [],
+    hastTransformer: mergePlugins(),
   };
 };
 

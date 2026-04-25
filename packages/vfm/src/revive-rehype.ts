@@ -1,4 +1,3 @@
-import { type Handlers as ToHastHandlers } from 'mdast-util-to-hast';
 import raw from 'rehype-raw';
 import unified from 'unified';
 import { handler as code } from './plugins/code.js';
@@ -34,7 +33,7 @@ export type ReviveRehypeOptions = FigureOptions &
 export const reviveRehype = (options: ReviveRehypeOptions) => {
   const {
     toHastHandlers: footnoteHandlers,
-    hastTransformers: footnoteTransformers,
+    hastTransformer: footnoteTransformer,
   } = createFootnotePlugin(options);
   return {
     toHastHandlers: {
@@ -43,11 +42,11 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       ruby,
       code,
       ...footnoteHandlers,
-    } as ToHastHandlers,
+    } as const,
     hastPlugins: [
       raw,
       [figure, options],
-      ...footnoteTransformers,
+      footnoteTransformer,
       [replace, options],
       [doc, options],
       // Must be run after `rehype-document` to write to `<head>`

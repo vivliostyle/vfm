@@ -128,6 +128,12 @@ export function VFM(
     math,
     disableFormatHtml,
   });
+  // `undefined` entries in toHastHandlers signal "use mdast-util-to-hast's
+  // default handler"; strip them so remark-rehype's Object.assign-style merge
+  // does not overwrite the defaults with undefined.
+  const activeHandlers = Object.fromEntries(
+    Object.entries(toHastHandlers).filter(([, v]) => v !== undefined),
+  );
 
   return unified()
     .data('settings', { position: true })
@@ -138,7 +144,7 @@ export function VFM(
         remarkRehype,
         {
           allowDangerousHtml: true,
-          handlers: toHastHandlers,
+          handlers: activeHandlers,
         },
       ],
       ...hastPlugins,
