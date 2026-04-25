@@ -48,6 +48,8 @@ export type StringifyMarkdownOptions = {
   title?: string | undefined;
   /** Document language (ignored in partial mode). */
   language?: string | undefined;
+  /** Edit the plugin lists assembled by VFM before they are used. */
+  editPlugins?: EditPlugins | undefined;
 } & SerializablePluginOptions &
   ReplaceOptions;
 
@@ -132,9 +134,9 @@ export function VFM(
     imgFigcaptionOrder,
     assignIdToFigcaption,
     footnote,
+    editPlugins = (plugins) => plugins,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
-  editPlugins: EditPlugins = (plugins) => plugins,
 ): Processor {
   checkMetadata(metadata, { style, title, language });
 

@@ -3,7 +3,7 @@ import type * as mdast from 'mdast';
 import type unified from 'unified';
 import { visit } from 'unist-util-visit';
 import { describe, expect, test } from 'vitest';
-import { VFM } from '../src/index.js';
+import { VFM, type Plugins } from '../src/index.js';
 
 const baseOptions = { partial: true, disableFormatHtml: true } as const;
 
@@ -13,7 +13,7 @@ describe('editPlugins', () => {
       VFM(baseOptions).processSync('# heading\n\ntext'),
     );
     const fromIdentity = String(
-      VFM(baseOptions, {}, (plugins) => plugins).processSync(
+      VFM({ ...baseOptions, editPlugins: (plugins) => plugins }).processSync(
         '# heading\n\ntext',
       ),
     );
@@ -22,11 +22,14 @@ describe('editPlugins', () => {
   });
 
   test('exposes mdastPlugins, mdastToHastHandlers, hastPlugins to the editor', () => {
-    let received: ReturnType<Parameters<typeof VFM>[2] & object> | undefined;
+    let received: Plugins | undefined;
 
-    VFM(baseOptions, {}, (plugins) => {
-      received = plugins;
-      return plugins;
+    VFM({
+      ...baseOptions,
+      editPlugins: (plugins) => {
+        received = plugins;
+        return plugins;
+      },
     }).processSync('text');
 
     expect(received).toBeDefined();
@@ -47,10 +50,13 @@ describe('editPlugins', () => {
     };
 
     const result = String(
-      VFM(baseOptions, {}, (plugins) => ({
-        ...plugins,
-        hastPlugins: [...plugins.hastPlugins, tagParagraphs],
-      })).processSync('hello'),
+      VFM({
+        ...baseOptions,
+        editPlugins: (plugins) => ({
+          ...plugins,
+          hastPlugins: [...plugins.hastPlugins, tagParagraphs],
+        }),
+      }).processSync('hello'),
     );
 
     expect(result).toContain('data-edited="yes"');
@@ -66,10 +72,13 @@ describe('editPlugins', () => {
 
     // …and is gone when removed via editPlugins.
     const withoutFigure = String(
-      VFM(baseOptions, {}, (plugins) => ({
-        ...plugins,
-        hastPlugins: plugins.hastPlugins.filter((_, i) => i !== 1),
-      })).processSync('![alt](pic.png)\n'),
+      VFM({
+        ...baseOptions,
+        editPlugins: (plugins) => ({
+          ...plugins,
+          hastPlugins: plugins.hastPlugins.filter((_, i) => i !== 1),
+        }),
+      }).processSync('![alt](pic.png)\n'),
     );
     expect(withoutFigure).not.toContain('<figure>');
   });
@@ -85,15 +94,14 @@ describe('editPlugins', () => {
       });
     };
 
-    VFM(
-      baseOptions,
-      {},
-      ({ mdastPlugins, mdastToHastHandlers, hastPlugins }) => ({
+    VFM({
+      ...baseOptions,
+      editPlugins: ({ mdastPlugins, mdastToHastHandlers, hastPlugins }) => ({
         mdastPlugins: [captureHeadings, ...mdastPlugins],
         mdastToHastHandlers,
         hastPlugins,
       }),
-    ).processSync('# alpha\n\n## beta\n\nbody');
+    }).processSync('# alpha\n\n## beta\n\nbody');
 
     expect(headings).toEqual(['alpha', 'beta']);
   });
@@ -112,12 +120,12 @@ describe('editPlugins', () => {
     const afterFigure = { sawFigure: false };
 
     String(
-      VFM(
-        baseOptions,
-        {},
-        ({ mdastPlugins, mdastToHastHandlers, hastPlugins }) => {
-          // Tuple destructure binds each slot by its brand type, letting the
-          // editor splice between specific plugins without index arithmetic.
+      VFM({
+        ...baseOptions,
+        editPlugins: ({ mdastPlugins, mdastToHastHandlers, hastPlugins }) => {
+          // Tuple destructure binds each slot by its brand type, letting
+          // the editor splice between specific plugins without index
+          // arithmetic.
           const [raw, figure, footnote, ...rest] = hastPlugins;
           return {
             mdastPlugins,
@@ -132,7 +140,7 @@ describe('editPlugins', () => {
             ],
           };
         },
-      ).processSync('![alt](pic.png)\n'),
+      }).processSync('![alt](pic.png)\n'),
     );
 
     // figure plugin wraps lone images in <figure>; observers placed before and
