@@ -91,6 +91,12 @@ type EndnoteBackReference = hast.Element & {
 const selectEndnoteBackReferences = (parent: hast.Element) =>
   selectAll(endnoteBackReferenceSelector, parent) as EndnoteBackReference[];
 
+/**
+ * Return a copy of `array` with only `key`'s values permuted to follow
+ * `compareFn`'s sort order; every other field stays in its original
+ * position.  Used to reshuffle one field across fixed slots without
+ * disturbing surrounding entries.
+ */
 function withSortedField<T extends Record<string, unknown>, K extends keyof T>(
   array: readonly T[],
   key: K,
