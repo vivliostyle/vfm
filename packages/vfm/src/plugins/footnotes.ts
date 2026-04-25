@@ -92,6 +92,23 @@ const selectEndnoteBackReferences = (parent: hast.Element) =>
   selectAll(endnoteBackReferenceSelector, parent) as EndnoteBackReference[];
 
 /**
+ * Return a copy of `array` with only `key`'s values permuted to follow
+ * `compareFn`'s sort order; every other field stays in its original
+ * position.  Used to reshuffle one field across fixed slots without
+ * disturbing surrounding entries.
+ */
+function withSortedField<T extends Record<string, unknown>, K extends keyof T>(
+  array: readonly T[],
+  key: K,
+  compareFn: (a: T, b: T) => number,
+): T[] {
+  const sortedValues = array.toSorted(compareFn);
+  return array.map(
+    (item, i) => ({ ...item, [key]: sortedValues[i]![key] }) as T,
+  );
+}
+
+/**
  * Create paired Pandoc transformer plugins that share duplicate-reference
  * state.  The first plugin rewrites endnote calls; the second rewrites
  * endnote areas and adds extra backlinks for duplicate references.
@@ -242,28 +259,29 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
     const refIndexByElem = new Map<hast.Element, number>(
       resolved.map((r) => [r.elem, r.refIndex]),
     );
-    selectAll('section[role="doc-endnotes"] ol', root).forEach(
-      (ol: hast.Element) => {
-        const liSlots = ol.children
-          .map((child, index) =>
-            child.type === 'element' &&
-            child.tagName === 'li' &&
-            refIndexByElem.has(child)
-              ? index
-              : -1,
-          )
-          .filter((i) => i !== -1);
-        const sortedLis = liSlots
-          .map((i) => ol.children[i] as hast.Element)
-          .sort(
-            (a, b) =>
-              (refIndexByElem.get(a) ?? 0) - (refIndexByElem.get(b) ?? 0),
-          );
-        liSlots.forEach((slotIndex, i) => {
-          ol.children[slotIndex] = sortedLis[i];
-        });
-      },
-    );
+    selectAll('section[role="doc-endnotes"] ol', root).forEach((ol) => {
+      withSortedField(
+        ol.children.flatMap((child, i) =>
+          child.type === 'element' &&
+          child.tagName === 'li' &&
+          refIndexByElem.has(child)
+            ? [
+                {
+                  li: child,
+                  fn: (li: hast.Element) => {
+                    ol.children[i] = li;
+                  },
+                },
+              ]
+            : [],
+        ),
+        'li',
+        ({ li: a }, { li: b }) =>
+          (refIndexByElem.get(a) ?? 0) - (refIndexByElem.get(b) ?? 0),
+      ).forEach(({ fn, li }) => {
+        fn(li);
+      });
+    });
   };
 
   return [endnoteCallsToPandoc, endnoteAreasToPandoc];
