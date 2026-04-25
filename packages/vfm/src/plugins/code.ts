@@ -3,6 +3,7 @@ import type { Code, Root } from 'mdast';
 import type { Handler } from 'mdast-util-to-hast';
 import parseAttr from 'md-attr-parser';
 import refractor from 'refractor';
+import type unified from 'unified';
 import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
@@ -141,29 +142,27 @@ function processMeta(node: Code): void {
   }
 }
 
-export function mdast() {
-  return (tree: Node) => {
-    visit(tree as Root, 'code', (node) => {
-      /**
-       * Workaround for remark-attr's "bad hack".
-       * When meta is null, remark-attr parses code content as attributes.
-       * @see https://github.com/arobase-che/remark-attr/blob/325f0ef730eafa601c9b631ea175b26c18c85a4a/src/index.js#L260-L263
-       */
-      if (!node.meta && node.data?.hProperties) {
-        delete node.data.hProperties;
-      }
+export const mdast: unified.Plugin<[]> = () => (tree: Node) => {
+  visit(tree as Root, 'code', (node) => {
+    /**
+     * Workaround for remark-attr's "bad hack".
+     * When meta is null, remark-attr parses code content as attributes.
+     * @see https://github.com/arobase-che/remark-attr/blob/325f0ef730eafa601c9b631ea175b26c18c85a4a/src/index.js#L260-L263
+     */
+    if (!node.meta && node.data?.hProperties) {
+      delete node.data.hProperties;
+    }
 
-      extractLangTitle(node);
-      processMeta(node);
+    extractLangTitle(node);
+    processMeta(node);
 
-      // syntax highlight
-      if (node.lang && refractor.registered(node.lang)) {
-        if (!node.data) node.data = {};
-        node.data.hChildren = refractor.highlight(node.value, node.lang);
-      }
-    });
-  };
-}
+    // syntax highlight
+    if (node.lang && refractor.registered(node.lang)) {
+      if (!node.data) node.data = {};
+      node.data.hChildren = refractor.highlight(node.value, node.lang);
+    }
+  });
+};
 
 export const handler: Handler = (h, node) => {
   const value = node.value || '';

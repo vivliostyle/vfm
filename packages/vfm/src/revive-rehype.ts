@@ -16,7 +16,7 @@ import {
 } from './plugins/math.js';
 import { replace, type ReplaceOptions } from './plugins/replace.js';
 import { handler as ruby } from './plugins/ruby.js';
-import { inspect } from './utils.js';
+import { inspect, partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
   FootnoteOptions &
@@ -24,6 +24,46 @@ export type ReviveRehypeOptions = FigureOptions &
   DocumentOptions &
   MathOptions &
   FormatOptions;
+
+declare const rehypeRawPluginBrand: unique symbol;
+export type RehypeRawPlugin = unified.Pluggable & {
+  [rehypeRawPluginBrand]: unknown;
+};
+
+declare const rehypeFigurePluginBrand: unique symbol;
+export type RehypeFigurePlugin = unified.Pluggable & {
+  [rehypeFigurePluginBrand]: unknown;
+};
+
+declare const rehypeFootnotePluginBrand: unique symbol;
+export type RehypeFootnotePlugin = unified.Pluggable & {
+  [rehypeFootnotePluginBrand]: unknown;
+};
+
+declare const rehypeReplacePluginBrand: unique symbol;
+export type RehypeReplacePlugin = unified.Pluggable & {
+  [rehypeReplacePluginBrand]: unknown;
+};
+
+declare const rehypeDocumentPluginBrand: unique symbol;
+export type RehypeDocumentPlugin = unified.Pluggable & {
+  [rehypeDocumentPluginBrand]: unknown;
+};
+
+declare const rehypeMathPluginBrand: unique symbol;
+export type RehypeMathPlugin = unified.Pluggable & {
+  [rehypeMathPluginBrand]: unknown;
+};
+
+declare const rehypeFormatPluginBrand: unique symbol;
+export type RehypeFormatPlugin = unified.Pluggable & {
+  [rehypeFormatPluginBrand]: unknown;
+};
+
+declare const rehypeInspectPluginBrand: unique symbol;
+export type RehypeInspectPlugin = unified.Pluggable & {
+  [rehypeInspectPluginBrand]: unknown;
+};
 
 /**
  * Create Hypertext AST handlers and transformers.
@@ -36,7 +76,7 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
     hastTransformer: footnoteTransformer,
   } = createFootnotePlugin(options);
   return {
-    toHastHandlers: {
+    mdastToHastHandlers: {
       displayMath,
       inlineMath,
       ruby,
@@ -44,16 +84,16 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       ...footnoteHandlers,
     } as const,
     hastPlugins: [
-      raw,
-      [figure, options],
-      footnoteTransformer,
-      [replace, options],
-      [doc, options],
+      raw as RehypeRawPlugin,
+      partial(figure, options) as RehypeFigurePlugin,
+      footnoteTransformer as RehypeFootnotePlugin,
+      partial(replace, options) as RehypeReplacePlugin,
+      partial(doc, options) as RehypeDocumentPlugin,
       // Must be run after `rehype-document` to write to `<head>`
-      [math, options],
+      partial(math, options) as RehypeMathPlugin,
       // Explicitly specify true if want unformatted HTML during development or debug
-      [format, options],
-      inspect('hast'),
-    ] as unified.PluggableList<unified.Settings>,
+      partial(format, options) as RehypeFormatPlugin,
+      inspect('hast') as RehypeInspectPlugin,
+    ] as const,
   };
 };

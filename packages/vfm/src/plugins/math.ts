@@ -3,7 +3,7 @@ import { select } from 'hast-util-select';
 import type { Root as MdastRoot } from 'mdast';
 import { findAndReplace } from 'mdast-util-find-and-replace';
 import type { Handler } from 'mdast-util-to-hast';
-import type { Plugin, Transformer } from 'unified';
+import type unified from 'unified';
 import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
@@ -111,9 +111,9 @@ const createTokenizers = () => {
  * Process Markdown AST.
  * @returns Transformer or undefined (less than remark 13).
  */
-export const mdast: Plugin<[MathOptions]> = function ({
+export const mdast: unified.Plugin<[MathOptions?]> = function ({
   math = true,
-}: MathOptions = {}): Transformer | undefined {
+}: MathOptions = {}): unified.Transformer | undefined {
   if (!math) return;
 
   // For less than remark 13 with exclusive other markdown syntax
@@ -222,7 +222,7 @@ export const handlerDisplayMath: Handler = (h, node: Node) => {
  *
  * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM option is `math: true`.
  */
-export const hast =
+export const hast: unified.Plugin<[MathOptions?]> =
   ({ math = true }: MathOptions = {}) =>
   (tree: Node) => {
     if (

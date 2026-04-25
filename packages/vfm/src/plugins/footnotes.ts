@@ -32,6 +32,7 @@ import {
 import footnotes from 'remark-footnotes';
 import type unified from 'unified';
 import { u } from 'unist-builder';
+import { mergePlugins, partial } from '../utils.js';
 
 type ElementWithProps = hast.Element & {
   properties: NonNullable<hast.Element['properties']>;
@@ -981,28 +982,6 @@ const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
 };
 
 /**
- * Merge multiple unified plugins into a single plugin whose transformer runs
- * each of the underlying transformers in order. Zero plugins yields a no-op.
- */
-const mergePlugins = (...plugins: unified.Plugin[]): unified.Plugin =>
-  function mergedAttacher(this: unknown, ...opts: unknown[]) {
-    const transformers = plugins
-      .map((plugin) =>
-        (plugin as (this: unknown, ...args: unknown[]) => unknown).apply(
-          this,
-          opts,
-        ),
-      )
-      .filter(
-        (t): t is (tree: unknown, file: unknown) => void =>
-          typeof t === 'function',
-      );
-    return (tree: unknown, file: unknown) => {
-      for (const t of transformers) t(tree, file);
-    };
-  };
-
-/**
  * Handlers returned by `createFootnotePlugin` for each footnote-related mdast
  * node type. A value of `undefined` means "fall through to
  * mdast-util-to-hast's default handler"; consumers are responsible for
@@ -1098,4 +1077,4 @@ export const createFootnotePlugin = (
 /**
  * Process Markdown AST.
  */
-export const mdast = [footnotes, { inlineNotes: true }];
+export const mdast = partial(footnotes, { inlineNotes: true });

@@ -12,6 +12,32 @@ import { debug } from './utils.js';
 // Expose metadata reading by VFM
 export * from './plugins/metadata.js';
 
+// Re-export plugin brand types for downstream consumers that wish to refer to
+// individual pipeline slots by their nominal identity.
+export type {
+  RemarkLineBreaksPlugin,
+  RemarkMathPlugin,
+  RemarkRubyPlugin,
+  RemarkFootnotesPlugin,
+  RemarkAttrPlugin,
+  RemarkSlugPlugin,
+  RemarkSectionPlugin,
+  RemarkCodePlugin,
+  RemarkTocPlugin,
+  RemarkFrontmatterPlugin,
+  RemarkInspectPlugin,
+} from './revive-parse.js';
+export type {
+  RehypeRawPlugin,
+  RehypeFigurePlugin,
+  RehypeFootnotePlugin,
+  RehypeReplacePlugin,
+  RehypeDocumentPlugin,
+  RehypeMathPlugin,
+  RehypeFormatPlugin,
+  RehypeInspectPlugin,
+} from './revive-rehype.js';
+
 /**
  * Option for convert Markdown to a stringify (HTML).
  */
@@ -69,6 +95,25 @@ const checkMetadata = (
   }
 };
 
+export type Plugins = ReturnType<typeof markdown> & ReturnType<typeof html>;
+
+/**
+ * Looser variant of {@link Plugins} returned by {@link EditPlugins}.
+ * Consumers receive the strictly-typed `Plugins` as input — slot identity is
+ * preserved via brand types — but are free to splice, drop, or extend the
+ * plugin lists, so the return shape widens to ordinary pluggable lists.
+ */
+export type EditedPlugins = {
+  mdastPlugins: ReadonlyArray<unified.Pluggable>;
+  mdastToHastHandlers: Record<
+    string,
+    Plugins['mdastToHastHandlers'][keyof Plugins['mdastToHastHandlers']]
+  >;
+  hastPlugins: ReadonlyArray<unified.Pluggable>;
+};
+
+export type EditPlugins = (plugins: Plugins) => EditedPlugins;
+
 /**
  * Create Unified processor for Markdown AST and Hypertext AST.
  * @param options Options.
@@ -89,6 +134,7 @@ export function VFM(
     footnote,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
+  editPlugins: EditPlugins = (plugins) => plugins,
 ): Processor {
   checkMetadata(metadata, { style, title, language });
 
@@ -117,22 +163,25 @@ export function VFM(
     }
   }
 
-  const { mdastPlugins } = markdown({ hardLineBreaks, math });
-  const { toHastHandlers, hastPlugins } = html({
-    imgFigcaptionOrder,
-    assignIdToFigcaption,
-    footnote,
-    replace,
-    partial,
-    metadata,
-    math,
-    disableFormatHtml,
+  const { mdastPlugins, mdastToHastHandlers, hastPlugins } = editPlugins({
+    ...markdown({ hardLineBreaks, math }),
+    ...html({
+      imgFigcaptionOrder,
+      assignIdToFigcaption,
+      footnote,
+      replace,
+      partial,
+      metadata,
+      math,
+      disableFormatHtml,
+    }),
   });
+
   // `undefined` entries in toHastHandlers signal "use mdast-util-to-hast's
   // default handler"; strip them so remark-rehype's Object.assign-style merge
   // does not overwrite the defaults with undefined.
   const activeHandlers = Object.fromEntries(
-    Object.entries(toHastHandlers).filter(([, v]) => v !== undefined),
+    Object.entries(mdastToHastHandlers).filter(([, v]) => v !== undefined),
   );
 
   return unified()

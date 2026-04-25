@@ -6,7 +6,7 @@ export type FormatOptions = {
   disableFormatHtml?: boolean | undefined;
 };
 
-export const hast: unified.Plugin<[FormatOptions]> = function ({
+export const hast: unified.Plugin<[FormatOptions?]> = function ({
   disableFormatHtml = false,
 }: FormatOptions = {}) {
   return disableFormatHtml ? () => {} : rehypeFormat.call(this);

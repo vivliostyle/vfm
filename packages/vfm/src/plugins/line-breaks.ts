@@ -6,7 +6,7 @@ export type LineBreaksOptions = {
   hardLineBreaks?: boolean | undefined;
 };
 
-export const mdast: unified.Plugin<[LineBreaksOptions]> = function ({
+export const mdast: unified.Plugin<[LineBreaksOptions?]> = function ({
   hardLineBreaks = false,
 }: LineBreaksOptions = {}) {
   if (!hardLineBreaks) return;

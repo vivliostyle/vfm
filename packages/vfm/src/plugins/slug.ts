@@ -8,6 +8,7 @@
 
 import GithubSlugger from 'github-slugger';
 import { toString } from 'mdast-util-to-string';
+import type unified from 'unified';
 import type { Node } from 'unist';
 import { selectAll } from 'unist-util-select';
 
@@ -50,7 +51,7 @@ const createSlug = (heading: Heading, slugger: GithubSlugger) => {
  * Process Markdown AST.
  * @returns Transformer.
  */
-export const mdast = () => (tree: any) => {
+export const mdast: unified.Plugin<[]> = () => (tree: any) => {
   const slugger = new GithubSlugger();
   slugger.reset();
 
