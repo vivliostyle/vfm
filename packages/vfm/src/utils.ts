@@ -1,13 +1,12 @@
 import initDebug from 'debug';
 import type unified from 'unified';
-import type { Plugin } from 'unified';
 import type { Node } from 'unist';
 import { inspect as unistInspect } from 'unist-util-inspect';
 
 export const debug = initDebug('vfm');
 
 export const inspect =
-  (header?: string): Plugin<[]> =>
+  (header?: string): unified.Plugin<[]> =>
   () =>
   (tree: Node) => {
     if (debug.enabled) {
@@ -29,6 +28,11 @@ export type StripFunctions<T> = T extends (...args: any[]) => any
       ? { [K in keyof T]: StripFunctions<T[K]> }
       : T;
 
+/**
+ * Pre-bind leading arguments of `fn` while forwarding `this` from the call
+ * site. Intended for unified plugin attachers that read `this.Parser` etc.,
+ * which `Function.prototype.bind` would clobber.
+ */
 export function partial<
   TThis,
   TPreset extends unknown[],
