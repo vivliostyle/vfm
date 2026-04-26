@@ -12,7 +12,7 @@ import { mdast as ruby } from './plugins/ruby.js';
 import { mdast as section } from './plugins/section.js';
 import { mdast as slug } from './plugins/slug.js';
 import { mdast as toc } from './plugins/toc.js';
-import { inspect, partial } from './utils.js';
+import { partial } from './utils.js';
 
 export type ReviveParseOptions = LineBreaksOptions & MathOptions;
 
@@ -66,11 +66,6 @@ export type RemarkFrontmatterPlugin = unified.Pluggable & {
   [remarkFrontmatterPluginBrand]: unknown;
 };
 
-declare const remarkInspectPluginBrand: unique symbol;
-export type RemarkInspectPlugin = unified.Pluggable & {
-  [remarkInspectPluginBrand]: unknown;
-};
-
 /**
  * Create Markdown AST parsers.
  * @param options Options for mdast parsers.
@@ -88,6 +83,5 @@ export const reviveParse = (options: ReviveParseOptions) => ({
     code as RemarkCodePlugin,
     toc as RemarkTocPlugin,
     frontmatter as RemarkFrontmatterPlugin,
-    inspect('mdast') as RemarkInspectPlugin,
   ] as const,
 });

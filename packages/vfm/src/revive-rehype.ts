@@ -16,7 +16,7 @@ import {
 } from './plugins/math.js';
 import { replace, type ReplaceOptions } from './plugins/replace.js';
 import { handler as ruby } from './plugins/ruby.js';
-import { inspect, partial } from './utils.js';
+import { partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
   FootnoteOptions &
@@ -60,11 +60,6 @@ export type RehypeFormatPlugin = unified.Pluggable & {
   [rehypeFormatPluginBrand]: unknown;
 };
 
-declare const rehypeInspectPluginBrand: unique symbol;
-export type RehypeInspectPlugin = unified.Pluggable & {
-  [rehypeInspectPluginBrand]: unknown;
-};
-
 /**
  * Create Hypertext AST handlers and transformers.
  * @param options Options for rehype transformers.
@@ -93,7 +88,6 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       partial(math, options) as RehypeMathPlugin,
       // Explicitly specify true if want unformatted HTML during development or debug
       partial(format, options) as RehypeFormatPlugin,
-      inspect('hast') as RehypeInspectPlugin,
     ] as const,
   };
 };

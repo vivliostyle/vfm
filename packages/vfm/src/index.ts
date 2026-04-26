@@ -7,7 +7,7 @@ import { type Metadata, readMetadata } from './plugins/metadata.js';
 import { type ReplaceOptions, type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
-import { debug } from './utils.js';
+import { debug, inspect } from './utils.js';
 
 // Expose metadata reading by VFM
 export * from './plugins/metadata.js';
@@ -25,7 +25,6 @@ export type {
   RemarkCodePlugin,
   RemarkTocPlugin,
   RemarkFrontmatterPlugin,
-  RemarkInspectPlugin,
 } from './revive-parse.js';
 export type {
   RehypeRawPlugin,
@@ -35,7 +34,6 @@ export type {
   RehypeDocumentPlugin,
   RehypeMathPlugin,
   RehypeFormatPlugin,
-  RehypeInspectPlugin,
 } from './revive-rehype.js';
 
 /**
@@ -191,6 +189,7 @@ export function VFM(
     .use([
       [remarkParse, { gfm: true, commonmark: true }],
       ...mdastPlugins,
+      inspect('mdast'),
       [
         remarkRehype,
         {
@@ -199,6 +198,7 @@ export function VFM(
         },
       ],
       ...hastPlugins,
+      inspect('hast'),
       rehypeStringify,
     ]);
 }
