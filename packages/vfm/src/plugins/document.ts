@@ -4,7 +4,6 @@ import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import type { VFile } from 'vfile';
 import type { Attribute, Metadata } from './metadata.js';
-import type unified from 'unified';
 
 /**
  * Create AST properties from attributes.
@@ -168,7 +167,7 @@ export type DocumentOptions = {
  * @param data Options.
  * @returns Transformer.
  */
-export const mdast: unified.Plugin<[DocumentOptions?]> = (
+export const mdast = (
   { metadata: data, partial = false }: DocumentOptions = { metadata: {} },
 ) =>
   partial

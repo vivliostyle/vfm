@@ -16,7 +16,7 @@ import {
 } from './plugins/math.js';
 import { replace, type ReplaceOptions } from './plugins/replace.js';
 import { handler as ruby } from './plugins/ruby.js';
-import { partial } from './utils.js';
+import { brand, partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
   FootnoteOptions &
@@ -79,15 +79,15 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       ...footnoteHandlers,
     } as const,
     hastPlugins: [
-      raw as RehypeRawPlugin,
-      partial(figure, options) as RehypeFigurePlugin,
-      footnoteTransformer as RehypeFootnotePlugin,
-      partial(replace, options) as RehypeReplacePlugin,
-      partial(doc, options) as RehypeDocumentPlugin,
+      brand<RehypeRawPlugin>(raw),
+      brand<RehypeFigurePlugin>(partial(figure, options)),
+      brand<RehypeFootnotePlugin>(footnoteTransformer),
+      brand<RehypeReplacePlugin>(partial(replace, options)),
+      brand<RehypeDocumentPlugin>(partial(doc, options)),
       // Must be run after `rehype-document` to write to `<head>`
-      partial(math, options) as RehypeMathPlugin,
+      brand<RehypeMathPlugin>(partial(math, options)),
       // Explicitly specify true if want unformatted HTML during development or debug
-      partial(format, options) as RehypeFormatPlugin,
+      brand<RehypeFormatPlugin>(format(options)),
     ] as const,
   };
 };

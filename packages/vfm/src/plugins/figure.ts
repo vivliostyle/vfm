@@ -1,7 +1,6 @@
 import type { Element, Properties, Root } from 'hast';
 import { isElement as is } from 'hast-util-is-element';
 import { h } from 'hastscript';
-import type unified from 'unified';
 import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
 
@@ -75,7 +74,7 @@ const wrapFigureImg = (
   }
 };
 
-export const hast: unified.Plugin<[FigureOptions?]> = ({
+export const hast = ({
   imgFigcaptionOrder = 'img-figcaption',
   assignIdToFigcaption = false,
 }: FigureOptions = {}) => {

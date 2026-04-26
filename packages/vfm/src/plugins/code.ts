@@ -3,7 +3,6 @@ import type { Code, Root } from 'mdast';
 import type { Handler } from 'mdast-util-to-hast';
 import parseAttr from 'md-attr-parser';
 import refractor from 'refractor';
-import type unified from 'unified';
 import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
@@ -142,7 +141,7 @@ function processMeta(node: Code): void {
   }
 }
 
-export const mdast: unified.Plugin<[]> = () => (tree: Node) => {
+export const mdast = () => (tree: Node) => {
   visit(tree as Root, 'code', (node) => {
     /**
      * Workaround for remark-attr's "bad hack".

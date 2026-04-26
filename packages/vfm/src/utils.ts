@@ -48,6 +48,15 @@ export function partial<
 }
 
 /**
+ * Attach a brand to a value so it satisfies a branded `unified.Pluggable`
+ * subtype. Centralizes the only unsafe cast required to bridge plain
+ * unified-agnostic plugin functions and the branded slot types used by
+ * `editPlugins`.
+ */
+export const brand = <B>(p: unknown): unified.Pluggable & B =>
+  p as unified.Pluggable & B;
+
+/**
  * Merge multiple unified plugins into a single plugin whose transformer runs
  * each of the underlying transformers in order. Zero plugins yields a no-op.
  */

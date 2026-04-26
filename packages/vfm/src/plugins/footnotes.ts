@@ -30,7 +30,7 @@ import {
   all as convertToHast,
 } from 'mdast-util-to-hast';
 import footnotes from 'remark-footnotes';
-import type unified from 'unified';
+import type * as unist from 'unist';
 import { u } from 'unist-builder';
 import { mergePlugins, partial } from '../utils.js';
 
@@ -134,7 +134,7 @@ function withSortedField<T extends Record<string, unknown>, K extends keyof T>(
  * differently from both Pandoc and GFM (tested via remark-gfm@4.0.1,
  * the latest as of 2026-03), though closer to the latter.
  */
-const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
+const createPandocTransformers = () => {
   // Shared between the two plugins: how many duplicate calls each
   // refIndex has.  Populated by the calls transformer, read by the
   // areas transformer.
@@ -146,7 +146,7 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
   // mdast-util-to-hast <12.1.1, producing a reversed endnote list).
   const identifierToRefIndex = new Map<string, number>();
 
-  const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+  const endnoteCallsToPandoc = () => (tree: unist.Node) => {
     // Reset closure-level maps so each document processed by a shared
     // processor instance starts from a clean slate.
     identifierToRefIndex.clear();
@@ -196,7 +196,7 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
     });
   };
 
-  const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
+  const endnoteAreasToPandoc = () => (tree: unist.Node) => {
     const root = tree as hast.Root;
 
     // must be called before mutating area.tagName
@@ -285,7 +285,7 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
     });
   };
 
-  return [endnoteCallsToPandoc, endnoteAreasToPandoc];
+  return [endnoteCallsToPandoc, endnoteAreasToPandoc] as const;
 };
 
 /**
@@ -751,9 +751,9 @@ const createReplaceDpubPlaceholders =
   (
     pending: Map<string, hast.Element>,
     inlinePending: Map<string, hast.Element>,
-  ): unified.Plugin =>
+  ) =>
   () =>
-  (tree) => {
+  (tree: unist.Node) => {
     const root = tree as hast.Root;
     const placed = new Set<string>();
 
@@ -994,12 +994,7 @@ export type FootnoteToHastHandlers = {
   footnote: ToHastHandler | undefined;
 };
 
-export const createFootnotePlugin = (
-  options?: FootnoteOptions,
-): {
-  toHastHandlers: FootnoteToHastHandlers;
-  hastTransformer: unified.Plugin;
-} => {
+export const createFootnotePlugin = (options?: FootnoteOptions) => {
   const resolved = resolveOption(options?.footnote);
 
   if (resolved.mode === 'pandoc') {

@@ -12,7 +12,7 @@ import { mdast as ruby } from './plugins/ruby.js';
 import { mdast as section } from './plugins/section.js';
 import { mdast as slug } from './plugins/slug.js';
 import { mdast as toc } from './plugins/toc.js';
-import { partial } from './utils.js';
+import { brand, partial } from './utils.js';
 
 export type ReviveParseOptions = LineBreaksOptions & MathOptions;
 
@@ -73,15 +73,15 @@ export type RemarkFrontmatterPlugin = unified.Pluggable & {
  */
 export const reviveParse = (options: ReviveParseOptions) => ({
   mdastPlugins: [
-    partial(lineBreaks, options) as RemarkLineBreaksPlugin,
-    partial(math, options) as RemarkMathPlugin,
-    ruby as RemarkRubyPlugin,
-    footnote as RemarkFootnotesPlugin,
-    attr as RemarkAttrPlugin,
-    slug as RemarkSlugPlugin,
-    section as RemarkSectionPlugin,
-    code as RemarkCodePlugin,
-    toc as RemarkTocPlugin,
-    frontmatter as RemarkFrontmatterPlugin,
+    brand<RemarkLineBreaksPlugin>(lineBreaks(options)),
+    brand<RemarkMathPlugin>(partial(math, options)),
+    brand<RemarkRubyPlugin>(ruby),
+    brand<RemarkFootnotesPlugin>(footnote),
+    brand<RemarkAttrPlugin>(attr),
+    brand<RemarkSlugPlugin>(slug),
+    brand<RemarkSectionPlugin>(section),
+    brand<RemarkCodePlugin>(code),
+    brand<RemarkTocPlugin>(toc),
+    brand<RemarkFrontmatterPlugin>(frontmatter),
   ] as const,
 });
