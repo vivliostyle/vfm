@@ -1,37 +1,47 @@
-import { test, expect } from 'vitest';
-import { stringify } from '../src/index.js';
+import rehypeStringify from 'rehype-stringify';
+import remarkBreaks from 'remark-breaks';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
+import unified from 'unified';
+import { expect, test } from 'vitest';
+import { handler as rubyHandler, mdast as ruby } from '../src/ruby.js';
 
-const options = {
-  partial: true,
-  disableFormatHtml: true,
+const stringify = (md: string, hardLineBreaks = false): string => {
+  let processor = unified()
+    .use(remarkParse, { gfm: true, commonmark: true })
+    .use(ruby);
+  if (hardLineBreaks) {
+    processor = processor.use(remarkBreaks);
+  }
+  return String(
+    processor
+      .use([
+        [
+          remarkRehype,
+          { allowDangerousHtml: true, handlers: { ruby: rubyHandler } },
+        ],
+        rehypeStringify,
+      ])
+      .processSync(md),
+  );
 };
 
 test('Simple ruby', () => {
-  const received = stringify(`{a|b}`, options);
-  const expected = `<p><ruby>a<rt>b</rt></ruby></p>`;
-  expect(received).toBe(expected);
+  expect(stringify('{a|b}')).toBe('<p><ruby>a<rt>b</rt></ruby></p>');
 });
 
 test('Enables escape in ruby body', () => {
-  const received = stringify(`{a\\|b|c}`, options);
-  const expected = `<p><ruby>a|b<rt>c</rt></ruby></p>`;
-  expect(received).toBe(expected);
+  expect(stringify('{a\\|b|c}')).toBe('<p><ruby>a|b<rt>c</rt></ruby></p>');
 });
 
 test('Disables any inline rule in <rt>', () => {
-  const received = stringify(`{a|*b*}`, options);
-  const expected = `<p><ruby>a<rt>*b*</rt></ruby></p>`;
-  expect(received).toBe(expected);
+  expect(stringify('{a|*b*}')).toBe('<p><ruby>a<rt>*b*</rt></ruby></p>');
 });
 
 test('Nested ruby', () => {
-  const received = stringify(`{{a|b}|c}`, options);
-  const expected = `<p><ruby>{a<rt>b</rt></ruby>|c}</p>`;
-  expect(received).toBe(expected);
+  expect(stringify('{{a|b}|c}')).toBe('<p><ruby>{a<rt>b</rt></ruby>|c}</p>');
 });
 
 test('Ruby with newline', () => {
-  const received = stringify(`{a\nb|c}`, { ...options, hardLineBreaks: true });
-  const expected = `<p>{a<br>\nb|c}</p>`;
-  expect(received).toBe(expected);
+  expect(stringify('{a\nb|c}', true)).toBe('<p>{a<br>\nb|c}</p>');
 });

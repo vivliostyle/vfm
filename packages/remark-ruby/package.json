@@ -1,13 +1,36 @@
 {
   "name": "@vivliostyle/remark-ruby",
   "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "description": "remark plugin to support `{...|...}` ruby annotation syntax used by VFM.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 20"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "module"
+  "type": "module",
+  "main": "lib/ruby.js",
+  "types": "lib/ruby.d.ts",
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/mdast": "^3.0.0",
+    "mdast-util-to-hast": "^11.3.0",
+    "unified": "^9.2.0",
+    "unist-builder": "^3.0.1"
+  },
+  "devDependencies": {
+    "rehype-stringify": "^8.0.0",
+    "remark-breaks": "^1.0.5",
+    "remark-parse": "^8.0.2",
+    "remark-rehype": "^8.1.0"
+  }
 }

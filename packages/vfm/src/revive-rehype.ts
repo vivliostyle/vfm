@@ -16,7 +16,7 @@ import {
   type MathOptions,
 } from './plugins/math.js';
 import { replace, type ReplaceOptions } from './plugins/replace.js';
-import { handler as ruby } from './plugins/ruby.js';
+import { handler as ruby } from '@vivliostyle/remark-ruby';
 import { brand, partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
