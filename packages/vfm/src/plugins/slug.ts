@@ -7,22 +7,10 @@
  */
 
 import GithubSlugger from 'github-slugger';
+import type { Heading } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import type { Node } from 'unist';
 import { selectAll } from 'unist-util-select';
-
-/**
- * Heading in Markdown AST.
- */
-interface Heading extends Node {
-  children: Node[];
-  data?: {
-    id?: string;
-    hProperties?: {
-      id?: string;
-    };
-  };
-}
 
 /**
  * Create slug from `id` or heading children.
@@ -31,14 +19,15 @@ interface Heading extends Node {
  * @returns
  */
 const createSlug = (heading: Heading, slugger: GithubSlugger) => {
-  if (heading.data && heading.data.hProperties && heading.data.hProperties.id) {
-    return slugger.slug(heading.data.hProperties.id, true);
+  const existingId = heading.data?.hProperties?.id;
+  if (typeof existingId === 'string' && existingId) {
+    return slugger.slug(existingId, true);
   }
 
   // Create slug string with footnotes removed
   const children = [...heading.children];
   heading.children = heading.children.filter(
-    (child: Node) => child.type !== 'footnote',
+    (child) => child.type !== 'footnote',
   );
   const text = slugger.slug(toString(heading).replace(/<[^<>]*>/g, ''));
   heading.children = children;
@@ -50,7 +39,7 @@ const createSlug = (heading: Heading, slugger: GithubSlugger) => {
  * Process Markdown AST.
  * @returns Transformer.
  */
-export const mdast = () => (tree: any) => {
+export const mdast = () => (tree: Node) => {
   const slugger = new GithubSlugger();
   slugger.reset();
 

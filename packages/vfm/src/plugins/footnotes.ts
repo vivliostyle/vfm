@@ -30,8 +30,9 @@ import {
   all as convertToHast,
 } from 'mdast-util-to-hast';
 import footnotes from 'remark-footnotes';
-import type unified from 'unified';
+import type * as unist from 'unist';
 import { u } from 'unist-builder';
+import { mergePlugins, partial } from '../utils.js';
 
 type ElementWithProps = hast.Element & {
   properties: NonNullable<hast.Element['properties']>;
@@ -133,7 +134,7 @@ function withSortedField<T extends Record<string, unknown>, K extends keyof T>(
  * differently from both Pandoc and GFM (tested via remark-gfm@4.0.1,
  * the latest as of 2026-03), though closer to the latter.
  */
-const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
+const createPandocTransformers = () => {
   // Shared between the two plugins: how many duplicate calls each
   // refIndex has.  Populated by the calls transformer, read by the
   // areas transformer.
@@ -145,7 +146,7 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
   // mdast-util-to-hast <12.1.1, producing a reversed endnote list).
   const identifierToRefIndex = new Map<string, number>();
 
-  const endnoteCallsToPandoc: unified.Plugin = () => (tree) => {
+  const endnoteCallsToPandoc = () => (tree: unist.Node) => {
     // Reset closure-level maps so each document processed by a shared
     // processor instance starts from a clean slate.
     identifierToRefIndex.clear();
@@ -195,7 +196,7 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
     });
   };
 
-  const endnoteAreasToPandoc: unified.Plugin = () => (tree) => {
+  const endnoteAreasToPandoc = () => (tree: unist.Node) => {
     const root = tree as hast.Root;
 
     // must be called before mutating area.tagName
@@ -284,7 +285,7 @@ const createPandocTransformers = (): [unified.Plugin, unified.Plugin] => {
     });
   };
 
-  return [endnoteCallsToPandoc, endnoteAreasToPandoc];
+  return [endnoteCallsToPandoc, endnoteAreasToPandoc] as const;
 };
 
 /**
@@ -750,9 +751,9 @@ const createReplaceDpubPlaceholders =
   (
     pending: Map<string, hast.Element>,
     inlinePending: Map<string, hast.Element>,
-  ): unified.Plugin =>
+  ) =>
   () =>
-  (tree) => {
+  (tree: unist.Node) => {
     const root = tree as hast.Root;
     const placed = new Set<string>();
 
@@ -980,20 +981,32 @@ const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
   return opt;
 };
 
-export const createFootnotePlugin = (
-  options?: FootnoteOptions,
-): {
-  toHastHandlers: Record<string, ToHastHandler> | Record<string, never>;
-  hastTransformers: unified.PluggableList;
-} => {
+/**
+ * Handlers returned by `createFootnotePlugin` for each footnote-related mdast
+ * node type. A value of `undefined` means "fall through to
+ * mdast-util-to-hast's default handler"; consumers are responsible for
+ * omitting undefined entries when merging into remark-rehype's `handlers`
+ * option (explicit undefined would otherwise overwrite the default).
+ */
+export type FootnoteToHastHandlers = {
+  footnoteDefinition: ToHastHandler | undefined;
+  footnoteReference: ToHastHandler | undefined;
+  footnote: ToHastHandler | undefined;
+};
+
+export const createFootnotePlugin = (options?: FootnoteOptions) => {
   const resolved = resolveOption(options?.footnote);
 
   if (resolved.mode === 'pandoc') {
     const [endnoteCallsToPandoc, endnoteAreasToPandoc] =
       createPandocTransformers();
     return {
-      toHastHandlers: {},
-      hastTransformers: [endnoteCallsToPandoc, endnoteAreasToPandoc],
+      toHastHandlers: {
+        footnoteDefinition: undefined,
+        footnoteReference: undefined,
+        footnote: undefined,
+      },
+      hastTransformer: mergePlugins(endnoteCallsToPandoc, endnoteAreasToPandoc),
     };
   }
 
@@ -1020,7 +1033,7 @@ export const createFootnotePlugin = (
           resolved.body,
         ),
       },
-      hastTransformers: [createReplaceDpubPlaceholders(pending, inlinePending)],
+      hastTransformer: createReplaceDpubPlaceholders(pending, inlinePending),
     };
   }
 
@@ -1045,17 +1058,18 @@ export const createFootnotePlugin = (
 
   return {
     toHastHandlers: {
+      footnoteDefinition: undefined,
       footnoteReference: createFootnoteReferenceHandler(
         buildFootnote,
         buildDuplicatedCall,
       ),
       footnote: createInlineFootnoteHandler(buildFootnote),
     },
-    hastTransformers: [],
+    hastTransformer: mergePlugins(),
   };
 };
 
 /**
  * Process Markdown AST.
  */
-export const mdast = [footnotes, { inlineNotes: true }];
+export const mdast = partial(footnotes, { inlineNotes: true });

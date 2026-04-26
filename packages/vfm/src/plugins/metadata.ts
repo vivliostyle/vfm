@@ -1,7 +1,8 @@
 import type { Element, Properties } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
-import type { Literal, Root } from 'mdast';
+import type { Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
+import type { Shortcode } from './toc.js';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
@@ -11,6 +12,8 @@ import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
+import type { StripFunctions } from '../utils.js';
+import type { SerializablePluginOptions } from './options.js';
 import { mdast as attr } from './attr.js';
 import { mdast as footnotes } from './footnotes.js';
 
@@ -24,39 +27,11 @@ export type Attribute = {
 
 /** Settings of VFM. */
 export type VFMSettings = {
-  /** Enable math syntax. */
-  math?: boolean | undefined;
-  /** Output markdown fragments.  */
-  partial?: boolean | undefined;
-  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
-  hardLineBreaks?: boolean | undefined;
-  /** Disable automatic HTML format. */
-  disableFormatHtml?: boolean | undefined;
   /** Path of theme. */
   theme?: string | undefined;
   /** Enable TOC mode. */
   toc?: boolean | undefined;
-  /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
-  /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean | undefined;
-  /** Footnote output mode. Default is `'pandoc'` (endnote section). */
-  footnote?:
-    | 'pandoc'
-    | 'dpub'
-    | 'gcpm'
-    | { mode: 'pandoc' }
-    | {
-        mode: 'dpub';
-        call?: Properties | undefined;
-        body?: Properties | undefined;
-      }
-    | {
-        mode: 'gcpm';
-        body?: Properties | undefined;
-      }
-    | undefined;
-};
+} & StripFunctions<SerializablePluginOptions>;
 
 /** Metadata from Frontmatter. */
 export type Metadata = {
@@ -160,7 +135,7 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
     }
   }
 
-  visit(tree as Root, 'shortcode', (node: Literal) => {
+  visit(tree as Root, 'shortcode', (node: Shortcode) => {
     if (node.identifier !== 'toc') {
       return;
     }
@@ -287,6 +262,11 @@ const readFootnoteOption = (raw: unknown): VFMSettings['footnote'] => {
           body:
             typeof obj.body === 'object' && obj.body !== null
               ? (obj.body as Properties)
+              : undefined,
+          duplicatedCall:
+            typeof obj.duplicatedCall === 'object' &&
+            obj.duplicatedCall !== null
+              ? (obj.duplicatedCall as Properties)
               : undefined,
         };
       }

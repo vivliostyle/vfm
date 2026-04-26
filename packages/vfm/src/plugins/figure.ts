@@ -16,7 +16,9 @@ const propertyToString = (
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
 export type FigureOptions = {
+  /** Order of img and figcaption elements in figure. */
   imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
+  /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean | undefined;
 };
 
@@ -72,9 +74,12 @@ const wrapFigureImg = (
   }
 };
 
-export const hast =
-  (options: FigureOptions = {}) =>
-  (tree: Node) => {
+export const hast = ({
+  imgFigcaptionOrder = 'img-figcaption',
+  assignIdToFigcaption = false,
+}: FigureOptions = {}) => {
+  const options: FigureOptions = { imgFigcaptionOrder, assignIdToFigcaption };
+  return (tree: Node) => {
     visit(tree as Root, 'element', (node, index, parent) => {
       // handle captioned code block
       const maybeCode = node.children?.[0] as Element | undefined;
@@ -112,3 +117,4 @@ export const hast =
       }
     });
   };
+};

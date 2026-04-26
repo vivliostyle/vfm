@@ -1,48 +1,55 @@
-import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
+import remarkParse from 'remark-parse';
+import remarkRehype from 'remark-rehype';
 import unified, { type Processor } from 'unified';
-import { mdast as doc } from './plugins/document.js';
-import { hast as hastMath } from './plugins/math.js';
-import type { FootnoteOptions } from './plugins/footnotes.js';
+import type { SerializablePluginOptions } from './plugins/options.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
-import {
-  replace as handleReplace,
-  type ReplaceRule,
-} from './plugins/replace.js';
+import { type ReplaceOptions, type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
-import { debug } from './utils.js';
+import { debug, inspect } from './utils.js';
 
 // Expose metadata reading by VFM
 export * from './plugins/metadata.js';
 
+// Re-export plugin brand types for downstream consumers that wish to refer to
+// individual pipeline slots by their nominal identity.
+export type {
+  RemarkLineBreaksPlugin,
+  RemarkMathPlugin,
+  RemarkRubyPlugin,
+  RemarkFootnotesPlugin,
+  RemarkAttrPlugin,
+  RemarkSlugPlugin,
+  RemarkSectionPlugin,
+  RemarkCodePlugin,
+  RemarkTocPlugin,
+  RemarkFrontmatterPlugin,
+} from './revive-parse.js';
+export type {
+  RehypeRawPlugin,
+  RehypeFigurePlugin,
+  RehypeFootnotePlugin,
+  RehypeReplacePlugin,
+  RehypeDocumentPlugin,
+  RehypeMathPlugin,
+  RehypeFormatPlugin,
+} from './revive-rehype.js';
+
 /**
  * Option for convert Markdown to a stringify (HTML).
  */
-export interface StringifyMarkdownOptions {
+export type StringifyMarkdownOptions = {
   /** Custom stylesheet path/URL. */
   style?: string | string[] | undefined;
-  /** Output markdown fragments. */
-  partial?: boolean | undefined;
   /** Document title (ignored in partial mode). */
   title?: string | undefined;
   /** Document language (ignored in partial mode). */
   language?: string | undefined;
-  /** Replacement handler for HTML string. */
-  replace?: ReplaceRule[] | undefined;
-  /** Add `<br>` at the position of hard line breaks, without needing spaces. */
-  hardLineBreaks?: boolean | undefined;
-  /** Disable automatic HTML format. */
-  disableFormatHtml?: boolean | undefined;
-  /** Enable math syntax. */
-  math?: boolean | undefined;
-  /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: 'img-figcaption' | 'figcaption-img' | undefined;
-  /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean | undefined;
-  /** Footnote output mode. Default is `'pandoc'` (endnote section). */
-  footnote?: FootnoteOptions['footnote'];
-}
+  /** Edit the plugin lists assembled by VFM before they are used. */
+  editPlugins?: EditPlugins | undefined;
+} & SerializablePluginOptions &
+  ReplaceOptions;
 
 export interface Hooks {
   afterParse: ReplaceRule[];
@@ -88,6 +95,27 @@ const checkMetadata = (
   }
 };
 
+export type BuiltinPlugins = ReturnType<typeof markdown> &
+  ReturnType<typeof html>;
+
+/**
+ * Looser variant of {@link BuiltinPlugins} returned by {@link EditPlugins}.
+ * Consumers receive the strictly typed `BuiltinPlugins` as input (slot
+ * identity is preserved via brand types), but are free to splice, drop, or
+ * extend the plugin lists, so the return shape widens to ordinary pluggable
+ * lists.
+ */
+export type EditedPlugins = {
+  mdastPlugins: ReadonlyArray<unified.Pluggable>;
+  mdastToHastHandlers: Record<
+    string,
+    BuiltinPlugins['mdastToHastHandlers'][keyof BuiltinPlugins['mdastToHastHandlers']]
+  >;
+  hastPlugins: ReadonlyArray<unified.Pluggable>;
+};
+
+export type EditPlugins = (plugins: BuiltinPlugins) => EditedPlugins;
+
 /**
  * Create Unified processor for Markdown AST and Hypertext AST.
  * @param options Options.
@@ -96,16 +124,17 @@ const checkMetadata = (
 export function VFM(
   {
     style = undefined,
-    partial = false,
+    partial,
     title = undefined,
     language = undefined,
-    replace = undefined,
-    hardLineBreaks = false,
-    disableFormatHtml = false,
-    math = true,
-    imgFigcaptionOrder = undefined,
-    assignIdToFigcaption = false,
-    footnote = undefined,
+    replace,
+    hardLineBreaks,
+    disableFormatHtml,
+    math,
+    imgFigcaptionOrder,
+    assignIdToFigcaption,
+    footnote,
+    editPlugins = (plugins) => plugins,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
 ): Processor {
@@ -136,32 +165,44 @@ export function VFM(
     }
   }
 
-  const processor = unified()
-    .use(markdown(hardLineBreaks, math))
+  const { mdastPlugins, mdastToHastHandlers, hastPlugins } = editPlugins({
+    ...markdown({ hardLineBreaks, math }),
+    ...html({
+      imgFigcaptionOrder,
+      assignIdToFigcaption,
+      footnote,
+      replace,
+      partial,
+      metadata,
+      math,
+      disableFormatHtml,
+    }),
+  });
+
+  // `undefined` entries in toHastHandlers signal "use mdast-util-to-hast's
+  // default handler"; strip them so remark-rehype's Object.assign-style merge
+  // does not overwrite the defaults with undefined.
+  const activeHandlers = Object.fromEntries(
+    Object.entries(mdastToHastHandlers).filter(([, v]) => v !== undefined),
+  );
+
+  return unified()
     .data('settings', { position: true })
-    .use(html({ imgFigcaptionOrder, assignIdToFigcaption, footnote }));
-
-  if (replace) {
-    processor.use(handleReplace, { rules: replace });
-  }
-
-  if (!partial) {
-    processor.use(doc, metadata);
-  }
-
-  processor.use(rehypeStringify);
-
-  // Must be run after `rehype-document` to write to `<head>`
-  if (math) {
-    processor.use(hastMath);
-  }
-
-  // Explicitly specify true if want unformatted HTML during development or debug
-  if (!disableFormatHtml) {
-    processor.use(rehypeFormat);
-  }
-
-  return processor;
+    .use([
+      [remarkParse, { gfm: true, commonmark: true }],
+      ...mdastPlugins,
+      inspect('mdast'),
+      [
+        remarkRehype,
+        {
+          allowDangerousHtml: true,
+          handlers: activeHandlers,
+        },
+      ],
+      ...hastPlugins,
+      inspect('hast'),
+      rehypeStringify,
+    ]);
 }
 
 /**
