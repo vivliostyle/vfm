@@ -95,24 +95,26 @@ const checkMetadata = (
   }
 };
 
-export type Plugins = ReturnType<typeof markdown> & ReturnType<typeof html>;
+export type BuiltinPlugins = ReturnType<typeof markdown> &
+  ReturnType<typeof html>;
 
 /**
- * Looser variant of {@link Plugins} returned by {@link EditPlugins}.
- * Consumers receive the strictly-typed `Plugins` as input — slot identity is
- * preserved via brand types — but are free to splice, drop, or extend the
- * plugin lists, so the return shape widens to ordinary pluggable lists.
+ * Looser variant of {@link BuiltinPlugins} returned by {@link EditPlugins}.
+ * Consumers receive the strictly typed `BuiltinPlugins` as input (slot
+ * identity is preserved via brand types), but are free to splice, drop, or
+ * extend the plugin lists, so the return shape widens to ordinary pluggable
+ * lists.
  */
 export type EditedPlugins = {
   mdastPlugins: ReadonlyArray<unified.Pluggable>;
   mdastToHastHandlers: Record<
     string,
-    Plugins['mdastToHastHandlers'][keyof Plugins['mdastToHastHandlers']]
+    BuiltinPlugins['mdastToHastHandlers'][keyof BuiltinPlugins['mdastToHastHandlers']]
   >;
   hastPlugins: ReadonlyArray<unified.Pluggable>;
 };
 
-export type EditPlugins = (plugins: Plugins) => EditedPlugins;
+export type EditPlugins = (plugins: BuiltinPlugins) => EditedPlugins;
 
 /**
  * Create Unified processor for Markdown AST and Hypertext AST.

@@ -8,9 +8,9 @@ import type { MathOptions } from './math.js';
 /**
  * Plugin options that can be expressed as serializable data.
  *
- * Excludes `ReplaceOptions` whose `match` callback is essential — stripping
- * it would yield a useless type. Options whose function members are only
- * *optional customizations* (e.g. `FootnoteOptions` factories) remain
+ * Excludes `ReplaceOptions` whose `match` callback is essential, since
+ * stripping it would yield a useless type. Options whose function members are
+ * only *optional customizations* (e.g. `FootnoteOptions` factories) remain
  * included; at boundaries where serialization is required (YAML frontmatter
  * etc.), apply `StripFunctions<>` to drop those callbacks while keeping the
  * declarative core intact.

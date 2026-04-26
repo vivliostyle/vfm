@@ -3,7 +3,7 @@ import type * as mdast from 'mdast';
 import type unified from 'unified';
 import { visit } from 'unist-util-visit';
 import { describe, expect, test } from 'vitest';
-import { VFM, type Plugins } from '../src/index.js';
+import { VFM, type BuiltinPlugins } from '../src/index.js';
 
 const baseOptions = { partial: true, disableFormatHtml: true } as const;
 
@@ -22,7 +22,7 @@ describe('editPlugins', () => {
   });
 
   test('exposes mdastPlugins, mdastToHastHandlers, hastPlugins to the editor', () => {
-    let received: Plugins | undefined;
+    let received: BuiltinPlugins | undefined;
 
     VFM({
       ...baseOptions,
