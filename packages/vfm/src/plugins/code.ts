@@ -1,4 +1,4 @@
-import type { ElementContent as HastElementContent } from 'hast';
+import type { ElementContent as HastElementContent, Properties } from 'hast';
 import type { Code, Root } from 'mdast';
 import type { Handler } from 'mdast-util-to-hast';
 import parseAttr from 'md-attr-parser';
@@ -7,24 +7,29 @@ import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 
-interface HProperties {
-  id?: string;
-  class?: string[];
-  title?: string;
-  [key: string]: unknown;
-}
-declare module 'mdast' {
-  interface Code {
-    data?: {
-      hProperties?: HProperties;
-      hChildren?: HastElementContent[] | ReturnType<typeof refractor.highlight>;
-    };
+/**
+ * Module augmentation is global, so this single declaration applies
+ * project-wide. Currently relied on by:
+ *
+ * - `code.ts` (this file): `hProperties`, `hChildren`
+ * - `section.ts`: `hProperties`, `hName`
+ * - `slug.ts`: `hProperties.id`
+ *
+ * @todo Drop after upgrading to `mdast-util-to-hast@>=13`, which ships the
+ *   same `Data` augmentation as a side effect import.
+ */
+declare module 'unist' {
+  interface Data {
+    hName?: string | undefined;
+    hProperties?: Properties | undefined;
+    hChildren?: HastElementContent[] | undefined;
   }
 }
-function getHProperties(node: Code): HProperties {
-  return (node.data?.hProperties as HProperties) ?? {};
+
+function getHProperties(node: Code): Properties {
+  return node.data?.hProperties ?? {};
 }
-function setHProperties(node: Code, props: HProperties): void {
+function setHProperties(node: Code, props: Properties): void {
   node.data = { ...(node.data ?? {}), hProperties: props };
 }
 
@@ -80,7 +85,7 @@ function isInsideQuotes(meta: string, pos: number): boolean {
  */
 function findValidAttrBlock(
   meta: string,
-): { prop: HProperties; eaten: string } | null {
+): { prop: Properties; eaten: string } | null {
   let searchStart = 0;
   while (searchStart < meta.length) {
     const braceIndex = meta.indexOf('{', searchStart);
@@ -106,7 +111,7 @@ function findValidAttrBlock(
       Object.values(parsed.prop).some((v) => v !== undefined);
 
     if (parsed.eaten && parsed.eaten.startsWith('{') && hasValidAttrs) {
-      return parsed;
+      return { prop: parsed.prop as Properties, eaten: parsed.eaten };
     }
     searchStart = braceIndex + 1;
   }
@@ -158,7 +163,10 @@ export const mdast = () => (tree: Node) => {
     // syntax highlight
     if (node.lang && refractor.registered(node.lang)) {
       if (!node.data) node.data = {};
-      node.data.hChildren = refractor.highlight(node.value, node.lang);
+      node.data.hChildren = refractor.highlight(
+        node.value,
+        node.lang,
+      ) as HastElementContent[];
     }
   });
 };

@@ -8,6 +8,23 @@ import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 
+export interface InlineMath extends Node {
+  type: 'inlineMath';
+  data: { hName: 'inlineMath'; value: string };
+}
+
+export interface DisplayMath extends Node {
+  type: 'displayMath';
+  data: { hName: 'displayMath'; value: string };
+}
+
+declare module 'mdast' {
+  interface StaticPhrasingContentMap {
+    inlineMath: InlineMath;
+    displayMath: DisplayMath;
+  }
+}
+
 /**
  * Inline math format, e.g. `$...$`.
  * - OK: `$x = y$`, `$x = \$y$`
@@ -63,7 +80,6 @@ const createTokenizers = () => {
 
     return eat(eaten)({
       type: TYPE_INLINE,
-      children: [],
       data: { hName: TYPE_INLINE, value: valueText },
     });
   };
@@ -94,7 +110,6 @@ const createTokenizers = () => {
 
     return eat(eaten)({
       type: TYPE_DISPLAY,
-      children: [],
       data: { hName: TYPE_DISPLAY, value: valueText },
     });
   };
@@ -135,35 +150,19 @@ export const mdast: unified.Plugin<[MathOptions?]> = function ({
     findAndReplace(
       tree as MdastRoot,
       REGEXP_INLINE,
-      (_: string, valueText: string) => {
-        return {
-          // NOTE: Although `type: "inlineMath"` is not a permitted type literal value within mdast,
-          // it causes no issues because it is handled by the handlerInlineMath function via remark-rehype.
-          // See also ../revive-rehype.ts.
-          type: TYPE_INLINE as any,
-          data: {
-            hName: TYPE_INLINE,
-            value: valueText,
-          },
-          children: [],
-        };
-      },
+      (_: string, valueText: string) => ({
+        type: TYPE_INLINE,
+        data: { hName: TYPE_INLINE, value: valueText },
+      }),
     );
 
     findAndReplace(
       tree as MdastRoot,
       REGEXP_DISPLAY,
-      (_: string, valueText: string) => {
-        return {
-          // NOTE: See the comment for inlineMath.
-          type: TYPE_DISPLAY as any,
-          data: {
-            hName: TYPE_DISPLAY,
-            value: valueText,
-          },
-          children: [],
-        };
-      },
+      (_: string, valueText: string) => ({
+        type: TYPE_DISPLAY,
+        data: { hName: TYPE_DISPLAY, value: valueText },
+      }),
     );
   };
 };

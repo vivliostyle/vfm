@@ -2,9 +2,11 @@ import findAndReplace from 'hast-util-find-and-replace';
 import { h } from 'hastscript';
 import type { Node } from 'unist';
 
+type H = typeof h;
+
 export interface ReplaceRule {
   test: RegExp;
-  match: (result: RegExpMatchArray, h: any) => Node | string;
+  match: (result: RegExpMatchArray, h: H) => Node | string;
 }
 
 export type ReplaceOptions = { replace?: ReplaceRule[] | undefined };

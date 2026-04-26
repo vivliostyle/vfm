@@ -6,11 +6,23 @@
  * @see https://github.com/jake-low/remark-sectionize
  */
 
-import type { Parent } from 'mdast';
+import type { BlockContent, Content, HTML, Heading, Parent } from 'mdast';
 import type { Node } from 'unist';
 import type { VFile } from 'vfile';
 import { findAfter } from 'unist-util-find-after';
 import { visitParents as visit } from 'unist-util-visit-parents';
+
+export interface Section extends Parent {
+  type: 'section';
+  depth: number;
+  children: BlockContent[];
+}
+
+declare module 'mdast' {
+  interface BlockContentMap {
+    section: Section;
+  }
+}
 
 /** Maximum depth of hierarchy to process headings. */
 const MAX_HEADING_DEPTH = 6;
@@ -27,8 +39,8 @@ const createProperties = (depth: number): KeyValue => {
   return properties;
 };
 
-const getHeadingLine = (node: any, file: VFile): string => {
-  if (node?.type !== 'heading') {
+const getHeadingLine = (node: Node, file: VFile): string => {
+  if (node.type !== 'heading') {
     return '';
   }
   const startOffset = node.position?.start.offset ?? 0;
@@ -43,7 +55,7 @@ const getHeadingLine = (node: any, file: VFile): string => {
  * @param file Virtual file.
  * @returns `true` if the node has a non-section mark.
  */
-const hasNonSectionMark = (node: any, file: VFile): boolean => {
+const hasNonSectionMark = (node: Heading, file: VFile): boolean => {
   const line = getHeadingLine(node, file);
   return (
     !!line && (/^#.*[ \t](#+)$/.exec(line)?.[1]?.length ?? 0) >= node.depth
@@ -55,9 +67,11 @@ const hasNonSectionMark = (node: any, file: VFile): boolean => {
  * @param node Node of Markdown AST.
  * @returns `true` if the node is a section-end mark.
  */
-const isSectionEndMark = (node: any, file: VFile): boolean => {
-  const line = getHeadingLine(node, file);
-  return !!line && /^(#+)$/.exec(line)?.[1]?.length === node.depth;
+const isSectionEndMark = (node: Node, file: VFile): boolean => {
+  if (node.type !== 'heading') return false;
+  const heading = node as Heading;
+  const line = getHeadingLine(heading, file);
+  return !!line && /^(#+)$/.exec(line)?.[1]?.length === heading.depth;
 };
 
 /**
@@ -68,7 +82,11 @@ const isSectionEndMark = (node: any, file: VFile): boolean => {
  * @param ancestors Parents.
  * @todo handle `@subtitle` properly.
  */
-const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
+const sectionizeIfRequired = (
+  node: Heading,
+  ancestors: Parent[],
+  file: VFile,
+) => {
   if (hasNonSectionMark(node, file)) {
     return;
   }
@@ -81,30 +99,34 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
   const depth = start.depth;
 
   // check if it's HTML end tag without corresponding start tag in sibling nodes.
-  const isHtmlEnd = (node: any) => {
+  const isHtmlEnd = (node: Node) => {
     if (node.type !== 'html') {
       return false;
     }
+    const html = node as HTML;
 
-    const tag = /<\/([^>\s]+)\s*>[^<]*$/.exec(node.value)?.[1];
+    const tag = /<\/([^>\s]+)\s*>[^<]*$/.exec(html.value)?.[1];
     if (!tag) {
       return false;
     }
 
     // it's HTML end tag, check if it has corresponding start tag
-    const isHtmlStart = (node: any) =>
-      node.type === 'html' && new RegExp(`<${tag}\\b[^>]*>`).test(node.value);
+    const isHtmlStart = (node: Node) =>
+      node.type === 'html' &&
+      new RegExp(`<${tag}\\b[^>]*>`).test((node as HTML).value);
     const htmlStart = findAfter(parent, start, isHtmlStart);
     if (
       !htmlStart ||
-      parent.children.indexOf(htmlStart) > parent.children.indexOf(node)
+      parent.children.indexOf(htmlStart as Content) >
+        parent.children.indexOf(html as Content)
     ) {
       // corresponding start tag is not found in this section level,
       // check if it is found earlier.
       const htmlStart1 = findAfter(parent, 0, isHtmlStart);
       if (
         htmlStart1 &&
-        parent.children.indexOf(htmlStart1) < parent.children.indexOf(start)
+        parent.children.indexOf(htmlStart1 as Content) <
+          parent.children.indexOf(start as Content)
       ) {
         return true;
       }
@@ -112,14 +134,14 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
     return false;
   };
 
-  const isEnd = (node: any) =>
-    (node.type === 'heading' && node.depth <= depth) ||
+  const isEnd = (node: Node) =>
+    (node.type === 'heading' && (node as Heading).depth <= depth) ||
     node.type === 'export' ||
     isHtmlEnd(node);
   const end = findAfter(parent, start, isEnd);
 
-  const startIndex = parent.children.indexOf(start);
-  const endIndex = parent.children.indexOf(end);
+  const startIndex = parent.children.indexOf(start as Content);
+  const endIndex = end ? parent.children.indexOf(end as Content) : -1;
 
   const between = parent.children.slice(
     startIndex,
@@ -129,7 +151,7 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
   const hProperties = createProperties(depth);
 
   // {hidden} specifier
-  if (Object.keys(node.data.hProperties).includes('hidden')) {
+  if (node.data?.hProperties && 'hidden' in node.data.hProperties) {
     node.data.hProperties.hidden = 'hidden';
   }
 
@@ -137,28 +159,29 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
   if (isDuplicated) {
     if (parent.data?.hProperties) {
       parent.data.hProperties = {
-        ...(parent.data.hProperties as any),
+        ...parent.data.hProperties,
         ...hProperties,
       };
     }
     return;
   }
 
-  const type = 'section';
-  const section = {
-    type,
+  const section: Section = {
+    type: 'section',
     data: {
-      hName: type,
+      hName: 'section',
       hProperties,
     },
-    depth: depth,
-    children: between,
-  } as any;
+    depth,
+    children: between as BlockContent[],
+  };
 
   parent.children.splice(
     startIndex,
     section.children.length +
-      (isSectionEndMark(end, file) && end.depth === depth ? 1 : 0),
+      (end && isSectionEndMark(end, file) && (end as Heading).depth === depth
+        ? 1
+        : 0),
     section,
   );
 };
@@ -169,14 +192,13 @@ const sectionizeIfRequired = (node: any, ancestors: Parent[], file: VFile) => {
  */
 export const mdast = () => (tree: Node, file: VFile) => {
   const sectionize = (node: Node, ancestors: Parent[]) => {
-    sectionizeIfRequired(node, ancestors, file);
+    sectionizeIfRequired(node as Heading, ancestors, file);
   };
   for (let depth = MAX_HEADING_DEPTH; depth > 0; depth--) {
     visit(
       tree,
-      (node) => {
-        return node.type === 'heading' && node.depth === depth;
-      },
+      (node: Node) =>
+        node.type === 'heading' && (node as Heading).depth === depth,
       sectionize,
     );
   }

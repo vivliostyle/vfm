@@ -1,7 +1,8 @@
 import type { Element, Properties } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
-import type { Literal, Root } from 'mdast';
+import type { Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
+import type { Shortcode } from './toc.js';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
 import markdown from 'remark-parse';
@@ -134,7 +135,7 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
     }
   }
 
-  visit(tree as Root, 'shortcode', (node: Literal) => {
+  visit(tree as Root, 'shortcode', (node: Shortcode) => {
     if (node.identifier !== 'toc') {
       return;
     }
