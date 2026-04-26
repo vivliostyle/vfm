@@ -74,10 +74,12 @@ describe('editPlugins', () => {
     const withoutFigure = String(
       VFM({
         ...baseOptions,
-        editPlugins: (plugins) => ({
-          ...plugins,
-          hastPlugins: plugins.hastPlugins.filter((_, i) => i !== 1),
-        }),
+        editPlugins: (plugins) => {
+          // keep comment between commas
+          // prettier-ignore
+          const [raw, /* figure */ , ...rest] = plugins.hastPlugins;
+          return { ...plugins, hastPlugins: [raw, ...rest] };
+        },
       }).processSync('![alt](pic.png)\n'),
     );
     expect(withoutFigure).not.toContain('<figure>');
