@@ -6,6 +6,7 @@ import refractor from 'refractor';
 import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
+import { type FigureOptions, propertyToString } from './figure.js';
 
 /**
  * Module augmentation is global, so this single declaration applies
@@ -171,24 +172,47 @@ export const mdast = () => (tree: Node) => {
   });
 };
 
-export const handler: Handler = (h, node) => {
-  const value = node.value || '';
-  const lang = node.lang ? node.lang.match(/^[^ \t]+(?=[ \t]|$)/) : 'text';
-  const langClass = 'language-' + lang;
+export const handler =
+  ({ assignIdToFigcaption = false }: FigureOptions = {}): Handler =>
+  (h, node) => {
+    const value = node.value || '';
+    const lang = node.lang ? node.lang.match(/^[^ \t]+(?=[ \t]|$)/) : 'text';
+    const langClass = 'language-' + lang;
 
-  // Merge language-* class with hProperties.class if present
-  const hProps = node.data?.hProperties ?? {};
-  const hClass = hProps.class;
-  const className = hClass
-    ? [langClass, ...(Array.isArray(hClass) ? hClass : [hClass])]
-    : [langClass];
+    // Strip `title` from code element props; it becomes the figcaption text.
+    const hProps = { ...(node.data?.hProperties ?? {}) };
+    const title = hProps.title;
+    delete hProps.title;
 
-  const preProps = { className: [langClass] };
-  const codeProps = { ...hProps, className };
-  // Use hChildren for syntax highlighting if available, otherwise plain text
-  const children = node.data?.hChildren ?? [u('text', value)];
+    // Merge language-* class with hProperties.class if present
+    const hClass = hProps.class;
+    const className = hClass
+      ? [langClass, ...(Array.isArray(hClass) ? hClass : [hClass])]
+      : [langClass];
 
-  return h(node.position, 'pre', preProps, [
-    h(node.position, 'code', codeProps, children),
-  ]);
-};
+    const preProps = { className: [langClass] };
+    const codeProps = { ...hProps, className };
+    // Use hChildren for syntax highlighting if available, otherwise plain text
+    const children = node.data?.hChildren ?? [u('text', value)];
+
+    if (!title) {
+      return h(node.position, 'pre', preProps, [
+        h(node.position, 'code', codeProps, children),
+      ]);
+    }
+
+    const figcaptionProps: Properties = {};
+    if (assignIdToFigcaption && codeProps.id) {
+      figcaptionProps.id = propertyToString(codeProps.id);
+      delete codeProps.id;
+    }
+
+    return h(node.position, 'figure', { class: langClass }, [
+      h({ type: 'element' }, 'figcaption', figcaptionProps, [
+        u('text', propertyToString(title)),
+      ]),
+      h(node.position, 'pre', preProps, [
+        h(node.position, 'code', codeProps, children),
+      ]),
+    ]);
+  };

@@ -63,26 +63,32 @@ describe('editPlugins', () => {
   });
 
   test('editor can drop a hast plugin entirely', () => {
-    // Confirm the figure plugin (slot index 1 in hastPlugins) wraps lone images
-    // by default…
-    const withDefault = String(
-      VFM(baseOptions).processSync('![alt](pic.png)\n'),
-    );
-    expect(withDefault).toContain('<figure>');
-
-    // …and is gone when removed via editPlugins.
-    const withoutFigure = String(
-      VFM({
-        ...baseOptions,
-        editPlugins: (plugins) => {
-          // keep comment between commas
-          // prettier-ignore
-          const [raw, /* figure */ , ...rest] = plugins.hastPlugins;
-          return { ...plugins, hastPlugins: [raw, ...rest] };
+    const replaceOptions = {
+      ...baseOptions,
+      replace: [
+        {
+          test: /foo/,
+          match: () => 'BAR',
         },
-      }).processSync('![alt](pic.png)\n'),
+      ],
+    };
+
+    // Confirm the replace plugin rewrites text by default...
+    const withDefault = String(VFM(replaceOptions).processSync('foo\n'));
+    expect(withDefault).toContain('BAR');
+
+    // ...and is gone when removed via editPlugins. Slot order is
+    // [raw, footnote, replace, doc, math, format].
+    const withoutReplace = String(
+      VFM({
+        ...replaceOptions,
+        editPlugins: (plugins) => {
+          const [raw, footnote /* replace */, , ...rest] = plugins.hastPlugins;
+          return { ...plugins, hastPlugins: [raw, footnote, ...rest] };
+        },
+      }).processSync('foo\n'),
     );
-    expect(withoutFigure).not.toContain('<figure>');
+    expect(withoutReplace).not.toContain('BAR');
   });
 
   test('editor can prepend an mdast plugin that observes parsed nodes', () => {
@@ -108,46 +114,52 @@ describe('editPlugins', () => {
     expect(headings).toEqual(['alpha', 'beta']);
   });
 
-  test('plugin injected between figure and footnote sees post-figure tree', () => {
+  test('plugin injected around replace sees pre/post-replacement tree', () => {
     const observe =
-      (record: { sawFigure: boolean }): unified.Plugin =>
+      (record: { sawReplaced: boolean }): unified.Plugin =>
       () =>
       (tree) => {
-        visit(tree as hast.Root, 'element', (node) => {
-          if (node.tagName === 'figure') record.sawFigure = true;
+        visit(tree as hast.Root, 'text', (node) => {
+          if (node.value.includes('BAR')) record.sawReplaced = true;
         });
       };
 
-    const beforeFigure = { sawFigure: false };
-    const afterFigure = { sawFigure: false };
+    const beforeReplace = { sawReplaced: false };
+    const afterReplace = { sawReplaced: false };
 
     String(
       VFM({
         ...baseOptions,
+        replace: [
+          {
+            test: /foo/,
+            match: () => 'BAR',
+          },
+        ],
         editPlugins: ({ mdastPlugins, mdastToHastHandlers, hastPlugins }) => {
           // Tuple destructure binds each slot by its brand type, letting
           // the editor splice between specific plugins without index
           // arithmetic.
-          const [raw, figure, footnote, ...rest] = hastPlugins;
+          const [raw, footnote, replace, ...rest] = hastPlugins;
           return {
             mdastPlugins,
             mdastToHastHandlers,
             hastPlugins: [
               raw,
-              observe(beforeFigure),
-              figure,
-              observe(afterFigure),
               footnote,
+              observe(beforeReplace),
+              replace,
+              observe(afterReplace),
               ...rest,
             ],
           };
         },
-      }).processSync('![alt](pic.png)\n'),
+      }).processSync('foo\n'),
     );
 
-    // figure plugin wraps lone images in <figure>; observers placed before and
-    // after it disagree on whether the wrapper is visible.
-    expect(beforeFigure.sawFigure).toBe(false);
-    expect(afterFigure.sawFigure).toBe(true);
+    // replace rewrites `foo` -> `BAR`; observers placed before and after it
+    // disagree on whether the replacement is visible.
+    expect(beforeReplace.sawReplaced).toBe(false);
+    expect(afterReplace.sawReplaced).toBe(true);
   });
 });
