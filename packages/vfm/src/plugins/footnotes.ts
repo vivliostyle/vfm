@@ -444,10 +444,7 @@ const dpubCallSchema = v.union([
   HastPropertiesSchema,
   v.pipe(
     v.function() as v.GenericSchema<DpubCallFactory>,
-    v.metadata({
-      typeString:
-        '(h: import("hastscript").Child extends never ? never : any, properties: { id: `fnref${number}`; href: `#fn${number}`; class: "footnote-ref"; role: "doc-noteref" }, children: DpubCallChildren) => import("hast").Element',
-    }),
+    v.metadata({ typeString: 'DpubCallFactory' }),
   ),
 ]);
 
@@ -455,10 +452,7 @@ const dpubBodySchema = v.union([
   HastPropertiesSchema,
   v.pipe(
     v.function() as v.GenericSchema<DpubBodyFactory>,
-    v.metadata({
-      typeString:
-        '(h: any, properties: { id: `fn${number}`; class: "footnote"; role: "doc-footnote" }, children: DpubBodyChildren) => import("hast").Element',
-    }),
+    v.metadata({ typeString: 'DpubBodyFactory' }),
   ),
 ]);
 
@@ -466,10 +460,7 @@ const gcpmBodySchema = v.union([
   HastPropertiesSchema,
   v.pipe(
     v.function() as v.GenericSchema<GcpmBodyFactory>,
-    v.metadata({
-      typeString:
-        '(h: any, properties: { id: `fn-${string}`; role: "doc-footnote" }, children: import("hast").ElementContent[]) => import("hast").Element',
-    }),
+    v.metadata({ typeString: 'GcpmBodyFactory' }),
   ),
 ]);
 
@@ -477,10 +468,7 @@ const gcpmDuplicatedCallSchema = v.union([
   HastPropertiesSchema,
   v.pipe(
     v.function() as v.GenericSchema<GcpmDuplicatedCallFactory>,
-    v.metadata({
-      typeString:
-        '(h: any, properties: { href: `#fn-${string}`; class: "footnote-duplicated-call"; role: "doc-noteref" }, children: import("hast").ElementContent[]) => import("hast").Element',
-    }),
+    v.metadata({ typeString: 'GcpmDuplicatedCallFactory' }),
   ),
 ]);
 

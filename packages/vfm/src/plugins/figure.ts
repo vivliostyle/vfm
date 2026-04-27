@@ -3,6 +3,7 @@ import { isElement as is } from 'hast-util-is-element';
 import { h } from 'hastscript';
 import type { Node, Parent } from 'unist';
 import { visit } from 'unist-util-visit';
+import * as v from 'valibot';
 
 const propertyToString = (
   property: NonNullable<Element['properties']>[string],
@@ -14,13 +15,28 @@ const propertyToString = (
       : ''; // <tag /> || <tag prop />
 };
 
-export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
-export type FigureOptions = {
-  /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
-  /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean | undefined;
-};
+export const ImgFigcaptionOrderSchema = v.picklist([
+  'img-figcaption',
+  'figcaption-img',
+]);
+export type ImgFigcaptionOrder = v.InferInput<typeof ImgFigcaptionOrderSchema>;
+
+export const FigureOptionsSchema = v.object({
+  imgFigcaptionOrder: v.optional(
+    v.pipe(
+      ImgFigcaptionOrderSchema,
+      v.description('Order of img and figcaption elements in figure.'),
+    ),
+  ),
+  assignIdToFigcaption: v.optional(
+    v.pipe(
+      v.boolean(),
+      v.description('Assign ID to figcaption instead of img/code.'),
+    ),
+  ),
+});
+
+export type FigureOptions = v.InferInput<typeof FigureOptionsSchema>;
 
 /**
  * Move ID from source element to target properties if assignIdToFigcaption is enabled.
