@@ -69,7 +69,7 @@ export const buildFigure = (
 
   const figcaptionProps: Properties = { 'aria-hidden': 'true' };
   if (assignIdToFigcaption && img.properties.id) {
-    figcaptionProps.id = propertyToString(img.properties.id);
+    figcaptionProps.id = img.properties.id;
     delete img.properties.id;
   }
 

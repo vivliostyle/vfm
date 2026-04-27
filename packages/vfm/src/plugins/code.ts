@@ -203,7 +203,7 @@ export const handler =
 
     const figcaptionProps: Properties = {};
     if (assignIdToFigcaption && codeProps.id) {
-      figcaptionProps.id = propertyToString(codeProps.id);
+      figcaptionProps.id = codeProps.id;
       delete codeProps.id;
     }
 
