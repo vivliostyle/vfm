@@ -191,9 +191,11 @@ export const handler =
   ({ assignIdToFigcaption = false }: CodeOptions = {}): Handler =>
   (h, maybeMdastNode) => {
     if (!isCodeNode(maybeMdastNode)) return undefined;
+
     const node = maybeMdastNode;
     const value = node.value || '';
-    const lang = node.lang ? node.lang.match(/^[^ \t]+(?=[ \t]|$)/) : 'text';
+    const langMatch = node.lang?.match(/^[^ \t]+(?=[ \t]|$)/);
+    const lang = langMatch?.[0] ?? 'text';
     const langClass = 'language-' + lang;
 
     const title = node.data?.figcaptionTitle;

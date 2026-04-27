@@ -304,6 +304,12 @@ const readSettings = (data: any): VFMSettings => {
       typeof data.assignIdToFigcaption === 'boolean'
         ? data.assignIdToFigcaption
         : false,
+    captionlessImagePolicy:
+      data.captionlessImagePolicy === 'paragraph' ||
+      data.captionlessImagePolicy === 'figure' ||
+      data.captionlessImagePolicy === 'figure-with-figcaption'
+        ? data.captionlessImagePolicy
+        : undefined,
     footnote: readFootnoteOption(data.footnote),
   };
 };
