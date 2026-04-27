@@ -435,7 +435,8 @@ export const FootnoteModeSchema = v.picklist(['pandoc', 'dpub', 'gcpm']);
 
 const HastPropertiesSchema = v.pipe(
   v.custom<hast.Properties>(
-    (input) => typeof input === 'object' && input !== null,
+    (input) =>
+      typeof input === 'object' && input !== null && !Array.isArray(input),
   ),
   v.metadata({ typeString: 'import("hast").Properties' }),
 );
