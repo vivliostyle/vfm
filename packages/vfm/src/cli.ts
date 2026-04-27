@@ -3,8 +3,8 @@
 import fs from 'fs';
 import meow, { type Result } from 'meow';
 import readline from 'readline';
-import { stringify } from './index.js';
-import type { FootnoteMode } from './plugins/footnotes.js';
+import * as v from 'valibot';
+import { stringify, StringifyMarkdownOptionsSchema } from './index.js';
 
 const cli = meow(
   `
@@ -70,24 +70,25 @@ const cli = meow(
 );
 
 function compile(input: string) {
+  // The CLI flags are typed loosely by meow (e.g. `imgFigcaptionOrder` is
+  // `string | undefined` rather than the literal union), so we route the
+  // raw flag values through the schema. `v.parse` validates and narrows in
+  // a single step, replacing the previous `as` casts with a runtime check
+  // that draws from the same source of truth as the programmatic API.
+  const options = v.parse(StringifyMarkdownOptionsSchema, {
+    partial: cli.flags.partial,
+    style: cli.flags.style,
+    title: cli.flags.title,
+    language: cli.flags.language,
+    hardLineBreaks: cli.flags.hardLineBreaks,
+    disableFormatHtml: cli.flags.disableFormatHtml,
+    math: cli.flags.disableMath === undefined ? true : !cli.flags.disableMath,
+    imgFigcaptionOrder: cli.flags.imgFigcaptionOrder,
+    assignIdToFigcaption: cli.flags.assignIdToFigcaption,
+    footnote: cli.flags.footnote,
+  });
   // eslint-disable-next-line no-console
-  console.log(
-    stringify(input, {
-      partial: cli.flags.partial,
-      style: cli.flags.style,
-      title: cli.flags.title,
-      language: cli.flags.language,
-      hardLineBreaks: cli.flags.hardLineBreaks,
-      disableFormatHtml: cli.flags.disableFormatHtml,
-      math: cli.flags.disableMath === undefined ? true : !cli.flags.disableMath,
-      imgFigcaptionOrder: cli.flags.imgFigcaptionOrder as
-        | 'img-figcaption'
-        | 'figcaption-img'
-        | undefined,
-      assignIdToFigcaption: cli.flags.assignIdToFigcaption,
-      footnote: cli.flags.footnote as FootnoteMode | undefined,
-    }),
-  );
+  console.log(stringify(input, options));
 }
 
 function main(
