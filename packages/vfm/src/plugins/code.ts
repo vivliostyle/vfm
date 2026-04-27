@@ -6,7 +6,11 @@ import refractor from 'refractor';
 import type * as unist from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
-import { type FigureOptions } from './figure.js';
+
+export type CodeOptions = {
+  /** Assign ID to figcaption instead of the `<code>` element. */
+  assignIdToFigcaption?: boolean | undefined;
+};
 
 const isCodeNode = (
   maybeMdastNode: unknown,
@@ -184,7 +188,7 @@ export const mdast = () => (tree: unist.Node) => {
 };
 
 export const handler =
-  ({ assignIdToFigcaption = false }: FigureOptions = {}): Handler =>
+  ({ assignIdToFigcaption = false }: CodeOptions = {}): Handler =>
   (h, maybeMdastNode) => {
     if (!isCodeNode(maybeMdastNode)) return undefined;
     const node = maybeMdastNode;

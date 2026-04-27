@@ -1,7 +1,7 @@
 import { type Handler, all } from 'mdast-util-to-hast';
 import raw from 'rehype-raw';
 import unified from 'unified';
-import { handler as code } from './plugins/code.js';
+import { handler as code, type CodeOptions } from './plugins/code.js';
 import { mdast as doc, type DocumentOptions } from './plugins/document.js';
 import { buildFigure, type FigureOptions } from './plugins/figure.js';
 import {
@@ -20,6 +20,7 @@ import { handler as ruby } from './plugins/ruby.js';
 import { brand, partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
+  CodeOptions &
   FootnoteOptions &
   ReplaceOptions &
   DocumentOptions &
