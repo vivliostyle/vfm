@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import type { Element, Properties, Root } from 'hast';
 import { isElement as is } from 'hast-util-is-element';
 import { h } from 'hastscript';
@@ -37,100 +38,115 @@ export const FigureOptionsSchema = v.object({
 });
 
 export type FigureOptions = v.InferInput<typeof FigureOptionsSchema>;
+=======
+import type * as hast from 'hast';
+import type * as mdast from 'mdast';
+import { type H, all } from 'mdast-util-to-hast';
+import { u } from 'unist-builder';
+
+export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
 
 /**
- * Move ID from source element to target properties if assignIdToFigcaption is enabled.
- * @param source Element to move ID from (img or code).
- * @param targetProps Properties object to receive the ID.
- * @param options Figure options.
- */
-const moveIdToFigcaption = (
-  source: Element,
-  targetProps: Properties,
-  options: FigureOptions,
-) => {
-  if (options.assignIdToFigcaption && source.properties?.id) {
-    targetProps.id = propertyToString(source.properties.id);
-    delete source.properties.id;
-  }
-};
-
-/**
- * Wrap the single line `<img>` in `<figure>` and generate `<figcaption>` from the `alt` attribute.
+ * Rendering policy for an image-only paragraph whose `alt` is empty
+ * (e.g. `![](url)`). Controls the output structure independently of the
+ * captioned case, which always renders as `<figure><img><figcaption>...`.
  *
- * A single line `<img>` is a child of `<p>` with no sibling elements. Also, `<figure>` cannot be a child of `<p>`. So convert the parent `<p>` to `<figure>`.
- * @param img `<img>` tag.
- * @param parent `<p>` tag.
- * @param options Figure options.
+ * - `'paragraph'`: keep `<p><img></p>` (default; backward compatible).
+ * - `'figure'`: emit `<figure><img></figure>` with no figcaption slot.
+ * - `'figure-with-figcaption'`: emit `<figure><img><figcaption></figcaption></figure>`
+ *   so CSS counters and `imgFigcaptionOrder`/`assignIdToFigcaption` apply
+ *   uniformly across captioned and captionless cases.
  */
-const wrapFigureImg = (
-  img: Element,
-  parent: Element,
-  options: FigureOptions,
-) => {
-  if (!(img.properties && parent.properties)) {
-    return;
-  }
+export type CaptionlessImagePolicy =
+  | 'paragraph'
+  | 'figure'
+  | 'figure-with-figcaption';
 
-  parent.tagName = 'figure';
-
-  const figcaptionProps: Properties = { 'aria-hidden': 'true' };
-  moveIdToFigcaption(img, figcaptionProps, options);
-
-  const figcaption = h(
-    'figcaption',
-    figcaptionProps,
-    propertyToString(img.properties.alt),
-  );
-
-  if (options.imgFigcaptionOrder === 'figcaption-img') {
-    parent.children.unshift(figcaption);
-  } else {
-    parent.children.push(figcaption);
-  }
+export type FigureOptions = {
+  /** Order of img and figcaption elements in figure. */
+  imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
+  /** Assign ID to figcaption instead of img/code. */
+  assignIdToFigcaption?: boolean | undefined;
+  /** How to render an image-only paragraph whose `alt` is empty. */
+  captionlessImagePolicy?: CaptionlessImagePolicy | undefined;
 };
 
-export const hast = ({
-  imgFigcaptionOrder = 'img-figcaption',
-  assignIdToFigcaption = false,
-}: FigureOptions = {}) => {
-  const options: FigureOptions = { imgFigcaptionOrder, assignIdToFigcaption };
-  return (tree: Node) => {
-    visit(tree as Root, 'element', (node, index, parent) => {
-      // handle captioned code block
-      const maybeCode = node.children?.[0] as Element | undefined;
-      if (
-        is(node, 'pre') &&
-        maybeCode?.properties &&
-        maybeCode.properties.title
-      ) {
-        const maybeTitle = maybeCode.properties.title;
-        delete maybeCode.properties.title;
-        if (Array.isArray(maybeCode.properties.className)) {
-          const figcaptionProps: Properties = {};
-          moveIdToFigcaption(maybeCode, figcaptionProps, options);
+const isImageNode = (
+  maybeMdastNode: unknown,
+): maybeMdastNode is mdast.Image => {
+  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
+  return (maybeMdastNode as { type?: unknown }).type === 'image';
+};
+>>>>>>> origin/main
 
-          (parent as Parent).children[index as number] = h(
-            'figure',
-            { class: maybeCode.properties.className[0] },
-            h('figcaption', figcaptionProps, propertyToString(maybeTitle)),
-            node,
-          );
-        }
+/**
+ * Predicate: a paragraph is figure-shaped when it contains exactly one image
+ * child. This is a pure structural check and does not consider `alt` content.
+ * Whether such a paragraph should actually become a `<figure>` is a policy
+ * decision left to {@link buildFigure}, which weighs `alt` and
+ * {@link FigureOptions} together.
+ *
+ * Exposed so callers composing their own `paragraph` handler (e.g. for CJK
+ * whitespace handling, indent control) can inspect figure candidacy.
+ */
+export const isFigureParagraph = (
+  maybeMdastNode: unknown,
+): maybeMdastNode is mdast.Paragraph & { children: [mdast.Image] } => {
+  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
+  const n = maybeMdastNode as { type?: unknown; children?: unknown };
+  if (n.type !== 'paragraph') return false;
+  if (!Array.isArray(n.children) || n.children.length !== 1) return false;
+  return isImageNode(n.children[0]);
+};
 
-        return;
-      }
+/**
+ * Build a `<figure>` element from a figure-shaped paragraph. Returns
+ * `undefined` when the node is not figure-shaped, or when its image lacks an
+ * `alt` and `captionlessImagePolicy` is `'paragraph'` (the default). Callers
+ * compose this with their own `<p>` fallback:
+ *
+ * ```ts
+ * paragraph: (h, node) =>
+ *   buildFigure(h, node, options) ?? h(node, 'p', all(h, node));
+ * ```
+ */
+export const buildFigure = (
+  h: H,
+  maybeMdastNode: unknown,
+  {
+    imgFigcaptionOrder = 'img-figcaption',
+    assignIdToFigcaption = false,
+    captionlessImagePolicy = 'paragraph',
+  }: FigureOptions = {},
+): hast.Element | undefined => {
+  if (!isFigureParagraph(maybeMdastNode)) return undefined;
 
-      // handle captioned and single line (like a block) img
-      if (
-        is(node, 'img') &&
-        node.properties?.alt &&
-        parent &&
-        parent.tagName === 'p' &&
-        parent.children.length === 1
-      ) {
-        wrapFigureImg(node, parent as Element, options);
-      }
-    });
-  };
+  const hasCaption = !!maybeMdastNode.children[0].alt;
+  if (!hasCaption && captionlessImagePolicy === 'paragraph') return undefined;
+
+  const converted = all(h, maybeMdastNode);
+  const img = converted[0];
+  if (img?.type !== 'element') return undefined;
+
+  if (!hasCaption && captionlessImagePolicy === 'figure') {
+    return h(maybeMdastNode, 'figure', [img]);
+  }
+
+  const figcaptionProps: hast.Properties = { 'aria-hidden': 'true' };
+  if (assignIdToFigcaption && img.properties && img.properties.id) {
+    figcaptionProps.id = img.properties.id;
+    delete img.properties.id;
+  }
+
+  const altText = maybeMdastNode.children[0].alt ?? '';
+  const figcaption = h({ type: 'element' }, 'figcaption', figcaptionProps, [
+    u('text', altText),
+  ]);
+
+  const figureChildren =
+    imgFigcaptionOrder === 'figcaption-img'
+      ? [figcaption, img]
+      : [img, figcaption];
+
+  return h(maybeMdastNode, 'figure', figureChildren);
 };

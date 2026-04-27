@@ -35,6 +35,153 @@ test(
 );
 
 test(
+  "captionlessImagePolicy: 'figure' wraps image without figcaption",
+  buildProcessorTestingCode(
+    `![](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+    `,
+    `<figure><img src="./img.png"></figure>`,
+    { captionlessImagePolicy: 'figure' },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure-with-figcaption' emits empty figcaption",
+  buildProcessorTestingCode(
+    `![](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+    `,
+    `<figure><img src="./img.png"><figcaption aria-hidden="true"></figcaption></figure>`,
+    { captionlessImagePolicy: 'figure-with-figcaption' },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure' does not promote inline image",
+  buildProcessorTestingCode(
+    `text ![](./img.png) text`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[3]
+        ├─0 text "text "
+        ├─1 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: null
+        └─2 text " text"
+    `,
+    `<p>text <img src="./img.png"> text</p>`,
+    { captionlessImagePolicy: 'figure' },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure' does not affect captioned image",
+  buildProcessorTestingCode(
+    `![caption](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+    `,
+    `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true">caption</figcaption></figure>`,
+    { captionlessImagePolicy: 'figure' },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure' with assignIdToFigcaption keeps ID on img",
+  buildProcessorTestingCode(
+    `![](./img.png){#fig1}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+    `,
+    `<figure><img src="./img.png" id="fig1"></figure>`,
+    {
+      captionlessImagePolicy: 'figure',
+      assignIdToFigcaption: true,
+    },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure-with-figcaption' with imgFigcaptionOrder: figcaption-img",
+  buildProcessorTestingCode(
+    `![](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+    `,
+    `<figure><figcaption aria-hidden="true"></figcaption><img src="./img.png"></figure>`,
+    {
+      captionlessImagePolicy: 'figure-with-figcaption',
+      imgFigcaptionOrder: 'figcaption-img',
+    },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure-with-figcaption' with assignIdToFigcaption moves ID to empty figcaption",
+  buildProcessorTestingCode(
+    `![](./img.png){#fig1}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+    `,
+    `<figure><img src="./img.png"><figcaption aria-hidden="true" id="fig1"></figcaption></figure>`,
+    {
+      captionlessImagePolicy: 'figure-with-figcaption',
+      assignIdToFigcaption: true,
+    },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure-with-figcaption' does not affect captioned image",
+  buildProcessorTestingCode(
+    `![caption](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+    `,
+    `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true">caption</figcaption></figure>`,
+    { captionlessImagePolicy: 'figure-with-figcaption' },
+  ),
+);
+
+test(
   'Only single line',
   buildProcessorTestingCode(
     stripIndent`

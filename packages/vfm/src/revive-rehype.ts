@@ -1,8 +1,9 @@
+import { type Handler, all } from 'mdast-util-to-hast';
 import raw from 'rehype-raw';
 import unified from 'unified';
-import { handler as code } from './plugins/code.js';
+import { handler as code, type CodeOptions } from './plugins/code.js';
 import { mdast as doc, type DocumentOptions } from './plugins/document.js';
-import { hast as figure, type FigureOptions } from './plugins/figure.js';
+import { buildFigure, type FigureOptions } from './plugins/figure.js';
 import {
   createFootnotePlugin,
   type FootnoteOptions,
@@ -19,6 +20,7 @@ import { handler as ruby } from './plugins/ruby.js';
 import { brand, partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
+  CodeOptions &
   FootnoteOptions &
   ReplaceOptions &
   DocumentOptions &
@@ -28,11 +30,6 @@ export type ReviveRehypeOptions = FigureOptions &
 declare const rehypeRawPluginBrand: unique symbol;
 export type RehypeRawPlugin = unified.Pluggable & {
   [rehypeRawPluginBrand]: unknown;
-};
-
-declare const rehypeFigurePluginBrand: unique symbol;
-export type RehypeFigurePlugin = unified.Pluggable & {
-  [rehypeFigurePluginBrand]: unknown;
 };
 
 declare const rehypeFootnotePluginBrand: unique symbol;
@@ -75,12 +72,13 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       displayMath,
       inlineMath,
       ruby,
-      code,
+      code: code(options),
+      paragraph: ((h, node) =>
+        buildFigure(h, node, options) ?? h(node, 'p', all(h, node))) as Handler,
       ...footnoteHandlers,
     } as const,
     hastPlugins: [
       brand<RehypeRawPlugin>(raw),
-      brand<RehypeFigurePlugin>(partial(figure, options)),
       brand<RehypeFootnotePlugin>(footnoteTransformer),
       brand<RehypeReplacePlugin>(partial(replace, options)),
       brand<RehypeDocumentPlugin>(partial(doc, options)),

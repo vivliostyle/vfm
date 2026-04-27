@@ -29,7 +29,6 @@ export type {
 } from './revive-parse.js';
 export type {
   RehypeRawPlugin,
-  RehypeFigurePlugin,
   RehypeFootnotePlugin,
   RehypeReplacePlugin,
   RehypeDocumentPlugin,
@@ -161,6 +160,7 @@ export function VFM(
     math,
     imgFigcaptionOrder,
     assignIdToFigcaption,
+    captionlessImagePolicy,
     footnote,
     editPlugins = (plugins) => plugins,
   }: StringifyMarkdownOptions = {},
@@ -188,6 +188,9 @@ export function VFM(
     if (metadata.vfm.assignIdToFigcaption !== undefined) {
       assignIdToFigcaption = metadata.vfm.assignIdToFigcaption;
     }
+    if (metadata.vfm.captionlessImagePolicy !== undefined) {
+      captionlessImagePolicy = metadata.vfm.captionlessImagePolicy;
+    }
     if (metadata.vfm.footnote !== undefined) {
       footnote = metadata.vfm.footnote;
     }
@@ -198,6 +201,7 @@ export function VFM(
     ...html({
       imgFigcaptionOrder,
       assignIdToFigcaption,
+      captionlessImagePolicy,
       footnote,
       replace,
       partial,
