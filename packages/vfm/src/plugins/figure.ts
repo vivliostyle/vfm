@@ -4,11 +4,30 @@ import { type H, all } from 'mdast-util-to-hast';
 import { u } from 'unist-builder';
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
+
+/**
+ * Rendering policy for an image-only paragraph whose `alt` is empty
+ * (e.g. `![](url)`). Controls the output structure independently of the
+ * captioned case, which always renders as `<figure><img><figcaption>...`.
+ *
+ * - `'paragraph'`: keep `<p><img></p>` (default; backward compatible).
+ * - `'figure'`: emit `<figure><img></figure>` with no figcaption slot.
+ * - `'figure-with-figcaption'`: emit `<figure><img><figcaption></figcaption></figure>`
+ *   so CSS counters and `imgFigcaptionOrder`/`assignIdToFigcaption` apply
+ *   uniformly across captioned and captionless cases.
+ */
+export type CaptionlessImagePolicy =
+  | 'paragraph'
+  | 'figure'
+  | 'figure-with-figcaption';
+
 export type FigureOptions = {
   /** Order of img and figcaption elements in figure. */
   imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
   /** Assign ID to figcaption instead of img/code. */
   assignIdToFigcaption?: boolean | undefined;
+  /** How to render an image-only paragraph whose `alt` is empty. */
+  captionlessImagePolicy?: CaptionlessImagePolicy | undefined;
 };
 
 const isFigureImage = (

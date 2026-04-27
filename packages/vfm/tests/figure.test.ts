@@ -35,6 +35,40 @@ test(
 );
 
 test(
+  "captionlessImagePolicy: 'figure' wraps image without figcaption",
+  buildProcessorTestingCode(
+    `![](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+    `,
+    `<figure><img src="./img.png"></figure>`,
+    { captionlessImagePolicy: 'figure' },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure-with-figcaption' emits empty figcaption",
+  buildProcessorTestingCode(
+    `![](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+    `,
+    `<figure><img src="./img.png"><figcaption aria-hidden="true"></figcaption></figure>`,
+    { captionlessImagePolicy: 'figure-with-figcaption' },
+  ),
+);
+
+test(
   'Only single line',
   buildProcessorTestingCode(
     stripIndent`
