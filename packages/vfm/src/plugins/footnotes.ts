@@ -496,12 +496,9 @@ export const FootnoteOptionsSchema = v.object({
 export type FootnoteOptions = v.InferInput<typeof FootnoteOptionsSchema>;
 
 /**
- * YAML-safe variant of {@link FootnoteOptionsSchema}.
- *
- * Frontmatter cannot encode JavaScript callables, so the factory members
- * (`call`, `body`, `duplicatedCall`) are restricted to `hast.Properties`
- * only. Used by `metadata.ts` when validating the `vfm:` field of YAML
- * frontmatter, where the function form is unreachable.
+ * YAML-safe variant of {@link FootnoteOptionsSchema}: `call`, `body`, and
+ * `duplicatedCall` accept `hast.Properties` only, since YAML cannot
+ * represent JavaScript functions.
  */
 export const YamlFootnoteOptionsSchema = v.object({
   footnote: v.optional(

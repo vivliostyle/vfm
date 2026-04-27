@@ -30,14 +30,7 @@ export type Attribute = {
   value: string;
 };
 
-/**
- * Schema for the `vfm:` field of YAML frontmatter.
- *
- * Composes every plugin's serializable schema (replacing the footnote
- * schema with the YAML-safe variant that drops callable factories, since
- * frontmatter cannot encode JavaScript functions) and adds the two
- * VFM-level fields (`theme`, `toc`).
- */
+/** Schema for the `vfm:` field of YAML frontmatter. */
 export const VFMSettingsSchema = v.intersect([
   LineBreaksOptionsSchema,
   MathOptionsSchema,
@@ -243,12 +236,8 @@ const readAttributesCollection = (
 };
 
 /**
- * Read VFM settings from a frontmatter object.
- *
- * Validates the input against {@link VFMSettingsSchema}. On a parse
- * failure the previous lenient behavior — returning a defaults-only
- * object with a debug log — is preserved so a malformed `vfm:` block
- * degrades to "no overrides applied" rather than aborting the build.
+ * Read VFM settings from a frontmatter object. Returns defaults on a
+ * schema mismatch so a malformed `vfm:` block does not abort processing.
  */
 const readSettings = (data: unknown): VFMSettings => {
   const defaults: VFMSettings = {

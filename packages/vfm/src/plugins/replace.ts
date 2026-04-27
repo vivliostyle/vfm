@@ -8,16 +8,12 @@ type H = typeof h;
 /**
  * Replace rule.
  *
- * Declared as an `interface` (rather than a type alias derived from the
- * schema via `v.InferInput`) so that TypeScript records `ReplaceRule` as a
- * single nominal name in declaration output. When `ReplaceOptionsSchema` is
- * composed by a downstream `v.intersect` (e.g. `StringifyMarkdownOptionsSchema`),
- * TS uses this named reference instead of expanding the structural form,
- * which would otherwise reach `typeof h` from `hastscript` and force the
- * inferred top-level type to leak `hastscript/lib/core.js`'s `HProperties`
- * and `HChild` (TS2883). The schema below carries an explicit
- * `v.GenericSchema<ReplaceRule>` annotation, which TS verifies at compile
- * time, so the schema and the type cannot drift apart silently.
+ * Declared as `interface` so TS keeps `ReplaceRule` as a nominal name in
+ * `.d.ts` output. Without it, `v.intersect` consumers inline the
+ * structural form, which reaches `typeof h` from `hastscript` and trips
+ * TS2883 because `hastscript/lib/core.js` is not in its `exports` map.
+ * The schema below pins to this type via `v.GenericSchema<ReplaceRule>`,
+ * so TS rejects drift at compile time.
  */
 export interface ReplaceRule {
   test: RegExp;

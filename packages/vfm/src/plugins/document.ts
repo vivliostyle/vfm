@@ -158,9 +158,8 @@ const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
 };
 
 /**
- * Schema for the user-facing serializable subset of {@link DocumentOptions}.
- * Excludes `metadata`, which is supplied internally by VFM rather than by the
- * user, and is therefore not part of the validatable input surface.
+ * User-input subset of {@link DocumentOptions}. `metadata` is supplied
+ * internally by VFM, so it is not part of the schema.
  */
 export const DocumentSerializableOptionsSchema = v.object({
   partial: v.optional(

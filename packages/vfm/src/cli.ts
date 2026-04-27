@@ -70,11 +70,8 @@ const cli = meow(
 );
 
 function compile(input: string) {
-  // The CLI flags are typed loosely by meow (e.g. `imgFigcaptionOrder` is
-  // `string | undefined` rather than the literal union), so we route the
-  // raw flag values through the schema. `v.parse` validates and narrows in
-  // a single step, replacing the previous `as` casts with a runtime check
-  // that draws from the same source of truth as the programmatic API.
+  // meow keeps `imgFigcaptionOrder` and `footnote` typed as plain `string`,
+  // so `v.parse` is needed to narrow them to their literal unions.
   const options = v.parse(StringifyMarkdownOptionsSchema, {
     partial: cli.flags.partial,
     style: cli.flags.style,

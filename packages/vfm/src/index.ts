@@ -37,13 +37,7 @@ export type {
   RehypeFormatPlugin,
 } from './revive-rehype.js';
 
-/**
- * Schema for {@link StringifyMarkdownOptions}.
- *
- * Composes `SerializablePluginOptionsSchema` (each plugin owns its own
- * schema fragment) with `ReplaceOptionsSchema` and the four vfm-level
- * fields. New plugin options propagate through automatically.
- */
+/** Schema for {@link StringifyMarkdownOptions}. */
 export const StringifyMarkdownOptionsSchema = v.intersect([
   v.object({
     style: v.optional(
@@ -80,12 +74,7 @@ export const StringifyMarkdownOptionsSchema = v.intersect([
   ReplaceOptionsSchema,
 ]);
 
-/**
- * Option for convert Markdown to a stringify (HTML).
- *
- * Inferred from {@link StringifyMarkdownOptionsSchema}, so additions to
- * any plugin schema flow through here without further editing.
- */
+/** Option for convert Markdown to a stringify (HTML). */
 export type StringifyMarkdownOptions = v.InferInput<
   typeof StringifyMarkdownOptionsSchema
 >;
