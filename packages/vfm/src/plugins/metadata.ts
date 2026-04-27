@@ -236,8 +236,37 @@ const readAttributesCollection = (
 };
 
 /**
- * Read VFM settings from a frontmatter object. Returns defaults on a
- * schema mismatch so a malformed `vfm:` block does not abort processing.
+ * Walk an `intersect`-of-`object` schema and collect every field's schema
+ * into a single map. Used by {@link readSettings} to validate the `vfm:`
+ * block one entry at a time so a single invalid value does not discard
+ * unrelated valid options.
+ */
+const collectObjectEntries = (
+  schema: v.GenericSchema<unknown>,
+): Record<string, v.GenericSchema<unknown>> => {
+  const s = schema as { type: string; entries?: unknown; options?: unknown[] };
+  if (s.type === 'object' && s.entries) {
+    return s.entries as Record<string, v.GenericSchema<unknown>>;
+  }
+  if (s.type === 'intersect' && Array.isArray(s.options)) {
+    return Object.assign(
+      {},
+      ...s.options.map((inner) =>
+        collectObjectEntries(inner as v.GenericSchema<unknown>),
+      ),
+    );
+  }
+  return {};
+};
+
+const vfmSettingsEntries = collectObjectEntries(
+  VFMSettingsSchema as v.GenericSchema<unknown>,
+);
+
+/**
+ * Read VFM settings from a frontmatter object. Validates per entry: an
+ * invalid field is dropped (its default applies) without discarding the
+ * other valid fields.
  */
 const readSettings = (data: unknown): VFMSettings => {
   const defaults: VFMSettings = {
@@ -249,12 +278,18 @@ const readSettings = (data: unknown): VFMSettings => {
   if (data === null || typeof data !== 'object') {
     return defaults;
   }
-  const result = v.safeParse(VFMSettingsSchema, data);
-  if (!result.success) {
-    debug('vfm: settings did not match VFMSettingsSchema: %o', result.issues);
-    return defaults;
+  const obj = data as Record<string, unknown>;
+  const merged: Record<string, unknown> = { ...defaults };
+  for (const [key, fieldSchema] of Object.entries(vfmSettingsEntries)) {
+    if (!(key in obj)) continue;
+    const r = v.safeParse(fieldSchema, obj[key]);
+    if (r.success) {
+      merged[key] = r.output;
+    } else {
+      debug('vfm.%s: invalid value, ignoring: %o', key, r.issues);
+    }
   }
-  return { ...defaults, ...result.output };
+  return merged as VFMSettings;
 };
 
 /**
