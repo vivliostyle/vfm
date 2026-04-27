@@ -14,6 +14,12 @@ type H = typeof h;
  * TS2883 because `hastscript/lib/core.js` is not in its `exports` map.
  * The schema below pins to this type via `v.GenericSchema<ReplaceRule>`,
  * so TS rejects drift at compile time.
+ *
+ * @todo Drop the interface + annotation pinning once `hastscript` exposes
+ *   `core.js` (or `HChild`/`HProperties`) through its `package.json#exports`
+ *   so consumers can resolve the canonical path TypeScript records for
+ *   those names. As of `hastscript@9.0.1`, only the package root is
+ *   exposed.
  */
 export interface ReplaceRule {
   test: RegExp;

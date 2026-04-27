@@ -240,6 +240,16 @@ const readAttributesCollection = (
  * into a single map. Used by {@link readSettings} to validate the `vfm:`
  * block one entry at a time so a single invalid value does not discard
  * unrelated valid options.
+ *
+ * @remarks
+ * Reads `schema.type`, `schema.entries`, and `schema.options` directly,
+ * which are valibot internals rather than a documented public API. The
+ * shapes have been stable across valibot 1.x; if a future major changes
+ * them, this function fails closed (returns `{}`) and `readSettings`
+ * silently accepts everything as `undefined`. The `valibot` dependency
+ * should stay pinned to `^1.x` for this reason. An alternative is to
+ * build the per-field map explicitly from the same plugin schema imports
+ * that compose `VFMSettingsSchema`, at the cost of duplicated maintenance.
  */
 const collectObjectEntries = (
   schema: v.GenericSchema<unknown>,
