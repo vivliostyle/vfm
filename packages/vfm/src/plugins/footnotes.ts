@@ -495,6 +495,39 @@ export const FootnoteOptionsSchema = v.object({
 
 export type FootnoteOptions = v.InferInput<typeof FootnoteOptionsSchema>;
 
+/**
+ * YAML-safe variant of {@link FootnoteOptionsSchema}.
+ *
+ * Frontmatter cannot encode JavaScript callables, so the factory members
+ * (`call`, `body`, `duplicatedCall`) are restricted to `hast.Properties`
+ * only. Used by `metadata.ts` when validating the `vfm:` field of YAML
+ * frontmatter, where the function form is unreachable.
+ */
+export const YamlFootnoteOptionsSchema = v.object({
+  footnote: v.optional(
+    v.union([
+      FootnoteModeSchema,
+      v.variant('mode', [
+        v.object({ mode: v.literal('pandoc') }),
+        v.object({
+          mode: v.literal('dpub'),
+          call: v.optional(HastPropertiesSchema),
+          body: v.optional(HastPropertiesSchema),
+        }),
+        v.object({
+          mode: v.literal('gcpm'),
+          body: v.optional(HastPropertiesSchema),
+          duplicatedCall: v.optional(HastPropertiesSchema),
+        }),
+      ]),
+    ]),
+  ),
+});
+
+export type YamlFootnoteOptions = v.InferInput<
+  typeof YamlFootnoteOptionsSchema
+>;
+
 type BuildFootnote = (
   id: `fn-${string}`,
   children: hast.ElementContent[],

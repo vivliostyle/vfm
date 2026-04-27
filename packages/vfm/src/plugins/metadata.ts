@@ -1,4 +1,4 @@
-import type { Element, Properties } from 'hast';
+import type { Element } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
 import type { Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
@@ -12,10 +12,15 @@ import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
-import type { StripFunctions } from '../utils.js';
-import type { SerializablePluginOptions } from './options.js';
+import * as v from 'valibot';
+import { debug } from '../utils.js';
 import { mdast as attr } from './attr.js';
-import { mdast as footnotes } from './footnotes.js';
+import { DocumentSerializableOptionsSchema } from './document.js';
+import { FigureOptionsSchema } from './figure.js';
+import { mdast as footnotes, YamlFootnoteOptionsSchema } from './footnotes.js';
+import { FormatOptionsSchema } from './format.js';
+import { LineBreaksOptionsSchema } from './line-breaks.js';
+import { MathOptionsSchema } from './math.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -25,13 +30,29 @@ export type Attribute = {
   value: string;
 };
 
+/**
+ * Schema for the `vfm:` field of YAML frontmatter.
+ *
+ * Composes every plugin's serializable schema (replacing the footnote
+ * schema with the YAML-safe variant that drops callable factories, since
+ * frontmatter cannot encode JavaScript functions) and adds the two
+ * VFM-level fields (`theme`, `toc`).
+ */
+export const VFMSettingsSchema = v.intersect([
+  LineBreaksOptionsSchema,
+  MathOptionsSchema,
+  DocumentSerializableOptionsSchema,
+  FormatOptionsSchema,
+  FigureOptionsSchema,
+  YamlFootnoteOptionsSchema,
+  v.object({
+    theme: v.optional(v.pipe(v.string(), v.description('Path of theme.'))),
+    toc: v.optional(v.pipe(v.boolean(), v.description('Enable TOC mode.'))),
+  }),
+]);
+
 /** Settings of VFM. */
-export type VFMSettings = {
-  /** Path of theme. */
-  theme?: string | undefined;
-  /** Enable TOC mode. */
-  toc?: boolean | undefined;
-} & StripFunctions<SerializablePluginOptions>;
+export type VFMSettings = v.InferInput<typeof VFMSettingsSchema>;
 
 /** Metadata from Frontmatter. */
 export type Metadata = {
@@ -222,90 +243,36 @@ const readAttributesCollection = (
 };
 
 /**
- * Parse the `footnote` value from frontmatter YAML.
- * @param raw Raw YAML value.
- * @returns Normalized footnote option, or `undefined`.
+ * Read VFM settings from a frontmatter object.
+ *
+ * Validates the input against {@link VFMSettingsSchema} and routes the
+ * legacy `footnote: true` form (introduced in PR #231 as an alias for
+ * `'gcpm'`) through a small pre-normalization step. On a parse failure
+ * the previous lenient behavior — returning a defaults-only object with
+ * a debug log — is preserved so a malformed `vfm:` block degrades to "no
+ * overrides applied" rather than aborting the build.
  */
-const readFootnoteOption = (raw: unknown): VFMSettings['footnote'] => {
-  if (raw === true || raw === 'gcpm') {
-    return 'gcpm';
-  }
-  if (raw === 'pandoc') {
-    return 'pandoc';
-  }
-  if (raw === 'dpub') {
-    return 'dpub';
-  }
-  if (typeof raw === 'object' && raw !== null) {
-    if ('mode' in raw) {
-      const obj = raw as Record<string, unknown>;
-      const mode = obj.mode;
-      if (mode === 'pandoc') {
-        return { mode: 'pandoc' };
-      }
-      if (mode === 'dpub') {
-        return {
-          mode: 'dpub',
-          call:
-            typeof obj.call === 'object' && obj.call !== null
-              ? (obj.call as Properties)
-              : undefined,
-          body:
-            typeof obj.body === 'object' && obj.body !== null
-              ? (obj.body as Properties)
-              : undefined,
-        };
-      }
-      if (mode === 'gcpm') {
-        return {
-          mode: 'gcpm',
-          body:
-            typeof obj.body === 'object' && obj.body !== null
-              ? (obj.body as Properties)
-              : undefined,
-          duplicatedCall:
-            typeof obj.duplicatedCall === 'object' &&
-            obj.duplicatedCall !== null
-              ? (obj.duplicatedCall as Properties)
-              : undefined,
-        };
-      }
-      return undefined;
-    }
-    return undefined;
-  }
-  return undefined;
-};
-
-/**
- * Read VFM settings from data object.
- * @param data Data object.
- * @returns Settings.
- */
-const readSettings = (data: any): VFMSettings => {
-  if (data === null || typeof data !== 'object') {
-    return { toc: false };
-  }
-
-  return {
-    math: typeof data.math === 'boolean' ? data.math : undefined,
-    partial: typeof data.partial === 'boolean' ? data.partial : undefined,
-    hardLineBreaks:
-      typeof data.hardLineBreaks === 'boolean'
-        ? data.hardLineBreaks
-        : undefined,
-    disableFormatHtml:
-      typeof data.disableFormatHtml === 'boolean'
-        ? data.disableFormatHtml
-        : undefined,
-    theme: typeof data.theme === 'string' ? data.theme : undefined,
-    toc: typeof data.toc === 'boolean' ? data.toc : false,
-    assignIdToFigcaption:
-      typeof data.assignIdToFigcaption === 'boolean'
-        ? data.assignIdToFigcaption
-        : false,
-    footnote: readFootnoteOption(data.footnote),
+const readSettings = (data: unknown): VFMSettings => {
+  const defaults: VFMSettings = {
+    toc: false,
+    assignIdToFigcaption: false,
+    footnote: undefined,
   };
+  if (data === null || typeof data !== 'object') {
+    return defaults;
+  }
+  const normalized: Record<string, unknown> = {
+    ...(data as Record<string, unknown>),
+  };
+  if (normalized.footnote === true) {
+    normalized.footnote = 'gcpm';
+  }
+  const result = v.safeParse(VFMSettingsSchema, normalized);
+  if (!result.success) {
+    debug('vfm: settings did not match VFMSettingsSchema: %o', result.issues);
+    return defaults;
+  }
+  return { ...defaults, ...result.output };
 };
 
 /**
