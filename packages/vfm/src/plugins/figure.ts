@@ -1,17 +1,7 @@
-import type { Element, Properties } from 'hast';
-import type { Image, Paragraph } from 'mdast';
+import type * as hast from 'hast';
+import type * as mdast from 'mdast';
 import { type H, all } from 'mdast-util-to-hast';
 import { u } from 'unist-builder';
-
-export const propertyToString = (
-  property: NonNullable<Element['properties']>[string],
-) => {
-  return typeof property === 'string' || typeof property === 'number'
-    ? String(property) // <tag prop="foo" /> || <tag prop=42 />
-    : Array.isArray(property)
-      ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
-      : ''; // <tag /> || <tag prop />
-};
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
 export type FigureOptions = {
@@ -21,9 +11,11 @@ export type FigureOptions = {
   assignIdToFigcaption?: boolean | undefined;
 };
 
-const isFigureImage = (child: unknown): child is Image & { alt: string } => {
-  if (!child || typeof child !== 'object') return false;
-  const node = child as { type?: unknown; alt?: unknown };
+const isFigureImage = (
+  maybeMdastNode: unknown,
+): maybeMdastNode is mdast.Image & { alt: string } => {
+  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
+  const node = maybeMdastNode as { type?: unknown; alt?: unknown };
   return node.type === 'image' && typeof node.alt === 'string' && !!node.alt;
 };
 
@@ -34,10 +26,12 @@ const isFigureImage = (child: unknown): child is Image & { alt: string } => {
  * delegate the figure case without re-implementing this rule.
  */
 export const isFigureParagraph = (
-  node: unknown,
-): node is Paragraph & { children: [Image & { alt: string }] } => {
-  if (!node || typeof node !== 'object') return false;
-  const n = node as { type?: unknown; children?: unknown };
+  maybeMdastNode: unknown,
+): maybeMdastNode is mdast.Paragraph & {
+  children: [mdast.Image & { alt: string }];
+} => {
+  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
+  const n = maybeMdastNode as { type?: unknown; children?: unknown };
   if (n.type !== 'paragraph') return false;
   if (!Array.isArray(n.children) || n.children.length !== 1) return false;
   return isFigureImage(n.children[0]);
@@ -55,33 +49,33 @@ export const isFigureParagraph = (
  */
 export const buildFigure = (
   h: H,
-  node: unknown,
+  maybeMdastNode: unknown,
   {
     imgFigcaptionOrder = 'img-figcaption',
     assignIdToFigcaption = false,
   }: FigureOptions = {},
-): Element | undefined => {
-  if (!isFigureParagraph(node)) return undefined;
+): hast.Element | undefined => {
+  if (!isFigureParagraph(maybeMdastNode)) return undefined;
 
-  const converted = all(h, node) as Element[];
+  const converted = all(h, maybeMdastNode);
   const img = converted[0];
-  if (!img || !img.properties) return undefined;
+  if (img?.type !== 'element') return undefined;
 
-  const figcaptionProps: Properties = { 'aria-hidden': 'true' };
-  if (assignIdToFigcaption && img.properties.id) {
+  const figcaptionProps: hast.Properties = { 'aria-hidden': 'true' };
+  if (assignIdToFigcaption && img.properties && img.properties.id) {
     figcaptionProps.id = img.properties.id;
     delete img.properties.id;
   }
 
-  const altText = propertyToString(img.properties.alt);
+  const altText = maybeMdastNode.children[0].alt;
   const figcaption = h({ type: 'element' }, 'figcaption', figcaptionProps, [
     u('text', altText),
-  ]) as Element;
+  ]);
 
   const figureChildren =
     imgFigcaptionOrder === 'figcaption-img'
       ? [figcaption, img]
       : [img, figcaption];
 
-  return h(node, 'figure', figureChildren) as Element;
+  return h(maybeMdastNode, 'figure', figureChildren);
 };
