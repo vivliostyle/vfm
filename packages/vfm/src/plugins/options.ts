@@ -1,3 +1,4 @@
+import type { CodeOptions } from './code.js';
 import type { DocumentOptions } from './document.js';
 import type { FigureOptions } from './figure.js';
 import type { FootnoteOptions } from './footnotes.js';
@@ -23,4 +24,5 @@ export type SerializablePluginOptions = LineBreaksOptions &
   Pick<DocumentOptions, 'partial'> &
   FormatOptions &
   FigureOptions &
+  CodeOptions &
   FootnoteOptions;

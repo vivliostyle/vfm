@@ -28,7 +28,6 @@ export type {
 } from './revive-parse.js';
 export type {
   RehypeRawPlugin,
-  RehypeFigurePlugin,
   RehypeFootnotePlugin,
   RehypeReplacePlugin,
   RehypeDocumentPlugin,

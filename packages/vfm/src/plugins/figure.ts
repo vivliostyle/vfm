@@ -1,18 +1,7 @@
-import type { Element, Properties, Root } from 'hast';
-import { isElement as is } from 'hast-util-is-element';
-import { h } from 'hastscript';
-import type { Node, Parent } from 'unist';
-import { visit } from 'unist-util-visit';
-
-const propertyToString = (
-  property: NonNullable<Element['properties']>[string],
-) => {
-  return typeof property === 'string' || typeof property === 'number'
-    ? String(property) // <tag prop="foo" /> || <tag prop=42 />
-    : Array.isArray(property)
-      ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
-      : ''; // <tag /> || <tag prop />
-};
+import type * as hast from 'hast';
+import type * as mdast from 'mdast';
+import { type H, all } from 'mdast-util-to-hast';
+import { u } from 'unist-builder';
 
 export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
 export type FigureOptions = {
@@ -22,99 +11,71 @@ export type FigureOptions = {
   assignIdToFigcaption?: boolean | undefined;
 };
 
-/**
- * Move ID from source element to target properties if assignIdToFigcaption is enabled.
- * @param source Element to move ID from (img or code).
- * @param targetProps Properties object to receive the ID.
- * @param options Figure options.
- */
-const moveIdToFigcaption = (
-  source: Element,
-  targetProps: Properties,
-  options: FigureOptions,
-) => {
-  if (options.assignIdToFigcaption && source.properties?.id) {
-    targetProps.id = propertyToString(source.properties.id);
-    delete source.properties.id;
-  }
+const isFigureImage = (
+  maybeMdastNode: unknown,
+): maybeMdastNode is mdast.Image & { alt: string } => {
+  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
+  const node = maybeMdastNode as { type?: unknown; alt?: unknown };
+  return node.type === 'image' && typeof node.alt === 'string' && !!node.alt;
 };
 
 /**
- * Wrap the single line `<img>` in `<figure>` and generate `<figcaption>` from the `alt` attribute.
+ * Predicate: a paragraph qualifies as a figure when it contains exactly one
+ * image child with non-empty `alt`. Exposed so callers composing their own
+ * `paragraph` handler (e.g. for CJK whitespace handling, indent control) can
+ * delegate the figure case without re-implementing this rule.
+ */
+export const isFigureParagraph = (
+  maybeMdastNode: unknown,
+): maybeMdastNode is mdast.Paragraph & {
+  children: [mdast.Image & { alt: string }];
+} => {
+  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
+  const n = maybeMdastNode as { type?: unknown; children?: unknown };
+  if (n.type !== 'paragraph') return false;
+  if (!Array.isArray(n.children) || n.children.length !== 1) return false;
+  return isFigureImage(n.children[0]);
+};
+
+/**
+ * Build a `<figure>` element from a paragraph that satisfies
+ * {@link isFigureParagraph}. Returns `undefined` for any other node, so
+ * callers can fall through to their own default `<p>` rendering:
  *
- * A single line `<img>` is a child of `<p>` with no sibling elements. Also, `<figure>` cannot be a child of `<p>`. So convert the parent `<p>` to `<figure>`.
- * @param img `<img>` tag.
- * @param parent `<p>` tag.
- * @param options Figure options.
+ * ```ts
+ * paragraph: (h, node) =>
+ *   buildFigure(h, node, options) ?? h(node, 'p', all(h, node));
+ * ```
  */
-const wrapFigureImg = (
-  img: Element,
-  parent: Element,
-  options: FigureOptions,
-) => {
-  if (!(img.properties && parent.properties)) {
-    return;
+export const buildFigure = (
+  h: H,
+  maybeMdastNode: unknown,
+  {
+    imgFigcaptionOrder = 'img-figcaption',
+    assignIdToFigcaption = false,
+  }: FigureOptions = {},
+): hast.Element | undefined => {
+  if (!isFigureParagraph(maybeMdastNode)) return undefined;
+
+  const converted = all(h, maybeMdastNode);
+  const img = converted[0];
+  if (img?.type !== 'element') return undefined;
+
+  const figcaptionProps: hast.Properties = { 'aria-hidden': 'true' };
+  if (assignIdToFigcaption && img.properties && img.properties.id) {
+    figcaptionProps.id = img.properties.id;
+    delete img.properties.id;
   }
 
-  parent.tagName = 'figure';
+  const altText = maybeMdastNode.children[0].alt;
+  const figcaption = h({ type: 'element' }, 'figcaption', figcaptionProps, [
+    u('text', altText),
+  ]);
 
-  const figcaptionProps: Properties = { 'aria-hidden': 'true' };
-  moveIdToFigcaption(img, figcaptionProps, options);
+  const figureChildren =
+    imgFigcaptionOrder === 'figcaption-img'
+      ? [figcaption, img]
+      : [img, figcaption];
 
-  const figcaption = h(
-    'figcaption',
-    figcaptionProps,
-    propertyToString(img.properties.alt),
-  );
-
-  if (options.imgFigcaptionOrder === 'figcaption-img') {
-    parent.children.unshift(figcaption);
-  } else {
-    parent.children.push(figcaption);
-  }
-};
-
-export const hast = ({
-  imgFigcaptionOrder = 'img-figcaption',
-  assignIdToFigcaption = false,
-}: FigureOptions = {}) => {
-  const options: FigureOptions = { imgFigcaptionOrder, assignIdToFigcaption };
-  return (tree: Node) => {
-    visit(tree as Root, 'element', (node, index, parent) => {
-      // handle captioned code block
-      const maybeCode = node.children?.[0] as Element | undefined;
-      if (
-        is(node, 'pre') &&
-        maybeCode?.properties &&
-        maybeCode.properties.title
-      ) {
-        const maybeTitle = maybeCode.properties.title;
-        delete maybeCode.properties.title;
-        if (Array.isArray(maybeCode.properties.className)) {
-          const figcaptionProps: Properties = {};
-          moveIdToFigcaption(maybeCode, figcaptionProps, options);
-
-          (parent as Parent).children[index as number] = h(
-            'figure',
-            { class: maybeCode.properties.className[0] },
-            h('figcaption', figcaptionProps, propertyToString(maybeTitle)),
-            node,
-          );
-        }
-
-        return;
-      }
-
-      // handle captioned and single line (like a block) img
-      if (
-        is(node, 'img') &&
-        node.properties?.alt &&
-        parent &&
-        parent.tagName === 'p' &&
-        parent.children.length === 1
-      ) {
-        wrapFigureImg(node, parent as Element, options);
-      }
-    });
-  };
+  return h(maybeMdastNode, 'figure', figureChildren);
 };
