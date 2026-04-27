@@ -3,16 +3,9 @@ import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import unified, { type Processor } from 'unified';
 import * as v from 'valibot';
-import {
-  SerializablePluginOptionsSchema,
-  type SerializablePluginOptions,
-} from './plugins/options.js';
+import { SerializablePluginOptionsSchema } from './plugins/options.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
-import {
-  ReplaceOptionsSchema,
-  type ReplaceOptions,
-  type ReplaceRule,
-} from './plugins/replace.js';
+import { ReplaceOptionsSchema, type ReplaceRule } from './plugins/replace.js';
 import { reviveParse as markdown } from './revive-parse.js';
 import { reviveRehype as html } from './revive-rehype.js';
 import { debug, inspect } from './utils.js';
@@ -45,62 +38,57 @@ export type {
 } from './revive-rehype.js';
 
 /**
+ * Schema for {@link StringifyMarkdownOptions}.
+ *
+ * Composes `SerializablePluginOptionsSchema` (each plugin owns its own
+ * schema fragment) with `ReplaceOptionsSchema` and the four vfm-level
+ * fields. New plugin options propagate through automatically.
+ */
+export const StringifyMarkdownOptionsSchema = v.intersect([
+  v.object({
+    style: v.optional(
+      v.pipe(
+        v.union([v.string(), v.array(v.string())]),
+        v.description('Custom stylesheet path/URL.'),
+      ),
+    ),
+    title: v.optional(
+      v.pipe(
+        v.string(),
+        v.description('Document title (ignored in partial mode).'),
+      ),
+    ),
+    language: v.optional(
+      v.pipe(
+        v.string(),
+        v.description('Document language (ignored in partial mode).'),
+      ),
+    ),
+    editPlugins: v.optional(
+      v.pipe(
+        v.function() as v.GenericSchema<EditPlugins>,
+        v.metadata({
+          typeString: '(plugins: BuiltinPlugins) => EditedPlugins',
+        }),
+        v.description(
+          'Edit the plugin lists assembled by VFM before they are used.',
+        ),
+      ),
+    ),
+  }),
+  SerializablePluginOptionsSchema,
+  ReplaceOptionsSchema,
+]);
+
+/**
  * Option for convert Markdown to a stringify (HTML).
  *
- * The type alias is intentionally written by hand here because the four
- * top-level fields (`style`, `title`, `language`, `editPlugins`) are stable
- * vfm-level concerns rather than plugin-extensible ones; the per-plugin
- * portion is kept in sync automatically because `SerializablePluginOptions`
- * is itself derived from the composed plugin schemas.
+ * Inferred from {@link StringifyMarkdownOptionsSchema}, so additions to
+ * any plugin schema flow through here without further editing.
  */
-export type StringifyMarkdownOptions = {
-  /** Custom stylesheet path/URL. */
-  style?: string | string[] | undefined;
-  /** Document title (ignored in partial mode). */
-  title?: string | undefined;
-  /** Document language (ignored in partial mode). */
-  language?: string | undefined;
-  /** Edit the plugin lists assembled by VFM before they are used. */
-  editPlugins?: EditPlugins | undefined;
-} & SerializablePluginOptions &
-  ReplaceOptions;
-
-export const StringifyMarkdownOptionsSchema: v.GenericSchema<StringifyMarkdownOptions> =
-  v.intersect([
-    v.object({
-      style: v.optional(
-        v.pipe(
-          v.union([v.string(), v.array(v.string())]),
-          v.description('Custom stylesheet path/URL.'),
-        ),
-      ),
-      title: v.optional(
-        v.pipe(
-          v.string(),
-          v.description('Document title (ignored in partial mode).'),
-        ),
-      ),
-      language: v.optional(
-        v.pipe(
-          v.string(),
-          v.description('Document language (ignored in partial mode).'),
-        ),
-      ),
-      editPlugins: v.optional(
-        v.pipe(
-          v.function() as v.GenericSchema<EditPlugins>,
-          v.metadata({
-            typeString: '(plugins: BuiltinPlugins) => EditedPlugins',
-          }),
-          v.description(
-            'Edit the plugin lists assembled by VFM before they are used.',
-          ),
-        ),
-      ),
-    }),
-    SerializablePluginOptionsSchema,
-    ReplaceOptionsSchema,
-  ]);
+export type StringifyMarkdownOptions = v.InferInput<
+  typeof StringifyMarkdownOptionsSchema
+>;
 
 export interface Hooks {
   afterParse: ReplaceRule[];
