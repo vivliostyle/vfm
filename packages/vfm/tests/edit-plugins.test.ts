@@ -83,7 +83,8 @@ describe('editPlugins', () => {
       VFM({
         ...replaceOptions,
         editPlugins: (plugins) => {
-          const [raw, footnote /* replace */, , ...rest] = plugins.hastPlugins;
+          const [raw, footnote, _replace, ...rest] = plugins.hastPlugins;
+          void _replace;
           return { ...plugins, hastPlugins: [raw, footnote, ...rest] };
         },
       }).processSync('foo\n'),
