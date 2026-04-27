@@ -1,26 +1,34 @@
-<<<<<<< HEAD
-import type { Element, Properties, Root } from 'hast';
-import { isElement as is } from 'hast-util-is-element';
-import { h } from 'hastscript';
-import type { Node, Parent } from 'unist';
-import { visit } from 'unist-util-visit';
+import type * as hast from 'hast';
+import type * as mdast from 'mdast';
+import { type H, all } from 'mdast-util-to-hast';
+import { u } from 'unist-builder';
 import * as v from 'valibot';
-
-const propertyToString = (
-  property: NonNullable<Element['properties']>[string],
-) => {
-  return typeof property === 'string' || typeof property === 'number'
-    ? String(property) // <tag prop="foo" /> || <tag prop=42 />
-    : Array.isArray(property)
-      ? property.map(String).join(' ') // <tag prop="foo 42 bar" />
-      : ''; // <tag /> || <tag prop />
-};
 
 export const ImgFigcaptionOrderSchema = v.picklist([
   'img-figcaption',
   'figcaption-img',
 ]);
 export type ImgFigcaptionOrder = v.InferInput<typeof ImgFigcaptionOrderSchema>;
+
+/**
+ * Rendering policy for an image-only paragraph whose `alt` is empty
+ * (e.g. `![](url)`). Controls the output structure independently of the
+ * captioned case, which always renders as `<figure><img><figcaption>...`.
+ *
+ * - `'paragraph'`: keep `<p><img></p>` (default; backward compatible).
+ * - `'figure'`: emit `<figure><img></figure>` with no figcaption slot.
+ * - `'figure-with-figcaption'`: emit `<figure><img><figcaption></figcaption></figure>`
+ *   so CSS counters and `imgFigcaptionOrder`/`assignIdToFigcaption` apply
+ *   uniformly across captioned and captionless cases.
+ */
+export const CaptionlessImagePolicySchema = v.picklist([
+  'paragraph',
+  'figure',
+  'figure-with-figcaption',
+]);
+export type CaptionlessImagePolicy = v.InferInput<
+  typeof CaptionlessImagePolicySchema
+>;
 
 export const FigureOptionsSchema = v.object({
   imgFigcaptionOrder: v.optional(
@@ -35,41 +43,17 @@ export const FigureOptionsSchema = v.object({
       v.description('Assign ID to figcaption instead of img/code.'),
     ),
   ),
+  captionlessImagePolicy: v.optional(
+    v.pipe(
+      CaptionlessImagePolicySchema,
+      v.description(
+        'How to render an image-only paragraph whose `alt` is empty.',
+      ),
+    ),
+  ),
 });
 
 export type FigureOptions = v.InferInput<typeof FigureOptionsSchema>;
-=======
-import type * as hast from 'hast';
-import type * as mdast from 'mdast';
-import { type H, all } from 'mdast-util-to-hast';
-import { u } from 'unist-builder';
-
-export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
-
-/**
- * Rendering policy for an image-only paragraph whose `alt` is empty
- * (e.g. `![](url)`). Controls the output structure independently of the
- * captioned case, which always renders as `<figure><img><figcaption>...`.
- *
- * - `'paragraph'`: keep `<p><img></p>` (default; backward compatible).
- * - `'figure'`: emit `<figure><img></figure>` with no figcaption slot.
- * - `'figure-with-figcaption'`: emit `<figure><img><figcaption></figcaption></figure>`
- *   so CSS counters and `imgFigcaptionOrder`/`assignIdToFigcaption` apply
- *   uniformly across captioned and captionless cases.
- */
-export type CaptionlessImagePolicy =
-  | 'paragraph'
-  | 'figure'
-  | 'figure-with-figcaption';
-
-export type FigureOptions = {
-  /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
-  /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean | undefined;
-  /** How to render an image-only paragraph whose `alt` is empty. */
-  captionlessImagePolicy?: CaptionlessImagePolicy | undefined;
-};
 
 const isImageNode = (
   maybeMdastNode: unknown,
@@ -77,7 +61,6 @@ const isImageNode = (
   if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
   return (maybeMdastNode as { type?: unknown }).type === 'image';
 };
->>>>>>> origin/main
 
 /**
  * Predicate: a paragraph is figure-shaped when it contains exactly one image

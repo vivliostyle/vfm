@@ -239,99 +239,12 @@ const readAttributesCollection = (
  * Read VFM settings from a frontmatter object. Returns defaults on a
  * schema mismatch so a malformed `vfm:` block does not abort processing.
  */
-<<<<<<< HEAD
 const readSettings = (data: unknown): VFMSettings => {
   const defaults: VFMSettings = {
     toc: false,
     assignIdToFigcaption: false,
+    captionlessImagePolicy: undefined,
     footnote: undefined,
-=======
-const readFootnoteOption = (raw: unknown): VFMSettings['footnote'] => {
-  if (raw === true || raw === 'gcpm') {
-    return 'gcpm';
-  }
-  if (raw === 'pandoc') {
-    return 'pandoc';
-  }
-  if (raw === 'dpub') {
-    return 'dpub';
-  }
-  if (typeof raw === 'object' && raw !== null) {
-    if ('mode' in raw) {
-      const obj = raw as Record<string, unknown>;
-      const mode = obj.mode;
-      if (mode === 'pandoc') {
-        return { mode: 'pandoc' };
-      }
-      if (mode === 'dpub') {
-        return {
-          mode: 'dpub',
-          call:
-            typeof obj.call === 'object' && obj.call !== null
-              ? (obj.call as Properties)
-              : undefined,
-          body:
-            typeof obj.body === 'object' && obj.body !== null
-              ? (obj.body as Properties)
-              : undefined,
-        };
-      }
-      if (mode === 'gcpm') {
-        return {
-          mode: 'gcpm',
-          body:
-            typeof obj.body === 'object' && obj.body !== null
-              ? (obj.body as Properties)
-              : undefined,
-          duplicatedCall:
-            typeof obj.duplicatedCall === 'object' &&
-            obj.duplicatedCall !== null
-              ? (obj.duplicatedCall as Properties)
-              : undefined,
-        };
-      }
-      return undefined;
-    }
-    return undefined;
-  }
-  return undefined;
-};
-
-/**
- * Read VFM settings from data object.
- * @param data Data object.
- * @returns Settings.
- */
-const readSettings = (data: any): VFMSettings => {
-  if (data === null || typeof data !== 'object') {
-    return { toc: false };
-  }
-
-  return {
-    math: typeof data.math === 'boolean' ? data.math : undefined,
-    partial: typeof data.partial === 'boolean' ? data.partial : undefined,
-    hardLineBreaks:
-      typeof data.hardLineBreaks === 'boolean'
-        ? data.hardLineBreaks
-        : undefined,
-    disableFormatHtml:
-      typeof data.disableFormatHtml === 'boolean'
-        ? data.disableFormatHtml
-        : undefined,
-    theme: typeof data.theme === 'string' ? data.theme : undefined,
-    toc: typeof data.toc === 'boolean' ? data.toc : false,
-    assignIdToFigcaption:
-      typeof data.assignIdToFigcaption === 'boolean'
-        ? data.assignIdToFigcaption
-        : false,
-    captionlessImagePolicy:
-      data.captionlessImagePolicy === 'paragraph' ||
-      data.captionlessImagePolicy === 'figure' ||
-      data.captionlessImagePolicy === 'figure-with-figcaption'
-        ? data.captionlessImagePolicy
-        : undefined,
-    footnote: readFootnoteOption(data.footnote),
->>>>>>> origin/main
   };
   if (data === null || typeof data !== 'object') {
     return defaults;
