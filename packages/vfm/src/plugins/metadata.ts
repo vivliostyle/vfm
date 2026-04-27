@@ -245,12 +245,10 @@ const readAttributesCollection = (
 /**
  * Read VFM settings from a frontmatter object.
  *
- * Validates the input against {@link VFMSettingsSchema} and routes the
- * legacy `footnote: true` form (introduced in PR #231 as an alias for
- * `'gcpm'`) through a small pre-normalization step. On a parse failure
- * the previous lenient behavior — returning a defaults-only object with
- * a debug log — is preserved so a malformed `vfm:` block degrades to "no
- * overrides applied" rather than aborting the build.
+ * Validates the input against {@link VFMSettingsSchema}. On a parse
+ * failure the previous lenient behavior — returning a defaults-only
+ * object with a debug log — is preserved so a malformed `vfm:` block
+ * degrades to "no overrides applied" rather than aborting the build.
  */
 const readSettings = (data: unknown): VFMSettings => {
   const defaults: VFMSettings = {
@@ -261,13 +259,7 @@ const readSettings = (data: unknown): VFMSettings => {
   if (data === null || typeof data !== 'object') {
     return defaults;
   }
-  const normalized: Record<string, unknown> = {
-    ...(data as Record<string, unknown>),
-  };
-  if (normalized.footnote === true) {
-    normalized.footnote = 'gcpm';
-  }
-  const result = v.safeParse(VFMSettingsSchema, normalized);
+  const result = v.safeParse(VFMSettingsSchema, data);
   if (!result.success) {
     debug('vfm: settings did not match VFMSettingsSchema: %o', result.issues);
     return defaults;
