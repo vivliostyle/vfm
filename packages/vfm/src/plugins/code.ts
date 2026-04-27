@@ -191,6 +191,7 @@ export const handler =
   ({ assignIdToFigcaption = false }: CodeOptions = {}): Handler =>
   (h, maybeMdastNode) => {
     if (!isCodeNode(maybeMdastNode)) return undefined;
+
     const node = maybeMdastNode;
     const value = node.value || '';
     const langMatch = node.lang?.match(/^[^ \t]+(?=[ \t]|$)/);
