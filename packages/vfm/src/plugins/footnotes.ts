@@ -32,6 +32,7 @@ import {
 import footnotes from 'remark-footnotes';
 import type * as unist from 'unist';
 import { u } from 'unist-builder';
+import * as v from 'valibot';
 import { mergePlugins, partial } from '../utils.js';
 
 type ElementWithProps = hast.Element & {
@@ -430,25 +431,81 @@ export type GcpmDuplicatedCallFactory = FootnoteFactory<
   }
 >;
 
-export type FootnoteOptions = {
-  footnote?:
-    | FootnoteMode
-    | { mode: 'pandoc' }
-    | {
-        mode: 'dpub';
-        call?: hast.Properties | DpubCallFactory | undefined;
-        body?: hast.Properties | DpubBodyFactory | undefined;
-      }
-    | {
-        mode: 'gcpm';
-        body?: hast.Properties | GcpmBodyFactory | undefined;
-        duplicatedCall?:
-          | hast.Properties
-          | GcpmDuplicatedCallFactory
-          | undefined;
-      }
-    | undefined;
-};
+export const FootnoteModeSchema = v.picklist(['pandoc', 'dpub', 'gcpm']);
+
+const HastPropertiesSchema = v.pipe(
+  v.custom<hast.Properties>(
+    (input) => typeof input === 'object' && input !== null,
+  ),
+  v.metadata({ typeString: 'import("hast").Properties' }),
+);
+
+const dpubCallSchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<DpubCallFactory>,
+    v.metadata({
+      typeString:
+        '(h: import("hastscript").Child extends never ? never : any, properties: { id: `fnref${number}`; href: `#fn${number}`; class: "footnote-ref"; role: "doc-noteref" }, children: DpubCallChildren) => import("hast").Element',
+    }),
+  ),
+]);
+
+const dpubBodySchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<DpubBodyFactory>,
+    v.metadata({
+      typeString:
+        '(h: any, properties: { id: `fn${number}`; class: "footnote"; role: "doc-footnote" }, children: DpubBodyChildren) => import("hast").Element',
+    }),
+  ),
+]);
+
+const gcpmBodySchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<GcpmBodyFactory>,
+    v.metadata({
+      typeString:
+        '(h: any, properties: { id: `fn-${string}`; role: "doc-footnote" }, children: import("hast").ElementContent[]) => import("hast").Element',
+    }),
+  ),
+]);
+
+const gcpmDuplicatedCallSchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<GcpmDuplicatedCallFactory>,
+    v.metadata({
+      typeString:
+        '(h: any, properties: { href: `#fn-${string}`; class: "footnote-duplicated-call"; role: "doc-noteref" }, children: import("hast").ElementContent[]) => import("hast").Element',
+    }),
+  ),
+]);
+
+export const FootnoteOptionsSchema = v.object({
+  footnote: v.optional(
+    v.union([
+      FootnoteModeSchema,
+      v.variant('mode', [
+        v.object({ mode: v.literal('pandoc') }),
+        v.object({
+          mode: v.literal('dpub'),
+          call: v.optional(dpubCallSchema),
+          body: v.optional(dpubBodySchema),
+        }),
+        v.object({
+          mode: v.literal('gcpm'),
+          body: v.optional(gcpmBodySchema),
+          duplicatedCall: v.optional(gcpmDuplicatedCallSchema),
+        }),
+      ]),
+    ]),
+  ),
+});
+
+export type FootnoteOptions = v.InferInput<typeof FootnoteOptionsSchema>;
 
 type BuildFootnote = (
   id: `fn-${string}`,
