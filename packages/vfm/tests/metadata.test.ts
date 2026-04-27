@@ -133,6 +133,28 @@ other-meta2: 'other2'
   expect(received).toStrictEqual(expected);
 });
 
+test.each(['paragraph', 'figure', 'figure-with-figcaption'] as const)(
+  'captionlessImagePolicy: accepts %s',
+  (value) => {
+    const received = readMetadata(
+      `---\nvfm:\n  captionlessImagePolicy: ${value}\n---\n`,
+    );
+    expect(received.vfm?.captionlessImagePolicy).toBe(value);
+  },
+);
+
+test.each([
+  ['unknown string', 'inline'],
+  ['boolean', true],
+  ['number', 1],
+  ['null', null],
+])('captionlessImagePolicy: %s falls back to undefined', (_label, value) => {
+  const received = readMetadata(
+    `---\nvfm:\n  captionlessImagePolicy: ${JSON.stringify(value)}\n---\n`,
+  );
+  expect(received.vfm?.captionlessImagePolicy).toBeUndefined();
+});
+
 test('Title from heading', () => {
   const received = readMetadata(
     `# Heading Title with {Ruby|ルビ} and <mark>HTML tag</mark>`,
