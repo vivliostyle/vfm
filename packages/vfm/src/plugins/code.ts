@@ -6,11 +6,18 @@ import refractor from 'refractor';
 import type * as unist from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
+import * as v from 'valibot';
 
-export type CodeOptions = {
-  /** Assign ID to figcaption instead of the `<code>` element. */
-  assignIdToFigcaption?: boolean | undefined;
-};
+export const CodeOptionsSchema = v.object({
+  assignIdToFigcaption: v.optional(
+    v.pipe(
+      v.boolean(),
+      v.description('Assign ID to figcaption instead of the `<code>` element.'),
+    ),
+  ),
+});
+
+export type CodeOptions = v.InferInput<typeof CodeOptionsSchema>;
 
 const isCodeNode = (
   maybeMdastNode: unknown,

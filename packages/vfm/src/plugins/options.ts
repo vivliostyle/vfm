@@ -1,5 +1,5 @@
 import * as v from 'valibot';
-import type { CodeOptions } from './code.js';
+import { CodeOptionsSchema } from './code.js';
 import { DocumentSerializableOptionsSchema } from './document.js';
 import { FigureOptionsSchema } from './figure.js';
 import { FootnoteOptionsSchema } from './footnotes.js';
@@ -26,10 +26,10 @@ export const SerializablePluginOptionsSchema = v.intersect([
   DocumentSerializableOptionsSchema,
   FormatOptionsSchema,
   FigureOptionsSchema,
+  CodeOptionsSchema,
   FootnoteOptionsSchema,
 ]);
 
 export type SerializablePluginOptions = v.InferInput<
   typeof SerializablePluginOptionsSchema
-> &
-  CodeOptions;
+>;
