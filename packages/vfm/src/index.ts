@@ -13,6 +13,51 @@ import { debug, inspect } from './utils.js';
 // Expose metadata reading by VFM
 export * from './plugins/metadata.js';
 
+// Re-export per-plugin schemas + their derived types so downstream consumers
+// (e.g. vivliostyle-cli's config schema) can compose VFM options through the
+// same source-of-truth schemas this package validates against internally.
+export {
+  LineBreaksOptionsSchema,
+  type LineBreaksOptions,
+} from './plugins/line-breaks.js';
+export { MathOptionsSchema, type MathOptions } from './plugins/math.js';
+export { FormatOptionsSchema, type FormatOptions } from './plugins/format.js';
+export { CodeOptionsSchema, type CodeOptions } from './plugins/code.js';
+export {
+  ImgFigcaptionOrderSchema,
+  CaptionlessImagePolicySchema,
+  FigureOptionsSchema,
+  type ImgFigcaptionOrder,
+  type CaptionlessImagePolicy,
+  type FigureOptions,
+} from './plugins/figure.js';
+export {
+  DocumentSerializableOptionsSchema,
+  type DocumentOptions,
+} from './plugins/document.js';
+export {
+  FootnoteModeSchema,
+  FootnoteOptionsSchema,
+  YamlFootnoteOptionsSchema,
+  type FootnoteMode,
+  type FootnoteOptions,
+  type YamlFootnoteOptions,
+  type DpubCallFactory,
+  type DpubBodyFactory,
+  type GcpmBodyFactory,
+  type GcpmDuplicatedCallFactory,
+} from './plugins/footnotes.js';
+export {
+  ReplaceRuleSchema,
+  ReplaceOptionsSchema,
+  type ReplaceRule,
+  type ReplaceOptions,
+} from './plugins/replace.js';
+export {
+  SerializablePluginOptionsSchema,
+  type SerializablePluginOptions,
+} from './plugins/options.js';
+
 // Re-export plugin brand types for downstream consumers that wish to refer to
 // individual pipeline slots by their nominal identity.
 export type {
