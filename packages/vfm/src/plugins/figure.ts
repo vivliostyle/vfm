@@ -4,9 +4,12 @@ import { type H, all } from 'mdast-util-to-hast';
 import { u } from 'unist-builder';
 import * as v from 'valibot';
 
-export const ImgFigcaptionOrderSchema = v.picklist([
-  'img-figcaption',
-  'figcaption-img',
+// Expressed as `v.union` of `v.literal` so consumers' schema walkers
+// (e.g. vivliostyle-cli's update-docs) can render the type via the
+// existing union+literal branch without needing picklist support.
+export const ImgFigcaptionOrderSchema = v.union([
+  v.literal('img-figcaption'),
+  v.literal('figcaption-img'),
 ]);
 export type ImgFigcaptionOrder = v.InferInput<typeof ImgFigcaptionOrderSchema>;
 
@@ -21,10 +24,10 @@ export type ImgFigcaptionOrder = v.InferInput<typeof ImgFigcaptionOrderSchema>;
  *   so CSS counters and `imgFigcaptionOrder`/`assignIdToFigcaption` apply
  *   uniformly across captioned and captionless cases.
  */
-export const CaptionlessImagePolicySchema = v.picklist([
-  'paragraph',
-  'figure',
-  'figure-with-figcaption',
+export const CaptionlessImagePolicySchema = v.union([
+  v.literal('paragraph'),
+  v.literal('figure'),
+  v.literal('figure-with-figcaption'),
 ]);
 export type CaptionlessImagePolicy = v.InferInput<
   typeof CaptionlessImagePolicySchema

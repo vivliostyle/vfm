@@ -431,7 +431,11 @@ export type GcpmDuplicatedCallFactory = FootnoteFactory<
   }
 >;
 
-export const FootnoteModeSchema = v.picklist(['pandoc', 'dpub', 'gcpm']);
+export const FootnoteModeSchema = v.union([
+  v.literal('pandoc'),
+  v.literal('dpub'),
+  v.literal('gcpm'),
+]);
 
 const HastPropertiesSchema = v.pipe(
   v.custom<hast.Properties>(
