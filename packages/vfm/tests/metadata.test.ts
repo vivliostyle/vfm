@@ -581,3 +581,30 @@ test('Exclude attribute syntax in title heading', () => {
   };
   expect(received).toStrictEqual(expected);
 });
+
+test('vfm: per-entry fallback keeps unrelated valid options when one is invalid', () => {
+  // `math: "yes"` is invalid (string instead of boolean). The other three
+  // fields are well-formed. Expectation: the invalid field falls back to
+  // its default (absent here, since `math` has no defaults entry), while
+  // the valid fields still apply. Whole-object reject would discard
+  // `partial`, `hardLineBreaks`, and `theme` together with `math`, which
+  // is a regression vs. the pre-schema hand-rolled `readSettings`.
+  const received = readMetadata(`---
+vfm:
+  math: "yes"
+  partial: true
+  hardLineBreaks: true
+  theme: "theme.css"
+---
+`);
+  const expected: Metadata['vfm'] = {
+    toc: false,
+    assignIdToFigcaption: false,
+    captionlessImagePolicy: undefined,
+    footnote: undefined,
+    partial: true,
+    hardLineBreaks: true,
+    theme: 'theme.css',
+  };
+  expect(received.vfm).toStrictEqual(expected);
+});

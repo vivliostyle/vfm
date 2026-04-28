@@ -1,4 +1,4 @@
-import type { Element, Properties } from 'hast';
+import type { Element } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
 import type { Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
@@ -12,10 +12,15 @@ import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
 import type { VFile } from 'vfile';
-import type { StripFunctions } from '../utils.js';
-import type { SerializablePluginOptions } from './options.js';
+import * as v from 'valibot';
+import { debug } from '../utils.js';
 import { mdast as attr } from './attr.js';
-import { mdast as footnotes } from './footnotes.js';
+import { DocumentSerializableOptionsSchema } from './document.js';
+import { FigureOptionsSchema } from './figure.js';
+import { mdast as footnotes, YamlFootnoteOptionsSchema } from './footnotes.js';
+import { FormatOptionsSchema } from './format.js';
+import { LineBreaksOptionsSchema } from './line-breaks.js';
+import { MathOptionsSchema } from './math.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -25,13 +30,22 @@ export type Attribute = {
   value: string;
 };
 
+/** Schema for the `vfm:` field of YAML frontmatter. */
+export const VFMSettingsSchema = v.intersect([
+  LineBreaksOptionsSchema,
+  MathOptionsSchema,
+  DocumentSerializableOptionsSchema,
+  FormatOptionsSchema,
+  FigureOptionsSchema,
+  YamlFootnoteOptionsSchema,
+  v.object({
+    theme: v.optional(v.pipe(v.string(), v.description('Path of theme.'))),
+    toc: v.optional(v.pipe(v.boolean(), v.description('Enable TOC mode.'))),
+  }),
+]);
+
 /** Settings of VFM. */
-export type VFMSettings = {
-  /** Path of theme. */
-  theme?: string | undefined;
-  /** Enable TOC mode. */
-  toc?: boolean | undefined;
-} & StripFunctions<SerializablePluginOptions>;
+export type VFMSettings = v.InferInput<typeof VFMSettingsSchema>;
 
 /** Metadata from Frontmatter. */
 export type Metadata = {
@@ -222,96 +236,70 @@ const readAttributesCollection = (
 };
 
 /**
- * Parse the `footnote` value from frontmatter YAML.
- * @param raw Raw YAML value.
- * @returns Normalized footnote option, or `undefined`.
+ * Walk an `intersect`-of-`object` schema and collect every field's schema
+ * into a single map. Used by {@link readSettings} to validate the `vfm:`
+ * block one entry at a time so a single invalid value does not discard
+ * unrelated valid options.
+ *
+ * @remarks
+ * Reads `schema.type`, `schema.entries`, and `schema.options` directly,
+ * which are valibot internals rather than a documented public API. The
+ * shapes have been stable across valibot 1.x; if a future major changes
+ * them, this function fails closed (returns `{}`) and `readSettings`
+ * silently accepts everything as `undefined`. The `valibot` dependency
+ * should stay pinned to `^1.x` for this reason. An alternative is to
+ * build the per-field map explicitly from the same plugin schema imports
+ * that compose `VFMSettingsSchema`, at the cost of duplicated maintenance.
  */
-const readFootnoteOption = (raw: unknown): VFMSettings['footnote'] => {
-  if (raw === true || raw === 'gcpm') {
-    return 'gcpm';
+const collectObjectEntries = (
+  schema: v.GenericSchema<unknown>,
+): Record<string, v.GenericSchema<unknown>> => {
+  const s = schema as { type: string; entries?: unknown; options?: unknown[] };
+  if (s.type === 'object' && s.entries) {
+    return s.entries as Record<string, v.GenericSchema<unknown>>;
   }
-  if (raw === 'pandoc') {
-    return 'pandoc';
+  if (s.type === 'intersect' && Array.isArray(s.options)) {
+    return Object.assign(
+      {},
+      ...s.options.map((inner) =>
+        collectObjectEntries(inner as v.GenericSchema<unknown>),
+      ),
+    );
   }
-  if (raw === 'dpub') {
-    return 'dpub';
-  }
-  if (typeof raw === 'object' && raw !== null) {
-    if ('mode' in raw) {
-      const obj = raw as Record<string, unknown>;
-      const mode = obj.mode;
-      if (mode === 'pandoc') {
-        return { mode: 'pandoc' };
-      }
-      if (mode === 'dpub') {
-        return {
-          mode: 'dpub',
-          call:
-            typeof obj.call === 'object' && obj.call !== null
-              ? (obj.call as Properties)
-              : undefined,
-          body:
-            typeof obj.body === 'object' && obj.body !== null
-              ? (obj.body as Properties)
-              : undefined,
-        };
-      }
-      if (mode === 'gcpm') {
-        return {
-          mode: 'gcpm',
-          body:
-            typeof obj.body === 'object' && obj.body !== null
-              ? (obj.body as Properties)
-              : undefined,
-          duplicatedCall:
-            typeof obj.duplicatedCall === 'object' &&
-            obj.duplicatedCall !== null
-              ? (obj.duplicatedCall as Properties)
-              : undefined,
-        };
-      }
-      return undefined;
-    }
-    return undefined;
-  }
-  return undefined;
+  return {};
 };
 
-/**
- * Read VFM settings from data object.
- * @param data Data object.
- * @returns Settings.
- */
-const readSettings = (data: any): VFMSettings => {
-  if (data === null || typeof data !== 'object') {
-    return { toc: false };
-  }
+const vfmSettingsEntries = collectObjectEntries(
+  VFMSettingsSchema as v.GenericSchema<unknown>,
+);
 
-  return {
-    math: typeof data.math === 'boolean' ? data.math : undefined,
-    partial: typeof data.partial === 'boolean' ? data.partial : undefined,
-    hardLineBreaks:
-      typeof data.hardLineBreaks === 'boolean'
-        ? data.hardLineBreaks
-        : undefined,
-    disableFormatHtml:
-      typeof data.disableFormatHtml === 'boolean'
-        ? data.disableFormatHtml
-        : undefined,
-    theme: typeof data.theme === 'string' ? data.theme : undefined,
-    toc: typeof data.toc === 'boolean' ? data.toc : false,
-    assignIdToFigcaption:
-      typeof data.assignIdToFigcaption === 'boolean'
-        ? data.assignIdToFigcaption
-        : false,
-    captionlessImagePolicy:
-      data.captionlessImagePolicy === 'paragraph' ||
-      data.captionlessImagePolicy === 'figure' ||
-      data.captionlessImagePolicy === 'figure-with-figcaption'
-        ? data.captionlessImagePolicy
-        : undefined,
-    footnote: readFootnoteOption(data.footnote),
+/**
+ * Read VFM settings from a frontmatter object. Validates per entry: an
+ * invalid field is dropped (its default applies) without discarding the
+ * other valid fields.
+ */
+const readSettings = (data: unknown): VFMSettings => {
+  const defaults: VFMSettings = {
+    toc: false,
+    assignIdToFigcaption: false,
+    captionlessImagePolicy: undefined,
+    footnote: undefined,
   };
+  if (data === null || typeof data !== 'object') {
+    return defaults;
+  }
+  const obj = data as Record<string, unknown>;
+  const merged: Record<string, unknown> = { ...defaults };
+  for (const [key, fieldSchema] of Object.entries(vfmSettingsEntries)) {
+    if (!(key in obj)) continue;
+    const r = v.safeParse(fieldSchema, obj[key]);
+    if (r.success) {
+      merged[key] = r.output;
+    } else {
+      debug('vfm.%s: invalid value, ignoring: %o', key, r.issues);
+    }
+  }
+  return merged as VFMSettings;
 };
 
 /**

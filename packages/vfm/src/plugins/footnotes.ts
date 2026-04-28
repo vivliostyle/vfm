@@ -32,6 +32,7 @@ import {
 import footnotes from 'remark-footnotes';
 import type * as unist from 'unist';
 import { u } from 'unist-builder';
+import * as v from 'valibot';
 import { mergePlugins, partial } from '../utils.js';
 
 type ElementWithProps = hast.Element & {
@@ -430,25 +431,104 @@ export type GcpmDuplicatedCallFactory = FootnoteFactory<
   }
 >;
 
-export type FootnoteOptions = {
-  footnote?:
-    | FootnoteMode
-    | { mode: 'pandoc' }
-    | {
-        mode: 'dpub';
-        call?: hast.Properties | DpubCallFactory | undefined;
-        body?: hast.Properties | DpubBodyFactory | undefined;
-      }
-    | {
-        mode: 'gcpm';
-        body?: hast.Properties | GcpmBodyFactory | undefined;
-        duplicatedCall?:
-          | hast.Properties
-          | GcpmDuplicatedCallFactory
-          | undefined;
-      }
-    | undefined;
-};
+export const FootnoteModeSchema = v.union([
+  v.literal('pandoc'),
+  v.literal('dpub'),
+  v.literal('gcpm'),
+]);
+
+const HastPropertiesSchema = v.pipe(
+  v.custom<hast.Properties>(
+    (input) =>
+      typeof input === 'object' && input !== null && !Array.isArray(input),
+  ),
+  v.metadata({ typeString: 'import("hast").Properties' }),
+);
+
+const dpubCallSchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<DpubCallFactory>,
+    v.metadata({ typeString: 'DpubCallFactory' }),
+  ),
+]);
+
+const dpubBodySchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<DpubBodyFactory>,
+    v.metadata({ typeString: 'DpubBodyFactory' }),
+  ),
+]);
+
+const gcpmBodySchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<GcpmBodyFactory>,
+    v.metadata({ typeString: 'GcpmBodyFactory' }),
+  ),
+]);
+
+const gcpmDuplicatedCallSchema = v.union([
+  HastPropertiesSchema,
+  v.pipe(
+    v.function() as v.GenericSchema<GcpmDuplicatedCallFactory>,
+    v.metadata({ typeString: 'GcpmDuplicatedCallFactory' }),
+  ),
+]);
+
+export const FootnoteOptionsSchema = v.object({
+  footnote: v.optional(
+    v.union([
+      FootnoteModeSchema,
+      v.variant('mode', [
+        v.object({ mode: v.literal('pandoc') }),
+        v.object({
+          mode: v.literal('dpub'),
+          call: v.optional(dpubCallSchema),
+          body: v.optional(dpubBodySchema),
+        }),
+        v.object({
+          mode: v.literal('gcpm'),
+          body: v.optional(gcpmBodySchema),
+          duplicatedCall: v.optional(gcpmDuplicatedCallSchema),
+        }),
+      ]),
+    ]),
+  ),
+});
+
+export type FootnoteOptions = v.InferInput<typeof FootnoteOptionsSchema>;
+
+/**
+ * YAML-safe variant of {@link FootnoteOptionsSchema}: `call`, `body`, and
+ * `duplicatedCall` accept `hast.Properties` only, since YAML cannot
+ * represent JavaScript functions.
+ */
+export const YamlFootnoteOptionsSchema = v.object({
+  footnote: v.optional(
+    v.union([
+      FootnoteModeSchema,
+      v.variant('mode', [
+        v.object({ mode: v.literal('pandoc') }),
+        v.object({
+          mode: v.literal('dpub'),
+          call: v.optional(HastPropertiesSchema),
+          body: v.optional(HastPropertiesSchema),
+        }),
+        v.object({
+          mode: v.literal('gcpm'),
+          body: v.optional(HastPropertiesSchema),
+          duplicatedCall: v.optional(HastPropertiesSchema),
+        }),
+      ]),
+    ]),
+  ),
+});
+
+export type YamlFootnoteOptions = v.InferInput<
+  typeof YamlFootnoteOptionsSchema
+>;
 
 type BuildFootnote = (
   id: `fn-${string}`,

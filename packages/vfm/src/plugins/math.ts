@@ -7,6 +7,7 @@ import type unified from 'unified';
 import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
+import * as v from 'valibot';
 
 export interface InlineMath extends Node {
   type: 'inlineMath';
@@ -45,10 +46,11 @@ const TYPE_DISPLAY = 'displayMath';
 const MATH_URL =
   'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML';
 
-export type MathOptions = {
-  /** Enable math syntax. */
-  math?: boolean | undefined;
-};
+export const MathOptionsSchema = v.object({
+  math: v.optional(v.pipe(v.boolean(), v.description('Enable math syntax.'))),
+});
+
+export type MathOptions = v.InferInput<typeof MathOptionsSchema>;
 
 /**
  * Create tokenizers for remark-parse.

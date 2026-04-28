@@ -2,8 +2,16 @@ import type * as hast from 'hast';
 import type * as mdast from 'mdast';
 import { type H, all } from 'mdast-util-to-hast';
 import { u } from 'unist-builder';
+import * as v from 'valibot';
 
-export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
+// Expressed as `v.union` of `v.literal` so consumers' schema walkers
+// (e.g. vivliostyle-cli's update-docs) can render the type via the
+// existing union+literal branch without needing picklist support.
+export const ImgFigcaptionOrderSchema = v.union([
+  v.literal('img-figcaption'),
+  v.literal('figcaption-img'),
+]);
+export type ImgFigcaptionOrder = v.InferInput<typeof ImgFigcaptionOrderSchema>;
 
 /**
  * Rendering policy for an image-only paragraph whose `alt` is empty
@@ -16,19 +24,39 @@ export type ImgFigcaptionOrder = 'img-figcaption' | 'figcaption-img';
  *   so CSS counters and `imgFigcaptionOrder`/`assignIdToFigcaption` apply
  *   uniformly across captioned and captionless cases.
  */
-export type CaptionlessImagePolicy =
-  | 'paragraph'
-  | 'figure'
-  | 'figure-with-figcaption';
+export const CaptionlessImagePolicySchema = v.union([
+  v.literal('paragraph'),
+  v.literal('figure'),
+  v.literal('figure-with-figcaption'),
+]);
+export type CaptionlessImagePolicy = v.InferInput<
+  typeof CaptionlessImagePolicySchema
+>;
 
-export type FigureOptions = {
-  /** Order of img and figcaption elements in figure. */
-  imgFigcaptionOrder?: ImgFigcaptionOrder | undefined;
-  /** Assign ID to figcaption instead of img/code. */
-  assignIdToFigcaption?: boolean | undefined;
-  /** How to render an image-only paragraph whose `alt` is empty. */
-  captionlessImagePolicy?: CaptionlessImagePolicy | undefined;
-};
+export const FigureOptionsSchema = v.object({
+  imgFigcaptionOrder: v.optional(
+    v.pipe(
+      ImgFigcaptionOrderSchema,
+      v.description('Order of img and figcaption elements in figure.'),
+    ),
+  ),
+  assignIdToFigcaption: v.optional(
+    v.pipe(
+      v.boolean(),
+      v.description('Assign ID to figcaption instead of img/code.'),
+    ),
+  ),
+  captionlessImagePolicy: v.optional(
+    v.pipe(
+      CaptionlessImagePolicySchema,
+      v.description(
+        'How to render an image-only paragraph whose `alt` is empty.',
+      ),
+    ),
+  ),
+});
+
+export type FigureOptions = v.InferInput<typeof FigureOptionsSchema>;
 
 const isImageNode = (
   maybeMdastNode: unknown,

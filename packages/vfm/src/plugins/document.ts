@@ -3,6 +3,7 @@ import { h, type Child } from 'hastscript';
 import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import type { VFile } from 'vfile';
+import * as v from 'valibot';
 import type { Attribute, Metadata } from './metadata.js';
 
 /**
@@ -156,11 +157,19 @@ const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
   ]);
 };
 
+/**
+ * User-input subset of {@link DocumentOptions}. `metadata` is supplied
+ * internally by VFM, so it is not part of the schema.
+ */
+export const DocumentSerializableOptionsSchema = v.object({
+  partial: v.optional(
+    v.pipe(v.boolean(), v.description('Output markdown fragments.')),
+  ),
+});
+
 export type DocumentOptions = {
   metadata: Metadata;
-  /** Output markdown fragments. */
-  partial?: boolean | undefined;
-};
+} & v.InferInput<typeof DocumentSerializableOptionsSchema>;
 
 /**
  * Process Markdown AST.
