@@ -81,8 +81,12 @@ export type {
   RehypeFormatPlugin,
 } from './revive-rehype.js';
 
-/** Schema for {@link StringifyMarkdownOptions}. */
-export const StringifyMarkdownOptionsSchema = v.intersect([
+// The raw intersect schema. Kept internal so its inferred TS type does not
+// leak `.pnpm/...` paths through pnpm-isolated downstream installs. The
+// public `StringifyMarkdownOptionsSchema` below is annotated with the
+// nominal `StringifyMarkdownOptions` interface to keep TS d.ts emit
+// portable (TS2742).
+const _stringifyMarkdownOptionsSchema = v.intersect([
   v.object({
     style: v.optional(
       v.pipe(
@@ -118,10 +122,25 @@ export const StringifyMarkdownOptionsSchema = v.intersect([
   ReplaceOptionsSchema,
 ]);
 
-/** Option for convert Markdown to a stringify (HTML). */
-export type StringifyMarkdownOptions = v.InferInput<
-  typeof StringifyMarkdownOptionsSchema
->;
+/**
+ * Option for convert Markdown to a stringify (HTML).
+ *
+ * Declared as `interface` so that downstream consumers (e.g.
+ * vivliostyle-cli) see a stable nominal name instead of
+ * `v.InferInput<typeof StringifyMarkdownOptionsSchema>`. The latter form
+ * causes TypeScript to expand the schema's structural shape during
+ * declaration emit and pulls non-portable `.pnpm/...` paths through pnpm
+ * isolated installs (TS2742). The compile-time check below pins this
+ * interface to the schema, so a drift in either direction is rejected.
+ */
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type -- the empty body is intentional; see the JSDoc above for rationale.
+export interface StringifyMarkdownOptions extends v.InferInput<
+  typeof _stringifyMarkdownOptionsSchema
+> {}
+
+/** Schema for {@link StringifyMarkdownOptions}. */
+export const StringifyMarkdownOptionsSchema: v.GenericSchema<StringifyMarkdownOptions> =
+  _stringifyMarkdownOptionsSchema;
 
 export interface Hooks {
   afterParse: ReplaceRule[];
