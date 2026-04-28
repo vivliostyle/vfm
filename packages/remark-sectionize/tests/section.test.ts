@@ -1,11 +1,11 @@
 import { test, expect } from 'vitest';
-import { stringify } from '../src/index.js';
+import { stringify } from './utils.js';
 
 // This test always fails, `remark-attr` does not handle empty headings.
 /*
 test('plain section', () => {
   const md = '# {.ok}';
-  const received = stringify(md, { partial: true, disableFormatHtml: true });
+  const received = stringify(md, false);
   const expected = '<section class="level1 ok"></section>';
   expect(received).toBe(expected);
 });
@@ -13,7 +13,7 @@ test('plain section', () => {
 
 test('Leveling and copy attributes, however the `id` will be moved', () => {
   const md = '# こんにちは {#id1 .class1 key1=value1}';
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level1">
   <h1 id="id1" class="class1" key1="value1">こんにちは</h1>
@@ -24,7 +24,7 @@ test('Leveling and copy attributes, however the `id` will be moved', () => {
 
 test('Heading with hidden attribute', () => {
   const md = '# Heading {hidden}';
-  const received = stringify(md, { partial: true, disableFormatHtml: true });
+  const received = stringify(md, false);
   const expected =
     '<section class="level1"><h1 hidden id="heading">Heading</h1></section>';
   expect(received).toBe(expected);
@@ -32,7 +32,7 @@ test('Heading with hidden attribute', () => {
 
 test('Disable section with blockquote heading', () => {
   const md = '> # Not Sectionize';
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <blockquote>
   <h1 id="not-sectionize">Not Sectionize</h1>
@@ -43,7 +43,7 @@ test('Disable section with blockquote heading', () => {
 
 test('Disable section with closing hashes', () => {
   const md = '### Not Sectionize ###';
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <h3 id="not-sectionize">Not Sectionize</h3>
 `;
@@ -52,7 +52,7 @@ test('Disable section with closing hashes', () => {
 
 test('Do not disable section with insufficient closing hashes', () => {
   const md = '### Sectionize ##';
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level3">
   <h3 id="sectionize">Sectionize</h3>
@@ -63,7 +63,7 @@ test('Do not disable section with insufficient closing hashes', () => {
 
 test('<h7> is not heading', () => {
   const md = '####### こんにちは {.test}';
-  const received = stringify(md, { partial: true, disableFormatHtml: true });
+  const received = stringify(md, false);
   const expected = '<p>####### こんにちは {.test}</p>';
   expect(received).toBe(expected);
 });
@@ -75,7 +75,7 @@ test('<h1>, ... <h6>', () => {
 #### Heading 4
 ##### Heading 5
 ###### Heading 6`;
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level1">
   <h1 id="heading-1">Heading 1</h1>
@@ -107,7 +107,7 @@ test('<h1>, ... <h6> with attribute', () => {
 #### Heading 4 {.depth4}
 ##### Heading 5 {.depth5}
 ###### Heading 6 {.depth6}`;
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level1">
   <h1 class="depth1" id="heading-1">Heading 1</h1>
@@ -135,7 +135,7 @@ test('Complex structure', () => {
   const md = `# Heading 1
 ## Heading 2 {.foo}
 # Heading 1`;
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level1">
   <h1 id="heading-1">Heading 1</h1>
@@ -154,15 +154,15 @@ test('Sample', () => {
   const md = `# Plain
 
   # Introduction {#intro}
-  
+
   # Welcome {.title}
-  
+
   # Level 1
-  
+
   ## Level 2
-  
+
   > # Not Sectionize`;
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level1">
   <h1 id="plain">Plain</h1>
@@ -200,7 +200,7 @@ This is a note.
 </aside>
 
 ## Heading 2-2`;
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level1">
   <h1 id="heading-1">Heading 1</h1>
@@ -257,7 +257,7 @@ Depth 3 again
 ##
 
 Depth 1 again`;
-  const received = stringify(md, { partial: true });
+  const received = stringify(md);
   const expected = `
 <section class="level1">
   <h1 id="heading-1">Heading 1</h1>

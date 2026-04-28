@@ -6,6 +6,7 @@
  * @see https://github.com/jake-low/remark-sectionize
  */
 
+import type * as hast from 'hast';
 import type { BlockContent, Content, HTML, Heading, Parent } from 'mdast';
 import type { Node } from 'unist';
 import type { VFile } from 'vfile';
@@ -21,6 +22,13 @@ export interface Section extends Parent {
 declare module 'mdast' {
   interface BlockContentMap {
     section: Section;
+  }
+}
+
+declare module 'unist' {
+  interface Data {
+    hName?: string | undefined;
+    hProperties?: hast.Properties | undefined;
   }
 }
 
