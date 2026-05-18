@@ -91,8 +91,8 @@ const rewriteTree = (tree: unist.Node, extensions: readonly string[]): void => {
  * to own the target.
  *
  * - Element axis: only `<a>` and `<area>` are touched. Per HTML
- *   Standard §4.6 (Review Draft published 20 January 2026,
- *   {@link https://html.spec.whatwg.org/review-drafts/2026-01/#links-created-by-a-and-area-elements}),
+ *   Standard §4.6 (commit snapshot
+ *   {@link https://html.spec.whatwg.org/commit-snapshots/6f84b26bd6eb8bd0e0e8df9819e43e901867166b/#links-created-by-a-and-area-elements}),
  *   these are the elements that unconditionally create hyperlinks
  *   when they bear an `href`. The other `href`-bearing elements
  *   (`<base>`, `<link>`) carry document metadata rather than an

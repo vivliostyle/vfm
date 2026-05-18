@@ -388,9 +388,8 @@ describe('rewriteLocalHrefExtensions: href rewriting spec', () => {
 
 // Element-scope specification. The rewrite is restricted to `<a>` and
 // `<area>`, the elements that unconditionally create hyperlinks when
-// they bear an `href` per HTML Standard §4.6 (Review Draft published
-// 20 January 2026,
-// https://html.spec.whatwg.org/review-drafts/2026-01/#links-created-by-a-and-area-elements).
+// they bear an `href` per HTML Standard §4.6 (commit snapshot
+// https://html.spec.whatwg.org/commit-snapshots/6f84b26bd6eb8bd0e0e8df9819e43e901867166b/#links-created-by-a-and-area-elements).
 // `<base>` (URL resolution) and `<link>` (external resource / metadata)
 // also carry `href` but are not author-specified navigation targets,
 // so the rewrite must leave them alone.
