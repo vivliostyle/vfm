@@ -207,16 +207,20 @@ describe('rewriteLocalHrefExtensions: href rewriting spec', () => {
   });
 
   // Absolute paths inherently couple the document to a machine-local
-  // file system and cannot be expected to work under Vivliostyle CLI.
-  // POSIX-style absolute paths (`/abs/...`) happen to be rewritten
-  // because excluding them would require an extra branch; Windows-style
-  // absolute paths (`C:/...` or `C:\...`, regardless of separator) are
-  // not supported because adding the branch needed to detect them is
-  // not justified for a non-portable form. The cases below pin both
-  // ends of this deliberate asymmetry.
+  // file system and cannot be expected to work under Vivliostyle CLI:
+  // the dev server serves files under a configurable base path
+  // (default `/vivliostyle`) and does not rewrite hrefs to prepend it,
+  // so an `href="/abs/file.html"` in served HTML resolves against the
+  // server origin and 404s. Both POSIX-style (`/abs/...`) and
+  // Windows-style (`C:/...`, `C:\...`) absolute paths are therefore
+  // left untouched. POSIX-style paths would naturally pass the
+  // local-reference check and are excluded by an explicit guard in
+  // the implementation; Windows-style paths fall out of scope on
+  // their own because `uri-js` parses the leading drive letter as a
+  // URI scheme.
   describe('absolute paths (machine-local; non-portable)', () => {
-    test('POSIX abs path is rewritten', () => {
-      expect(hrefOf(runRewrite('/abs/file.md'))).toBe('/abs/file.html');
+    test('POSIX abs path is NOT rewritten (excluded by design)', () => {
+      expect(hrefOf(runRewrite('/abs/file.md'))).toBe('/abs/file.md');
     });
 
     test('Windows abs path with forward slashes is NOT rewritten (failure by design)', () => {

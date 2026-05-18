@@ -53,6 +53,9 @@ const rewriteHref = (
   if (r.scheme !== undefined || r.host !== undefined) return undefined;
   const path = r.path;
   if (!path) return undefined;
+  // POSIX-like absolute paths would otherwise be rewritten here; exclude
+  // them deliberately. See the matching test block for the rationale.
+  if (path.startsWith('/')) return undefined;
   const lastDot = path.lastIndexOf('.');
   if (lastDot < 0) return undefined;
   const pathExt = path.slice(lastDot + 1);
