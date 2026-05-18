@@ -385,3 +385,93 @@ describe('rewriteLocalHrefExtensions: href rewriting spec', () => {
     });
   });
 });
+
+// Element-scope specification. The rewrite is restricted to `<a>` and
+// `<area>`, the elements that unconditionally create hyperlinks when
+// they bear an `href` per HTML Standard §4.6 (Review Draft published
+// 20 January 2026,
+// https://html.spec.whatwg.org/review-drafts/2026-01/#links-created-by-a-and-area-elements).
+// `<base>` (URL resolution) and `<link>` (external resource / metadata)
+// also carry `href` but are not author-specified navigation targets,
+// so the rewrite must leave them alone.
+
+type ElementTree = {
+  type: 'root';
+  children: [
+    {
+      type: 'element';
+      tagName: string;
+      properties: { href: string };
+      children: [];
+    },
+  ];
+};
+
+const treeWithTagHref = (tagName: string, href: string): ElementTree => ({
+  type: 'root',
+  children: [
+    {
+      type: 'element',
+      tagName,
+      properties: { href },
+      children: [],
+    },
+  ],
+});
+
+const runElementRewrite = (tagName: string, href: string): string => {
+  const tree = treeWithTagHref(tagName, href);
+  rewriteLocalHrefExtensions({ rewriteLocalHrefExtensions: true })(
+    tree as unknown as unist.Node,
+  );
+  return tree.children[0].properties.href;
+};
+
+describe('rewriteLocalHrefExtensions: element scope', () => {
+  test('rewrites <a href>', () => {
+    expect(runElementRewrite('a', './x.md')).toBe('./x.html');
+  });
+
+  test('rewrites <area href> (image-map hyperlink, per HTML §4.6)', () => {
+    expect(runElementRewrite('area', './x.md')).toBe('./x.html');
+  });
+
+  test('leaves <base href> alone (document base URL, not a hyperlink)', () => {
+    expect(runElementRewrite('base', './x.md')).toBe('./x.md');
+  });
+
+  test('leaves <link href> alone (external resource / metadata, not an unconditional hyperlink)', () => {
+    expect(runElementRewrite('link', './x.md')).toBe('./x.md');
+  });
+
+  test('leaves any other element carrying `href` alone', () => {
+    expect(runElementRewrite('custom-link', './x.md')).toBe('./x.md');
+  });
+
+  test('rewrites anchors nested inside non-hyperlink elements', () => {
+    const tree = {
+      type: 'root',
+      children: [
+        {
+          type: 'element',
+          tagName: 'div',
+          properties: {},
+          children: [
+            {
+              type: 'element',
+              tagName: 'a',
+              properties: { href: './nested.md' },
+              children: [],
+            },
+          ],
+        },
+      ],
+    };
+    rewriteLocalHrefExtensions({ rewriteLocalHrefExtensions: true })(
+      tree as unknown as unist.Node,
+    );
+    expect(tree.children[0]!.children[0]!.properties.href).toBe(
+      './nested.html',
+    );
+  });
+});

@@ -1,6 +1,6 @@
 import type * as hast from 'hast';
+import { selectAll } from 'hast-util-select';
 import type * as unist from 'unist';
-import { visit } from 'unist-util-visit';
 import { parse as parseUri } from 'uri-js';
 import * as v from 'valibot';
 
@@ -19,7 +19,7 @@ export const RewriteLocalHrefExtensionsOptionsSchema: v.GenericSchema<RewriteLoc
       v.pipe(
         v.union([v.boolean(), v.array(v.string())]),
         v.description(
-          'Rewrite local document hrefs to *.html. `true` is shorthand for `["md"]`; pass an array (e.g. `["md", "adoc"]`) to broaden the set of source extensions whose links get rewritten. Remote URLs are left untouched. The rewrite is purely syntactic. The file system is not consulted, so producing the target `*.html` is the embedder\'s responsibility.',
+          'Rewrite the trailing extension of local hyperlink hrefs to *.html. `true` is shorthand for `["md"]`; pass an array (e.g. `["md", "adoc"]`) to broaden the set of source extensions whose links get rewritten. Only `<a>` and `<area>` elements are touched (the elements that unconditionally create hyperlinks per HTML Standard §4.6); `<base>` and `<link>` are left alone because their `href` is not an author-specified navigation target. Only references with no scheme and no host are touched; remote URLs are left untouched. The rewrite is purely syntactic. The file system is not consulted, so producing the target `*.html` is the embedder\'s responsibility.',
         ),
       ),
     ),
@@ -65,27 +65,43 @@ const rewriteHref = (
 
 const rewriteTree = (tree: unist.Node, extensions: readonly string[]): void => {
   if (extensions.length === 0) return;
-  visit(tree as hast.Root, 'element', (node) => {
+  for (const node of selectAll('a[href], area[href]', tree as hast.Root)) {
     const href = node.properties?.href;
-    if (typeof href !== 'string') return;
+    if (typeof href !== 'string') continue;
     const rewritten = rewriteHref(href, extensions);
     if (rewritten !== undefined) {
       (node.properties ??= {}).href = rewritten;
     }
-  });
+  }
 };
 
 /**
- * Rewrite local relative document hrefs (`./x.ext`, `../x.ext`,
- * `x.ext`) to `*.html` for each `ext` listed in the option. `true` is
- * shorthand for `['md']`, supporting the standard VFM Markdown
- * pipeline; pass an array such as `['md', 'adoc']` when the same
- * unified processor also handles other source formats. Remote URLs
- * (`https://...`, `//host/...`, `mailto:`, etc.) are left untouched.
- * Query strings, fragments, and percent-encoded characters in the path
- * are preserved across the rewrite. The plugin does not consult the
- * file system: whether the target `.html` is actually produced and
- * served is the embedder's concern.
+ * Rewrite the trailing extension of local hyperlink hrefs to `.html`
+ * for each `ext` listed in the option. `true` is shorthand for
+ * `['md']`, supporting the standard VFM Markdown pipeline; pass an
+ * array such as `['md', 'adoc']` when the same unified processor also
+ * handles other source formats. Query strings, fragments, and
+ * percent-encoded characters in the path are preserved across the
+ * rewrite. The plugin does not consult the file system: whether the
+ * target `.html` is actually produced and served is the embedder's
+ * concern.
+ *
+ * Scope is fixed along two axes, both expressing the same principle:
+ * the rewrite is only applied where the build pipeline can be assumed
+ * to own the target.
+ *
+ * - Element axis: only `<a>` and `<area>` are touched. Per HTML
+ *   Standard §4.6 (Review Draft published 20 January 2026,
+ *   {@link https://html.spec.whatwg.org/review-drafts/2026-01/#links-created-by-a-and-area-elements}),
+ *   these are the elements that unconditionally create hyperlinks
+ *   when they bear an `href`. The other `href`-bearing elements
+ *   (`<base>`, `<link>`) carry document metadata rather than an
+ *   author-specified navigation target and are intentionally left
+ *   alone.
+ * - Path axis: only references with no scheme and no host (i.e.
+ *   "local") are touched. Remote URLs (`https://...`, `//host/...`,
+ *   `mailto:`, etc.) are left untouched because a parallel `*.html`
+ *   cannot be assumed to exist in another address space.
  */
 export const rewriteLocalHrefExtensions =
   ({
