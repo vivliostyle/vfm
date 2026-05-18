@@ -4,18 +4,18 @@ import type * as unist from 'unist';
 import * as v from 'valibot';
 import { readMetadata, VFM } from '../src/index.js';
 import {
-  RewriteLocalHrefExtensionsOptionsSchema,
-  rewriteLocalHrefExtensions,
-} from '../src/plugins/rewrite-local-href-extensions.js';
+  RewriteRelativeHrefExtensionsOptionsSchema,
+  rewriteRelativeHrefExtensions,
+} from '../src/plugins/rewrite-relative-href-extensions.js';
 
 // The boolean toggle must flow from YAML frontmatter (`vfm:` key) into
 // the rewrite without being repeated in programmatic options.
-test('E2E (YAML frontmatter): rewriteLocalHrefExtensions flows from `vfm:` into the rewrite', () => {
+test('E2E (YAML frontmatter): rewriteRelativeHrefExtensions flows from `vfm:` into the rewrite', () => {
   const input = stripIndent`
     ---
     vfm:
       partial: true
-      rewriteLocalHrefExtensions: true
+      rewriteRelativeHrefExtensions: true
     ---
     [sibling](./sibling.md)
   `;
@@ -32,85 +32,85 @@ test('E2E: relative *.md link is rewritten to *.html through the full pipeline',
       VFM({
         partial: true,
         disableFormatHtml: true,
-        rewriteLocalHrefExtensions: true,
+        rewriteRelativeHrefExtensions: true,
       }).processSync(`[sibling](./sibling.md)`),
     ),
   ).toBe(`<p><a href="./sibling.html">sibling</a></p>`);
 });
 
-describe('RewriteLocalHrefExtensionsOptionsSchema', () => {
+describe('RewriteRelativeHrefExtensionsOptionsSchema', () => {
   test('accepts an empty object (option is optional)', () => {
-    expect(v.parse(RewriteLocalHrefExtensionsOptionsSchema, {})).toEqual({});
+    expect(v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {})).toEqual({});
   });
 
-  test('accepts rewriteLocalHrefExtensions: true', () => {
+  test('accepts rewriteRelativeHrefExtensions: true', () => {
     expect(
-      v.parse(RewriteLocalHrefExtensionsOptionsSchema, {
-        rewriteLocalHrefExtensions: true,
+      v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {
+        rewriteRelativeHrefExtensions: true,
       }),
-    ).toEqual({ rewriteLocalHrefExtensions: true });
+    ).toEqual({ rewriteRelativeHrefExtensions: true });
   });
 
-  test('accepts rewriteLocalHrefExtensions: false', () => {
+  test('accepts rewriteRelativeHrefExtensions: false', () => {
     expect(
-      v.parse(RewriteLocalHrefExtensionsOptionsSchema, {
-        rewriteLocalHrefExtensions: false,
+      v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {
+        rewriteRelativeHrefExtensions: false,
       }),
-    ).toEqual({ rewriteLocalHrefExtensions: false });
+    ).toEqual({ rewriteRelativeHrefExtensions: false });
   });
 
   test('accepts an empty extension array', () => {
     expect(
-      v.parse(RewriteLocalHrefExtensionsOptionsSchema, {
-        rewriteLocalHrefExtensions: [],
+      v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {
+        rewriteRelativeHrefExtensions: [],
       }),
-    ).toEqual({ rewriteLocalHrefExtensions: [] });
+    ).toEqual({ rewriteRelativeHrefExtensions: [] });
   });
 
   test('accepts a single-element extension array', () => {
     expect(
-      v.parse(RewriteLocalHrefExtensionsOptionsSchema, {
-        rewriteLocalHrefExtensions: ['md'],
+      v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {
+        rewriteRelativeHrefExtensions: ['md'],
       }),
-    ).toEqual({ rewriteLocalHrefExtensions: ['md'] });
+    ).toEqual({ rewriteRelativeHrefExtensions: ['md'] });
   });
 
   test('accepts a multi-element extension array', () => {
     expect(
-      v.parse(RewriteLocalHrefExtensionsOptionsSchema, {
-        rewriteLocalHrefExtensions: ['md', 'adoc'],
+      v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {
+        rewriteRelativeHrefExtensions: ['md', 'adoc'],
       }),
-    ).toEqual({ rewriteLocalHrefExtensions: ['md', 'adoc'] });
+    ).toEqual({ rewriteRelativeHrefExtensions: ['md', 'adoc'] });
   });
 
   test('rejects scalar non-boolean values', () => {
     expect(() =>
-      v.parse(RewriteLocalHrefExtensionsOptionsSchema, {
-        rewriteLocalHrefExtensions: 'yes',
+      v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {
+        rewriteRelativeHrefExtensions: 'yes',
       }),
     ).toThrow();
   });
 
   test('rejects arrays with non-string elements', () => {
     expect(() =>
-      v.parse(RewriteLocalHrefExtensionsOptionsSchema, {
-        rewriteLocalHrefExtensions: ['md', 1],
+      v.parse(RewriteRelativeHrefExtensionsOptionsSchema, {
+        rewriteRelativeHrefExtensions: ['md', 1],
       }),
     ).toThrow();
   });
 });
 
-describe('rewriteLocalHrefExtensions plugin shape', () => {
+describe('rewriteRelativeHrefExtensions plugin shape', () => {
   test('always returns a transformer function (enabled)', () => {
     expect(
-      typeof rewriteLocalHrefExtensions({
-        rewriteLocalHrefExtensions: true,
+      typeof rewriteRelativeHrefExtensions({
+        rewriteRelativeHrefExtensions: true,
       }),
     ).toBe('function');
   });
 
   test('always returns a transformer function (disabled by default)', () => {
-    expect(typeof rewriteLocalHrefExtensions()).toBe('function');
+    expect(typeof rewriteRelativeHrefExtensions()).toBe('function');
   });
 
   test('disabled transformer is a no-op on the tree', () => {
@@ -125,7 +125,7 @@ describe('rewriteLocalHrefExtensions plugin shape', () => {
         },
       ],
     } as unist.Node;
-    rewriteLocalHrefExtensions()(tree);
+    rewriteRelativeHrefExtensions()(tree);
     expect(tree).toEqual({
       type: 'root',
       children: [
@@ -177,13 +177,13 @@ const runRewrite = (
   { extensions = true }: { extensions?: boolean | readonly string[] } = {},
 ): AnchorTree => {
   const tree = treeWithHref(href);
-  rewriteLocalHrefExtensions({
-    rewriteLocalHrefExtensions: extensions,
+  rewriteRelativeHrefExtensions({
+    rewriteRelativeHrefExtensions: extensions,
   })(tree as unknown as unist.Node);
   return tree;
 };
 
-describe('rewriteLocalHrefExtensions: href rewriting spec', () => {
+describe('rewriteRelativeHrefExtensions: href rewriting spec', () => {
   describe('rewrites relative .md hrefs', () => {
     test('bare relative path (./sibling.md)', () => {
       expect(hrefOf(runRewrite('./sibling.md'))).toBe('./sibling.html');
@@ -213,11 +213,12 @@ describe('rewriteLocalHrefExtensions: href rewriting spec', () => {
   // so an `href="/abs/file.html"` in served HTML resolves against the
   // server origin and 404s. Both POSIX-style (`/abs/...`) and
   // Windows-style (`C:/...`, `C:\...`) absolute paths are therefore
-  // left untouched. POSIX-style paths would naturally pass the
-  // local-reference check and are excluded by an explicit guard in
-  // the implementation; Windows-style paths fall out of scope on
-  // their own because `uri-js` parses the leading drive letter as a
-  // URI scheme.
+  // left untouched, which is precisely what motivates restricting the
+  // rewrite to *relative* references rather than the broader notion of
+  // a local (no-scheme, no-authority) URI reference. POSIX-style paths
+  // are excluded by the explicit guard in the implementation;
+  // Windows-style paths fall out of scope on their own because
+  // `uri-js` parses the leading drive letter as a URI scheme.
   describe('absolute paths (machine-local; non-portable)', () => {
     test('POSIX abs path is NOT rewritten (excluded by design)', () => {
       expect(hrefOf(runRewrite('/abs/file.md'))).toBe('/abs/file.md');
@@ -325,7 +326,7 @@ describe('rewriteLocalHrefExtensions: href rewriting spec', () => {
   });
 
   describe('opt-out behaviour', () => {
-    test('is a no-op when rewriteLocalHrefExtensions is false (default)', () => {
+    test('is a no-op when rewriteRelativeHrefExtensions is false (default)', () => {
       expect(hrefOf(runRewrite('./sibling.md', { extensions: false }))).toBe(
         './sibling.md',
       );
@@ -424,13 +425,13 @@ const treeWithTagHref = (tagName: string, href: string): ElementTree => ({
 
 const runElementRewrite = (tagName: string, href: string): string => {
   const tree = treeWithTagHref(tagName, href);
-  rewriteLocalHrefExtensions({ rewriteLocalHrefExtensions: true })(
+  rewriteRelativeHrefExtensions({ rewriteRelativeHrefExtensions: true })(
     tree as unknown as unist.Node,
   );
   return tree.children[0].properties.href;
 };
 
-describe('rewriteLocalHrefExtensions: element scope', () => {
+describe('rewriteRelativeHrefExtensions: element scope', () => {
   test('rewrites <a href>', () => {
     expect(runElementRewrite('a', './x.md')).toBe('./x.html');
   });
@@ -470,7 +471,7 @@ describe('rewriteLocalHrefExtensions: element scope', () => {
         },
       ],
     };
-    rewriteLocalHrefExtensions({ rewriteLocalHrefExtensions: true })(
+    rewriteRelativeHrefExtensions({ rewriteRelativeHrefExtensions: true })(
       tree as unknown as unist.Node,
     );
     expect(tree.children[0]!.children[0]!.properties.href).toBe(

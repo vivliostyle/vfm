@@ -54,9 +54,9 @@ export {
   type ReplaceOptions,
 } from './plugins/replace.js';
 export {
-  RewriteLocalHrefExtensionsOptionsSchema,
-  type RewriteLocalHrefExtensionsOptions,
-} from './plugins/rewrite-local-href-extensions.js';
+  RewriteRelativeHrefExtensionsOptionsSchema,
+  type RewriteRelativeHrefExtensionsOptions,
+} from './plugins/rewrite-relative-href-extensions.js';
 export {
   SerializablePluginOptionsSchema,
   type SerializablePluginOptions,
@@ -83,7 +83,7 @@ export type {
   RehypeDocumentPlugin,
   RehypeMathPlugin,
   RehypeFormatPlugin,
-  RehypeRewriteLocalHrefExtensionsPlugin,
+  RehypeRewriteRelativeHrefExtensionsPlugin,
 } from './revive-rehype.js';
 
 // The raw intersect schema. Kept internal so its inferred TS type does not
@@ -242,7 +242,7 @@ export function VFM(
     assignIdToFigcaption,
     captionlessImagePolicy,
     footnote,
-    rewriteLocalHrefExtensions,
+    rewriteRelativeHrefExtensions,
     editPlugins = (plugins) => plugins,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
@@ -275,8 +275,9 @@ export function VFM(
     if (metadata.vfm.footnote !== undefined) {
       footnote = metadata.vfm.footnote;
     }
-    if (metadata.vfm.rewriteLocalHrefExtensions !== undefined) {
-      rewriteLocalHrefExtensions = metadata.vfm.rewriteLocalHrefExtensions;
+    if (metadata.vfm.rewriteRelativeHrefExtensions !== undefined) {
+      rewriteRelativeHrefExtensions =
+        metadata.vfm.rewriteRelativeHrefExtensions;
     }
   }
 
@@ -292,7 +293,7 @@ export function VFM(
       metadata,
       math,
       disableFormatHtml,
-      rewriteLocalHrefExtensions,
+      rewriteRelativeHrefExtensions,
     }),
   });
 

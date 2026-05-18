@@ -21,7 +21,7 @@ import { mdast as footnotes, YamlFootnoteOptionsSchema } from './footnotes.js';
 import { FormatOptionsSchema } from './format.js';
 import { LineBreaksOptionsSchema } from './line-breaks.js';
 import { MathOptionsSchema } from './math.js';
-import { RewriteLocalHrefExtensionsOptionsSchema } from './rewrite-local-href-extensions.js';
+import { RewriteRelativeHrefExtensionsOptionsSchema } from './rewrite-relative-href-extensions.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -39,7 +39,7 @@ export const VFMSettingsSchema = v.intersect([
   FormatOptionsSchema,
   FigureOptionsSchema,
   YamlFootnoteOptionsSchema,
-  RewriteLocalHrefExtensionsOptionsSchema,
+  RewriteRelativeHrefExtensionsOptionsSchema,
   v.object({
     theme: v.optional(v.pipe(v.string(), v.description('Path of theme.'))),
     toc: v.optional(v.pipe(v.boolean(), v.description('Enable TOC mode.'))),

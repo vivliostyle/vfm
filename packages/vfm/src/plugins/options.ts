@@ -6,7 +6,7 @@ import { FootnoteOptionsSchema } from './footnotes.js';
 import { FormatOptionsSchema } from './format.js';
 import { LineBreaksOptionsSchema } from './line-breaks.js';
 import { MathOptionsSchema } from './math.js';
-import { RewriteLocalHrefExtensionsOptionsSchema } from './rewrite-local-href-extensions.js';
+import { RewriteRelativeHrefExtensionsOptionsSchema } from './rewrite-relative-href-extensions.js';
 
 /**
  * Plugin options that can be expressed as serializable data.
@@ -29,7 +29,7 @@ export const SerializablePluginOptionsSchema = v.intersect([
   FigureOptionsSchema,
   CodeOptionsSchema,
   FootnoteOptionsSchema,
-  RewriteLocalHrefExtensionsOptionsSchema,
+  RewriteRelativeHrefExtensionsOptionsSchema,
 ]);
 
 export type SerializablePluginOptions = v.InferInput<

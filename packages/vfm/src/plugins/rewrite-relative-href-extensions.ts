@@ -5,21 +5,22 @@ import { parse as parseUri } from 'uri-js';
 import * as v from 'valibot';
 
 /**
- * Options for {@link rewriteLocalHrefExtensions}. The extension list
- * is read-only; the plugin never mutates it. `string[]` is structurally
- * assignable to `readonly string[]`, so callers may pass either form.
+ * Options for {@link rewriteRelativeHrefExtensions}. The extension
+ * list is read-only; the plugin never mutates it. `string[]` is
+ * structurally assignable to `readonly string[]`, so callers may pass
+ * either form.
  */
-export interface RewriteLocalHrefExtensionsOptions {
-  rewriteLocalHrefExtensions?: boolean | readonly string[] | undefined;
+export interface RewriteRelativeHrefExtensionsOptions {
+  rewriteRelativeHrefExtensions?: boolean | readonly string[] | undefined;
 }
 
-export const RewriteLocalHrefExtensionsOptionsSchema: v.GenericSchema<RewriteLocalHrefExtensionsOptions> =
+export const RewriteRelativeHrefExtensionsOptionsSchema: v.GenericSchema<RewriteRelativeHrefExtensionsOptions> =
   v.object({
-    rewriteLocalHrefExtensions: v.optional(
+    rewriteRelativeHrefExtensions: v.optional(
       v.pipe(
         v.union([v.boolean(), v.array(v.string())]),
         v.description(
-          'Rewrite the trailing extension of local hyperlink hrefs to *.html. `true` is shorthand for `["md"]`; pass an array (e.g. `["md", "adoc"]`) to broaden the set of source extensions whose links get rewritten. Only `<a>` and `<area>` elements are touched (the elements that unconditionally create hyperlinks per HTML Standard §4.6); `<base>` and `<link>` are left alone because their `href` is not an author-specified navigation target. Only references with no scheme and no host are touched; remote URLs are left untouched. The rewrite is purely syntactic. The file system is not consulted, so producing the target `*.html` is the embedder\'s responsibility.',
+          'Rewrite the trailing extension of relative hyperlink hrefs to *.html. `true` is shorthand for `["md"]`; pass an array (e.g. `["md", "adoc"]`) to broaden the set of source extensions whose links get rewritten. Only `<a>` and `<area>` elements are touched (the elements that unconditionally create hyperlinks per HTML Standard §4.6); `<base>` and `<link>` are left alone because their `href` is not an author-specified navigation target. Only relative references (no scheme, no host, and the path does not start with `/`) are touched; remote URLs and rooted paths are left untouched. The rewrite is purely syntactic. The file system is not consulted, so producing the target `*.html` is the embedder\'s responsibility.',
         ),
       ),
     ),
@@ -40,10 +41,10 @@ const resolveExtensions = (
 
 /**
  * Decompose the href via `uri-js` (RFC 3986) and rewrite the trailing
- * extension to `.html` when the reference is local (no scheme, no
- * authority) and its extension matches one of `extensions`. Tail
- * components (query, fragment, percent-encoding) are preserved
- * verbatim.
+ * extension to `.html` when the reference is relative — no scheme, no
+ * authority, and the path does not start with `/` — and its extension
+ * matches one of `extensions`. Tail components (query, fragment,
+ * percent-encoding) are preserved verbatim.
  */
 const rewriteHref = (
   href: string,
@@ -53,8 +54,9 @@ const rewriteHref = (
   if (r.scheme !== undefined || r.host !== undefined) return undefined;
   const path = r.path;
   if (!path) return undefined;
-  // POSIX-like absolute paths would otherwise be rewritten here; exclude
-  // them deliberately. See the matching test block for the rationale.
+  // Rooted paths are excluded from the "relative" definition; see the
+  // matching test block for why POSIX-like absolute paths are not
+  // supported under Vivliostyle CLI.
   if (path.startsWith('/')) return undefined;
   const lastDot = path.lastIndexOf('.');
   if (lastDot < 0) return undefined;
@@ -79,11 +81,11 @@ const rewriteTree = (tree: unist.Node, extensions: readonly string[]): void => {
 };
 
 /**
- * Rewrite the trailing extension of local hyperlink hrefs to `.html`
- * for each `ext` listed in the option. `true` is shorthand for
- * `['md']`, supporting the standard VFM Markdown pipeline; pass an
- * array such as `['md', 'adoc']` when the same unified processor also
- * handles other source formats. Query strings, fragments, and
+ * Rewrite the trailing extension of relative hyperlink hrefs to
+ * `.html` for each `ext` listed in the option. `true` is shorthand
+ * for `['md']`, supporting the standard VFM Markdown pipeline; pass
+ * an array such as `['md', 'adoc']` when the same unified processor
+ * also handles other source formats. Query strings, fragments, and
  * percent-encoded characters in the path are preserved across the
  * rewrite. The plugin does not consult the file system: whether the
  * target `.html` is actually produced and served is the embedder's
@@ -101,14 +103,15 @@ const rewriteTree = (tree: unist.Node, extensions: readonly string[]): void => {
  *   (`<base>`, `<link>`) carry document metadata rather than an
  *   author-specified navigation target and are intentionally left
  *   alone.
- * - Path axis: only references with no scheme and no host (i.e.
- *   "local") are touched. Remote URLs (`https://...`, `//host/...`,
- *   `mailto:`, etc.) are left untouched because a parallel `*.html`
- *   cannot be assumed to exist in another address space.
+ * - Path axis: only relative references — no scheme, no host, and
+ *   the path does not start with `/` — are touched. Remote URLs
+ *   (`https://...`, `//host/...`, `mailto:`, etc.) and rooted paths
+ *   (`/abs/...`, drive-letter-prefixed Windows paths) are left
+ *   untouched.
  */
-export const rewriteLocalHrefExtensions =
+export const rewriteRelativeHrefExtensions =
   ({
-    rewriteLocalHrefExtensions: extensions = false,
-  }: RewriteLocalHrefExtensionsOptions = {}) =>
+    rewriteRelativeHrefExtensions: extensions = false,
+  }: RewriteRelativeHrefExtensionsOptions = {}) =>
   (tree: unist.Node) =>
     rewriteTree(tree, resolveExtensions(extensions));
