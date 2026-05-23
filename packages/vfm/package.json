@@ -5,7 +5,7 @@
   "author": "Vivliostyle Foundation",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">= 20"
+    "node": ">= 22"
   },
   "type": "module",
   "main": "lib/index.js",

@@ -3,19 +3,13 @@
   "private": true,
   "description": "Custom Markdown syntax specialized in book authoring.",
   "engines": {
-    "node": ">= 20"
+    "node": ">= 22"
   },
-  "volta": {
-    "node": "20.19.5"
-  },
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "build": "npm --workspaces run build --if-present",
-    "test": "npm --workspaces run test --if-present",
-    "format": "npm --workspaces run format --if-present",
-    "lint": "npm --workspaces run lint --if-present"
+    "build": "pnpm -r --if-present run build",
+    "test": "pnpm -r --if-present run test",
+    "format": "pnpm -r --if-present run format",
+    "lint": "pnpm -r --if-present run lint"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
