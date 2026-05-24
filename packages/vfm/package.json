@@ -40,8 +40,8 @@
     "lint": "eslint --fix ."
   },
   "//": {
-    "dependencies.{@types/hast,@types/mdast}": [
-      "@types/hast, @types/mdast は vfm の公開 API に現れるため、ユーザーにも型パッケージをインストールさせる必要がある",
+    "dependencies.{@types/unist,@types/hast,@types/mdast,vfile}": [
+      "@types/unist, @types/hast, @types/mdast, vfile は vfm の公開 API に現れるため、ユーザーにも型パッケージをインストールさせる必要がある",
       "さらにバージョンを Major 固定し、依存ツリー内で異なる Minor/Patch バージョンの重複インストール発生を防ぐ。これは unified の作者も使用しているパターン",
       "see: https://github.com/wooorm/refractor/blob/ed824ac801ef4bb5b25f73a4bcd6ce46b7eec8c9/package.json#L14"
     ]
@@ -49,6 +49,7 @@
   "dependencies": {
     "@types/hast": "^2.0.0",
     "@types/mdast": "^3.0.0",
+    "@types/unist": "^2.0.0",
     "debug": "^4.4.3",
     "doctype": "^3.0.1",
     "github-slugger": "^2.0.0",
@@ -83,10 +84,10 @@
     "unist-util-select": "^4.0.3",
     "unist-util-visit": "^4.1.2",
     "unist-util-visit-parents": "^5.1.3",
-    "valibot": "1.2.0"
+    "valibot": "1.2.0",
+    "vfile": "^4.0.0"
   },
   "devDependencies": {
-    "@release-it/conventional-changelog": "^10.0.1",
     "@types/common-tags": "^1.8.4",
     "@types/debug": "^4.1.12",
     "@types/js-yaml": "^4.0.9",
