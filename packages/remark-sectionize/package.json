@@ -29,14 +29,11 @@
     "vfile": "^4.2.1"
   },
   "devDependencies": {
-    "github-slugger": "^2.0.0",
-    "mdast-util-to-string": "^3.2.0",
     "rehype-format": "^3.1.0",
     "rehype-raw": "^5.1.0",
     "rehype-stringify": "^8.0.0",
     "remark-attr": "^0.11.1",
     "remark-parse": "^8.0.2",
-    "remark-rehype": "^8.1.0",
-    "unist-util-visit": "^4.1.2"
+    "remark-rehype": "^8.1.0"
   }
 }

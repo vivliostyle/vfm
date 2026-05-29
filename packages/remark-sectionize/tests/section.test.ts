@@ -11,7 +11,7 @@ test('plain section', () => {
 });
 */
 
-test('Leveling and copy attributes, however the `id` will be moved', () => {
+test('Leveling and copy attributes', () => {
   const md = '# こんにちは {#id1 .class1 key1=value1}';
   const received = stringify(md);
   const expected = `
@@ -25,8 +25,7 @@ test('Leveling and copy attributes, however the `id` will be moved', () => {
 test('Heading with hidden attribute', () => {
   const md = '# Heading {hidden}';
   const received = stringify(md, false);
-  const expected =
-    '<section class="level1"><h1 hidden id="heading">Heading</h1></section>';
+  const expected = '<section class="level1"><h1 hidden>Heading</h1></section>';
   expect(received).toBe(expected);
 });
 
@@ -35,7 +34,7 @@ test('Disable section with blockquote heading', () => {
   const received = stringify(md);
   const expected = `
 <blockquote>
-  <h1 id="not-sectionize">Not Sectionize</h1>
+  <h1>Not Sectionize</h1>
 </blockquote>
 `;
   expect(received).toBe(expected);
@@ -45,7 +44,7 @@ test('Disable section with closing hashes', () => {
   const md = '### Not Sectionize ###';
   const received = stringify(md);
   const expected = `
-<h3 id="not-sectionize">Not Sectionize</h3>
+<h3>Not Sectionize</h3>
 `;
   expect(received).toBe(expected);
 });
@@ -55,7 +54,7 @@ test('Do not disable section with insufficient closing hashes', () => {
   const received = stringify(md);
   const expected = `
 <section class="level3">
-  <h3 id="sectionize">Sectionize</h3>
+  <h3>Sectionize</h3>
 </section>
 `;
   expect(received).toBe(expected);
@@ -78,17 +77,17 @@ test('<h1>, ... <h6>', () => {
   const received = stringify(md);
   const expected = `
 <section class="level1">
-  <h1 id="heading-1">Heading 1</h1>
+  <h1>Heading 1</h1>
   <section class="level2">
-    <h2 id="heading-2">Heading 2</h2>
+    <h2>Heading 2</h2>
     <section class="level3">
-      <h3 id="heading-3">Heading 3</h3>
+      <h3>Heading 3</h3>
       <section class="level4">
-        <h4 id="heading-4">Heading 4</h4>
+        <h4>Heading 4</h4>
         <section class="level5">
-          <h5 id="heading-5">Heading 5</h5>
+          <h5>Heading 5</h5>
           <section class="level6">
-            <h6 id="heading-6">Heading 6</h6>
+            <h6>Heading 6</h6>
           </section>
         </section>
       </section>
@@ -99,7 +98,6 @@ test('<h1>, ... <h6>', () => {
   expect(received).toBe(expected);
 });
 
-// It seems that when the class is processed by `remark-attr`, it is output before id.
 test('<h1>, ... <h6> with attribute', () => {
   const md = `# Heading 1 {.depth1}
 ## Heading 2 {.depth2}
@@ -110,17 +108,17 @@ test('<h1>, ... <h6> with attribute', () => {
   const received = stringify(md);
   const expected = `
 <section class="level1">
-  <h1 class="depth1" id="heading-1">Heading 1</h1>
+  <h1 class="depth1">Heading 1</h1>
   <section class="level2">
-    <h2 class="depth2" id="heading-2">Heading 2</h2>
+    <h2 class="depth2">Heading 2</h2>
     <section class="level3">
-      <h3 class="depth3" id="heading-3">Heading 3</h3>
+      <h3 class="depth3">Heading 3</h3>
       <section class="level4">
-        <h4 class="depth4" id="heading-4">Heading 4</h4>
+        <h4 class="depth4">Heading 4</h4>
         <section class="level5">
-          <h5 class="depth5" id="heading-5">Heading 5</h5>
+          <h5 class="depth5">Heading 5</h5>
           <section class="level6">
-            <h6 class="depth6" id="heading-6">Heading 6</h6>
+            <h6 class="depth6">Heading 6</h6>
           </section>
         </section>
       </section>
@@ -138,13 +136,13 @@ test('Complex structure', () => {
   const received = stringify(md);
   const expected = `
 <section class="level1">
-  <h1 id="heading-1">Heading 1</h1>
+  <h1>Heading 1</h1>
   <section class="level2">
-    <h2 class="foo" id="heading-2">Heading 2</h2>
+    <h2 class="foo">Heading 2</h2>
   </section>
 </section>
 <section class="level1">
-  <h1 id="heading-1-1">Heading 1</h1>
+  <h1>Heading 1</h1>
 </section>
 `;
   expect(received).toBe(expected);
@@ -165,20 +163,20 @@ test('Sample', () => {
   const received = stringify(md);
   const expected = `
 <section class="level1">
-  <h1 id="plain">Plain</h1>
+  <h1>Plain</h1>
 </section>
 <section class="level1">
   <h1 id="intro">Introduction</h1>
 </section>
 <section class="level1">
-  <h1 class="title" id="welcome">Welcome</h1>
+  <h1 class="title">Welcome</h1>
 </section>
 <section class="level1">
-  <h1 id="level-1">Level 1</h1>
+  <h1>Level 1</h1>
   <section class="level2">
-    <h2 id="level-2">Level 2</h2>
+    <h2>Level 2</h2>
     <blockquote>
-      <h1 id="not-sectionize">Not Sectionize</h1>
+      <h1>Not Sectionize</h1>
     </blockquote>
   </section>
 </section>
@@ -203,18 +201,18 @@ This is a note.
   const received = stringify(md);
   const expected = `
 <section class="level1">
-  <h1 id="heading-1">Heading 1</h1>
+  <h1>Heading 1</h1>
   <section class="level2">
-    <h2 id="heading-2-1">Heading 2-1</h2>
+    <h2>Heading 2-1</h2>
     <aside class="note">
       <section class="level3">
-        <h3 id="note">NOTE</h3>
+        <h3>NOTE</h3>
         <p>This is a note.</p>
       </section>
     </aside>
   </section>
   <section class="level2">
-    <h2 id="heading-2-2">Heading 2-2</h2>
+    <h2>Heading 2-2</h2>
   </section>
 </section>
 `;
@@ -260,22 +258,22 @@ Depth 1 again`;
   const received = stringify(md);
   const expected = `
 <section class="level1">
-  <h1 id="heading-1">Heading 1</h1>
+  <h1>Heading 1</h1>
   <p>Depth 1</p>
   <section class="level2">
-    <h2 id="heading-2">Heading 2</h2>
+    <h2>Heading 2</h2>
     <p>Depth 2</p>
     <section class="level3">
-      <h3 id="heading-3">Heading 3</h3>
+      <h3>Heading 3</h3>
       <p>Depth 3</p>
       <section class="level4">
-        <h4 id="heading-4">Heading 4</h4>
+        <h4>Heading 4</h4>
         <p>Depth 4</p>
         <section class="level5">
-          <h5 id="heading-5">Heading 5</h5>
+          <h5>Heading 5</h5>
           <p>Depth 5</p>
           <section class="level6">
-            <h6 id="heading-6">Heading 6</h6>
+            <h6>Heading 6</h6>
             <p>Depth 6</p>
           </section>
           <p>Depth 5 again</p>
