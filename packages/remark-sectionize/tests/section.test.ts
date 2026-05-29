@@ -5,7 +5,7 @@ import { stringify } from './utils.js';
 /*
 test('plain section', () => {
   const md = '# {.ok}';
-  const received = stringify(md, false);
+  const received = stringify(md);
   const expected = '<section class="level1 ok"></section>';
   expect(received).toBe(expected);
 });
@@ -24,8 +24,12 @@ test('Leveling and copy attributes', () => {
 
 test('Heading with hidden attribute', () => {
   const md = '# Heading {hidden}';
-  const received = stringify(md, false);
-  const expected = '<section class="level1"><h1 hidden>Heading</h1></section>';
+  const received = stringify(md);
+  const expected = `
+<section class="level1">
+  <h1 hidden>Heading</h1>
+</section>
+`;
   expect(received).toBe(expected);
 });
 
@@ -62,8 +66,10 @@ test('Do not disable section with insufficient closing hashes', () => {
 
 test('<h7> is not heading', () => {
   const md = '####### こんにちは {.test}';
-  const received = stringify(md, false);
-  const expected = '<p>####### こんにちは {.test}</p>';
+  const received = stringify(md);
+  const expected = `
+<p>####### こんにちは {.test}</p>
+`;
   expect(received).toBe(expected);
 });
 
