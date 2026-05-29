@@ -1,9 +1,11 @@
 import GithubSlugger from 'github-slugger';
 import type { Heading } from 'mdast';
 import { toString } from 'mdast-util-to-string';
+// @ts-expect-error no type
 import format from 'rehype-format';
 import raw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
+// @ts-expect-error no type
 import attr from 'remark-attr';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';

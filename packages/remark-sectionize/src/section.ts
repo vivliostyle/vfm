@@ -44,8 +44,8 @@ const MAX_HEADING_DEPTH = 6;
  * @param depth - Depth of heading elements that are sections.
  * @returns Properties.
  */
-const createProperties = (depth: number): KeyValue => {
-  const properties: KeyValue = {
+const createProperties = (depth: number): hast.Properties => {
+  const properties: hast.Properties = {
     class: [`level${depth}`],
   };
   return properties;
