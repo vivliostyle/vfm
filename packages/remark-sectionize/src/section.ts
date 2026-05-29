@@ -25,6 +25,10 @@ declare module 'mdast' {
   }
 }
 
+/**
+ * @todo Drop the hast fields after upgrading to `mdast-util-to-hast@>=13`,
+ *   which ships the same `Data` augmentation as a side effect import.
+ */
 declare module 'unist' {
   interface Data {
     hName?: string | undefined;

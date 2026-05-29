@@ -31,7 +31,6 @@ const isCodeNode = (
  * project-wide. Currently relied on by:
  *
  * - `code.ts` (this file): `hProperties`, `hChildren`, `figcaptionTitle`
- * - `section.ts`: `hProperties`, `hName`
  * - `slug.ts`: `hProperties.id`
  *
  * @todo Drop the hast fields after upgrading to `mdast-util-to-hast@>=13`,
