@@ -10,24 +10,16 @@ import unified from 'unified';
 import { mdast as section } from '../src/section.js';
 
 /**
- * Mirror of `vfm/src/plugins/attr.ts`. Kept inline so this package's tests do
- * not depend on `@vivliostyle/vfm`.
+ * The minimal `remark-attr` configuration sectionize needs to be tested
+ * against: inline attributes on ATX headings (`# Heading {#id .class key=value}`),
+ * with a permissive scope so arbitrary attributes survive sectionization.
+ * Only `atxHeading` is relevant here; the other elements VFM enables do not
+ * interact with sectionize.
  */
 const attrOptions = {
   enableAtxHeaderInline: true,
   scope: 'permissive',
-  elements: [
-    'link',
-    'atxHeading',
-    'strong',
-    'emphasis',
-    'code',
-    'deletion',
-    'reference',
-    'footnoteCall',
-    'autoLink',
-    'fencedCode',
-  ],
+  elements: ['atxHeading'],
 } as const;
 
 /**
