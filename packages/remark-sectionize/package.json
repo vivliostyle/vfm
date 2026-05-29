@@ -4,7 +4,7 @@
   "description": "remark plugin to wrap headings in `<section class=\"levelN\">` elements, with VFM-specific extensions for non-section markers and section-end marks. Derived from `remark-sectionize` (Jake Low, 2019).",
   "license": "MIT",
   "engines": {
-    "node": ">= 20"
+    "node": ">= 22"
   },
   "type": "module",
   "main": "lib/section.js",
