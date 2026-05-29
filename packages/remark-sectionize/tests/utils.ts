@@ -13,8 +13,8 @@ import { mdast as section } from '../src/section.js';
  * The minimal `remark-attr` configuration sectionize needs to be tested
  * against: inline attributes on ATX headings (`# Heading {#id .class key=value}`),
  * with a permissive scope so arbitrary attributes survive sectionization.
- * Only `atxHeading` is relevant here; the other elements VFM enables do not
- * interact with sectionize.
+ * Only `atxHeading` is relevant here; other elements do not interact with
+ * sectionize.
  */
 const attrOptions = {
   enableAtxHeaderInline: true,
@@ -23,9 +23,8 @@ const attrOptions = {
 } as const;
 
 /**
- * Run a section-only stringify pipeline that mirrors the relevant subset of
- * VFM's pipeline (attr + section + raw + format) without depending on
- * the rest of VFM.
+ * Render markdown to HTML through the attr -> section -> raw (-> format)
+ * pipeline so tests can assert the HTML that sectionize produces.
  */
 export const stringify = (md: string, formatHtml = true): string => {
   let processor = unified()
