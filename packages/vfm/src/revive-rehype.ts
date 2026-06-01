@@ -16,6 +16,10 @@ import {
   type MathOptions,
 } from './plugins/math.js';
 import { replace, type ReplaceOptions } from './plugins/replace.js';
+import {
+  rewriteRelativeHrefExtensions,
+  type RewriteRelativeHrefExtensionsOptions,
+} from './plugins/rewrite-relative-href-extensions.js';
 import { handler as ruby } from './plugins/ruby.js';
 import { brand, partial } from './utils.js';
 
@@ -25,7 +29,8 @@ export type ReviveRehypeOptions = FigureOptions &
   ReplaceOptions &
   DocumentOptions &
   MathOptions &
-  FormatOptions;
+  FormatOptions &
+  RewriteRelativeHrefExtensionsOptions;
 
 declare const rehypeRawPluginBrand: unique symbol;
 export type RehypeRawPlugin = unified.Pluggable & {
@@ -57,6 +62,11 @@ export type RehypeFormatPlugin = unified.Pluggable & {
   [rehypeFormatPluginBrand]: unknown;
 };
 
+declare const rehypeRewriteRelativeHrefExtensionsPluginBrand: unique symbol;
+export type RehypeRewriteRelativeHrefExtensionsPlugin = unified.Pluggable & {
+  [rehypeRewriteRelativeHrefExtensionsPluginBrand]: unknown;
+};
+
 /**
  * Create Hypertext AST handlers and transformers.
  * @param options Options for rehype transformers.
@@ -81,6 +91,9 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       brand<RehypeRawPlugin>(raw),
       brand<RehypeFootnotePlugin>(footnoteTransformer),
       brand<RehypeReplacePlugin>(partial(replace, options)),
+      brand<RehypeRewriteRelativeHrefExtensionsPlugin>(
+        partial(rewriteRelativeHrefExtensions, options),
+      ),
       brand<RehypeDocumentPlugin>(partial(doc, options)),
       // Must be run after `rehype-document` to write to `<head>`
       brand<RehypeMathPlugin>(partial(math, options)),
