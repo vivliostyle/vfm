@@ -6,6 +6,7 @@
  * @see https://github.com/jake-low/remark-sectionize
  */
 
+import type * as hast from 'hast';
 import type { BlockContent, Content, HTML, Heading, Parent } from 'mdast';
 import type { Node } from 'unist';
 import type { VFile } from 'vfile';
@@ -24,6 +25,17 @@ declare module 'mdast' {
   }
 }
 
+/**
+ * @todo Drop the hast fields after upgrading to `mdast-util-to-hast@>=13`,
+ *   which ships the same `Data` augmentation as a side effect import.
+ */
+declare module 'unist' {
+  interface Data {
+    hName?: string | undefined;
+    hProperties?: hast.Properties | undefined;
+  }
+}
+
 /** Maximum depth of hierarchy to process headings. */
 const MAX_HEADING_DEPTH = 6;
 
@@ -32,8 +44,8 @@ const MAX_HEADING_DEPTH = 6;
  * @param depth - Depth of heading elements that are sections.
  * @returns Properties.
  */
-const createProperties = (depth: number): KeyValue => {
-  const properties: KeyValue = {
+const createProperties = (depth: number): hast.Properties => {
+  const properties: hast.Properties = {
     class: [`level${depth}`],
   };
   return properties;

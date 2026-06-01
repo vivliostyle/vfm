@@ -39,6 +39,49 @@ importers:
         specifier: ^4.1.3
         version: 4.1.3(@types/node@22.19.19)(vite@8.0.7(@types/node@22.19.19))
 
+  packages/remark-sectionize:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/mdast':
+        specifier: ^3.0.0
+        version: 3.0.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      unist-util-find-after:
+        specifier: ^4.0.1
+        version: 4.0.1
+      unist-util-visit-parents:
+        specifier: ^5.1.3
+        version: 5.1.3
+      vfile:
+        specifier: ^4.2.1
+        version: 4.2.1
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-raw:
+        specifier: ^5.1.0
+        version: 5.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-attr:
+        specifier: ^0.11.1
+        version: 0.11.1
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+
   packages/vfm:
     dependencies:
       '@types/hast':
@@ -50,6 +93,9 @@ importers:
       '@types/unist':
         specifier: ^2.0.0
         version: 2.0.3
+      '@vivliostyle/remark-sectionize':
+        specifier: workspace:*
+        version: link:../remark-sectionize
       debug:
         specifier: ^4.4.3
         version: 4.4.3
