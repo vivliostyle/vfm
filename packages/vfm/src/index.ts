@@ -54,6 +54,10 @@ export {
   type ReplaceOptions,
 } from './plugins/replace.js';
 export {
+  RewriteRelativeHrefExtensionsOptionsSchema,
+  type RewriteRelativeHrefExtensionsOptions,
+} from './plugins/rewrite-relative-href-extensions.js';
+export {
   SerializablePluginOptionsSchema,
   type SerializablePluginOptions,
 } from './plugins/options.js';
@@ -79,6 +83,7 @@ export type {
   RehypeDocumentPlugin,
   RehypeMathPlugin,
   RehypeFormatPlugin,
+  RehypeRewriteRelativeHrefExtensionsPlugin,
 } from './revive-rehype.js';
 
 // The raw intersect schema. Kept internal so its inferred TS type does not
@@ -113,7 +118,7 @@ const _stringifyMarkdownOptionsSchema = v.intersect([
           typeString: '(plugins: BuiltinPlugins) => EditedPlugins',
         }),
         v.description(
-          'Edit the plugin lists assembled by VFM before they are used.',
+          'Edit the plugin lists assembled by VFM before they are used. Only head-prepend and tail-append to the built-in lists are behaviorally stable across minor releases.',
         ),
       ),
     ),
@@ -186,15 +191,26 @@ const checkMetadata = (
   }
 };
 
+/**
+ * Plugin lists VFM hands to {@link EditPlugins} so callers can splice
+ * their own plugins around the built-in ones.
+ *
+ * The branded slot types (e.g. {@link RehypeReplacePlugin}) are
+ * self-documentation: they let `editPlugins` code refer to a built-in
+ * plugin by a stable nominal name at the moment of writing. They do
+ * not constitute a SemVer stability contract over the slot inventory
+ * or order. VFM may reorder, remove, or insert built-in slots in any
+ * minor or patch release without treating it as a breaking change.
+ */
 export type BuiltinPlugins = ReturnType<typeof markdown> &
   ReturnType<typeof html>;
 
 /**
  * Looser variant of {@link BuiltinPlugins} returned by {@link EditPlugins}.
- * Consumers receive the strictly typed `BuiltinPlugins` as input (slot
- * identity is preserved via brand types), but are free to splice, drop, or
- * extend the plugin lists, so the return shape widens to ordinary pluggable
- * lists.
+ * Consumers receive the strictly typed `BuiltinPlugins` as input (the
+ * branded slot types let callers identify each built-in by name), but
+ * are free to splice, drop, or extend the plugin lists, so the return
+ * shape widens to ordinary pluggable lists.
  */
 export type EditedPlugins = {
   mdastPlugins: ReadonlyArray<unified.Pluggable>;
@@ -226,6 +242,7 @@ export function VFM(
     assignIdToFigcaption,
     captionlessImagePolicy,
     footnote,
+    rewriteRelativeHrefExtensions,
     editPlugins = (plugins) => plugins,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
@@ -258,6 +275,10 @@ export function VFM(
     if (metadata.vfm.footnote !== undefined) {
       footnote = metadata.vfm.footnote;
     }
+    if (metadata.vfm.rewriteRelativeHrefExtensions !== undefined) {
+      rewriteRelativeHrefExtensions =
+        metadata.vfm.rewriteRelativeHrefExtensions;
+    }
   }
 
   const { mdastPlugins, mdastToHastHandlers, hastPlugins } = editPlugins({
@@ -272,6 +293,7 @@ export function VFM(
       metadata,
       math,
       disableFormatHtml,
+      rewriteRelativeHrefExtensions,
     }),
   });
 
