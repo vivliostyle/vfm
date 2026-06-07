@@ -1,6 +1,36 @@
 import { type Handler, all } from 'mdast-util-to-hast';
+import type {
+  Eat as RemarkEat,
+  Tokenizer as RemarkTokenizer,
+} from 'remark-parse';
 import type { Plugin } from 'unified';
+import type { Node, Point } from 'unist';
 import { u } from 'unist-builder';
+
+/**
+ * `remark-parse`'s public `Eat` type omits `now()`, which the runtime sets:
+ * https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/tokenizer.js#L31
+ */
+type Eat = RemarkEat & { now(): Point };
+
+/**
+ * `remark-parse`'s public `Tokenizer` type omits the parser `this` context:
+ * tokenizers run `this`-bound and `tokenizeInline` is a parser prototype method.
+ * https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/tokenizer.js#L62
+ * https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/parser.js#L134
+ */
+type TokenizerInstance = {
+  tokenizeInline(value: string, location: Point): Node[];
+};
+
+type Tokenizer = {
+  (
+    this: TokenizerInstance,
+    eat: Eat,
+    value: string,
+    silent?: boolean,
+  ): boolean | Node | void;
+} & Pick<RemarkTokenizer, keyof RemarkTokenizer>;
 
 // remark
 function locateRuby(value: string, fromIndex: number) {
@@ -20,7 +50,9 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
   if (silent) return true;
 
   now.column += 1;
-  now.offset += 1;
+  // `unist` types `Point.offset` as optional, but `now()` always sets it:
+  // https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/tokenizer.js#L133
+  now.offset! += 1;
 
   return eat(eaten)({
     type: 'ruby',

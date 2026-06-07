@@ -44,6 +44,9 @@ importers:
       '@types/mdast':
         specifier: ^3.0.0
         version: 3.0.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
       mdast-util-to-hast:
         specifier: ^11.3.0
         version: 11.3.0
@@ -61,7 +64,7 @@ importers:
         specifier: ^1.0.5
         version: 1.0.5
       remark-parse:
-        specifier: ^8.0.2
+        specifier: ^8.0.3
         version: 8.0.3
       remark-rehype:
         specifier: ^8.1.0

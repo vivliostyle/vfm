@@ -1,4 +1,5 @@
 import rehypeStringify from 'rehype-stringify';
+// @ts-expect-error no type
 import remarkBreaks from 'remark-breaks';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
