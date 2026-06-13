@@ -8,7 +8,7 @@ import {
   type LineBreaksOptions,
 } from './plugins/line-breaks.js';
 import { mdast as math, type MathOptions } from './plugins/math.js';
-import { mdast as ruby } from './plugins/ruby.js';
+import { mdast as ruby } from '@vivliostyle/remark-ruby';
 import { mdast as section } from '@vivliostyle/remark-sectionize';
 import { mdast as slug } from './plugins/slug.js';
 import { mdast as toc } from './plugins/toc.js';

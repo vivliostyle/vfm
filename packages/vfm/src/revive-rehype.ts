@@ -20,7 +20,7 @@ import {
   rewriteRelativeHrefExtensions,
   type RewriteRelativeHrefExtensionsOptions,
 } from './plugins/rewrite-relative-href-extensions.js';
-import { handler as ruby } from './plugins/ruby.js';
+import { handler as ruby } from '@vivliostyle/remark-ruby';
 import { brand, partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
