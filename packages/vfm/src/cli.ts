@@ -22,8 +22,10 @@ const cli = meow(
       --disable-math               Disable math syntax
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
       --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
+      --captionless-image-policy   How to render an empty-alt image (paragraph, figure, or figure-with-figcaption)
       --footnote                   Footnote output mode (pandoc, dpub, or gcpm)
       --table-cell                 How each table cell is emitted (align-attribute, align-class, or align-style)
+      --rewrite-relative-href-extensions   Rewrite relative document href extensions to .html (repeatable, e.g. md)
 
     Examples
       $ vfm input.md
@@ -62,6 +64,10 @@ const cli = meow(
       assignIdToFigcaption: {
         type: 'boolean',
       },
+      captionlessImagePolicy: {
+        type: 'string',
+        choices: ['paragraph', 'figure', 'figure-with-figcaption'],
+      },
       footnote: {
         type: 'string',
         choices: ['pandoc', 'dpub', 'gcpm'],
@@ -70,14 +76,18 @@ const cli = meow(
         type: 'string',
         choices: ['align-attribute', 'align-class', 'align-style'],
       },
+      rewriteRelativeHrefExtensions: {
+        type: 'string',
+        isMultiple: true,
+      },
     },
   },
 );
 
 function compile(input: string) {
-  // meow keeps `imgFigcaptionOrder`, `footnote`, and `tableCell` typed as
-  // plain `string`, so `v.parse` is needed to narrow them to their literal
-  // unions.
+  // meow keeps `imgFigcaptionOrder`, `captionlessImagePolicy`, `footnote`, and
+  // `tableCell` typed as plain `string`, so `v.parse` is needed to narrow them
+  // to their literal unions.
   const options = v.parse(StringifyMarkdownOptionsSchema, {
     partial: cli.flags.partial,
     style: cli.flags.style,
@@ -88,8 +98,10 @@ function compile(input: string) {
     math: cli.flags.disableMath === undefined ? true : !cli.flags.disableMath,
     imgFigcaptionOrder: cli.flags.imgFigcaptionOrder,
     assignIdToFigcaption: cli.flags.assignIdToFigcaption,
+    captionlessImagePolicy: cli.flags.captionlessImagePolicy,
     footnote: cli.flags.footnote,
     table: cli.flags.tableCell ? { cell: cli.flags.tableCell } : undefined,
+    rewriteRelativeHrefExtensions: cli.flags.rewriteRelativeHrefExtensions,
   });
   // eslint-disable-next-line no-console
   console.log(stringify(input, options));
@@ -106,8 +118,10 @@ function main(
     disableMath: { type: 'boolean' };
     imgFigcaptionOrder: { type: 'string' };
     assignIdToFigcaption: { type: 'boolean' };
+    captionlessImagePolicy: { type: 'string' };
     footnote: { type: 'string' };
     tableCell: { type: 'string' };
+    rewriteRelativeHrefExtensions: { type: 'string' };
   }>,
 ) {
   try {
