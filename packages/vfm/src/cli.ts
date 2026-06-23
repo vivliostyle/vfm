@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import fs from 'fs';
-import meow, { type Result } from 'meow';
+import meow from 'meow';
 import readline from 'readline';
 import * as v from 'valibot';
 import { stringify, StringifyMarkdownOptionsSchema } from './index.js';
@@ -107,23 +107,9 @@ function compile(input: string) {
   console.log(stringify(input, options));
 }
 
-function main(
-  cli: Result<{
-    style: { type: 'string'; shortFlag: string };
-    partial: { type: 'boolean'; shortFlag: string };
-    title: { type: 'string' };
-    language: { type: 'string' };
-    hardLineBreaks: { type: 'boolean' };
-    disableFormatHtml: { type: 'boolean' };
-    disableMath: { type: 'boolean' };
-    imgFigcaptionOrder: { type: 'string' };
-    assignIdToFigcaption: { type: 'boolean' };
-    captionlessImagePolicy: { type: 'string' };
-    footnote: { type: 'string' };
-    tableCell: { type: 'string' };
-    rewriteRelativeHrefExtensions: { type: 'string' };
-  }>,
-) {
+type Cli = typeof cli;
+
+function main(cli: Cli) {
   try {
     const filepath = cli.input[0];
 
