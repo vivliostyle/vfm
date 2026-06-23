@@ -19,6 +19,225 @@ test(
 );
 
 test(
+  'adjacent HTML comment does not suppress figure and is kept right after the img',
+  buildProcessorTestingCode(
+    `![caption](./img.png)<!-- comment -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 html "<!-- comment -->"
+    `,
+    `<figure><img src="./img.png" alt="caption"><!-- comment --><figcaption aria-hidden="true">caption</figcaption></figure>`,
+  ),
+);
+
+test(
+  'multiple comments stay right after the img in order',
+  buildProcessorTestingCode(
+    `![caption](./img.png)<!-- a --><!-- b -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[3]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        ├─1 html "<!-- a -->"
+        └─2 html "<!-- b -->"
+    `,
+    `<figure><img src="./img.png" alt="caption"><!-- a --><!-- b --><figcaption aria-hidden="true">caption</figcaption></figure>`,
+  ),
+);
+
+test(
+  'comment stays right after the img with imgFigcaptionOrder: figcaption-img',
+  buildProcessorTestingCode(
+    `![caption](./img.png)<!-- c -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 html "<!-- c -->"
+    `,
+    `<figure><figcaption aria-hidden="true">caption</figcaption><img src="./img.png" alt="caption"><!-- c --></figure>`,
+    { imgFigcaptionOrder: 'figcaption-img' },
+  ),
+);
+
+test(
+  'two images separated by a comment stay a paragraph',
+  buildProcessorTestingCode(
+    `![a](./a.png)<!-- c -->![b](./b.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[3]
+        ├─0 image
+        │     title: null
+        │     url: "./a.png"
+        │     alt: "a"
+        ├─1 html "<!-- c -->"
+        └─2 image
+              title: null
+              url: "./b.png"
+              alt: "b"
+    `,
+    `<p><img src="./a.png" alt="a"><!-- c --><img src="./b.png" alt="b"></p>`,
+  ),
+);
+
+test(
+  'an adjacent inline HTML element keeps it a paragraph',
+  buildProcessorTestingCode(
+    `![caption](./img.png)<span>x</span>`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[4]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        ├─1 html "<span>"
+        ├─2 text "x"
+        └─3 html "</span>"
+    `,
+    `<p><img src="./img.png" alt="caption"><span>x</span></p>`,
+  ),
+);
+
+test(
+  'garbage in, garbage out: an orphan close tag is content, not a comment, so the image stays a paragraph',
+  buildProcessorTestingCode(
+    `![caption](./img.png)</figure>`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 html "</figure>"
+    `,
+    `<p><img src="./img.png" alt="caption"></p>`,
+  ),
+);
+
+test(
+  'garbage in, garbage out: a close tag wrapping the image keeps it a paragraph the div closes around',
+  buildProcessorTestingCode(
+    stripIndent`
+    <div>
+
+    ![caption](./img.png)</div>
+    `,
+    stripIndent`
+    root[2]
+    ├─0 html "<div>"
+    └─1 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 html "</div>"
+    `,
+    stripIndent`
+    <div>
+    <p><img src="./img.png" alt="caption"></p></div><p></p>
+    `,
+  ),
+);
+
+test(
+  'whitespace between image and comment is content, so it stays a paragraph',
+  buildProcessorTestingCode(
+    `![caption](./img.png) <!-- c -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[3]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        ├─1 text " "
+        └─2 html "<!-- c -->"
+    `,
+    `<p><img src="./img.png" alt="caption"> <!-- c --></p>`,
+  ),
+);
+
+test(
+  'bare trailing whitespace (no comment) is content, so it stays a paragraph',
+  buildProcessorTestingCode(
+    `![caption](./img.png) `,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        └─1 text " "
+    `,
+    `<p><img src="./img.png" alt="caption"> </p>`,
+  ),
+);
+
+// A line beginning with `<!--` opens a CommonMark raw HTML block (block type
+// 2): the whole line, `![](...)` and all, is taken as raw text and never
+// parsed, so no figure forms and the line is passed through verbatim. Confirmed
+// in the commonmark.js reference implementation and markdown-it.
+test(
+  'a leading comment makes the whole line a raw HTML block, not a figure',
+  buildProcessorTestingCode(
+    `<!-- c -->![](./img.png)`,
+    `root[1]
+└─0 html "<!-- c -->![](./img.png)"`,
+    `<!-- c -->![](./img.png)`,
+  ),
+);
+
+test(
+  'captionless image with comment keeps default paragraph policy (comment preserved)',
+  buildProcessorTestingCode(
+    `![](./img.png)<!-- c -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: null
+        └─1 html "<!-- c -->"
+    `,
+    `<p><img src="./img.png"><!-- c --></p>`,
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure' promotes an image trailed by a comment",
+  buildProcessorTestingCode(
+    `![](./img.png)<!-- c -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: null
+        └─1 html "<!-- c -->"
+    `,
+    `<figure><img src="./img.png"><!-- c --></figure>`,
+    { captionlessImagePolicy: 'figure' },
+  ),
+);
+
+test(
   'image without caption',
   buildProcessorTestingCode(
     `![](./img.png)`,
@@ -64,6 +283,24 @@ test(
               alt: null
     `,
     `<figure><img src="./img.png"><figcaption aria-hidden="true"></figcaption></figure>`,
+    { captionlessImagePolicy: 'figure-with-figcaption' },
+  ),
+);
+
+test(
+  "captionlessImagePolicy: 'figure-with-figcaption' keeps a comment after the img",
+  buildProcessorTestingCode(
+    `![](./img.png)<!-- c -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: null
+        └─1 html "<!-- c -->"
+    `,
+    `<figure><img src="./img.png"><!-- c --><figcaption aria-hidden="true"></figcaption></figure>`,
     { captionlessImagePolicy: 'figure-with-figcaption' },
   ),
 );
@@ -268,6 +505,25 @@ test(
               alt: "caption"
     `,
     `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true" id="id">caption</figcaption></figure>`,
+    { assignIdToFigcaption: true },
+  ),
+);
+
+test(
+  'assignIdToFigcaption moves ID to figcaption with a comment after the img',
+  buildProcessorTestingCode(
+    `![caption](./img.png){#id}<!-- c -->`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[2]
+        ├─0 image
+        │     title: null
+        │     url: "./img.png"
+        │     alt: "caption"
+        │     data: {"hProperties":{"id":"id"}}
+        └─1 html "<!-- c -->"
+    `,
+    `<figure><img src="./img.png" alt="caption"><!-- c --><figcaption aria-hidden="true" id="id">caption</figcaption></figure>`,
     { assignIdToFigcaption: true },
   ),
 );
