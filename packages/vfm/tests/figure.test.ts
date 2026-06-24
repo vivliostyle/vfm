@@ -561,3 +561,37 @@ test(
     { assignIdToFigcaption: false },
   ),
 );
+
+test(
+  'distinct explicit alt drops figcaption aria-hidden',
+  buildProcessorTestingCode(
+    `![caption](./img.png){alt="alt text"}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+              data: {"hProperties":{"alt":"alt text"}}
+    `,
+    `<figure><img src="./img.png" alt="alt text"><figcaption>caption</figcaption></figure>`,
+  ),
+);
+
+test(
+  'explicit alt equal to the caption keeps aria-hidden (no double read)',
+  buildProcessorTestingCode(
+    `![caption](./img.png){alt="caption"}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+              data: {"hProperties":{"alt":"caption"}}
+    `,
+    `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true">caption</figcaption></figure>`,
+  ),
+);

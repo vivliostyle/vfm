@@ -143,13 +143,22 @@ export const buildFigure = (
     return h(mdastParagraph, 'figure', imgWithComments);
   }
 
-  const figcaptionProps: hast.Properties = { 'aria-hidden': 'true' };
+  const altText = mdastImage.alt ?? '';
+
+  // By default the <figcaption> is aria-hidden so assistive technology does
+  // not expose it and alt as duplicates (#75). But when an explicit {alt=...}
+  // differs from it, exposing both is preferable for accessibility. See also
+  // jgm/pandoc#6782.
+  const explicitAlt = mdastImage.data?.hProperties?.alt;
+  const captionIsAlt = explicitAlt === undefined || explicitAlt === altText;
+  const figcaptionProps: hast.Properties = captionIsAlt
+    ? { 'aria-hidden': 'true' }
+    : {};
   if (assignIdToFigcaption && hastImg.properties && hastImg.properties.id) {
     figcaptionProps.id = hastImg.properties.id;
     delete hastImg.properties.id;
   }
 
-  const altText = mdastImage.alt ?? '';
   const figcaption = h({ type: 'element' }, 'figcaption', figcaptionProps, [
     u('text', altText),
   ]);
