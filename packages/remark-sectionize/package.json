@@ -9,6 +9,11 @@
   "type": "module",
   "main": "lib/section.js",
   "types": "lib/section.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/remark-sectionize"
+  },
   "files": [
     "lib"
   ],

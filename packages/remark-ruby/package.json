@@ -9,6 +9,11 @@
   "type": "module",
   "main": "lib/ruby.js",
   "types": "lib/ruby.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/remark-ruby"
+  },
   "files": [
     "lib"
   ],
