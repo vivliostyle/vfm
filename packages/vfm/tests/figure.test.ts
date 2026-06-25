@@ -306,6 +306,24 @@ test(
 );
 
 test(
+  "captionlessImagePolicy: 'figure-with-figcaption' keeps the empty figcaption aria-hidden even with an explicit alt",
+  buildProcessorTestingCode(
+    `![](./img.png){alt="alt text"}`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: null
+              data: {"hProperties":{"alt":"alt text"}}
+    `,
+    `<figure><img src="./img.png" alt="alt text"><figcaption aria-hidden="true"></figcaption></figure>`,
+    { captionlessImagePolicy: 'figure-with-figcaption' },
+  ),
+);
+
+test(
   "captionlessImagePolicy: 'figure' does not promote inline image",
   buildProcessorTestingCode(
     `text ![](./img.png) text`,
