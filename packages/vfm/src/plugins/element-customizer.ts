@@ -118,8 +118,9 @@ export const buildElement = <
     // explicitly named tag is preserved. For a union `TTag` like `'th' | 'td'`
     // this lets a per-cell hook decide the tag from context, and a hardcoded
     // wrong tag surfaces instead of being silently rewritten. Explicit `div` is
-    // unreachable: it is not assignable to `TTag | ShorthandTagName` for any
-    // current caller, so a `div` here can only be shorthand.
+    // unreachable at the type level: it is not assignable to
+    // `TTag | ShorthandTagName` for any current caller, so a `div` here can
+    // only be shorthand.
     if (result.tagName === 'div') result.tagName = tagName;
     return result;
   }
