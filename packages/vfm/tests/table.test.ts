@@ -63,6 +63,32 @@ test("'align-class' preset emits table-align-* classes and drops align", () => {
   expect(received).toBe(expected);
 });
 
+test("'align-style' preset emits inline text-align style and drops align", () => {
+  const received = stringify(tableMd, {
+    partial: true,
+    table: { cell: 'align-style' },
+  });
+  const expected = `
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right">P</th>
+      <th style="text-align: center">D</th>
+      <th>N</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right"><code>id</code></td>
+      <td style="text-align: center">x</td>
+      <td>y</td>
+    </tr>
+  </tbody>
+</table>
+`;
+  expect(received).toBe(expected);
+});
+
 test('custom Properties hook receives align and tagName', () => {
   const received = stringify(tableMd, {
     partial: true,
@@ -206,6 +232,38 @@ test("'align-class' selectable via vfm frontmatter", () => {
     <tr>
       <td class="table-align-right"><code>id</code></td>
       <td class="table-align-center">x</td>
+      <td>y</td>
+    </tr>
+  </tbody>
+</table>
+`;
+  expect(received).toBe(expected);
+});
+
+test("'align-style' selectable via vfm frontmatter", () => {
+  const md = [
+    '---',
+    'vfm:',
+    '  table:',
+    '    cell: align-style',
+    '---',
+    '',
+    tableMd,
+  ].join('\n');
+  const received = stringify(md, { partial: true });
+  const expected = `
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: right">P</th>
+      <th style="text-align: center">D</th>
+      <th>N</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: right"><code>id</code></td>
+      <td style="text-align: center">x</td>
       <td>y</td>
     </tr>
   </tbody>

@@ -23,7 +23,7 @@ const cli = meow(
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
       --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
       --footnote                   Footnote output mode (pandoc, dpub, or gcpm)
-      --table-cell                 How each table cell is emitted (align-attribute or align-class)
+      --table-cell                 How each table cell is emitted (align-attribute, align-class, or align-style)
 
     Examples
       $ vfm input.md
@@ -68,7 +68,7 @@ const cli = meow(
       },
       tableCell: {
         type: 'string',
-        choices: ['align-attribute', 'align-class'],
+        choices: ['align-attribute', 'align-class', 'align-style'],
       },
     },
   },

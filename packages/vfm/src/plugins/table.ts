@@ -43,6 +43,9 @@ export type TableCellHook = (
  * - `'align-class'`: emit a `table-align-{left|center|right}` class instead,
  *   which is HTML5- / EPUB 3.3-conforming. VFM ships no CSS for it; styling is
  *   the theme's responsibility.
+ * - `'align-style'`: emit an inline `style="text-align: {left|center|right}"`
+ *   instead, which is HTML5- / EPUB 3.3-conforming and self-contained (renders
+ *   aligned with no accompanying CSS).
  *
  * Expressed as `v.union` of `v.literal` (not `v.picklist`) so consumers' schema
  * walkers (e.g. vivliostyle-cli's update-docs) can render it.
@@ -50,6 +53,7 @@ export type TableCellHook = (
 export const TableCellPresetSchema = v.union([
   v.literal('align-attribute'),
   v.literal('align-class'),
+  v.literal('align-style'),
 ]);
 export type TableCellPreset = v.InferInput<typeof TableCellPresetSchema>;
 
@@ -63,7 +67,8 @@ const cellSchema = v.union([
 
 const cellDescription =
   "How each GFM table cell (th/td) is emitted: 'align-attribute' (default; " +
-  "HTML4 align attribute) or 'align-class' (table-align-* class).";
+  "HTML4 align attribute), 'align-class' (table-align-* class), or " +
+  "'align-style' (inline text-align style).";
 
 export const TableOptionsSchema = v.object({
   table: v.optional(
@@ -100,6 +105,8 @@ const resolveCellHook = (
         {
           'align-class': ({ align }) =>
             align ? { className: [`table-align-${align}`] } : {},
+          'align-style': ({ align }) =>
+            align ? { style: `text-align: ${align}` } : {},
         } satisfies Record<
           Exclude<TableCellPreset, typeof DEFAULT_CELL_POLICY>,
           TableCellHook
