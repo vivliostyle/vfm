@@ -23,6 +23,7 @@ const cli = meow(
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
       --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
       --footnote                   Footnote output mode (pandoc, dpub, or gcpm)
+      --table-cell                 How each table cell is emitted (align-attribute or align-class)
 
     Examples
       $ vfm input.md
@@ -65,13 +66,18 @@ const cli = meow(
         type: 'string',
         choices: ['pandoc', 'dpub', 'gcpm'],
       },
+      tableCell: {
+        type: 'string',
+        choices: ['align-attribute', 'align-class'],
+      },
     },
   },
 );
 
 function compile(input: string) {
-  // meow keeps `imgFigcaptionOrder` and `footnote` typed as plain `string`,
-  // so `v.parse` is needed to narrow them to their literal unions.
+  // meow keeps `imgFigcaptionOrder`, `footnote`, and `tableCell` typed as
+  // plain `string`, so `v.parse` is needed to narrow them to their literal
+  // unions.
   const options = v.parse(StringifyMarkdownOptionsSchema, {
     partial: cli.flags.partial,
     style: cli.flags.style,
@@ -83,6 +89,7 @@ function compile(input: string) {
     imgFigcaptionOrder: cli.flags.imgFigcaptionOrder,
     assignIdToFigcaption: cli.flags.assignIdToFigcaption,
     footnote: cli.flags.footnote,
+    table: cli.flags.tableCell ? { cell: cli.flags.tableCell } : undefined,
   });
   // eslint-disable-next-line no-console
   console.log(stringify(input, options));
@@ -100,6 +107,7 @@ function main(
     imgFigcaptionOrder: { type: 'string' };
     assignIdToFigcaption: { type: 'boolean' };
     footnote: { type: 'string' };
+    tableCell: { type: 'string' };
   }>,
 ) {
   try {

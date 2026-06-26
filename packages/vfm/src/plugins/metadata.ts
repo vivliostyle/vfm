@@ -22,6 +22,7 @@ import { FormatOptionsSchema } from './format.js';
 import { LineBreaksOptionsSchema } from './line-breaks.js';
 import { MathOptionsSchema } from './math.js';
 import { RewriteRelativeHrefExtensionsOptionsSchema } from './rewrite-relative-href-extensions.js';
+import { YamlTableOptionsSchema } from './table.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -40,6 +41,7 @@ export const VFMSettingsSchema = v.intersect([
   FigureOptionsSchema,
   YamlFootnoteOptionsSchema,
   RewriteRelativeHrefExtensionsOptionsSchema,
+  YamlTableOptionsSchema,
   v.object({
     theme: v.optional(v.pipe(v.string(), v.description('Path of theme.'))),
     toc: v.optional(v.pipe(v.boolean(), v.description('Enable TOC mode.'))),

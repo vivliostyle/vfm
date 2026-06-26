@@ -20,6 +20,7 @@ import {
   rewriteRelativeHrefExtensions,
   type RewriteRelativeHrefExtensionsOptions,
 } from './plugins/rewrite-relative-href-extensions.js';
+import { createTableHandler, type TableOptions } from './plugins/table.js';
 import { handler as ruby } from '@vivliostyle/remark-ruby';
 import { brand, partial } from './utils.js';
 
@@ -30,7 +31,8 @@ export type ReviveRehypeOptions = FigureOptions &
   DocumentOptions &
   MathOptions &
   FormatOptions &
-  RewriteRelativeHrefExtensionsOptions;
+  RewriteRelativeHrefExtensionsOptions &
+  TableOptions;
 
 declare const rehypeRawPluginBrand: unique symbol;
 export type RehypeRawPlugin = unified.Pluggable & {
@@ -85,6 +87,7 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       code: code(options),
       paragraph: ((h, node) =>
         buildFigure(h, node, options) ?? h(node, 'p', all(h, node))) as Handler,
+      table: createTableHandler(options),
       ...footnoteHandlers,
     } as const,
     hastPlugins: [
