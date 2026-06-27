@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import { stripIndent } from 'common-tags';
 import { readMetadata, VFM } from '../src/index.js';
-import { buildProcessorTestingCode } from './utils.js';
+import { buildHtmlTestingCode, buildProcessorTestingCode } from './utils.js';
 
 test(
   'simple figure output',
@@ -651,20 +651,14 @@ test(
   ),
 );
 
-test('parseFigcaptionAsInline extracts an rp-bearing ruby reading into alt as 情報(じょうほう)', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync(
-      '![<ruby>情報<rp>(</rp><rt>じょうほう</rt><rp>)</rp></ruby>](i.png)',
-    ),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline extracts an rp-bearing ruby reading into alt as 情報(じょうほう)',
+  buildHtmlTestingCode(
+    '![<ruby>情報<rp>(</rp><rt>じょうほう</rt><rp>)</rp></ruby>](i.png)',
     `<figure><img src="i.png" alt="情報(じょうほう)"><figcaption aria-hidden="true"><ruby>情報<rp>(</rp><rt>じょうほう</rt><rp>)</rp></ruby></figcaption></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
 // TODO: the current math implementation has no hast-level rendering; it
 // defers to MathJax at typesetting time. This alt is not ideal, but it is a
@@ -737,28 +731,19 @@ test(
   ),
 );
 
-test('parseFigcaptionAsInline applies inline attributes inside the caption', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![**bold**{#x} word](img.png)'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline applies inline attributes inside the caption',
+  buildHtmlTestingCode(
+    '![**bold**{#x} word](img.png)',
     `<figure><img src="img.png" alt="bold word"><figcaption aria-hidden="true"><strong id="x">bold</strong> word</figcaption></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
-test('parseFigcaptionAsInline resolves a caption footnote document-wide, with dedupe', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![graph[^1]](img.png)\n\ntext[^1]\n\n[^1]: a note\n'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline resolves a caption footnote document-wide, with dedupe',
+  buildHtmlTestingCode(
+    '![graph[^1]](img.png)\n\ntext[^1]\n\n[^1]: a note\n',
     [
       `<figure><img src="img.png" alt="graph1"><figcaption aria-hidden="true">graph<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
       `<p>text<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></p>`,
@@ -769,18 +754,14 @@ test('parseFigcaptionAsInline resolves a caption footnote document-wide, with de
       `</ol>`,
       `</section>`,
     ].join('\n'),
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
-test('parseFigcaptionAsInline renders a caption-only footnote and its endnote', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![graph[^1]](img.png)\n\n[^1]: a note\n'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline renders a caption-only footnote and its endnote',
+  buildHtmlTestingCode(
+    '![graph[^1]](img.png)\n\n[^1]: a note\n',
     [
       `<figure><img src="img.png" alt="graph1"><figcaption aria-hidden="true">graph<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
       `<section class="footnotes" role="doc-endnotes">`,
@@ -790,18 +771,14 @@ test('parseFigcaptionAsInline renders a caption-only footnote and its endnote', 
       `</ol>`,
       `</section>`,
     ].join('\n'),
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
-test('parseFigcaptionAsInline dedupes a footnote referenced twice within one caption', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![a[^1] b[^1]](img.png)\n\n[^1]: a note\n'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline dedupes a footnote referenced twice within one caption',
+  buildHtmlTestingCode(
+    '![a[^1] b[^1]](img.png)\n\n[^1]: a note\n',
     [
       `<figure><img src="img.png" alt="a1 b1"><figcaption aria-hidden="true">a<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a> b<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
       `<section class="footnotes" role="doc-endnotes">`,
@@ -811,36 +788,27 @@ test('parseFigcaptionAsInline dedupes a footnote referenced twice within one cap
       `</ol>`,
       `</section>`,
     ].join('\n'),
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
-test('parseFigcaptionAsInline honors imgFigcaptionOrder: figcaption-img', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-      imgFigcaptionOrder: 'figcaption-img',
-    }).processSync('![**bold**](img.png)'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline honors imgFigcaptionOrder: figcaption-img',
+  buildHtmlTestingCode(
+    '![**bold**](img.png)',
     `<figure><figcaption aria-hidden="true"><strong>bold</strong></figcaption><img src="img.png" alt="bold"></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true, imgFigcaptionOrder: 'figcaption-img' },
+  ),
+);
 
-test('parseFigcaptionAsInline moves the image id to the figcaption (assignIdToFigcaption)', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-      assignIdToFigcaption: true,
-    }).processSync('![**bold**](img.png){#x}'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline moves the image id to the figcaption (assignIdToFigcaption)',
+  buildHtmlTestingCode(
+    '![**bold**](img.png){#x}',
     `<figure><img src="img.png" alt="bold"><figcaption aria-hidden="true" id="x"><strong>bold</strong></figcaption></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true, assignIdToFigcaption: true },
+  ),
+);
 
 test('parseFigcaptionAsInline can be enabled via YAML frontmatter (vfm:)', () => {
   const input = stripIndent`
@@ -860,46 +828,34 @@ test('parseFigcaptionAsInline can be enabled via YAML frontmatter (vfm:)', () =>
   );
 });
 
-test('parseFigcaptionAsInline falls back to the literal alt when the caption is not inline-shaped', () => {
-  // `# x` tokenizes to a heading (no top-level paragraph), so there is no inline
-  // caption to stash; the figcaption keeps the literal alt text verbatim.
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![# x](img.png)'),
-  );
-  expect(html).toBe(
+// `# x` tokenizes to a heading (no top-level paragraph), so there is no inline
+// caption to stash; the figcaption keeps the literal alt text verbatim.
+test(
+  'parseFigcaptionAsInline falls back to the literal alt when the caption is not inline-shaped',
+  buildHtmlTestingCode(
+    '![# x](img.png)',
     `<figure><img src="img.png" alt="# x"><figcaption aria-hidden="true"># x</figcaption></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
-test('parseFigcaptionAsInline excludes aria-hidden caption content from alt', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![a**b**{aria-hidden=true}c](img.png)'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline excludes aria-hidden caption content from alt',
+  buildHtmlTestingCode(
+    '![a**b**{aria-hidden=true}c](img.png)',
     `<figure><img src="img.png" alt="ac"><figcaption aria-hidden="true">a<strong aria-hidden="true">b</strong>c</figcaption></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
-test('parseFigcaptionAsInline uses a nested image’s own alt in the figure alt', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![before ![inner alt](inner.png) after](outer.png)'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline uses a nested image’s own alt in the figure alt',
+  buildHtmlTestingCode(
+    '![before ![inner alt](inner.png) after](outer.png)',
     `<figure><img src="outer.png" alt="before inner alt after"><figcaption aria-hidden="true">before <img src="inner.png" alt="inner alt"> after</figcaption></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
 
 test('parseFigcaptionAsInline reaches alt parity between a raw-HTML and a Markdown nested image', () => {
   const process = (md: string) =>
@@ -920,15 +876,11 @@ test('parseFigcaptionAsInline reaches alt parity between a raw-HTML and a Markdo
   expect(altOf(raw)).toBe(altOf(process('![x ![y](inner.png) z](outer.png)')));
 });
 
-test('parseFigcaptionAsInline derives alt from a caption whose only text-bearing node is a raw-HTML image', () => {
-  const html = String(
-    VFM({
-      partial: true,
-      disableFormatHtml: true,
-      parseFigcaptionAsInline: true,
-    }).processSync('![*<img alt=y src=inner.png>*](outer.png)'),
-  );
-  expect(html).toBe(
+test(
+  'parseFigcaptionAsInline derives alt from a caption whose only text-bearing node is a raw-HTML image',
+  buildHtmlTestingCode(
+    '![*<img alt=y src=inner.png>*](outer.png)',
     `<figure><img src="outer.png" alt="y"><figcaption aria-hidden="true"><em><img alt="y" src="inner.png"></em></figcaption></figure>`,
-  );
-});
+    { parseFigcaptionAsInline: true },
+  ),
+);
