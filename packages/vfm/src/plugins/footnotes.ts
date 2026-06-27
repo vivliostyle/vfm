@@ -35,7 +35,7 @@ import {
   HastPropertiesSchema,
   type ElementFactory,
   type TagAwareH,
-} from './element-customizer.js';
+} from '@vivliostyle/internal';
 
 type ElementWithProps = hast.Element & {
   properties: NonNullable<hast.Element['properties']>;
