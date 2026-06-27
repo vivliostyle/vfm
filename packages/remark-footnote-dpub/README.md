@@ -1,0 +1,1 @@
+# @vivliostyle/remark-footnote-dpub

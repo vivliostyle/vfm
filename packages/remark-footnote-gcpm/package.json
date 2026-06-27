@@ -9,6 +9,11 @@
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/remark-footnote-gcpm"
+  },
   "files": [
     "lib"
   ],
