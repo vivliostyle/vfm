@@ -20,7 +20,12 @@ export {
   LineBreaksOptionsSchema,
   type LineBreaksOptions,
 } from './plugins/line-breaks.js';
-export { MathOptionsSchema, type MathOptions } from './plugins/math.js';
+export {
+  MathRendererSchema,
+  MathOptionsSchema,
+  type MathRenderer,
+  type MathOptions,
+} from './plugins/math.js';
 export { FormatOptionsSchema, type FormatOptions } from './plugins/format.js';
 export { CodeOptionsSchema, type CodeOptions } from './plugins/code.js';
 export {
@@ -252,6 +257,7 @@ export function VFM(
     hardLineBreaks,
     disableFormatHtml,
     math,
+    mathRenderer,
     imgFigcaptionOrder,
     assignIdToFigcaption,
     captionlessImagePolicy,
@@ -269,6 +275,9 @@ export function VFM(
   if (metadata.vfm) {
     if (metadata.vfm.math !== undefined) {
       math = metadata.vfm.math;
+    }
+    if (metadata.vfm.mathRenderer !== undefined) {
+      mathRenderer = metadata.vfm.mathRenderer;
     }
     if (metadata.vfm.partial !== undefined) {
       partial = metadata.vfm.partial;
@@ -304,7 +313,12 @@ export function VFM(
   }
 
   const { mdastPlugins, mdastToHastHandlers, hastPlugins } = editPlugins({
-    ...markdown({ hardLineBreaks, math, parseFigcaptionAsInline }),
+    ...markdown({
+      hardLineBreaks,
+      math,
+      mathRenderer,
+      parseFigcaptionAsInline,
+    }),
     ...html({
       imgFigcaptionOrder,
       assignIdToFigcaption,
@@ -315,6 +329,7 @@ export function VFM(
       partial,
       metadata,
       math,
+      mathRenderer,
       disableFormatHtml,
       rewriteRelativeHrefExtensions,
       table,

@@ -16,6 +16,7 @@ import {
 import { hast as format, type FormatOptions } from './plugins/format.js';
 import {
   hast as math,
+  buildDisplayMath,
   handlerDisplayMath as displayMath,
   handlerInlineMath as inlineMath,
   type MathOptions,
@@ -92,12 +93,14 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
   } = createFootnotePlugin(options);
   return {
     mdastToHastHandlers: {
-      displayMath,
-      inlineMath,
+      displayMath: displayMath(options),
+      inlineMath: inlineMath(options),
       ruby,
       code: code(options),
       paragraph: ((h, node) =>
-        buildFigure(h, node, options) ?? h(node, 'p', all(h, node))) as Handler,
+        buildDisplayMath(node, options) ??
+        buildFigure(h, node, options) ??
+        h(node, 'p', all(h, node))) as Handler,
       table: createTableHandler(options),
       ...footnoteHandlers,
     } as const,

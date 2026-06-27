@@ -20,6 +20,7 @@ const cli = meow(
       --hard-line-breaks           Add <br> at the position of hard line breaks, without needing spaces
       --disable-format-html        Disable automatic HTML format
       --disable-math               Disable math syntax
+      --math-renderer              Math renderer (mathjax or mathml)
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
       --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
       --captionless-image-policy   How to render an empty-alt image (paragraph, figure, or figure-with-figcaption)
@@ -58,6 +59,10 @@ const cli = meow(
       disableMath: {
         type: 'boolean',
       },
+      mathRenderer: {
+        type: 'string',
+        choices: ['mathjax', 'mathml'],
+      },
       imgFigcaptionOrder: {
         type: 'string',
         choices: ['img-figcaption', 'figcaption-img'],
@@ -89,9 +94,9 @@ const cli = meow(
 );
 
 function compile(input: string) {
-  // meow keeps `imgFigcaptionOrder`, `captionlessImagePolicy`, `footnote`, and
-  // `tableCell` typed as plain `string`, so `v.parse` is needed to narrow them
-  // to their literal unions.
+  // meow keeps `mathRenderer`, `imgFigcaptionOrder`, `captionlessImagePolicy`,
+  // `footnote`, and `tableCell` typed as plain `string`, so `v.parse` is needed
+  // to narrow them to their literal unions.
   const options = v.parse(StringifyMarkdownOptionsSchema, {
     partial: cli.flags.partial,
     style: cli.flags.style,
@@ -100,6 +105,7 @@ function compile(input: string) {
     hardLineBreaks: cli.flags.hardLineBreaks,
     disableFormatHtml: cli.flags.disableFormatHtml,
     math: cli.flags.disableMath === undefined ? true : !cli.flags.disableMath,
+    mathRenderer: cli.flags.mathRenderer,
     imgFigcaptionOrder: cli.flags.imgFigcaptionOrder,
     assignIdToFigcaption: cli.flags.assignIdToFigcaption,
     captionlessImagePolicy: cli.flags.captionlessImagePolicy,
