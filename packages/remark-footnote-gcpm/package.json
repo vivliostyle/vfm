@@ -1,0 +1,39 @@
+{
+  "name": "@vivliostyle/remark-footnote-gcpm",
+  "version": "0.0.0",
+  "description": "GCPM-style inline footnote plugin used by VFM. Emits `<span class=\"footnote\">` elements at the call site, with duplicate references rendered as `<a class=\"footnote-duplicated-call\">`.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/hast": "^2.0.0",
+    "@vivliostyle/internal": "workspace:*",
+    "hastscript": "^7.2.0",
+    "mdast-util-to-hast": "^11.3.0",
+    "unified": "^9.2.0",
+    "valibot": "1.2.0"
+  },
+  "devDependencies": {
+    "rehype-format": "^3.1.0",
+    "rehype-stringify": "^8.0.0",
+    "remark-footnotes": "^2.0.0",
+    "remark-parse": "^8.0.2",
+    "remark-rehype": "^8.1.0"
+  }
+}

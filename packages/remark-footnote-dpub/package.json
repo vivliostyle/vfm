@@ -1,0 +1,43 @@
+{
+  "name": "@vivliostyle/remark-footnote-dpub",
+  "version": "0.0.0",
+  "description": "DPUB-ARIA inline footnote plugin used by VFM. Emits `<a role=\"doc-noteref\">` calls with `<aside role=\"doc-footnote\">` bodies placed after the containing block element.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/hast": "^2.0.0",
+    "@types/unist": "^2.0.0",
+    "@vivliostyle/internal": "workspace:*",
+    "hast-util-select": "^5.0.5",
+    "hastscript": "^7.2.0",
+    "mdast-util-to-hast": "^11.3.0",
+    "unified": "^9.2.0",
+    "unist-builder": "^3.0.1",
+    "valibot": "1.2.0"
+  },
+  "devDependencies": {
+    "rehype-format": "^3.1.0",
+    "rehype-raw": "^5.1.0",
+    "rehype-stringify": "^8.0.0",
+    "remark-footnotes": "^2.0.0",
+    "remark-parse": "^8.0.2",
+    "remark-rehype": "^8.1.0"
+  }
+}
