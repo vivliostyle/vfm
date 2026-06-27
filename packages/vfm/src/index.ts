@@ -27,9 +27,11 @@ export {
   ImgFigcaptionOrderSchema,
   CaptionlessImagePolicySchema,
   FigureOptionsSchema,
+  FigcaptionInlineOptionsSchema,
   type ImgFigcaptionOrder,
   type CaptionlessImagePolicy,
   type FigureOptions,
+  type FigcaptionInlineOptions,
 } from './plugins/figure.js';
 export {
   DocumentSerializableOptionsSchema,
@@ -253,6 +255,7 @@ export function VFM(
     imgFigcaptionOrder,
     assignIdToFigcaption,
     captionlessImagePolicy,
+    parseFigcaptionAsInline,
     footnote,
     rewriteRelativeHrefExtensions,
     table,
@@ -285,6 +288,9 @@ export function VFM(
     if (metadata.vfm.captionlessImagePolicy !== undefined) {
       captionlessImagePolicy = metadata.vfm.captionlessImagePolicy;
     }
+    if (metadata.vfm.parseFigcaptionAsInline !== undefined) {
+      parseFigcaptionAsInline = metadata.vfm.parseFigcaptionAsInline;
+    }
     if (metadata.vfm.footnote !== undefined) {
       footnote = metadata.vfm.footnote;
     }
@@ -298,11 +304,12 @@ export function VFM(
   }
 
   const { mdastPlugins, mdastToHastHandlers, hastPlugins } = editPlugins({
-    ...markdown({ hardLineBreaks, math }),
+    ...markdown({ hardLineBreaks, math, parseFigcaptionAsInline }),
     ...html({
       imgFigcaptionOrder,
       assignIdToFigcaption,
       captionlessImagePolicy,
+      parseFigcaptionAsInline,
       footnote,
       replace,
       partial,

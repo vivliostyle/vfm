@@ -1,7 +1,10 @@
 import * as v from 'valibot';
 import { CodeOptionsSchema } from './code.js';
 import { DocumentSerializableOptionsSchema } from './document.js';
-import { FigureOptionsSchema } from './figure.js';
+import {
+  FigcaptionInlineOptionsSchema,
+  FigureOptionsSchema,
+} from './figure.js';
 import { FootnoteOptionsSchema } from './footnotes.js';
 import { FormatOptionsSchema } from './format.js';
 import { LineBreaksOptionsSchema } from './line-breaks.js';
@@ -28,6 +31,7 @@ export const SerializablePluginOptionsSchema = v.intersect([
   DocumentSerializableOptionsSchema,
   FormatOptionsSchema,
   FigureOptionsSchema,
+  FigcaptionInlineOptionsSchema,
   CodeOptionsSchema,
   FootnoteOptionsSchema,
   RewriteRelativeHrefExtensionsOptionsSchema,
