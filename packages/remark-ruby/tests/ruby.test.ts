@@ -21,7 +21,7 @@ const stringify = (md: string, hardLineBreaks = false): string => {
           remarkRehype,
           { allowDangerousHtml: true, handlers: { ruby: rubyHandler } },
         ],
-        rehypeStringify,
+        [rehypeStringify, { allowDangerousHtml: true }],
       ])
       .processSync(md),
   );
@@ -45,4 +45,28 @@ test('Nested ruby', () => {
 
 test('Ruby with newline', () => {
   expect(stringify('{a\nb|c}', true)).toBe('<p>{a<br>\nb|c}</p>');
+});
+
+test('Ruby in Markdown link', () => {
+  expect(stringify('[{a|b}](c)')).toBe(
+    '<p><a href="c"><ruby>a<rt>b</rt></ruby></a></p>',
+  );
+});
+
+test('Ruby with surrounding text in Markdown link', () => {
+  expect(stringify('[x{a|b}y](c)')).toBe(
+    '<p><a href="c">x<ruby>a<rt>b</rt></ruby>y</a></p>',
+  );
+});
+
+test('Ruby in raw HTML anchor', () => {
+  expect(stringify('<a href="c">{a|b}</a>')).toBe(
+    '<p><a href="c"><ruby>a<rt>b</rt></ruby></a></p>',
+  );
+});
+
+test('Link in ruby body', () => {
+  expect(stringify('{[a](b)|c}')).toBe(
+    '<p><ruby><a href="b">a</a><rt>c</rt></ruby></p>',
+  );
 });
