@@ -16,7 +16,10 @@ import * as v from 'valibot';
 import { debug } from '../utils.js';
 import { mdast as attr } from './attr.js';
 import { DocumentSerializableOptionsSchema } from './document.js';
-import { FigureOptionsSchema } from './figure.js';
+import {
+  FigcaptionInlineOptionsSchema,
+  FigureOptionsSchema,
+} from './figure.js';
 import { mdast as footnotes, YamlFootnoteOptionsSchema } from './footnotes.js';
 import { FormatOptionsSchema } from './format.js';
 import { LineBreaksOptionsSchema } from './line-breaks.js';
@@ -39,6 +42,7 @@ export const VFMSettingsSchema = v.intersect([
   DocumentSerializableOptionsSchema,
   FormatOptionsSchema,
   FigureOptionsSchema,
+  FigcaptionInlineOptionsSchema,
   YamlFootnoteOptionsSchema,
   RewriteRelativeHrefExtensionsOptionsSchema,
   YamlTableOptionsSchema,

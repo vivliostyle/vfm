@@ -23,6 +23,7 @@ const cli = meow(
       --img-figcaption-order       Order of img and figcaption elements in figure (img-figcaption or figcaption-img)
       --assign-id-to-figcaption    Assign ID to figcaption instead of img/code
       --captionless-image-policy   How to render an empty-alt image (paragraph, figure, or figure-with-figcaption)
+      --parse-figcaption-as-inline Re-parse figcaption text as inline markdown (math, ruby, footnotes, etc.)
       --footnote                   Footnote output mode (pandoc, dpub, or gcpm)
       --table-cell                 How each table cell is emitted (align-attribute, align-class, or align-style)
       --rewrite-relative-href-extensions   Rewrite relative document href extensions to .html (repeatable, e.g. md)
@@ -68,6 +69,9 @@ const cli = meow(
         type: 'string',
         choices: ['paragraph', 'figure', 'figure-with-figcaption'],
       },
+      parseFigcaptionAsInline: {
+        type: 'boolean',
+      },
       footnote: {
         type: 'string',
         choices: ['pandoc', 'dpub', 'gcpm'],
@@ -99,6 +103,7 @@ function compile(input: string) {
     imgFigcaptionOrder: cli.flags.imgFigcaptionOrder,
     assignIdToFigcaption: cli.flags.assignIdToFigcaption,
     captionlessImagePolicy: cli.flags.captionlessImagePolicy,
+    parseFigcaptionAsInline: cli.flags.parseFigcaptionAsInline,
     footnote: cli.flags.footnote,
     table: cli.flags.tableCell ? { cell: cli.flags.tableCell } : undefined,
     rewriteRelativeHrefExtensions: cli.flags.rewriteRelativeHrefExtensions,

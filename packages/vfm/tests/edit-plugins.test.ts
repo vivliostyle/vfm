@@ -3,7 +3,11 @@ import type * as mdast from 'mdast';
 import type unified from 'unified';
 import { visit } from 'unist-util-visit';
 import { describe, expect, test } from 'vitest';
-import { VFM, type BuiltinPlugins } from '../src/index.js';
+import {
+  VFM,
+  type BuiltinPlugins,
+  type RehypeReplacePlugin,
+} from '../src/index.js';
 
 const baseOptions = { partial: true, disableFormatHtml: true } as const;
 
@@ -77,15 +81,23 @@ describe('editPlugins', () => {
     const withDefault = String(VFM(replaceOptions).processSync('foo\n'));
     expect(withDefault).toContain('BAR');
 
-    // ...and is gone when removed via editPlugins. Slot order is
-    // [raw, footnote, replace, doc, math, format].
+    // ...and is gone when removed via editPlugins.
     const withoutReplace = String(
       VFM({
         ...replaceOptions,
         editPlugins: (plugins) => {
-          const [raw, footnote, _replace, ...rest] = plugins.hastPlugins;
-          void _replace;
-          return { ...plugins, hastPlugins: [raw, footnote, ...rest] };
+          const [raw, deriveImgAltFromFigcaption, footnote, _replace, ...rest] =
+            plugins.hastPlugins;
+          // Per the note on `BuiltinPlugins`, slot order is not a semver
+          // contract, but each slot is branded. When an edit targets a
+          // specific plugin's position (beyond prepend/append), assert the
+          // slot against its brand so that a future reordering fails to
+          // compile here instead of breaking silently.
+          _replace satisfies RehypeReplacePlugin;
+          return {
+            ...plugins,
+            hastPlugins: [raw, deriveImgAltFromFigcaption, footnote, ...rest],
+          };
         },
       }).processSync('foo\n'),
     );
@@ -141,12 +153,16 @@ describe('editPlugins', () => {
           // Tuple destructure binds each slot by its brand type, letting
           // the editor splice between specific plugins without index
           // arithmetic.
-          const [raw, footnote, replace, ...rest] = hastPlugins;
+          const [raw, deriveImgAltFromFigcaption, footnote, replace, ...rest] =
+            hastPlugins;
+          // See the note above.
+          replace satisfies RehypeReplacePlugin;
           return {
             mdastPlugins,
             mdastToHastHandlers,
             hastPlugins: [
               raw,
+              deriveImgAltFromFigcaption,
               footnote,
               observe(beforeReplace),
               replace,

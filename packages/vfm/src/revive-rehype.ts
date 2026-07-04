@@ -3,7 +3,12 @@ import raw from 'rehype-raw';
 import unified from 'unified';
 import { handler as code, type CodeOptions } from './plugins/code.js';
 import { mdast as doc, type DocumentOptions } from './plugins/document.js';
-import { buildFigure, type FigureOptions } from './plugins/figure.js';
+import {
+  buildFigure,
+  hast as deriveImgAltFromFigcaption,
+  type FigcaptionInlineOptions,
+  type FigureOptions,
+} from './plugins/figure.js';
 import {
   createFootnotePlugin,
   type FootnoteOptions,
@@ -25,6 +30,7 @@ import { handler as ruby } from '@vivliostyle/remark-ruby';
 import { brand, partial } from './utils.js';
 
 export type ReviveRehypeOptions = FigureOptions &
+  FigcaptionInlineOptions &
   CodeOptions &
   FootnoteOptions &
   ReplaceOptions &
@@ -37,6 +43,11 @@ export type ReviveRehypeOptions = FigureOptions &
 declare const rehypeRawPluginBrand: unique symbol;
 export type RehypeRawPlugin = unified.Pluggable & {
   [rehypeRawPluginBrand]: unknown;
+};
+
+declare const rehypeDeriveImgAltFromFigcaptionPluginBrand: unique symbol;
+export type RehypeDeriveImgAltFromFigcaptionPlugin = unified.Pluggable & {
+  [rehypeDeriveImgAltFromFigcaptionPluginBrand]: unknown;
 };
 
 declare const rehypeFootnotePluginBrand: unique symbol;
@@ -92,6 +103,10 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
     } as const,
     hastPlugins: [
       brand<RehypeRawPlugin>(raw),
+      // Must run after `rehype-raw`: it reads the expanded figcaption.
+      brand<RehypeDeriveImgAltFromFigcaptionPlugin>(
+        partial(deriveImgAltFromFigcaption, options),
+      ),
       brand<RehypeFootnotePlugin>(footnoteTransformer),
       brand<RehypeReplacePlugin>(partial(replace, options)),
       brand<RehypeRewriteRelativeHrefExtensionsPlugin>(

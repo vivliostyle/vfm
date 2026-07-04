@@ -35,3 +35,30 @@ export const buildProcessorTestingCode =
     ).toBe(expectedMdast.trim().replace(D, ''));
     expect(String(vfm.processSync(input))).toBe(expectedHtml);
   };
+
+/**
+ * Utility for testing only the HTML string generated from Markdown, for cases
+ * where the intermediate MDAST is uninteresting or the input spans a whole
+ * document. Mirrors the option defaults of {@link buildProcessorTestingCode}.
+ * @param input Markdown string.
+ * @param expectedHtml Expected HTML string.
+ * @param options Option for convert Markdown to VFM (HTML).
+ */
+export const buildHtmlTestingCode =
+  (
+    input: string,
+    expectedHtml: string,
+    {
+      partial = true,
+      disableFormatHtml = true,
+      math = false,
+      ...rest
+    }: StringifyMarkdownOptions = {},
+  ) =>
+  (): void => {
+    expect(
+      String(
+        VFM({ partial, disableFormatHtml, math, ...rest }).processSync(input),
+      ),
+    ).toBe(expectedHtml);
+  };

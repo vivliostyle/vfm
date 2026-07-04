@@ -1,8 +1,10 @@
 import type * as hast from 'hast';
 import raw from 'hast-util-raw';
 import type * as mdast from 'mdast';
-import { type H, one } from 'mdast-util-to-hast';
+import { type H, all, one } from 'mdast-util-to-hast';
+import type unified from 'unified';
 import { u } from 'unist-builder';
+import { visit } from 'unist-util-visit';
 import * as v from 'valibot';
 
 // Expressed as `v.union` of `v.literal` so consumers' schema walkers
@@ -59,6 +61,23 @@ export const FigureOptionsSchema = v.object({
 
 export type FigureOptions = v.InferInput<typeof FigureOptionsSchema>;
 
+export const FigcaptionInlineOptionsSchema = v.object({
+  parseFigcaptionAsInline: v.optional(
+    v.pipe(
+      v.boolean(),
+      v.description(
+        'Re-parse figcaption text as inline markdown (math, ruby, emphasis, footnotes, etc.).',
+      ),
+    ),
+  ),
+});
+
+export type FigcaptionInlineOptions = v.InferInput<
+  typeof FigcaptionInlineOptionsSchema
+>;
+
+const DEFAULT_PARSE_FIGCAPTION_AS_INLINE = false;
+
 const isImageNode = (
   maybeMdastNode: unknown,
 ): maybeMdastNode is mdast.Image => {
@@ -99,6 +118,45 @@ const loneImageParagraph = (
 };
 
 /**
+ * Not a standard mdast `Image` shape, but in practice subsequent transforms
+ * treat these `children` as genuine. This lets the caption be processed in the
+ * body's context (e.g. a footnote in it participates in the document-wide
+ * numbering).
+ */
+type ImageWithParsedCaption = mdast.Image & {
+  children?: mdast.PhrasingContent[] | undefined;
+};
+
+const parseImageAltAsInline: unified.Plugin<[FigcaptionInlineOptions?]> =
+  function ({
+    parseFigcaptionAsInline = DEFAULT_PARSE_FIGCAPTION_AS_INLINE,
+  }: FigcaptionInlineOptions = {}) {
+    return !parseFigcaptionAsInline
+      ? () => {}
+      : (tree) => {
+          visit(tree as mdast.Root, 'paragraph', (paragraph) => {
+            const lone = loneImageParagraph(paragraph);
+            if (!lone) {
+              return;
+            }
+            const image: ImageWithParsedCaption = lone.mdastImage;
+            if (!image.alt) {
+              return;
+            }
+            // TODO: feeding raw, re-parseable Markdown text through `Image.alt`
+            // relies on behavior specific to remark-parse@8.
+            const root = this.parse(image.alt) as mdast.Root;
+            const inline = root.children[0];
+            if (inline?.type === 'paragraph') {
+              image.children = inline.children;
+            }
+          });
+        };
+  };
+
+export { parseImageAltAsInline as mdast };
+
+/**
  * Build a `<figure>` from a lone-image paragraph. Returns `undefined` when the
  * node is not a lone-image paragraph, or when its image lacks an `alt` and
  * `captionlessImagePolicy` is `'paragraph'` (the default). Callers compose this
@@ -120,7 +178,8 @@ export const buildFigure = (
 ): hast.Element | undefined => {
   const lone = loneImageParagraph(maybeMdastNode);
   if (!lone) return undefined;
-  const { mdastParagraph, mdastImage } = lone;
+  const { mdastParagraph } = lone;
+  const mdastImage: ImageWithParsedCaption = lone.mdastImage;
 
   const hasCaption = !!mdastImage.alt;
   if (!hasCaption && captionlessImagePolicy === 'paragraph') return undefined;
@@ -162,9 +221,16 @@ export const buildFigure = (
     delete hastImg.properties.id;
   }
 
-  const figcaption = h({ type: 'element' }, 'figcaption', figcaptionProps, [
-    u('text', altText),
-  ]);
+  const reparsed = !!mdastImage.children?.length;
+  const figcaptionChildren = reparsed
+    ? all(h, mdastImage)
+    : [u('text', altText)];
+  const figcaption = h(
+    { type: 'element' },
+    'figcaption',
+    figcaptionProps,
+    figcaptionChildren,
+  );
 
   return h(
     mdastParagraph,
@@ -174,3 +240,79 @@ export const buildFigure = (
       : [...imgWithComments, figcaption],
   );
 };
+
+/** Whether a node is exposed to assistive tech (not `aria-hidden`/`hidden`). */
+const isExposed = (node: hast.RootContent): boolean => {
+  if (node.type !== 'element') return true;
+  const props: hast.Properties = node.properties ?? {};
+  const ariaHidden = props.ariaHidden ?? props['aria-hidden'];
+  return !(
+    ariaHidden === true ||
+    ariaHidden === 'true' ||
+    props.hidden === true
+  );
+};
+
+/**
+ * A hast-level Accessible Name Computation that captures the essence rather
+ * than the full algorithm.
+ * https://www.w3.org/TR/accname-1.2/
+ * It works purely from the hast, so rendered-state factors such as CSS
+ * visibility are out of scope. `aria-hidden`/`hidden` descendants are dropped,
+ * but the node passed in is treated as directly referenced: its own hidden
+ * state is ignored, so the `<figcaption>` VFM hides by design still yields a
+ * name from its content.
+ */
+const accessibleName = (node: hast.RootContent | hast.Root): string => {
+  if (node.type === 'element') {
+    const props: hast.Properties = node.properties ?? {};
+    const ariaLabel = props.ariaLabel ?? props['aria-label'];
+    if (typeof ariaLabel === 'string' && ariaLabel) return ariaLabel;
+    if (node.tagName === 'img') {
+      return typeof props.alt === 'string' ? props.alt : '';
+    }
+    return node.children.filter(isExposed).map(accessibleName).join('');
+  }
+  if (node.type === 'text') return node.value;
+  if (node.type === 'root') {
+    return node.children.filter(isExposed).map(accessibleName).join('');
+  }
+  return '';
+};
+
+/**
+ * Derive each figure image's `alt` from its rendered `<figcaption>`. Runs after
+ * `rehype-raw` so inline HTML in a reparsed caption has been expanded into real
+ * elements.
+ *
+ * CommonMark is not normative about what an `alt` may contain; it only
+ * recommends "the plain string content"
+ * (https://spec.commonmark.org/0.31.2/#images). Deriving it from the rendered
+ * caption via accname departs from how typical CommonMark implementations
+ * behave, but stays within that recommendation and is the more capable choice
+ * for a conversion that targets HTML.
+ */
+const deriveImgAltFromFigcaption: unified.Plugin<
+  [FigcaptionInlineOptions?]
+> = ({
+  parseFigcaptionAsInline = DEFAULT_PARSE_FIGCAPTION_AS_INLINE,
+}: FigcaptionInlineOptions = {}) =>
+  !parseFigcaptionAsInline
+    ? () => {}
+    : (tree) => {
+        visit(tree as hast.Root, 'element', (figure) => {
+          if (figure.tagName !== 'figure') return;
+          const child = (tagName: string) =>
+            figure.children.find(
+              (c): c is hast.Element =>
+                c.type === 'element' && c.tagName === tagName,
+            );
+          const img = child('img');
+          const figcaption = child('figcaption');
+          if (img && figcaption) {
+            (img.properties ??= {}).alt = accessibleName(figcaption);
+          }
+        });
+      };
+
+export { deriveImgAltFromFigcaption as hast };

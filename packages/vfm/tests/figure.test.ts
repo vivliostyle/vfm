@@ -1,6 +1,7 @@
-import { test } from 'vitest';
+import { expect, test } from 'vitest';
 import { stripIndent } from 'common-tags';
-import { buildProcessorTestingCode } from './utils.js';
+import { readMetadata, VFM } from '../src/index.js';
+import { buildHtmlTestingCode, buildProcessorTestingCode } from './utils.js';
 
 test(
   'simple figure output',
@@ -611,5 +612,275 @@ test(
               data: {"hProperties":{"alt":"caption"}}
     `,
     `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true">caption</figcaption></figure>`,
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline renders math in figcaption and keeps its rendered text (\\(x = y\\)) in alt',
+  buildProcessorTestingCode(
+    `![$x = y$](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "$x = y$"
+    `,
+    `<figure><img src="./img.png" alt="\\(x = y\\)"><figcaption aria-hidden="true"><span class="math inline" data-math-typeset="true">\\(x = y\\)</span></figcaption></figure>`,
+    { parseFigcaptionAsInline: true, math: true },
+  ),
+);
+
+// TODO: remark-ruby currently emits no `<rp>`. It is debatable whether the
+// resulting `Rubyるび` is a sound accessible name; see also the next test.
+test(
+  'parseFigcaptionAsInline renders ruby in figcaption and includes the reading in alt (no <rp> yet)',
+  buildProcessorTestingCode(
+    `![{Ruby|るび}](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "{Ruby|るび}"
+    `,
+    `<figure><img src="./img.png" alt="Rubyるび"><figcaption aria-hidden="true"><ruby>Ruby<rt>るび</rt></ruby></figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline extracts an rp-bearing ruby reading into alt as 情報(じょうほう)',
+  buildHtmlTestingCode(
+    '![<ruby>情報<rp>(</rp><rt>じょうほう</rt><rp>)</rp></ruby>](i.png)',
+    `<figure><img src="i.png" alt="情報(じょうほう)"><figcaption aria-hidden="true"><ruby>情報<rp>(</rp><rt>じょうほう</rt><rp>)</rp></ruby></figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+// TODO: the current math implementation has no hast-level rendering; it
+// defers to MathJax at typesetting time. This alt is not ideal, but it is a
+// reasonable representation derived from the structure.
+test(
+  'parseFigcaptionAsInline handles mixed math and text (vivliostyle/vfm#35)',
+  buildProcessorTestingCode(
+    `![$t-v(t)$ のグラフ](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "$t-v(t)$ のグラフ"
+    `,
+    `<figure><img src="./img.png" alt="\\(t-v(t)\\) のグラフ"><figcaption aria-hidden="true"><span class="math inline" data-math-typeset="true">\\(t-v(t)\\)</span> のグラフ</figcaption></figure>`,
+    { parseFigcaptionAsInline: true, math: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline leaves a plain-text caption unchanged',
+  buildProcessorTestingCode(
+    `![caption](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "caption"
+    `,
+    `<figure><img src="./img.png" alt="caption"><figcaption aria-hidden="true">caption</figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline renders raw HTML in the caption (same path as body HTML)',
+  buildProcessorTestingCode(
+    `![<span>a</span>](i.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "i.png"
+              alt: "<span>a</span>"
+    `,
+    `<figure><img src="i.png" alt="a"><figcaption aria-hidden="true"><span>a</span></figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline disabled (default) keeps caption syntax as literal text',
+  buildProcessorTestingCode(
+    `![$x = y$](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "$x = y$"
+    `,
+    `<figure><img src="./img.png" alt="$x = y$"><figcaption aria-hidden="true">$x = y$</figcaption></figure>`,
+    { math: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline applies inline attributes inside the caption',
+  buildHtmlTestingCode(
+    '![**bold**{#x} word](img.png)',
+    `<figure><img src="img.png" alt="bold word"><figcaption aria-hidden="true"><strong id="x">bold</strong> word</figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline resolves a caption footnote document-wide, with dedupe',
+  buildHtmlTestingCode(
+    '![graph[^1]](img.png)\n\ntext[^1]\n\n[^1]: a note\n',
+    [
+      `<figure><img src="img.png" alt="graph1"><figcaption aria-hidden="true">graph<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
+      `<p>text<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></p>`,
+      `<section class="footnotes" role="doc-endnotes">`,
+      `<hr>`,
+      `<ol>`,
+      `<li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a><a href="#fnref1-1" class="footnote-back" role="doc-backlink">↩</a></li>`,
+      `</ol>`,
+      `</section>`,
+    ].join('\n'),
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline renders a caption-only footnote and its endnote',
+  buildHtmlTestingCode(
+    '![graph[^1]](img.png)\n\n[^1]: a note\n',
+    [
+      `<figure><img src="img.png" alt="graph1"><figcaption aria-hidden="true">graph<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
+      `<section class="footnotes" role="doc-endnotes">`,
+      `<hr>`,
+      `<ol>`,
+      `<li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>`,
+      `</ol>`,
+      `</section>`,
+    ].join('\n'),
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline dedupes a footnote referenced twice within one caption',
+  buildHtmlTestingCode(
+    '![a[^1] b[^1]](img.png)\n\n[^1]: a note\n',
+    [
+      `<figure><img src="img.png" alt="a1 b1"><figcaption aria-hidden="true">a<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a> b<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
+      `<section class="footnotes" role="doc-endnotes">`,
+      `<hr>`,
+      `<ol>`,
+      `<li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a><a href="#fnref1-1" class="footnote-back" role="doc-backlink">↩</a></li>`,
+      `</ol>`,
+      `</section>`,
+    ].join('\n'),
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline honors imgFigcaptionOrder: figcaption-img',
+  buildHtmlTestingCode(
+    '![**bold**](img.png)',
+    `<figure><figcaption aria-hidden="true"><strong>bold</strong></figcaption><img src="img.png" alt="bold"></figure>`,
+    { parseFigcaptionAsInline: true, imgFigcaptionOrder: 'figcaption-img' },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline moves the image id to the figcaption (assignIdToFigcaption)',
+  buildHtmlTestingCode(
+    '![**bold**](img.png){#x}',
+    `<figure><img src="img.png" alt="bold"><figcaption aria-hidden="true" id="x"><strong>bold</strong></figcaption></figure>`,
+    { parseFigcaptionAsInline: true, assignIdToFigcaption: true },
+  ),
+);
+
+test('parseFigcaptionAsInline can be enabled via YAML frontmatter (vfm:)', () => {
+  const input = stripIndent`
+    ---
+    vfm:
+      partial: true
+      parseFigcaptionAsInline: true
+    ---
+    ![**bold**](img.png)
+  `;
+  expect(
+    String(
+      VFM({ disableFormatHtml: true }, readMetadata(input)).processSync(input),
+    ),
+  ).toBe(
+    `<figure><img src="img.png" alt="bold"><figcaption aria-hidden="true"><strong>bold</strong></figcaption></figure>`,
+  );
+});
+
+// `# x` tokenizes to a heading (no top-level paragraph), so there is no inline
+// caption to stash; the figcaption keeps the literal alt text verbatim.
+test(
+  'parseFigcaptionAsInline falls back to the literal alt when the caption is not inline-shaped',
+  buildHtmlTestingCode(
+    '![# x](img.png)',
+    `<figure><img src="img.png" alt="# x"><figcaption aria-hidden="true"># x</figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline excludes aria-hidden caption content from alt',
+  buildHtmlTestingCode(
+    '![a**b**{aria-hidden=true}c](img.png)',
+    `<figure><img src="img.png" alt="ac"><figcaption aria-hidden="true">a<strong aria-hidden="true">b</strong>c</figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline uses a nested image’s own alt in the figure alt',
+  buildHtmlTestingCode(
+    '![before ![inner alt](inner.png) after](outer.png)',
+    `<figure><img src="outer.png" alt="before inner alt after"><figcaption aria-hidden="true">before <img src="inner.png" alt="inner alt"> after</figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test('parseFigcaptionAsInline reaches alt parity between a raw-HTML and a Markdown nested image', () => {
+  const process = (md: string) =>
+    String(
+      VFM({
+        partial: true,
+        disableFormatHtml: true,
+        parseFigcaptionAsInline: true,
+      }).processSync(md),
+    );
+  const altOf = (html: string) =>
+    /<img src="outer\.png" alt="([^"]*)"/.exec(html)?.[1];
+
+  const raw = process('![x <img alt=y src=inner.png> z](outer.png)');
+  expect(raw).toBe(
+    `<figure><img src="outer.png" alt="x y z"><figcaption aria-hidden="true">x <img alt="y" src="inner.png"> z</figcaption></figure>`,
+  );
+  expect(altOf(raw)).toBe(altOf(process('![x ![y](inner.png) z](outer.png)')));
+});
+
+test(
+  'parseFigcaptionAsInline derives alt from a caption whose only text-bearing node is a raw-HTML image',
+  buildHtmlTestingCode(
+    '![*<img alt=y src=inner.png>*](outer.png)',
+    `<figure><img src="outer.png" alt="y"><figcaption aria-hidden="true"><em><img alt="y" src="inner.png"></em></figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
   ),
 );
