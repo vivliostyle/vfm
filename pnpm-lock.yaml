@@ -54,6 +54,132 @@ importers:
         specifier: 1.2.0
         version: 1.2.0(typescript@6.0.2)
 
+  packages/remark-footnote-dpub:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      '@vivliostyle/internal':
+        specifier: workspace:*
+        version: link:../internal
+      hast-util-select:
+        specifier: ^5.0.5
+        version: 5.0.5
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      mdast-util-to-hast:
+        specifier: ^11.3.0
+        version: 11.3.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      unist-builder:
+        specifier: ^3.0.1
+        version: 3.0.1
+      valibot:
+        specifier: 1.2.0
+        version: 1.2.0(typescript@6.0.2)
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-raw:
+        specifier: ^5.1.0
+        version: 5.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-footnotes:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+
+  packages/remark-footnote-gcpm:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@vivliostyle/internal':
+        specifier: workspace:*
+        version: link:../internal
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      mdast-util-to-hast:
+        specifier: ^11.3.0
+        version: 11.3.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      valibot:
+        specifier: 1.2.0
+        version: 1.2.0(typescript@6.0.2)
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-footnotes:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+
+  packages/remark-footnote-pandoc:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      hast-util-select:
+        specifier: ^5.0.5
+        version: 5.0.5
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      unist-builder:
+        specifier: ^3.0.1
+        version: 3.0.1
+      valibot:
+        specifier: 1.2.0
+        version: 1.2.0(typescript@6.0.2)
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-footnotes:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+
   packages/remark-ruby:
     dependencies:
       '@types/mdast':
@@ -142,6 +268,15 @@ importers:
       '@vivliostyle/internal':
         specifier: workspace:*
         version: link:../internal
+      '@vivliostyle/remark-footnote-dpub':
+        specifier: workspace:*
+        version: link:../remark-footnote-dpub
+      '@vivliostyle/remark-footnote-gcpm':
+        specifier: workspace:*
+        version: link:../remark-footnote-gcpm
+      '@vivliostyle/remark-footnote-pandoc':
+        specifier: workspace:*
+        version: link:../remark-footnote-pandoc
       '@vivliostyle/remark-ruby':
         specifier: workspace:*
         version: link:../remark-ruby
