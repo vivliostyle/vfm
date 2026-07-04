@@ -1,0 +1,34 @@
+{
+  "name": "@vivliostyle/internal",
+  "version": "0.0.0",
+  "description": "Internal shared machinery for VFM's own packages.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/internal"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/hast": "^2.0.0",
+    "hastscript": "^7.2.0",
+    "valibot": "1.2.0"
+  }
+}

@@ -20,11 +20,7 @@
 
 import type * as hast from 'hast';
 import { selectAll } from 'hast-util-select';
-import {
-  h,
-  type Properties as HProperties,
-  type Child as HChild,
-} from 'hastscript';
+import { h } from 'hastscript';
 import {
   type Handler as ToHastHandler,
   all as convertToHast,
@@ -34,6 +30,12 @@ import type * as unist from 'unist';
 import { u } from 'unist-builder';
 import * as v from 'valibot';
 import { mergePlugins, partial } from '../utils.js';
+import {
+  buildElement,
+  HastPropertiesSchema,
+  type ElementFactory,
+  type TagAwareH,
+} from '@vivliostyle/internal';
 
 type ElementWithProps = hast.Element & {
   properties: NonNullable<hast.Element['properties']>;
@@ -290,79 +292,14 @@ const createPandocTransformers = () => {
 };
 
 /**
- * Extract the tag name from a hastscript CSS selector string.
- * hastscript recognizes only `#` and `.` as selector shorthand delimiters.
- *
- * - `"aside"` → `"aside"`
- * - `"aside.foo"` → `"aside"`
- * - `".foo"` → `ShorthandTagName` (implicit div, distinguished from explicit `"div"`)
- * - `""` → `ShorthandTagName`
- *
- * @see https://github.com/syntax-tree/hast-util-parse-selector/blob/3.1.1/lib/index.js#L6
- */
-type ExtractTagName<S extends string> = S extends `${infer Tag}${
-  | '.'
-  | '#'}${string}`
-  ? Tag extends ''
-    ? ShorthandTagName
-    : Tag
-  : S extends ''
-    ? ShorthandTagName
-    : S;
-
-const shorthandTagBrand = Symbol();
-
-/**
- * Branded `"div"` produced when hastscript receives a tag-less shorthand
- * selector (e.g. `".foo"`).  Distinguished from an explicit `"div"` so that
- * {@link FootnoteFactory} can accept shorthand at the top level while
- * rejecting an explicit wrong tag name.
- */
-type ShorthandTagName = 'div' & { [shorthandTagBrand]: unknown };
-
-/**
- * Tag-aware `h` function passed to {@link FootnoteFactory}.
- * Accepts any selector freely (enabling child element creation with
- * arbitrary tags), but preserves the tag name extracted from the selector
- * in the return type.
- */
-type TagAwareH = {
-  <S extends string>(
-    selector: S,
-    properties?: HProperties,
-    ...children: HChild[]
-  ): hast.Element & { tagName: ExtractTagName<S> };
-  <S extends string>(
-    selector: S,
-    ...children: HChild[]
-  ): hast.Element & {
-    tagName: ExtractTagName<S>;
-  };
-};
-
-/**
- * Factory that customizes a footnote element.
- *
- * The `h` parameter is a {@link TagAwareH} that accepts any selector
- * (including child-element creation like `h('span.wrap', ...)`), but
- * the return type must have `tagName` matching `TTag` or
- * {@link ShorthandTagName} (tag-less shorthand like `".foo"`).
- * When a shorthand selector is used, the caller overwrites `tagName`
- * at runtime.
- *
- * @template TTag The expected root tag name.
- * @template TProps Structural properties provided by the caller.
- * @template TChildren Children tuple provided by the caller.
+ * Factory that customizes a footnote element. Footnote-specific alias of the
+ * generic {@link ElementFactory}, preserved for backward compatibility.
  */
 export type FootnoteFactory<
   TTag extends string,
   TProps,
   TChildren extends hast.ElementContent[] = hast.ElementContent[],
-> = (
-  h: TagAwareH,
-  properties: TProps,
-  children: TChildren,
-) => hast.Element & { tagName: TTag | ShorthandTagName };
+> = ElementFactory<TTag, TProps, TChildren>;
 
 /** Backlink element placed at the head of a DPUB footnote body. */
 type DpubBacklink = hast.Element & {
@@ -436,14 +373,6 @@ export const FootnoteModeSchema = v.union([
   v.literal('dpub'),
   v.literal('gcpm'),
 ]);
-
-const HastPropertiesSchema = v.pipe(
-  v.custom<hast.Properties>(
-    (input) =>
-      typeof input === 'object' && input !== null && !Array.isArray(input),
-  ),
-  v.metadata({ typeString: 'import("hast").Properties' }),
-);
 
 const dpubCallSchema = v.union([
   HastPropertiesSchema,
@@ -613,37 +542,6 @@ const createFootnoteReferenceHandler = (
       ),
     );
   };
-};
-
-/**
- * Build a hast element by applying a Properties-or-Factory customizer.
- * The caller provides the fixed `tagName` and `structuralProps`;
- * user-supplied Properties are spread after structural ones (user wins).
- * For Factory, the factory receives structural props and its returned
- * properties are merged with structural props winning only for `tagName`.
- */
-const buildElement = <
-  TTag extends string,
-  TProps extends hast.Properties,
-  TChildren extends hast.ElementContent[] = hast.ElementContent[],
->(
-  tagName: TTag,
-  structuralProps: TProps,
-  children: TChildren,
-  customizer:
-    | hast.Properties
-    | FootnoteFactory<TTag, TProps, TChildren>
-    | undefined,
-): hast.Element => {
-  if (typeof customizer === 'function') {
-    const result = customizer(h as TagAwareH, structuralProps, children);
-    result.tagName = tagName;
-    return result;
-  }
-  if (typeof customizer === 'object') {
-    return h(tagName, { ...structuralProps, ...customizer }, ...children);
-  }
-  return h(tagName, structuralProps, ...children);
 };
 
 /**

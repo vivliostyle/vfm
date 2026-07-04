@@ -58,6 +58,18 @@ export {
   type RewriteRelativeHrefExtensionsOptions,
 } from './plugins/rewrite-relative-href-extensions.js';
 export {
+  TableCellPresetSchema,
+  TableOptionsSchema,
+  YamlTableOptionsSchema,
+  type TableCellAlign,
+  type TableCellContext,
+  type TableCellFactory,
+  type TableCellHook,
+  type TableCellPreset,
+  type TableOptions,
+  type YamlTableOptions,
+} from './plugins/table.js';
+export {
   SerializablePluginOptionsSchema,
   type SerializablePluginOptions,
 } from './plugins/options.js';
@@ -243,6 +255,7 @@ export function VFM(
     captionlessImagePolicy,
     footnote,
     rewriteRelativeHrefExtensions,
+    table,
     editPlugins = (plugins) => plugins,
   }: StringifyMarkdownOptions = {},
   metadata: Metadata = {},
@@ -279,6 +292,9 @@ export function VFM(
       rewriteRelativeHrefExtensions =
         metadata.vfm.rewriteRelativeHrefExtensions;
     }
+    if (metadata.vfm.table !== undefined) {
+      table = metadata.vfm.table;
+    }
   }
 
   const { mdastPlugins, mdastToHastHandlers, hastPlugins } = editPlugins({
@@ -294,6 +310,7 @@ export function VFM(
       math,
       disableFormatHtml,
       rewriteRelativeHrefExtensions,
+      table,
     }),
   });
 

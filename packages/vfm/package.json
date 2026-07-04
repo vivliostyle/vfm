@@ -51,6 +51,7 @@
     "@types/hast": "^2.0.0",
     "@types/mdast": "^3.0.0",
     "@types/unist": "^2.0.0",
+    "@vivliostyle/internal": "workspace:*",
     "@vivliostyle/remark-ruby": "workspace:*",
     "@vivliostyle/remark-sectionize": "workspace:*",
     "debug": "^4.4.3",

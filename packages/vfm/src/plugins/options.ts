@@ -7,6 +7,7 @@ import { FormatOptionsSchema } from './format.js';
 import { LineBreaksOptionsSchema } from './line-breaks.js';
 import { MathOptionsSchema } from './math.js';
 import { RewriteRelativeHrefExtensionsOptionsSchema } from './rewrite-relative-href-extensions.js';
+import { TableOptionsSchema } from './table.js';
 
 /**
  * Plugin options that can be expressed as serializable data.
@@ -30,6 +31,7 @@ export const SerializablePluginOptionsSchema = v.intersect([
   CodeOptionsSchema,
   FootnoteOptionsSchema,
   RewriteRelativeHrefExtensionsOptionsSchema,
+  TableOptionsSchema,
 ]);
 
 export type SerializablePluginOptions = v.InferInput<

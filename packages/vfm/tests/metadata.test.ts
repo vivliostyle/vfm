@@ -155,6 +155,27 @@ test.each([
   expect(received.vfm?.captionlessImagePolicy).toBeUndefined();
 });
 
+test.each(['align-attribute', 'align-class', 'align-style'] as const)(
+  'table.cell: accepts %s',
+  (value) => {
+    const received = readMetadata(
+      `---\nvfm:\n  table:\n    cell: ${value}\n---\n`,
+    );
+    expect(received.vfm?.table?.cell).toBe(value);
+  },
+);
+
+test.each([
+  ['unknown string', 'inline-style'],
+  ['boolean', true],
+  ['number', 1],
+])('table.cell: %s falls back to undefined', (_label, value) => {
+  const received = readMetadata(
+    `---\nvfm:\n  table:\n    cell: ${JSON.stringify(value)}\n---\n`,
+  );
+  expect(received.vfm?.table?.cell).toBeUndefined();
+});
+
 test('Title from heading', () => {
   const received = readMetadata(
     `# Heading Title with {Ruby|ルビ} and <mark>HTML tag</mark>`,
