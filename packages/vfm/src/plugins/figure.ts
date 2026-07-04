@@ -1,6 +1,7 @@
 import type * as hast from 'hast';
+import raw from 'hast-util-raw';
 import type * as mdast from 'mdast';
-import { type H, all } from 'mdast-util-to-hast';
+import { type H, one } from 'mdast-util-to-hast';
 import { u } from 'unist-builder';
 import * as v from 'valibot';
 
@@ -65,31 +66,43 @@ const isImageNode = (
   return (maybeMdastNode as { type?: unknown }).type === 'image';
 };
 
-/**
- * Predicate: a paragraph is figure-shaped when it contains exactly one image
- * child. This is a pure structural check and does not consider `alt` content.
- * Whether such a paragraph should actually become a `<figure>` is a policy
- * decision left to {@link buildFigure}, which weighs `alt` and
- * {@link FigureOptions} together.
- *
- * Exposed so callers composing their own `paragraph` handler (e.g. for CJK
- * whitespace handling, indent control) can inspect figure candidacy.
- */
-export const isFigureParagraph = (
+const parseHtml = (value: string): hast.Root =>
+  raw(u('root', [u('raw', value)])) as hast.Root;
+
+const isHtmlComment = (node: unknown): boolean => {
+  if (!node || typeof node !== 'object') return false;
+  const { type, value } = node as { type?: unknown; value?: unknown };
+  if (type !== 'html' || typeof value !== 'string') return false;
+  const { children } = parseHtml(value);
+  // For broken input like an orphan close tag, avoid `[].every(...)` being
+  // vacuously true on an empty parse. It is broken either way; see the
+  // "garbage in, garbage out" tests for the output.
+  return (
+    children.length > 0 && children.every((child) => child.type === 'comment')
+  );
+};
+
+const loneImageParagraph = (
   maybeMdastNode: unknown,
-): maybeMdastNode is mdast.Paragraph & { children: [mdast.Image] } => {
-  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return false;
+): { mdastParagraph: mdast.Paragraph; mdastImage: mdast.Image } | undefined => {
+  if (!maybeMdastNode || typeof maybeMdastNode !== 'object') return undefined;
   const n = maybeMdastNode as { type?: unknown; children?: unknown };
-  if (n.type !== 'paragraph') return false;
-  if (!Array.isArray(n.children) || n.children.length !== 1) return false;
-  return isImageNode(n.children[0]);
+  if (n.type !== 'paragraph') return undefined;
+  if (!Array.isArray(n.children)) return undefined;
+  const effective = n.children.filter((child) => !isHtmlComment(child));
+  return effective.length === 1 && isImageNode(effective[0])
+    ? {
+        mdastParagraph: maybeMdastNode as mdast.Paragraph,
+        mdastImage: effective[0],
+      }
+    : undefined;
 };
 
 /**
- * Build a `<figure>` element from a figure-shaped paragraph. Returns
- * `undefined` when the node is not figure-shaped, or when its image lacks an
- * `alt` and `captionlessImagePolicy` is `'paragraph'` (the default). Callers
- * compose this with their own `<p>` fallback:
+ * Build a `<figure>` from a lone-image paragraph. Returns `undefined` when the
+ * node is not a lone-image paragraph, or when its image lacks an `alt` and
+ * `captionlessImagePolicy` is `'paragraph'` (the default). Callers compose this
+ * with their own `<p>` fallback:
  *
  * ```ts
  * paragraph: (h, node) =>
@@ -105,34 +118,47 @@ export const buildFigure = (
     captionlessImagePolicy = 'paragraph',
   }: FigureOptions = {},
 ): hast.Element | undefined => {
-  if (!isFigureParagraph(maybeMdastNode)) return undefined;
+  const lone = loneImageParagraph(maybeMdastNode);
+  if (!lone) return undefined;
+  const { mdastParagraph, mdastImage } = lone;
 
-  const hasCaption = !!maybeMdastNode.children[0].alt;
+  const hasCaption = !!mdastImage.alt;
   if (!hasCaption && captionlessImagePolicy === 'paragraph') return undefined;
 
-  const converted = all(h, maybeMdastNode);
-  const img = converted[0];
-  if (img?.type !== 'element') return undefined;
+  const hastImg = one(h, mdastImage, mdastParagraph);
+  if (!hastImg || Array.isArray(hastImg) || hastImg.type !== 'element') {
+    return undefined;
+  }
+
+  const toHast = (children: mdast.PhrasingContent[]): hast.ElementContent[] =>
+    children.flatMap((child) => one(h, child, mdastParagraph) ?? []);
+  const at = mdastParagraph.children.indexOf(mdastImage);
+  const imgWithComments = [
+    ...toHast(mdastParagraph.children.slice(0, at)),
+    hastImg,
+    ...toHast(mdastParagraph.children.slice(at + 1)),
+  ];
 
   if (!hasCaption && captionlessImagePolicy === 'figure') {
-    return h(maybeMdastNode, 'figure', [img]);
+    return h(mdastParagraph, 'figure', imgWithComments);
   }
 
   const figcaptionProps: hast.Properties = { 'aria-hidden': 'true' };
-  if (assignIdToFigcaption && img.properties && img.properties.id) {
-    figcaptionProps.id = img.properties.id;
-    delete img.properties.id;
+  if (assignIdToFigcaption && hastImg.properties && hastImg.properties.id) {
+    figcaptionProps.id = hastImg.properties.id;
+    delete hastImg.properties.id;
   }
 
-  const altText = maybeMdastNode.children[0].alt ?? '';
+  const altText = mdastImage.alt ?? '';
   const figcaption = h({ type: 'element' }, 'figcaption', figcaptionProps, [
     u('text', altText),
   ]);
 
-  const figureChildren =
+  return h(
+    mdastParagraph,
+    'figure',
     imgFigcaptionOrder === 'figcaption-img'
-      ? [figcaption, img]
-      : [img, figcaption];
-
-  return h(maybeMdastNode, 'figure', figureChildren);
+      ? [figcaption, ...imgWithComments]
+      : [...imgWithComments, figcaption],
+  );
 };
