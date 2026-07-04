@@ -19,7 +19,8 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/vivliostyle/vfm.git"
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/vfm"
   },
   "homepage": "https://github.com/vivliostyle/vfm",
   "bugs": {

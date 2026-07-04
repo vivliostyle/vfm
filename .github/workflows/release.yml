@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  # Required for OIDC
+  # see https://github.com/npm/documentation/blob/49f623dac37dc2dfc08fa084d46d5ec67dd00824/content/packages-and-modules/securing-your-code/trusted-publishers.mdx?plain=1#L127
+  id-token: write
+  # Required by changesets/action to push the version commit and tags and to create GitHub Releases
+  contents: write
+  # Required by changesets/action to open the "Version Packages" pull request
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up mise
+        uses: jdx/mise-action@v4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Create Release Pull Request or Publish to npm
+        uses: changesets/action@v1.9.0
+        with:
+          publish: pnpm exec changeset publish
