@@ -76,7 +76,6 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
   } satisfies Ruby);
 };
 
-tokenizer.notInLink = true;
 tokenizer.locator = (value, fromIndex) => value.indexOf('{', fromIndex);
 
 // remark
