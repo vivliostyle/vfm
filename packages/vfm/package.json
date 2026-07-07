@@ -51,7 +51,7 @@
     "@types/hast": "^2.0.0",
     "@types/mdast": "^3.0.0",
     "@types/unist": "^2.0.0",
-    "@vivliostyle/internal": "workspace:*",
+    "@vivliostyle/vfm-internal-utils": "workspace:*",
     "@vivliostyle/remark-footnote-dpub": "workspace:*",
     "@vivliostyle/remark-footnote-gcpm": "workspace:*",
     "@vivliostyle/remark-footnote-pandoc": "workspace:*",

@@ -12,7 +12,7 @@ import {
   type ElementFactory as FootnoteFactory,
   HastPropertiesSchema,
   type TagAwareH,
-} from '@vivliostyle/internal';
+} from '@vivliostyle/vfm-internal-utils';
 import type * as hast from 'hast';
 import { h } from 'hastscript';
 import {
@@ -22,7 +22,7 @@ import {
 import type unified from 'unified';
 import * as v from 'valibot';
 
-export type { ElementFactory as FootnoteFactory } from '@vivliostyle/internal';
+export type { ElementFactory as FootnoteFactory } from '@vivliostyle/vfm-internal-utils';
 
 // ---------------------------------------------------------------------------
 // GCPM-specific types and schemas
