@@ -3,7 +3,10 @@ import { type Handler as ToHastHandler } from 'mdast-util-to-hast';
 import { table as defaultTableHandler } from 'mdast-util-to-hast/lib/handlers/table.js';
 import { visit } from 'unist-util-visit';
 import * as v from 'valibot';
-import { buildElement, type ElementFactory } from '@vivliostyle/internal';
+import {
+  buildElement,
+  type ElementFactory,
+} from '@vivliostyle/vfm-internal-utils';
 
 /** Column alignment carried on a GFM table cell. */
 export type TableCellAlign = 'left' | 'center' | 'right';

@@ -12,7 +12,7 @@ import {
   buildElement,
   type ElementFactory as FootnoteFactory,
   HastPropertiesSchema,
-} from '@vivliostyle/internal';
+} from '@vivliostyle/vfm-internal-utils';
 import type * as hast from 'hast';
 import { selectAll } from 'hast-util-select';
 import { h } from 'hastscript';
@@ -25,7 +25,7 @@ import type * as unist from 'unist';
 import { u } from 'unist-builder';
 import * as v from 'valibot';
 
-export type { ElementFactory as FootnoteFactory } from '@vivliostyle/internal';
+export type { ElementFactory as FootnoteFactory } from '@vivliostyle/vfm-internal-utils';
 
 type ElementWithProps = hast.Element & {
   properties: NonNullable<hast.Element['properties']>;
