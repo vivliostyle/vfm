@@ -1,6 +1,6 @@
 {
   "name": "@vivliostyle/remark-footnote-dpub",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "DPUB-ARIA inline footnote plugin used by VFM. Emits `<a role=\"doc-noteref\">` calls with `<aside role=\"doc-footnote\">` bodies placed after the containing block element.",
   "license": "Apache-2.0",
   "engines": {
