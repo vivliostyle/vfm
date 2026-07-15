@@ -1,6 +1,6 @@
 {
   "name": "@vivliostyle/remark-footnote-gcpm",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GCPM-style inline footnote plugin used by VFM. Emits `<span class=\"footnote\">` elements at the call site, with duplicate references rendered as `<a class=\"footnote-duplicated-call\">`.",
   "license": "Apache-2.0",
   "engines": {

@@ -1,6 +1,6 @@
 {
   "name": "@vivliostyle/remark-footnote-pandoc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pandoc-style endnote rewriter used by VFM. Converts mdast-util-to-hast's default endnote markup into a `<section role=\"doc-endnotes\">` block with renumbering and duplicate-call backlinks.",
   "license": "Apache-2.0",
   "engines": {
