@@ -13,6 +13,7 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
 - [Code](#code)
   - [with caption](#with-caption)
 - [Footnotes](#footnotes)
+  - [Footnote mode](#footnote-mode)
 - [Frontmatter](#frontmatter)
   - [Defined properties](#defined-properties)
   - [Priority with options](#priority-with-options)
@@ -20,12 +21,21 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
 - [Hard new line](#hard-new-line)
 - [Image](#image)
   - [with caption and single line](#with-caption-and-single-line)
+  - [Captionless image policy](#captionless-image-policy)
+  - [Order of img and figcaption](#order-of-img-and-figcaption)
+  - [Assign ID to figcaption](#assign-id-to-figcaption)
+  - [Parse figcaption as inline markdown](#parse-figcaption-as-inline-markdown)
+- [Link](#link)
+  - [Rewrite relative href extensions](#rewrite-relative-href-extensions)
 - [Math equation](#math-equation)
+  - [Math renderer](#math-renderer)
 - [Raw HTML](#raw-html)
   - [with Markdown](#with-markdown)
 - [Ruby](#ruby)
   - [Escape pipe in ruby body](#escape-pipe-in-ruby-body)
 - [Sectionization](#sectionization)
+- [Table](#table)
+  - [Cell alignment output](#cell-alignment-output)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -140,6 +150,64 @@ Footnotes can also be written inline^[This part is a footnote.].
 
 ```css
 .footnotes {
+}
+```
+
+### Footnote mode
+
+Selects how footnotes are output with the `footnote` option (`pandoc`, `dpub` or `gcpm`).
+
+- `stringify` / `VFM` API options: `footnote: 'dpub'`
+- CLI options: `--footnote dpub`
+- Frontmatter: `footnote: 'dpub'` of `vfm:` property
+
+**VFM**
+
+```markdown
+VFM is developed in the GitHub repository[^1].
+Footnotes can also be written inline^[This part is a footnote.].
+
+[^1]: [VFM](https://github.com/vivliostyle/vfm)
+```
+
+**HTML** (`footnote: 'pandoc'`, default)
+
+Collects the notes into an endnote section at the end of the document. Refer to the previous example.
+
+**HTML** (`footnote: 'dpub'`)
+
+Places each note as an `<aside role="doc-footnote">` element after the block element containing its call, following [DPUB-ARIA](https://www.w3.org/TR/dpub-aria-1.1/).
+
+```html
+<p>
+  VFM is developed in the GitHub repository<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a>.
+  Footnotes can also be written inline<a id="fnref2" href="#fn2" class="footnote-ref" role="doc-noteref"><sup>2</sup></a>.
+</p>
+<aside id="fn2" class="footnote" role="doc-footnote"><a href="#fnref2" class="footnote-back" role="doc-backlink"><sup>2</sup></a>This part is a footnote.</aside>
+<aside id="fn1" class="footnote" role="doc-footnote"><a href="#fnref1" class="footnote-back" role="doc-backlink"><sup>1</sup></a><a href="https://github.com/vivliostyle/vfm">VFM</a></aside>
+```
+
+**HTML** (`footnote: 'gcpm'`)
+
+Embeds each note inline at the call site as `<span class="footnote">`, for footnote floating by [CSS GCPM](https://www.w3.org/TR/css-gcpm-3/#footnotes).
+
+```html
+<p>
+  VFM is developed in the GitHub repository<span class="footnote" id="fn-1" role="doc-footnote"><a href="https://github.com/vivliostyle/vfm">VFM</a></span>.
+  Footnotes can also be written inline<span class="footnote" id="fn-2" role="doc-footnote">This part is a footnote.</span>.
+</p>
+```
+
+**CSS**
+
+```css
+/* dpub */
+aside.footnote {
+}
+
+/* gcpm */
+span.footnote {
+  float: footnote;
 }
 ```
 
@@ -258,10 +326,18 @@ Text
 | Property            | Type      | Default | Description |
 | ------------------: | :-------: | :-----: | --- |
 | `math`              | `Boolean` | `true`  | Enable math syntax. |
+| `mathRenderer`      | `String`  | `'mathjax'` | Math renderer, value is `'mathjax'` or `'mathml'`. Refer to [Math renderer](#math-renderer). |
 | `partial`           | `Boolean` | `false` | Output markdown fragments. |
 | `hardLineBreaks`    | `Boolean` | `false` | Add `<br>` at the position of hard line breaks, without needing spaces. |
 | `disableFormatHtml` | `Boolean` | `false` | Disable automatic HTML format. |
 | `theme`             | `String`  | -       | Vivliostyle theme package or bare CSS file. |
+| `imgFigcaptionOrder` | `String` | `'img-figcaption'` | Order of `img` and `figcaption` elements in `figure`, value is `'img-figcaption'` or `'figcaption-img'`. Refer to [Order of img and figcaption](#order-of-img-and-figcaption). |
+| `assignIdToFigcaption` | `Boolean` | `false` | Assign ID to `figcaption` instead of `img` / `code`. Refer to [Assign ID to figcaption](#assign-id-to-figcaption). |
+| `captionlessImagePolicy` | `String` | `'paragraph'` | How to render an image-only paragraph whose `alt` is empty, value is `'paragraph'`, `'figure'` or `'figure-with-figcaption'`. Refer to [Captionless image policy](#captionless-image-policy). |
+| `parseFigcaptionAsInline` | `Boolean` | `false` | Re-parse figcaption text as inline markdown. Refer to [Parse figcaption as inline markdown](#parse-figcaption-as-inline-markdown). |
+| `footnote`          | `String`  | `'pandoc'` | Footnote output mode, value is `'pandoc'`, `'dpub'` or `'gcpm'`. Refer to [Footnote mode](#footnote-mode). |
+| `rewriteRelativeHrefExtensions` | `Boolean` or `String[]` | `false` | Rewrite the extension of relative document links to `.html`. Refer to [Rewrite relative href extensions](#rewrite-relative-href-extensions). |
+| `table`             | `Object`  | -       | Table output settings, e.g. `cell: 'align-class'`. Refer to [Cell alignment output](#cell-alignment-output). |
 
 ### Priority with options
 
@@ -414,6 +490,180 @@ figure figcaption {
 }
 ```
 
+The `<figcaption>` is `aria-hidden` by default because it duplicates the image `alt`. When an explicit `{alt=...}` attribute differs from the caption, both are exposed to assistive technology.
+
+**VFM**
+
+```md
+![Figure 3](./fig3.png){alt="Photo of fig 3"}
+```
+
+**HTML**
+
+```html
+<figure>
+  <img src="./fig3.png" alt="Photo of fig 3">
+  <figcaption>Figure 3</figcaption>
+</figure>
+```
+
+### Captionless image policy
+
+Controls how an image-only paragraph without a caption (empty `alt`) is rendered, with the `captionlessImagePolicy` option (`paragraph`, `figure` or `figure-with-figcaption`).
+
+- `stringify` / `VFM` API options: `captionlessImagePolicy: 'figure'`
+- CLI options: `--captionless-image-policy figure`
+- Frontmatter: `captionlessImagePolicy: 'figure'` of `vfm:` property
+
+**VFM**
+
+```md
+![](./divider.svg)
+```
+
+**HTML** (`captionlessImagePolicy: 'paragraph'`, default)
+
+```html
+<p>
+  <img src="./divider.svg">
+</p>
+```
+
+**HTML** (`captionlessImagePolicy: 'figure'`)
+
+```html
+<figure>
+  <img src="./divider.svg">
+</figure>
+```
+
+**HTML** (`captionlessImagePolicy: 'figure-with-figcaption'`)
+
+The empty `<figcaption>` stays `aria-hidden` to avoid accessibility-tree noise. This value lets CSS counters and `imgFigcaptionOrder` / `assignIdToFigcaption` apply uniformly across captioned and captionless cases.
+
+```html
+<figure>
+  <img src="./divider.svg">
+  <figcaption aria-hidden="true"></figcaption>
+</figure>
+```
+
+**CSS**
+
+```css
+figure img {
+}
+figure figcaption {
+}
+```
+
+### Order of img and figcaption
+
+Controls the order of `<img>` and `<figcaption>` in `<figure>` with the `imgFigcaptionOrder` option (`img-figcaption` or `figcaption-img`, the default is `img-figcaption`).
+
+- `stringify` / `VFM` API options: `imgFigcaptionOrder: 'figcaption-img'`
+- CLI options: `--img-figcaption-order figcaption-img`
+- Frontmatter: `imgFigcaptionOrder: 'figcaption-img'` of `vfm:` property
+
+**VFM**
+
+```md
+![Figure 1](./fig1.png)
+```
+
+**HTML** (`imgFigcaptionOrder: 'figcaption-img'`)
+
+```html
+<figure>
+  <figcaption aria-hidden="true">Figure 1</figcaption>
+  <img src="./fig1.png" alt="Figure 1">
+</figure>
+```
+
+### Assign ID to figcaption
+
+If `assignIdToFigcaption: true` is specified, the `id` attribute written with the image is assigned to `<figcaption>` instead of `<img>`.
+
+- `stringify` / `VFM` API options: `assignIdToFigcaption: true`
+- CLI options: `--assign-id-to-figcaption`
+- Frontmatter: `assignIdToFigcaption: true` of `vfm:` property
+
+**VFM**
+
+```md
+![Figure 2](./fig2.png){id="image"}
+```
+
+**HTML** (`assignIdToFigcaption: true`)
+
+```html
+<figure>
+  <img src="./fig2.png" alt="Figure 2">
+  <figcaption aria-hidden="true" id="image">Figure 2</figcaption>
+</figure>
+```
+
+### Parse figcaption as inline markdown
+
+If `parseFigcaptionAsInline: true` is specified, the caption text is re-parsed as inline markdown (emphasis, ruby, math, footnotes, ...etc). The image `alt` is derived from the plain text of the rendered caption.
+
+- `stringify` / `VFM` API options: `parseFigcaptionAsInline: true`
+- CLI options: `--parse-figcaption-as-inline`
+- Frontmatter: `parseFigcaptionAsInline: true` of `vfm:` property
+
+**VFM**
+
+```md
+![**Figure** {V|ビ} $x$](./fig1.png)
+```
+
+**HTML** (`parseFigcaptionAsInline: true`)
+
+```html
+<figure>
+  <img src="./fig1.png" alt="Figure Vビ \(x\)">
+  <figcaption aria-hidden="true"><strong>Figure</strong> <ruby>V<rt>ビ</rt></ruby> <span class="math inline" data-math-typeset="true">\(x\)</span></figcaption>
+</figure>
+```
+
+**HTML** (`parseFigcaptionAsInline: false`, default)
+
+```html
+<figure>
+  <img src="./fig1.png" alt="**Figure** {V|ビ} $x$">
+  <figcaption aria-hidden="true">**Figure** {V|ビ} $x$</figcaption>
+</figure>
+```
+
+## Link
+
+Standard Markdown links.
+
+### Rewrite relative href extensions
+
+Rewrites the trailing extension of relative hyperlink `href`s to `.html`, with the `rewriteRelativeHrefExtensions` option. Useful for multi-file books where each Markdown file is converted to HTML. `true` is shorthand for `['md']`; pass an array (e.g. `['md', 'adoc']`) to broaden the set of source extensions.
+
+- `stringify` / `VFM` API options: `rewriteRelativeHrefExtensions: true`
+- CLI options: `--rewrite-relative-href-extensions md` (repeatable)
+- Frontmatter: `rewriteRelativeHrefExtensions: true` of `vfm:` property
+
+Only `<a>` and `<area>` elements whose reference is relative (no scheme, no host, and the path does not start with `/`) are rewritten. Query strings and fragments are preserved. The rewrite is purely syntactic: the file system is not consulted, so producing the target `*.html` is the embedder's responsibility.
+
+**VFM**
+
+```md
+[Chapter 2](./chapter2.md#intro)
+
+[Remote](https://example.com/page.md)
+```
+
+**HTML** (`rewriteRelativeHrefExtensions: true`)
+
+```html
+<p><a href="./chapter2.html#intro">Chapter 2</a></p>
+<p><a href="https://example.com/page.md">Remote</a></p>
+```
+
 ## Math equation
 
 Outputs HTML processed by [MathJax](https://www.mathjax.org/).
@@ -478,6 +728,60 @@ It also outputs `<script>` for processing MathJax if `math` is enabled and the m
 }
 
 .math.display {
+}
+```
+
+### Math renderer
+
+Selects the renderer used when `math` is enabled, with the `mathRenderer` option (`mathjax` or `mathml`, the default is `mathjax`).
+
+- `stringify` / `VFM` API options: `mathRenderer: 'mathml'`
+- CLI options: `--math-renderer mathml`
+- Frontmatter: `mathRenderer: 'mathml'` of `vfm:` property
+
+`'mathjax'` keeps the LaTeX source and outputs a `<script>` to load MathJax for runtime rendering, as in the previous example. `'mathml'` converts LaTeX to MathML at build time via [Temml](https://temml.org/); no runtime script is output.
+
+With `'mathml'`, a `$$` equation whose fences stand on their own lines is rendered in display mode as `<math display="block">`.
+
+**VFM**
+
+```markdown
+inline: $x = y$
+
+$$
+1 + 1 = 2
+$$
+```
+
+**HTML** (`mathRenderer: 'mathml'`)
+
+```html
+<p>inline: 
+  <math>
+    <mrow>
+      <mi>x</mi>
+      <mo>=</mo>
+      <mi>y</mi>
+    </mrow>
+  </math>
+</p>
+<math display="block" class="tml-display" style="display:block math;">
+  <mrow>
+    <mn>1</mn>
+    <mo>+</mo>
+    <mn>1</mn>
+    <mo>=</mo>
+    <mn>2</mn>
+  </mrow>
+</math>
+```
+
+**CSS**
+
+```css
+math {
+}
+math[display='block'] {
 }
 ```
 
@@ -642,5 +946,112 @@ section:has(> h1.title) {
 }
 
 blockquote > h1 {
+}
+```
+
+## Table
+
+[GFM tables](https://github.github.com/gfm/#tables-extension-) are supported.
+
+### Cell alignment output
+
+Column alignment written in the delimiter row is output as the HTML4 `align` attribute by default. The `table.cell` option selects how each cell (`th` / `td`) expresses the alignment (`align-attribute`, `align-class` or `align-style`, the default is `align-attribute`).
+
+- `stringify` / `VFM` API options: `table: { cell: 'align-class' }`
+- CLI options: `--table-cell align-class`
+- Frontmatter: `cell: 'align-class'` of `table:` in `vfm:` property
+
+`'align-class'` outputs a `table-align-{left|center|right}` class instead, which conforms to HTML5 / EPUB 3.3. VFM ships no CSS for it; styling is the theme's responsibility. `'align-style'` outputs an inline `style="text-align: ..."` instead, which conforms to HTML5 / EPUB 3.3 and renders aligned without accompanying CSS.
+
+In the Node.js API, `table.cell` also accepts a function (`TableCellHook`) that customizes each cell freely. Refer to the TypeScript type information.
+
+**VFM**
+
+```md
+| Left | Center | Right | None |
+|:-----|:------:|------:|------|
+| a    | b      | c     | d    |
+```
+
+**HTML** (`table.cell: 'align-attribute'`, default)
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th align="left">Left</th>
+      <th align="center">Center</th>
+      <th align="right">Right</th>
+      <th>None</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td align="left">a</td>
+      <td align="center">b</td>
+      <td align="right">c</td>
+      <td>d</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+**HTML** (`table.cell: 'align-class'`)
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th class="table-align-left">Left</th>
+      <th class="table-align-center">Center</th>
+      <th class="table-align-right">Right</th>
+      <th>None</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="table-align-left">a</td>
+      <td class="table-align-center">b</td>
+      <td class="table-align-right">c</td>
+      <td>d</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+**HTML** (`table.cell: 'align-style'`)
+
+```html
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Left</th>
+      <th style="text-align: center">Center</th>
+      <th style="text-align: right">Right</th>
+      <th>None</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">a</td>
+      <td style="text-align: center">b</td>
+      <td style="text-align: right">c</td>
+      <td>d</td>
+    </tr>
+  </tbody>
+</table>
+```
+
+**CSS**
+
+```css
+.table-align-left {
+  text-align: left;
+}
+.table-align-center {
+  text-align: center;
+}
+.table-align-right {
+  text-align: right;
 }
 ```
