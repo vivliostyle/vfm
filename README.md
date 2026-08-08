@@ -23,6 +23,7 @@ Vivliostyle Flavored Markdown (VFM), a Markdown syntax optimized for book author
     - [`hardLineBreaks` (default: `false`)](#hardlinebreaks-default-false)
     - [`disableFormatHtml` (default: `false`)](#disableformathtml-default-false)
     - [`math` (default: `true`)](#math-default-true)
+    - [Other options](#other-options)
   - [Advanced usage](#advanced-usage)
     - [Unified processor](#unified-processor)
     - [Unified plugin](#unified-plugin)
@@ -313,6 +314,21 @@ will generates:
   </body>
 </html>
 ```
+
+#### Other options
+
+The following options are also available. Refer to [Vivliostyle Flavored Markdown](https://vivliostyle.github.io/vfm/#/vfm) and [Hooks](https://vivliostyle.github.io/vfm/#/hooks) for details.
+
+- `mathRenderer` (default: `'mathjax'`): Math renderer, `'mathjax'` or `'mathml'`.
+- `replace`: Rules to replace custom inline syntax.
+- `editPlugins`: Edit the plugin lists assembled by VFM before the processor is built.
+- `imgFigcaptionOrder` (default: `'img-figcaption'`): Order of `img` and `figcaption` elements in `figure`.
+- `assignIdToFigcaption` (default: `false`): Assign ID to `figcaption` instead of `img` / `code`.
+- `captionlessImagePolicy` (default: `'paragraph'`): How to render an image-only paragraph whose `alt` is empty.
+- `parseFigcaptionAsInline` (default: `false`): Re-parse figcaption text as inline markdown.
+- `footnote` (default: `'pandoc'`): Footnote output mode, `'pandoc'`, `'dpub'` or `'gcpm'`.
+- `rewriteRelativeHrefExtensions` (default: `false`): Rewrite the extension of relative document links to `.html`.
+- `table`: Table output settings, e.g. `{ cell: 'align-class' }`.
 
 ### Advanced usage
 
