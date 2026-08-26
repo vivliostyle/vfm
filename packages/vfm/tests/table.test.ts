@@ -1,215 +1,41 @@
-import { test, expect } from 'vitest';
-import { stringify } from '../src/index.js';
+import { expect, test } from 'vitest';
+import * as v from 'valibot';
+import {
+  stringify,
+  TableCellHookSchema,
+  TableOptionsSchema,
+} from '../src/index.js';
+import { resolveTableCellHook } from '../src/plugins/table.js';
+import { alignByAttribute } from '@vivliostyle/mdast-to-hast-table-cell';
 
-// `--:` right, `:-:` center, `---` unaligned.
-const tableMd = [
-  '| P | D | N |',
-  '| --: | :-: | --- |',
-  '| `id` | x | y |',
-].join('\n');
+const tableMd = ['| A |', '| :-: |', '| x |'].join('\n');
 
-test('default emits the HTML4 align attribute', () => {
-  const received = stringify(tableMd, { partial: true });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th align="right">P</th>
-      <th align="center">D</th>
-      <th>N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td align="right"><code>id</code></td>
-      <td align="center">x</td>
-      <td>y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
+test('resolves an omitted table cell option to alignByAttribute', () => {
+  expect(resolveTableCellHook()).toBe(alignByAttribute);
 });
 
-test("'align-attribute' preset is identical to the default", () => {
+test('exports TableOptionsSchema', () => {
   expect(
-    stringify(tableMd, { partial: true, table: { cell: 'align-attribute' } }),
-  ).toBe(stringify(tableMd, { partial: true }));
+    v.parse(TableOptionsSchema, { table: { cell: 'align-style' } }),
+  ).toEqual({ table: { cell: 'align-style' } });
 });
 
-test("'align-class' preset emits table-align-* classes and drops align", () => {
-  const received = stringify(tableMd, {
-    partial: true,
-    table: { cell: 'align-class' },
-  });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th class="table-align-right">P</th>
-      <th class="table-align-center">D</th>
-      <th>N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="table-align-right"><code>id</code></td>
-      <td class="table-align-center">x</td>
-      <td>y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
+test('exports the VFM table cell hook schema', () => {
+  const hook = () => ({});
+  expect(v.parse(TableCellHookSchema, hook)).toBe(hook);
 });
 
-test("'align-style' preset emits inline text-align style and drops align", () => {
+test('applies table cell alignment output through the programmatic API', () => {
   const received = stringify(tableMd, {
     partial: true,
     table: { cell: 'align-style' },
   });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: right">P</th>
-      <th style="text-align: center">D</th>
-      <th>N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: right"><code>id</code></td>
-      <td style="text-align: center">x</td>
-      <td>y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
+  expect(received).toContain('<th style="text-align: center">A</th>');
+  expect(received).toContain('<td style="text-align: center">x</td>');
 });
 
-test('custom Properties hook receives align and tagName', () => {
-  const received = stringify(tableMd, {
-    partial: true,
-    table: { cell: ({ align }) => (align ? { 'data-align': align } : {}) },
-  });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th data-align="right">P</th>
-      <th data-align="center">D</th>
-      <th>N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td data-align="right"><code>id</code></td>
-      <td data-align="center">x</td>
-      <td>y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
-});
-
-test('custom hook can branch on tagName (th for header, td for body)', () => {
-  // Mark only header cells, proving the hook is handed `th` for the header row
-  // and `td` for body rows per the TableCellContext contract.
-  const received = stringify(tableMd, {
-    partial: true,
-    table: {
-      cell: ({ tagName }) => (tagName === 'th' ? { 'data-head': 'yes' } : {}),
-    },
-  });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th data-head="yes">P</th>
-      <th data-head="yes">D</th>
-      <th data-head="yes">N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>id</code></td>
-      <td>x</td>
-      <td>y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
-});
-
-test('custom Factory hook rebuilds the cell using the context tagName', () => {
-  // The hook owns the tag: it builds `th` for the header row and `td` for body
-  // rows by reading `tagName` from the context.
-  const received = stringify(tableMd, {
-    partial: true,
-    table: {
-      cell:
-        ({ tagName }) =>
-        (h, props, children) =>
-          h(tagName, props, h('span.cell', children)),
-    },
-  });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th><span class="cell">P</span></th>
-      <th><span class="cell">D</span></th>
-      <th><span class="cell">N</span></th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><span class="cell"><code>id</code></span></td>
-      <td><span class="cell">x</span></td>
-      <td><span class="cell">y</span></td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
-});
-
-test('factory tag-less shorthand fills in the cell tag (th/td)', () => {
-  // `h('.foo')` is a tag-less shorthand (a bare div); the machinery substitutes
-  // the cell's own tag, so it becomes a th/td rather than leaking a div.
-  const received = stringify(tableMd, {
-    partial: true,
-    table: {
-      cell: () => (h, props, children) => h('.foo', props, ...children),
-    },
-  });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th class="foo">P</th>
-      <th class="foo">D</th>
-      <th class="foo">N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="foo"><code>id</code></td>
-      <td class="foo">x</td>
-      <td class="foo">y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
-});
-
-test("'align-class' selectable via vfm frontmatter", () => {
-  const md = [
+test('applies table cell alignment output through frontmatter', () => {
+  const markdown = [
     '---',
     'vfm:',
     '  table:',
@@ -218,76 +44,45 @@ test("'align-class' selectable via vfm frontmatter", () => {
     '',
     tableMd,
   ].join('\n');
-  const received = stringify(md, { partial: true });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th class="table-align-right">P</th>
-      <th class="table-align-center">D</th>
-      <th>N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td class="table-align-right"><code>id</code></td>
-      <td class="table-align-center">x</td>
-      <td>y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
+  const received = stringify(markdown, { partial: true });
+  expect(received).toContain('<th class="table-align-center">A</th>');
+  expect(received).toContain('<td class="table-align-center">x</td>');
 });
 
-test("'align-style' selectable via vfm frontmatter", () => {
-  const md = [
-    '---',
-    'vfm:',
-    '  table:',
-    '    cell: align-style',
-    '---',
-    '',
-    tableMd,
-  ].join('\n');
-  const received = stringify(md, { partial: true });
-  const expected = `
-<table>
-  <thead>
-    <tr>
-      <th style="text-align: right">P</th>
-      <th style="text-align: center">D</th>
-      <th>N</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: right"><code>id</code></td>
-      <td style="text-align: center">x</td>
-      <td>y</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
-});
-
-test('author raw HTML tables pass through untouched (GFM-generated cells only)', () => {
-  // A raw HTML table is an mdast `html` node, not a `table` node, so it never
-  // reaches the table handler; `align-class` leaves its cells alone.
-  const raw = '<table><tr><td align="right">raw</td></tr></table>';
-  const received = stringify(raw, {
+test('applies a table cell function handler through VFM', () => {
+  const received = stringify(tableMd, {
     partial: true,
-    table: { cell: 'align-class' },
+    table: {
+      cell: ({ align }) => (align ? { 'data-align': align } : {}),
+    },
   });
-  const expected = `
-<table>
-  <tbody>
-    <tr>
-      <td align="right">raw</td>
-    </tr>
-  </tbody>
-</table>
-`;
-  expect(received).toBe(expected);
+  expect(received).toContain('<th data-align="center">A</th>');
+  expect(received).toContain('<td data-align="center">x</td>');
+});
+
+test('passes undefined to VFM hooks for unaligned cells', () => {
+  const markdown = ['| A | B |', '| :-: | --- |', '| x | y |'].join('\n');
+  const received = stringify(markdown, {
+    partial: true,
+    table: {
+      cell: ({ align }) =>
+        align === undefined ? { 'data-unaligned': 'yes' } : {},
+    },
+  });
+  expect(received).toContain('<th data-unaligned="yes">B</th>');
+  expect(received).toContain('<td data-unaligned="yes">y</td>');
+});
+
+test('adapts a table cell factory through VFM', () => {
+  const received = stringify(tableMd, {
+    partial: true,
+    table: {
+      cell:
+        ({ tagName }) =>
+        (h, properties, children) =>
+          h(tagName, properties, h('span.cell', children)),
+    },
+  });
+  expect(received).toContain('<th><span class="cell">A</span></th>');
+  expect(received).toContain('<td><span class="cell">x</span></td>');
 });

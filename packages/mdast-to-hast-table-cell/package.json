@@ -1,0 +1,45 @@
+{
+  "name": "@vivliostyle/mdast-to-hast-table-cell",
+  "version": "0.0.0",
+  "description": "Composable mdast-to-hast handler enhancer for customizing GFM table cell output.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/mdast-to-hast-table-cell"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/hast": "^2.0.0",
+    "hast-util-get-attribute": "^1.1.1",
+    "hast-util-get-class-list": "^1.0.0",
+    "mdast-util-to-hast": "^11.3.0",
+    "unist-util-visit": "^4.1.2",
+    "valibot": "1.4.2"
+  },
+  "devDependencies": {
+    "rehype-format": "^3.1.0",
+    "rehype-raw": "^5.1.0",
+    "rehype-stringify": "^8.0.0",
+    "remark-parse": "^8.0.2",
+    "remark-rehype": "^8.1.0",
+    "unified": "^9.2.0"
+  }
+}

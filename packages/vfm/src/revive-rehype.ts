@@ -1,4 +1,5 @@
 import { type Handler, all } from 'mdast-util-to-hast';
+import { table as defaultTableHandler } from 'mdast-util-to-hast/lib/handlers/table.js';
 import raw from 'rehype-raw';
 import unified from 'unified';
 import { handler as code, type CodeOptions } from './plugins/code.js';
@@ -30,7 +31,8 @@ import {
   resolveRewriteRelativeHrefExtensions,
   type RewriteRelativeHrefExtensionsOptions,
 } from './plugins/rewrite-relative-href-extensions.js';
-import { createTableHandler, type TableOptions } from './plugins/table.js';
+import { withTableCellTransform } from '@vivliostyle/mdast-to-hast-table-cell';
+import { resolveTableCellHook, type TableOptions } from './plugins/table.js';
 import { handler as ruby } from '@vivliostyle/remark-ruby';
 import { brand, partial } from './utils.js';
 
@@ -128,7 +130,9 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
         buildDisplayMath(node, options) ??
         buildFigure(h, node, options) ??
         h(node, 'p', all(h, node))) as Handler,
-      table: createTableHandler(options),
+      table: withTableCellTransform(resolveTableCellHook(options.table?.cell))(
+        defaultTableHandler,
+      ),
       ...footnoteHandlers,
     } as const,
     hastPlugins: [
