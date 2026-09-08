@@ -1,0 +1,38 @@
+{
+  "name": "@vivliostyle/rehype-rewrite-extension",
+  "version": "0.0.0",
+  "description": "rehype plugin to rewrite trailing extensions in selected URI properties.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages/rehype-rewrite-extension"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/hast": "^2.0.0",
+    "@types/unist": "^2.0.0",
+    "hast-util-get-attribute": "^1.1.1",
+    "hast-util-select": "^5.0.5",
+    "upath": "^3.0.8",
+    "uri-js": "^4.4.1",
+    "valibot": "1.4.2"
+  }
+}

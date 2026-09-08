@@ -23,7 +23,11 @@ import {
 } from './plugins/math.js';
 import { replace, type ReplaceOptions } from './plugins/replace.js';
 import {
-  rewriteRelativeHrefExtensions,
+  rewriteExtension,
+  type RewriteExtensionOptions,
+} from '@vivliostyle/rehype-rewrite-extension';
+import {
+  resolveRewriteRelativeHrefExtensions,
   type RewriteRelativeHrefExtensionsOptions,
 } from './plugins/rewrite-relative-href-extensions.js';
 import { createTableHandler, type TableOptions } from './plugins/table.js';
@@ -82,6 +86,29 @@ export type RehypeRewriteRelativeHrefExtensionsPlugin = unified.Pluggable & {
 };
 
 /**
+ * Only `<a>` and `<area>` unconditionally create hyperlinks when they have an
+ * `href`, per HTML Standard §4.6. `<base>` and `<link>` instead provide
+ * document metadata, so their relative href extensions must remain unchanged.
+ * @see {@link https://html.spec.whatwg.org/commit-snapshots/6f84b26bd6eb8bd0e0e8df9819e43e901867166b/#links-created-by-a-and-area-elements}
+ */
+const relativeHrefRules = (
+  value: RewriteRelativeHrefExtensionsOptions['rewriteRelativeHrefExtensions'],
+): RewriteExtensionOptions['rules'] => {
+  if (
+    value === false ||
+    value === undefined ||
+    (Array.isArray(value) && value.length === 0)
+  ) {
+    return [];
+  }
+  const resolver = resolveRewriteRelativeHrefExtensions(value);
+  return [
+    { selector: 'a[href]', property: 'href', resolver },
+    { selector: 'area[href]', property: 'href', resolver },
+  ];
+};
+
+/**
  * Create Hypertext AST handlers and transformers.
  * @param options Options for rehype transformers.
  * @returns Handlers and transformers.
@@ -113,7 +140,9 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       brand<RehypeFootnotePlugin>(footnoteTransformer),
       brand<RehypeReplacePlugin>(partial(replace, options)),
       brand<RehypeRewriteRelativeHrefExtensionsPlugin>(
-        partial(rewriteRelativeHrefExtensions, options),
+        partial(rewriteExtension, {
+          rules: relativeHrefRules(options.rewriteRelativeHrefExtensions),
+        }),
       ),
       brand<RehypeDocumentPlugin>(partial(doc, options)),
       // Must be run after `rehype-document` to write to `<head>`
