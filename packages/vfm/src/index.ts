@@ -65,13 +65,16 @@ export {
   type RewriteRelativeHrefExtensionsOptions,
 } from './plugins/rewrite-relative-href-extensions.js';
 export {
-  TableCellPresetSchema,
   TableOptionsSchema,
+  TableCellHookSchema,
+  TableCellOptionSchema,
+  TableCellPresetSchema,
   YamlTableOptionsSchema,
   type TableCellAlign,
   type TableCellContext,
   type TableCellFactory,
   type TableCellHook,
+  type TableCellOption,
   type TableCellPreset,
   type TableOptions,
   type YamlTableOptions,
