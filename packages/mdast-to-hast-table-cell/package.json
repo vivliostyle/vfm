@@ -1,6 +1,6 @@
 {
   "name": "@vivliostyle/mdast-to-hast-table-cell",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Composable mdast-to-hast handler enhancer for customizing GFM table cell output.",
   "license": "Apache-2.0",
   "engines": {
