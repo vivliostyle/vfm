@@ -1,8 +1,9 @@
-# pnpm は `pnpm` ではなく `"npm:pnpm"` を指定する。
-# 前者は GitHub API に依存しており OAuth トークン (gh CLI のログイン情報など) が無いと
-# 60 req/h の匿名アクセス上限でトラブルになる事例が報告されている。また pnpm 自身が
-# Node.js をバンドルするため Node.js が二重にダウンロードされる。
-# npm 経由で取得することでいずれの問題も回避できる。
+# pnpm は `pnpm` (aqua バックエンド) を指定する。
+# 以前は GitHub API の匿名レート制限 (60 req/h) を避けるため `"npm:pnpm"` としていたが、
+# 現在の mise は公開リポジトリーのリリース情報を mise-versions.jdx.dev 経由で取得するため
+# トークン無しでも問題なく、CI の jdx/mise-action も既定で GITHUB_TOKEN を渡す。
+# 一方 pnpm 12 以降の npm パッケージは install script でネイティブ バイナリーへ差し替える
+# 配布形態となり、install script を実行しない mise の npm バックエンドでは動作しない。
 [tools]
 node = "22.22.3"
-"npm:pnpm" = "11.2.2"
+pnpm = "11.2.2"
