@@ -52,6 +52,7 @@ Rules for the co-existence period:
 - Every package in `packages-next/` has the `-next` suffix in its `name`, and `workspace:*` dependencies and `import` statements between next packages use the suffixed names. This keeps pnpm `--filter` and `workspace:*` resolution unambiguous. The suffix is removed when next replaces current.
 - Bug fixes for the released packages go to `packages/`. Migration work goes to `packages-next/`. Do not apply migration changes to `packages/`.
 - `packages-next/` has no `CHANGELOG.md` and is excluded from changesets. Do not add changesets for next packages.
+- Tests in `packages-next/` compare an MDAST dump next to the HTML. Regenerate the dump with the `mdast` script instead of editing it by hand; see the Tests section of [packages-next/README.md](./packages-next/README.md).
 - `pnpm-workspace.yaml` carries `overrides` and `packageExtensions` that keep the `@types/unist` / `unified` / `vfile` type resolution of each tree on its own major. When you add a dependency to `packages-next/` that also exists in `packages/` at an older major, run `pnpm build` at the root to confirm both trees still compile. See breaking point 19 in [docs/dev/remark13-breaking-points.md](./docs/dev/remark13-breaking-points.md).
 - `pnpm build` and `pnpm test` at the repository root run both trees. To work on one tree only:
 
