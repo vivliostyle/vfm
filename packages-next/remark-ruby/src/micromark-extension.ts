@@ -67,7 +67,7 @@ const rubyLookahead: Construct = {
     /**
      * At `{`: open the scratch token and consume the brace.
      * `consume` needs an open token even inside a `check`.
-     * @param code Current character code.
+     * @param code - Current character code.
      * @returns Next state.
      */
     function start(code: number | null): State | undefined {
@@ -79,7 +79,7 @@ const rubyLookahead: Construct = {
     /**
      * Scan the rest of the line for an unescaped `|` followed by `}`.
      * Succeeds at the first `}` after a separator; fails at the line end.
-     * @param code Current character code.
+     * @param code - Current character code.
      * @returns Next state.
      */
     function scan(code: number | null): State | undefined {
@@ -101,7 +101,7 @@ const rubyLookahead: Construct = {
 
     /**
      * After a backslash: skip the escaped character so `\|` and `\}` do not count.
-     * @param code Current character code.
+     * @param code - Current character code.
      * @returns Next state.
      */
     function escaped(code: number | null): State | undefined {
@@ -114,8 +114,8 @@ const rubyLookahead: Construct = {
 
     /**
      * Close the scratch token and hand over to `ok` or `nok`.
-     * @param next `ok` or `nok`.
-     * @param code Current character code.
+     * @param next - `ok` or `nok`.
+     * @param code - Current character code.
      * @returns Next state.
      */
     function done(next: State, code: number | null): State | undefined {
@@ -129,15 +129,15 @@ const rubyLookahead: Construct = {
  * Tokenize `{` as a ruby start, after the lookahead confirms that a closing
  * `|...}` follows on the same line. The start token is pushed onto
  * `_rubyStarts` for the matching `rubyEnd`.
- * @param effects Tokenizer effects.
- * @param ok Success state.
- * @param nok Failure state.
+ * @param effects - Tokenizer effects.
+ * @param ok - Success state.
+ * @param nok - Failure state.
  * @returns Initial state.
  */
 const tokenizeRubyStart: Tokenizer = function (effects, ok, nok) {
   /**
    * Consume `{` as `rubyStartMarker` and record the start token.
-   * @param code Current character code (`{`).
+   * @param code - Current character code (`{`).
    * @returns Next state.
    */
   const open: State = (code) => {
@@ -156,9 +156,9 @@ const tokenizeRubyStart: Tokenizer = function (effects, ok, nok) {
 /**
  * Tokenize `|`, the literal ruby text and `}` as a ruby end. Requires an open
  * start on the same line with a non-empty base; otherwise the `|` stays text.
- * @param effects Tokenizer effects.
- * @param ok Success state.
- * @param nok Failure state.
+ * @param effects - Tokenizer effects.
+ * @param ok - Success state.
+ * @param nok - Failure state.
  * @returns Initial state.
  */
 const tokenizeRubyEnd: Tokenizer = function (effects, ok, nok) {
@@ -176,7 +176,7 @@ const tokenizeRubyEnd: Tokenizer = function (effects, ok, nok) {
   /**
    * Fail and mark the start as balanced: nothing later on this line can
    * close it anymore, so `resolveAll` turns it back into data.
-   * @param code Current character code.
+   * @param code - Current character code.
    * @returns Next state.
    */
   const giveUp: State = (code) => {
@@ -187,7 +187,7 @@ const tokenizeRubyEnd: Tokenizer = function (effects, ok, nok) {
   /**
    * Inside the ruby text: consume literally up to the first `}`, which closes
    * the ruby. A line end before that gives up.
-   * @param code Current character code.
+   * @param code - Current character code.
    * @returns Next state.
    */
   const text: State = (code) => {
@@ -210,7 +210,7 @@ const tokenizeRubyEnd: Tokenizer = function (effects, ok, nok) {
   /**
    * After `|`: the ruby text must be non-empty, so `}` or a line end here
    * gives up.
-   * @param code Current character code.
+   * @param code - Current character code.
    * @returns Next state.
    */
   const textStart: State = (code) => {
@@ -229,7 +229,7 @@ const tokenizeRubyEnd: Tokenizer = function (effects, ok, nok) {
   /**
    * At `|`: check for an open start on the same line with a non-empty base,
    * then consume the separator.
-   * @param code Current character code (`|`).
+   * @param code - Current character code (`|`).
    * @returns Next state.
    */
   const begin: State = (code) => {
@@ -259,8 +259,8 @@ const tokenizeRubyEnd: Tokenizer = function (effects, ok, nok) {
  * Wrap the events from the nearest open start up to `}` into a `ruby` token
  * with a `rubyBase` around the base content. Runs right after `rubyEnd`
  * succeeds.
- * @param events Events of the current text content.
- * @param context Tokenize context.
+ * @param events - Events of the current text content.
+ * @param context - Tokenize context.
  * @returns The same array, modified in place.
  */
 const resolveToRuby: Resolver = function (events, context) {
@@ -325,7 +325,7 @@ const resolveToRuby: Resolver = function (events, context) {
 /**
  * Turn starts that never closed back into plain data. Runs once over the whole
  * text content after tokenizing.
- * @param events Events of the current text content.
+ * @param events - Events of the current text content.
  * @returns The same array, modified in place.
  */
 const resolveAllRuby: Resolver = function (events) {

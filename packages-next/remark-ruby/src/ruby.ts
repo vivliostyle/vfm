@@ -12,7 +12,7 @@ export { ruby as rubySyntax } from './micromark-extension.js';
 
 /**
  * Whether `node` is a `ruby` node produced by {@link rubyFromMarkdown}.
- * @param node Any value handed to the to-hast handler.
+ * @param node - Any value handed to the to-hast handler.
  * @returns `true` for a `ruby` node.
  */
 const isRuby = (node: unknown): node is Ruby =>
@@ -36,8 +36,8 @@ export const mdast: Plugin = function () {
 
 /**
  * mdast-util-to-hast handler: `ruby` node to `<ruby>base<rt>ruby</rt></ruby>`.
- * @param state to-hast state.
- * @param node Node to handle; anything but a `ruby` node is left to the
+ * @param state - to-hast state.
+ * @param node - Node to handle; anything but a `ruby` node is left to the
  *   default handling.
  * @returns The `<ruby>` element, or `undefined` for other nodes.
  */

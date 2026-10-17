@@ -28,7 +28,7 @@ declare module 'mdast' {
 
 /**
  * Enter a `ruby` node. `rubyText` is filled in by {@link exitRubyText}.
- * @param token The `ruby` token.
+ * @param token - The `ruby` token.
  */
 function enterRuby(this: CompileContext, token: Token): undefined {
   this.enter({ type: 'ruby', rubyText: '', children: [] }, token);
@@ -36,7 +36,7 @@ function enterRuby(this: CompileContext, token: Token): undefined {
 
 /**
  * Store the literal ruby text on the `ruby` node being built.
- * @param token The `rubyText` token.
+ * @param token - The `rubyText` token.
  */
 function exitRubyText(this: CompileContext, token: Token): undefined {
   const node = this.stack[this.stack.length - 1];
@@ -47,7 +47,7 @@ function exitRubyText(this: CompileContext, token: Token): undefined {
 
 /**
  * Exit the `ruby` node.
- * @param token The `ruby` token.
+ * @param token - The `ruby` token.
  */
 function exitRuby(this: CompileContext, token: Token): undefined {
   this.exit(token);
