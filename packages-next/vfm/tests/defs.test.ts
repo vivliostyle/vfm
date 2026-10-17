@@ -7,9 +7,9 @@ import { VFM } from '../src/index.js';
 
 test('registers micromark extensions for the parser', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
-  // remark-gfm, math, ruby, remark-frontmatter
-  expect(vfm.data('micromarkExtensions')).toHaveLength(4);
-  expect(vfm.data('fromMarkdownExtensions')).toHaveLength(4);
+  // remark-gfm, math, ruby, attribute, remark-frontmatter
+  expect(vfm.data('micromarkExtensions')).toHaveLength(5);
+  expect(vfm.data('fromMarkdownExtensions')).toHaveLength(5);
 });
 
 test('does not expose the remark-parse 8 parser class', () => {

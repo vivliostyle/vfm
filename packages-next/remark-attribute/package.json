@@ -1,0 +1,49 @@
+{
+  "name": "@vivliostyle/remark-attribute-next",
+  "private": true,
+  "version": "0.0.0",
+  "description": "remark plugin to support `{#id .class key=value}` attribute syntax used by VFM (micromark extension).",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages-next/remark-attribute"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/unist": "^3.0.3",
+    "html-element-attributes": "^3.5.0",
+    "mdast-util-from-markdown": "^2.1.0",
+    "mdast-util-to-hast": "^13.2.1",
+    "micromark-factory-space": "^2.1.0",
+    "micromark-factory-whitespace": "^2.0.1",
+    "micromark-util-character": "^2.1.1",
+    "micromark-util-symbol": "^2.0.1",
+    "micromark-util-types": "^2.0.3",
+    "parse-entities": "^4.0.2",
+    "unified": "^11.0.5",
+    "unist-util-visit-parents": "^6.0.2"
+  },
+  "devDependencies": {
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unist-util-inspect": "^8.1.0"
+  }
+}

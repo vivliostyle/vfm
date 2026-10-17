@@ -11,8 +11,7 @@ test('plain section', () => {
 });
 */
 
-// TODO(#288): heading attributes need the VFM attribute extension.
-test.skip('Leveling and copy attributes', () => {
+test('Leveling and copy attributes', () => {
   const md = '# こんにちは {#id1 .class1 key1=value1}';
   const received = stringify(md);
   const expected = `
@@ -23,8 +22,7 @@ test.skip('Leveling and copy attributes', () => {
   expect(received).toBe(expected);
 });
 
-// TODO(#288): heading attributes need the VFM attribute extension.
-test.skip('Heading with hidden attribute', () => {
+test('Heading with hidden attribute', () => {
   const md = '# Heading {hidden}';
   const received = stringify(md);
   const expected = `
@@ -106,8 +104,7 @@ test('<h1>, ... <h6>', () => {
   expect(received).toBe(expected);
 });
 
-// TODO(#288): heading attributes need the VFM attribute extension.
-test.skip('<h1>, ... <h6> with attribute', () => {
+test('<h1>, ... <h6> with attribute', () => {
   const md = `# Heading 1 {.depth1}
 ## Heading 2 {.depth2}
 ### Heading 3 {.depth3}
@@ -138,8 +135,7 @@ test.skip('<h1>, ... <h6> with attribute', () => {
   expect(received).toBe(expected);
 });
 
-// TODO(#288): heading attributes need the VFM attribute extension.
-test.skip('Complex structure', () => {
+test('Complex structure', () => {
   const md = `# Heading 1
 ## Heading 2 {.foo}
 # Heading 1`;
@@ -158,8 +154,7 @@ test.skip('Complex structure', () => {
   expect(received).toBe(expected);
 });
 
-// TODO(#288): heading attributes need the VFM attribute extension.
-test.skip('Sample', () => {
+test('Sample', () => {
   const md = `# Plain
 
   # Introduction {#intro}

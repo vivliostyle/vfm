@@ -1,12 +1,15 @@
-import type { AnyPlugin } from '../utils.js';
+import { mdast as attribute } from '@vivliostyle/remark-attribute-next';
+import { type AnyPlugin, partial } from '../utils.js';
 
 /**
- * Attribute syntax (`{#id .class key=value}`) slot.
+ * Attribute syntax slot (`{#id .class key=value}`).
  *
- * Until VFM 2.x this slot held remark-attr 0.11, which patches the remark-parse
- * 8 parser. remark-parse 11 has no parser class to patch and remark-attr
- * throws when it is missing, so the slot is a no-op for now and attribute
- * blocks stay in the text.
- * @todo Replace with the VFM attribute extension (#288).
+ * `scope: 'permissive'` keeps every attribute except DOM event handlers, and a
+ * trailing list on a heading line applies to the heading, as remark-attr was
+ * configured in VFM 2.x. Fenced code attributes are read from `code.meta` by
+ * the code plugin instead.
  */
-export const mdast: AnyPlugin = () => undefined;
+export const mdast: AnyPlugin = partial(attribute, {
+  scope: 'permissive',
+  enableAtxHeaderInline: true,
+}) as AnyPlugin;

@@ -178,20 +178,13 @@ function processMeta(node: mdastType.Code): void {
 
 /**
  * remark plugin: extract `lang:title`, `title=` meta and `{...}` attributes
- * from fenced code and highlight the code into `hChildren`.
+ * from fenced code and highlight the code into `hChildren`. The attribute
+ * list in the info string is parsed here with `md-attr-parser`, not by the
+ * attribute plugin.
  * @returns Transformer.
  */
 export const mdast = () => (tree: unist.Node) => {
   visit(tree as mdastType.Root, 'code', (node) => {
-    /**
-     * Workaround for remark-attr's "bad hack".
-     * When meta is null, remark-attr parses code content as attributes.
-     * @see https://github.com/arobase-che/remark-attr/blob/325f0ef730eafa601c9b631ea175b26c18c85a4a/src/index.js#L260-L263
-     */
-    if (!node.meta && node.data?.hProperties) {
-      delete node.data.hProperties;
-    }
-
     extractLangTitle(node);
     processMeta(node);
 

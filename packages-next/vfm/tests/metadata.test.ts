@@ -594,8 +594,7 @@ title: ["Foo", "Bar"]
   expect(received).toStrictEqual(expected);
 });
 
-// TODO(#288): heading attributes `{...}` need the VFM attribute extension.
-test.skip('Exclude attribute syntax in title heading', () => {
+test('Exclude attribute syntax in title heading', () => {
   const md = '# Foo {.bar}';
   const received = readMetadata(md);
   const expected: Metadata = {
