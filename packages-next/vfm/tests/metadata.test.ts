@@ -630,25 +630,19 @@ vfm:
   expect(received.vfm).toStrictEqual(expected);
 });
 
-test('vfm.toc: enabled by [[toc]] in the body', () => {
-  const received = readMetadata('# Title\n\n[[toc]]\n\nText.');
-  expect(received.title).toBe('Title');
-  expect(received.vfm?.toc).toBe(true);
-});
-
-test('vfm.toc: [[toc]] is merged into the frontmatter settings', () => {
+test('vfm.toc: [[toc]] in the body does not change the metadata', () => {
+  // Parity with the remark 8 version, where the `[[toc]]` detection in the
+  // metadata processor never ran (see the `mdast` plugin in metadata.ts).
+  // `vfm.toc` is set only by the frontmatter; `[[toc]]` is decided in #207.
+  expect(readMetadata('# Title\n\n[[toc]]\n\nText.')).toStrictEqual({
+    title: 'Title',
+  });
   const received = readMetadata(`---
 vfm:
   math: false
 ---
 [[toc id="toc"]]
 `);
-  expect(received.vfm?.toc).toBe(true);
+  expect(received.vfm?.toc).toBe(false);
   expect(received.vfm?.math).toBe(false);
-});
-
-test('vfm.toc: other shortcodes and inline [[toc]] do not enable it', () => {
-  // Without frontmatter `vfm` stays undefined, so there is no `toc` to read.
-  expect(readMetadata('[[foobar]]').vfm?.toc).toBeFalsy();
-  expect(readMetadata('text [[toc]]').vfm?.toc).toBeFalsy();
 });
