@@ -26,6 +26,7 @@ Phases refer to the sub-issues of [#275](https://github.com/vivliostyle/vfm/issu
 | 16 | `findAndReplace` fallback in `math.ts` | Wrong output | 3 |
 | 17 | Legacy external plugins | Silent no-op | 3 |
 | 18 | Sub-package test utilities | Test failure | 4 |
+| 19 | Type resolution across the two generations in one workspace | Compile error | 1 / 2 |
 
 "Silent no-op" entries are the dangerous ones: the build and the processor run, and only the HTML output shows that a syntax was not parsed.
 
@@ -363,9 +364,28 @@ Phases refer to the sub-issues of [#275](https://github.com/vivliostyle/vfm/issu
 - **Verify**
   - `pnpm test` per package
 
+### 19. Type resolution across the two generations in one workspace
+
+- **Where**
+  - `pnpm-workspace.yaml` (`overrides`, `packageExtensions`)
+  - `@types/mdast@3` / `@types/mdast@4` / `@types/hast@2` / `@types/hast@3`, which declare `@types/unist: "*"`
+  - remark 8 generation packages whose `.d.ts` import `unist`, `unified`, `vfile`, `hastscript` without declaring the dependency: `remark-parse@8`, `remark-rehype@8`, `remark-frontmatter@2`, `remark-footnotes@2`, `rehype-raw@5`, `rehype-stringify@8`, `unified@9`, `unist-builder@2`, `unist-util-is@4`, `vfile-location@3`, `hast-util-to-html@7`, `hast-util-from-parse5@6`, `hast-util-has-property@2`, `mdast-util-definitions@4`, `hast-util-to-string@2`, `@types/refractor@3`
+  - remark 13 generation packages with the same gap for `vfile`: `remark-parse@11`, `remark-stringify@11`, `rehype-stringify@10`
+- **Why**
+  - Found in Phase 2. With `packages/` on unist 2 and `packages-next/` on unist 3 in one pnpm workspace, every `@types/unist: "*"` range resolves to one version, and every undeclared type import resolves through pnpm's single hoisted copy in `node_modules/.pnpm/node_modules`. Whichever generation loses gets types from the other major: `Parents` collapses to `never`, `Plugin` and `Processor` come from the wrong unified, and the build of the losing tree fails although its own `package.json` is correct.
+- **Counterpart**
+  - pnpm `overrides` with a parent selector (`'@types/mdast@4>@types/unist': ^3.0.0`) pin the `*` child per parent major.
+  - pnpm `packageExtensions` add the missing `dependencies` to the published packages so they resolve their own copy instead of the hoisted one.
+- **Fix**
+  - Both tables live in `pnpm-workspace.yaml` with a comment. They are scaffolding for the co-existence period and are removed in Phase 5 (#296) together with `packages/`.
+- **Verify**
+  - `pnpm install --frozen-lockfile && pnpm build && pnpm test` at the root, which runs both trees.
+  - If a new generation-specific dependency is added, check `node_modules/.pnpm/<pkg>/node_modules/@types/unist/package.json` for the version it resolved.
+
 ## Dependencies between fixes
 
 - #15 (inline note node) and #17 (attribute extension) are inputs to #1, #6, #9, #11, #12, and #18. Define those two node shapes before porting handlers or tests.
 - #2 and #11 are done together per footnote package.
 - #4 (remark-gfm) must land before any footnote or table test can pass.
 - #10, #13, and #14 are independent library adaptations and can be done first in Phase 2.
+- #19 is a workspace concern: it has to be in place before any `packages-next/` dependency moves to the new majors, and it goes away with `packages/` in Phase 5.

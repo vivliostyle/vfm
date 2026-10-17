@@ -26,6 +26,7 @@ Phase は [#275](https://github.com/vivliostyle/vfm/issues/275) の sub-issue �
 | 16 | `math.ts` の `findAndReplace` フォールバック | 出力不正 | 3 |
 | 17 | 旧方式の外部プラグイン | 無言で無効 | 3 |
 | 18 | サブパッケージのテスト ユーティリティ | テスト失敗 | 4 |
+| 19 | 1 つの workspace に 2 世代が併存することによる型解決 | コンパイル エラー | 1 / 2 |
 
 「無言で無効」の項目が危険。ビルドもプロセッサも動き、HTML 出力を見るまで構文がパースされていないことに気付けない。
 
@@ -363,9 +364,28 @@ Phase は [#275](https://github.com/vivliostyle/vfm/issues/275) の sub-issue �
 - **検証**
   - パッケージごとの `pnpm test`
 
+### 19. 1 つの workspace に 2 世代が併存することによる型解決
+
+- **場所**
+  - `pnpm-workspace.yaml` (`overrides`, `packageExtensions`)
+  - `@types/unist: "*"` を宣言している `@types/mdast@3` / `@types/mdast@4` / `@types/hast@2` / `@types/hast@3`
+  - `.d.ts` で `unist`、`unified`、`vfile`、`hastscript` を依存宣言なしに import している remark 8 世代のパッケージ: `remark-parse@8`、`remark-rehype@8`、`remark-frontmatter@2`、`remark-footnotes@2`、`rehype-raw@5`、`rehype-stringify@8`、`unified@9`、`unist-builder@2`、`unist-util-is@4`、`vfile-location@3`、`hast-util-to-html@7`、`hast-util-from-parse5@6`、`hast-util-has-property@2`、`mdast-util-definitions@4`、`hast-util-to-string@2`、`@types/refractor@3`
+  - `vfile` について同じ欠落がある remark 13 世代のパッケージ: `remark-parse@11`、`remark-stringify@11`、`rehype-stringify@10`
+- **理由**
+  - Phase 2 で判明。1 つの pnpm workspace に unist 2 の `packages/` と unist 3 の `packages-next/` が併存すると、`@types/unist: "*"` はすべて 1 つのバージョンに解決され、依存宣言の無い型 import は `node_modules/.pnpm/node_modules` にある pnpm の hoist 済みコピー 1 つに解決される。負けた世代は別 major の型を読むことになり、`Parents` が `never` に潰れ、`Plugin` や `Processor` が別の unified のものになり、自身の `package.json` が正しくてもそのツリーのビルドが失敗する。
+- **対応物**
+  - 親セレクター付きの pnpm `overrides` (`'@types/mdast@4>@types/unist': ^3.0.0`) で、`*` の子を親の major ごとに固定する。
+  - pnpm `packageExtensions` で、公開パッケージに欠けている `dependencies` を補い、hoist 済みコピーではなく自身のコピーを解決させる。
+- **修正**
+  - 両方の表は `pnpm-workspace.yaml` にコメント付きで置いてある。併存期間のための足場であり、Phase 5 (#296) で `packages/` とともに削除する。
+- **検証**
+  - ルートで `pnpm install --frozen-lockfile && pnpm build && pnpm test` を実行する (両ツリーが対象)。
+  - 世代固有の依存を新たに追加したときは、`node_modules/.pnpm/<pkg>/node_modules/@types/unist/package.json` で解決されたバージョンを確認する。
+
 ## 修正間の依存関係
 
 - #15 (inline note ノード) と #17 (属性拡張) は #1、#6、#9、#11、#12、#18 の入力になる。handler やテストを移植する前に、この 2 つのノード形状を定義する。
 - #2 と #11 は footnote パッケージごとに一緒に行う。
 - #4 (remark-gfm) は footnote や table のテストが通る前に入れる必要がある。
 - #10、#13、#14 は独立したライブラリ適応で、Phase 2 の最初にできる。
+- #19 は workspace の問題で、`packages-next/` の依存を新 major に上げる前に入れておく必要があり、Phase 5 で `packages/` とともに消える。
