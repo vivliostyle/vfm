@@ -9,5 +9,10 @@ export const FormatOptionsSchema = v.object({
 
 export type FormatOptions = v.InferInput<typeof FormatOptionsSchema>;
 
+/**
+ * hast slot: rehype-format, or a no-op when `disableFormatHtml` is set.
+ * @param options - Format options.
+ * @returns Plugin.
+ */
 export const hast = ({ disableFormatHtml = false }: FormatOptions = {}) =>
   disableFormatHtml ? () => () => {} : rehypeFormat;

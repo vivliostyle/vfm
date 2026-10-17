@@ -85,7 +85,7 @@ export type RemarkFrontmatterPlugin = Pluggable & {
 
 /**
  * Create Markdown AST parsers.
- * @param options Options for mdast parsers.
+ * @param options - Options for mdast parsers.
  * @returns Parsers.
  */
 export const reviveParse = (options: ReviveParseOptions) => ({

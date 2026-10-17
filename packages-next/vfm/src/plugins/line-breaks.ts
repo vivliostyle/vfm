@@ -14,5 +14,10 @@ export const LineBreaksOptionsSchema = v.object({
 
 export type LineBreaksOptions = v.InferInput<typeof LineBreaksOptionsSchema>;
 
+/**
+ * mdast slot: remark-breaks when `hardLineBreaks` is set, otherwise a no-op.
+ * @param options - Line break options.
+ * @returns Plugin.
+ */
 export const mdast = ({ hardLineBreaks = false }: LineBreaksOptions = {}) =>
   hardLineBreaks ? breaks : () => () => {};

@@ -8,6 +8,12 @@ import { inspectNoColor } from 'unist-util-inspect';
 import { expect, test } from 'vitest';
 import { handler as rubyHandler, mdast as ruby } from '../src/ruby.js';
 
+/**
+ * Render Markdown with the ruby plugin and handler to HTML.
+ * @param md - Markdown source.
+ * @param options - `hardLineBreaks` adds remark-breaks, `gfm` adds remark-gfm.
+ * @returns HTML.
+ */
 const stringify = (
   md: string,
   { hardLineBreaks = false, gfm = false } = {},
@@ -32,6 +38,11 @@ const stringify = (
   );
 };
 
+/**
+ * Parse Markdown with the ruby plugin and dump the mdast without positions.
+ * @param md - Markdown source.
+ * @returns `unist-util-inspect` dump.
+ */
 const parse = (md: string): string =>
   inspectNoColor(unified().use(remarkParse).use(ruby).parse(md)).replace(
     / \(.+?\)$/gm,

@@ -95,6 +95,13 @@ export type MathOptions = v.InferInput<typeof MathOptionsSchema>;
  * @returns Tokenizers.
  */
 const createTokenizers = () => {
+  /**
+   * remark-parse 8 tokenizer for inline math `$...$`.
+   * @param eat - Consumes the matched text.
+   * @param value - Remaining input.
+   * @param silent - Only check whether the syntax matches.
+   * @returns Node, `true` in silent mode, or `undefined` when not matched.
+   */
   const tokenizerInlineMath: Tokenizer = function (eat, value, silent) {
     if (
       !value.startsWith('$') ||
@@ -129,6 +136,13 @@ const createTokenizers = () => {
     return value.indexOf('$', fromIndex);
   };
 
+  /**
+   * remark-parse 8 tokenizer for display math `$$...$$`.
+   * @param eat - Consumes the matched text.
+   * @param value - Remaining input.
+   * @param silent - Only check whether the syntax matches.
+   * @returns Node, `true` in silent mode, or `undefined` when not matched.
+   */
   const tokenizerDisplayMath: Tokenizer = function (eat, value, silent) {
     if (!value.startsWith('$$') || value.startsWith('$$$')) {
       return;
@@ -221,6 +235,12 @@ export const mdast: Plugin<[MathOptions?], MdastRoot> = function ({
  */
 const isDisplayMode = (value: string): boolean => /^\r?\n/.test(value);
 
+/**
+ * Render LaTeX to MathML with temml and return it as hast children.
+ * @param latex - LaTeX source.
+ * @param displayMode - Render as `display="block"`.
+ * @returns Element content (a leading doctype is dropped).
+ */
 const toMathML = (latex: string, displayMode: boolean): ElementContent[] => {
   const mathml = temml.renderToString(latex.trim(), { displayMode });
   // RootContent = Comment | DocType | Element | Text
@@ -273,7 +293,7 @@ const mathSpan = (mode: 'inline' | 'display', text: string): Element => ({
 
 /**
  * Handle inline math to Hypertext AST.
- * @param options Math options.
+ * @param options - Math options.
  * @returns Hypertext AST handler.
  */
 export const handlerInlineMath =
@@ -290,7 +310,7 @@ export const handlerInlineMath =
 
 /**
  * Handle display math to Hypertext AST.
- * @param options Math options.
+ * @param options - Math options.
  * @returns Hypertext AST handler.
  */
 export const handlerDisplayMath =

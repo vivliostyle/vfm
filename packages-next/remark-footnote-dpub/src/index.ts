@@ -122,6 +122,18 @@ export type DpubYamlFootnoteOptions = v.InferInput<
 // DPUB handlers and transformer
 // ---------------------------------------------------------------------------
 
+/**
+ * Create the `footnoteReference` handler. Emits the `<a role="doc-noteref">`
+ * call, assigns the note number on the first reference (duplicates reuse it
+ * with a `-n` suffix on the call id) and queues the `<aside>` body in
+ * `pending` for the transformer.
+ * @param pending - Queued bodies by definition identifier.
+ * @param nextIndex - Allocates the next note number.
+ * @param assigned - Numbering state by definition identifier.
+ * @param callCustomizer - Properties or factory for the call.
+ * @param bodyCustomizer - Properties or factory for the body.
+ * @returns Handler.
+ */
 const createDpubFootnoteReferenceHandler =
   (
     pending: Map<string, hast.Element>,
@@ -202,6 +214,16 @@ const createDpubFootnoteReferenceHandler =
     );
   };
 
+/**
+ * Create the `footnote` (inline note) handler. Registers a synthetic
+ * definition, emits the call and queues the `<aside>` in `inlinePending`
+ * keyed by call id, so the transformer can place it after the call's block.
+ * @param inlinePending - Queued bodies by call id.
+ * @param nextIndex - Allocates the next note number.
+ * @param callCustomizer - Properties or factory for the call.
+ * @param bodyCustomizer - Properties or factory for the body.
+ * @returns Handler.
+ */
 const createDpubInlineFootnoteHandler =
   (
     inlinePending: Map<string, hast.Element>,
@@ -285,6 +307,11 @@ const createReplaceDpubPlaceholders =
     const placed = new Set<string>();
 
     // Phase 1: Replace placeholders with asides from reference footnotes
+    /**
+     * Replace each `<div data-footnote-placeholder>` with its queued `<aside>`;
+     * placeholders of definitions that were never referenced are dropped.
+     * @param parent - Node whose children are rewritten in place.
+     */
     function walkAndReplace(parent: hast.Element | hast.Root) {
       const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
       for (const child of parent.children) {
@@ -316,6 +343,12 @@ const createReplaceDpubPlaceholders =
     if (inlinePending.size > 0) {
       const remaining = new Set(inlinePending.keys());
 
+      /**
+       * Collect, in document order, the ids of inline-note calls below `node` that
+       * still wait for their `<aside>`.
+       * @param node - Subtree to search.
+       * @returns Call ids.
+       */
       const containsCall = (
         node: hast.RootContent | hast.ElementContent,
       ): string[] => {
@@ -329,6 +362,12 @@ const createReplaceDpubPlaceholders =
         ];
       };
 
+      /**
+       * Insert each pending inline-note `<aside>` right after the nearest
+       * non-flow-container child that contains its call; recurse into flow
+       * containers to find a more precise position.
+       * @param parent - Node whose children are rewritten in place.
+       */
       const processParent = (parent: hast.Element | hast.Root) => {
         const newChildren: (hast.RootContent | hast.ElementContent)[] = [];
         for (const child of parent.children) {
@@ -498,6 +537,12 @@ export type DpubFootnotePlugin = {
   hastTransformer: Plugin;
 };
 
+/**
+ * Create the DPUB-ARIA footnote plugin: the to-hast handlers and the hast
+ * transformer that places the queued `<aside>` bodies.
+ * @param options - Mode and customizers for calls and bodies.
+ * @returns Handlers and transformer.
+ */
 export const createDpubFootnotePlugin = (
   options: Partial<DpubFootnoteOptions> = { mode: 'dpub' },
 ): DpubFootnotePlugin => {
@@ -505,6 +550,9 @@ export const createDpubFootnotePlugin = (
   const inlinePending = new Map<string, hast.Element>();
   const assigned = new Map<string, { refIndex: number; dupCount: number }>();
   let counter = 0;
+  /**
+   * Allocate the next note number.
+   */
   const nextIndex = () => ++counter;
   return {
     toHastHandlers: {

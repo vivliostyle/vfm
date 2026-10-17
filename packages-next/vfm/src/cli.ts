@@ -93,6 +93,10 @@ const cli = meow(
   },
 );
 
+/**
+ * Convert `input` with the CLI flags and print the HTML.
+ * @param input - Markdown source.
+ */
 function compile(input: string) {
   // meow keeps `mathRenderer`, `imgFigcaptionOrder`, `captionlessImagePolicy`,
   // `footnote`, and `tableCell` typed as plain `string`, so `v.parse` is needed
@@ -120,6 +124,11 @@ function compile(input: string) {
 
 type Cli = typeof cli;
 
+/**
+ * Entry point: convert the file given as the first argument, or read stdin
+ * and convert on a line `EOD` or when the input pauses.
+ * @param cli - Parsed command line.
+ */
 function main(cli: Cli) {
   try {
     const filepath = cli.input[0];

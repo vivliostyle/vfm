@@ -21,8 +21,8 @@ declare module 'mdast' {
 
 /**
  * Create slug from `id` or heading children.
- * @param heading Heading.
- * @param slugs Slugger.
+ * @param heading - Heading.
+ * @param slugs - Slugger.
  * @returns
  */
 const createSlug = (heading: Heading, slugger: GithubSlugger) => {

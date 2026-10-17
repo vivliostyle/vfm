@@ -11,10 +11,15 @@ import {
   type DpubFootnoteOptions,
 } from '../src/index.js';
 
-// Test pipeline mirrors VFM's footnote-relevant subset so this package's
-// plugin can be exercised in isolation. Output is naturally partial
-// (no <head>/<body>), matching the per-package expected strings
-// migrated verbatim from vfm/tests/footnotes.test.ts.
+/**
+ * Render Markdown through the footnote-relevant subset of the VFM pipeline so
+ * the plugin can be exercised in isolation. Output is partial (no `<head>` /
+ * `<body>`), matching the expected strings migrated verbatim from
+ * `vfm/tests/footnotes.test.ts`.
+ * @param md - Markdown source.
+ * @param options - Footnote options.
+ * @returns Formatted HTML.
+ */
 const stringify = (
   md: string,
   options: DpubFootnoteOptions = { mode: 'dpub' },
@@ -246,6 +251,13 @@ const issue129Md = `| Label     | Col |
 [^fn3]: fn3
 `;
 
+/**
+ * Assert that every fragment occurs in `received`, in strictly ascending
+ * order. Catches fixes that relabel ids correctly but leave the physical order
+ * of `<ol>` / `<aside>` reversed.
+ * @param received - HTML.
+ * @param fragments - Fragments in the expected order.
+ */
 const expectInOrder = (received: string, fragments: string[]) => {
   fragments
     .map((fragment) => {

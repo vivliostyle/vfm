@@ -16,6 +16,9 @@ describe('buildElement', () => {
   });
 
   test('with a Factory using a tag-less shorthand, substitutes the caller tag', () => {
+    /**
+     * Factory that uses a tag-less shorthand selector.
+     */
     const factory: ElementFactory<'th', hast.Properties> = (h) => h('.cell');
     const el = buildElement('th', {}, [], factory);
     expect(el.tagName).toBe('th');

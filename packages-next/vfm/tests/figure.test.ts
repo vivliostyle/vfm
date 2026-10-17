@@ -895,6 +895,11 @@ test.skip(
 );
 
 test('parseFigcaptionAsInline reaches alt parity between a raw-HTML and a Markdown nested image', () => {
+  /**
+   * Render partial HTML with `parseFigcaptionAsInline` on.
+   * @param md - Markdown source.
+   * @returns HTML.
+   */
   const process = (md: string) =>
     String(
       VFM({
@@ -903,6 +908,11 @@ test('parseFigcaptionAsInline reaches alt parity between a raw-HTML and a Markdo
         parseFigcaptionAsInline: true,
       }).processSync(md),
     );
+  /**
+   * Read the `alt` of the outer image.
+   * @param html - Rendered HTML.
+   * @returns `alt`, or `undefined`.
+   */
   const altOf = (html: string) =>
     /<img src="outer\.png" alt="([^"]*)"/.exec(html)?.[1];
 

@@ -111,7 +111,7 @@ const relativeHrefRules = (
 
 /**
  * Create Hypertext AST handlers and transformers.
- * @param options Options for rehype transformers.
+ * @param options - Options for rehype transformers.
  * @returns Handlers and transformers.
  */
 export const reviveRehype = (options: ReviveRehypeOptions) => {

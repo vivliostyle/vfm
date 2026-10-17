@@ -45,6 +45,9 @@ describe('editPlugins', () => {
   });
 
   test('appended hast plugin runs and can mutate the tree', () => {
+    /**
+     * hast plugin that marks every `<p>` with `data-edited`.
+     */
     const tagParagraphs: Plugin = () => (tree) => {
       visit(tree as hast.Root, 'element', (node) => {
         if (node.tagName === 'p') {
@@ -106,6 +109,9 @@ describe('editPlugins', () => {
 
   test('editor can prepend an mdast plugin that observes parsed nodes', () => {
     const headings: string[] = [];
+    /**
+     * mdast plugin that records the text of every heading.
+     */
     const captureHeadings: Plugin = () => (tree) => {
       visit(tree as mdast.Root, 'heading', (node) => {
         const text = node.children
@@ -128,6 +134,11 @@ describe('editPlugins', () => {
   });
 
   test('plugin injected around replace sees pre/post-replacement tree', () => {
+    /**
+     * hast plugin that records whether the replaced text is visible.
+     * @param record - Flag object to set when `BAR` is found.
+     * @returns Plugin.
+     */
     const observe =
       (record: { sawReplaced: boolean }): Plugin =>
       () =>

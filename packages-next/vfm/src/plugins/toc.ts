@@ -26,6 +26,10 @@ declare module 'mdast' {
   }
 }
 
+/**
+ * remark plugin: remove every shortcode except `[[toc]]`.
+ * @returns Transformer.
+ */
 const keepToC = () => (tree: Node) => {
   remove(
     tree,

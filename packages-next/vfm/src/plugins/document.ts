@@ -7,7 +7,7 @@ import type { Attribute, Metadata } from './metadata.js';
 
 /**
  * Create AST properties from attributes.
- * @param attributes Attributes.
+ * @param attributes - Attributes.
  * @returns Properties.
  */
 const createProperties = (attributes?: Array<Attribute>): KeyValue => {
@@ -25,8 +25,8 @@ const createProperties = (attributes?: Array<Attribute>): KeyValue => {
 
 /**
  * Create Markdown AST for `<head>`.
- * @param data Metadata.
- * @param vfile VFile.
+ * @param data - Metadata.
+ * @param vfile - VFile.
  * @returns AST of `<head>`.
  */
 const createHead = (data: Metadata, vfile: VFile): Child[] => {
@@ -88,8 +88,8 @@ const createHead = (data: Metadata, vfile: VFile): Child[] => {
 
 /**
  * Create Markdown AST for `<body>`.
- * @param metadata Metadata.
- * @param tree Tree of Markdown AST.
+ * @param metadata - Metadata.
+ * @param tree - Tree of Markdown AST.
  * @returns AST of `<body>`.
  */
 const createBody = (metadata: Metadata, tree: hast.Root) => {
@@ -117,9 +117,9 @@ const createBody = (metadata: Metadata, tree: hast.Root) => {
  * Create properties for `<html>`.
  * Sets the value defined for `html` in Frontmatter.
  * However, if `id`,` lang`, `dir`, and `class` are defined in the root, those are given priority.
- * @param metadata Metadata.
- * @param tree Tree of Markdown AST.
- * @param vfile VFile.
+ * @param metadata - Metadata.
+ * @param tree - Tree of Markdown AST.
+ * @param vfile - VFile.
  * @returns AST of `<html>`.
  */
 const createHTML = (metadata: Metadata, tree: hast.Root, vfile: VFile) => {
@@ -171,7 +171,7 @@ export type DocumentOptions = {
 
 /**
  * Process Markdown AST.
- * @param data Options.
+ * @param data - Options.
  * @returns Transformer.
  */
 export const mdast = (

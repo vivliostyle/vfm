@@ -10,6 +10,12 @@ import { mdast as section } from '../src/section.js';
 // TODO(#288): heading attributes (`{#id .class hidden}`) came from remark-attr,
 // which remark-parse 11 ignores. Re-add the VFM attribute extension here once
 // it exists.
+/**
+ * Render Markdown through remark-gfm, sectionize, remark-rehype, rehype-raw
+ * and rehype-format.
+ * @param md - Markdown source.
+ * @returns Formatted HTML.
+ */
 export const stringify = (md: string): string => {
   const processor = unified()
     .use(remarkParse)

@@ -57,6 +57,13 @@ export type RewriteExtensionOptions = v.InferOutput<
   typeof RewriteExtensionOptionsSchema
 >;
 
+/**
+ * Rewrite the extension of the path of a URI reference through `resolver`.
+ * @param value - Property value (URI reference).
+ * @param resolver - Decides the destination extension.
+ * @returns Rewritten URI reference, or `null` when the path is empty, ends
+ *   with `/`, or the resolver returns `null`.
+ */
 const rewritePropertyExtension = (
   value: string,
   resolver: ExtensionResolver,
@@ -87,6 +94,12 @@ const rewritePropertyExtension = (
   );
 };
 
+/**
+ * rehype plugin: for each rule, select elements, read the property as its
+ * attribute string and rewrite the extension of its path.
+ * @param options - Rules (selector, property name and resolver).
+ * @returns Transformer.
+ */
 export const rewriteExtension =
   ({ rules }: RewriteExtensionOptions) =>
   (tree: unist.Node) => {
