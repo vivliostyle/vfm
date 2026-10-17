@@ -130,7 +130,7 @@ The package-by-package survey, including the exact upstream output each footnote
 
 ### Breaking points ([#279](https://github.com/vivliostyle/vfm/issues/279))
 
-Places that are guaranteed to break on remark 13. The phase issues refer to this list.
+Places that are guaranteed to break on remark 13. The phase issues refer to this list. Each point is expanded (location, cause, remark 13 counterpart, fix, phase, verification), together with nine more found during Phase 0-1 and 0-2, in [remark13-breaking-points.md](./remark13-breaking-points.md).
 
 1. **Legacy tokenizer extensions.** Adding to `this.Parser.prototype.inlineTokenizers` / `inlineMethods` (`packages/vfm/src/plugins/math.ts`, `packages/remark-ruby/src/ruby.ts`). remark 13 silently ignores them. Rewrite as micromark extensions.
 2. **to-hast handler signature.** `(h, node)` with `all(h, node)` / `one(h, ...)` becomes `(state, node, parent)` with `state.all()` / `state.one()`. Affects every handler plus `buildFigure`, `buildDisplayMath`, `withTableCellTransform`, and the three footnote packages.
