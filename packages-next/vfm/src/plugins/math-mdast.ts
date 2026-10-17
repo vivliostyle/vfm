@@ -75,9 +75,11 @@ function exitValue(this: CompileContext, token: Token): undefined {
  *
  * Inside an image label the math is put back as literal text. The label
  * becomes the image's `alt` through `mdast-util-to-string`, which would drop
- * the `$` delimiters, and VFM re-parses the alt itself when
- * `parseFigcaptionAsInline` is on. remark-parse 8 behaved the same way
- * (`notInLink`). TODO(#292): revisit when captions keep their inline children.
+ * the `$` delimiters; keeping them matches the remark-parse 8 output
+ * (`notInLink`), where `alt` and the default figcaption show the source text.
+ * The figcaption re-parse of `parseFigcaptionAsInline` reads the label from
+ * the Markdown source, so it does not depend on this. Whether `alt` should
+ * instead hold the plain math is a Phase 4 decision (#293).
  * @param token - The `mathInline` or `mathDisplay` token.
  */
 function exitMath(this: CompileContext, token: Token): undefined {

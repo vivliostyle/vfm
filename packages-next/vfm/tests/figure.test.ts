@@ -1,6 +1,8 @@
 import { expect, test } from 'vitest';
 import { stripIndent } from 'common-tags';
+import type { Image } from 'mdast';
 import { readMetadata, VFM } from '../src/index.js';
+import { sliceImageLabel } from '../src/plugins/figure.js';
 import { buildHtmlTestingCode, buildProcessorTestingCode } from './utils.js';
 
 test(
@@ -653,18 +655,20 @@ test(
 
 // TODO: remark-ruby currently emits no `<rp>`. It is debatable whether the
 // resulting `Rubyるび` is a sound accessible name; see also the next test.
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline renders ruby in figcaption and includes the reading in alt (no <rp> yet)',
   buildProcessorTestingCode(
     `![{Ruby|るび}](./img.png)`,
+    // micromark decodes the label to plain text for `alt`, so the mdast `alt`
+    // is the ruby base only (remark-parse 8 kept the source `{Ruby|るび}`).
+    // The HTML `alt` below is derived from the rendered figcaption instead.
     stripIndent`
     root[1]
     └─0 paragraph[1]
         └─0 image
               title: null
               url: "./img.png"
-              alt: "{Ruby|るび}"
+              alt: "Ruby"
     `,
     `<figure><img src="./img.png" alt="Rubyるび"><figcaption aria-hidden="true"><ruby>Ruby<rt>るび</rt></ruby></figcaption></figure>`,
     { parseFigcaptionAsInline: true },
@@ -751,8 +755,7 @@ test(
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline applies inline attributes inside the caption',
   buildHtmlTestingCode(
     '![**bold**{#x} word](img.png)',
@@ -761,63 +764,50 @@ test.skip(
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline resolves a caption footnote document-wide, with dedupe',
   buildHtmlTestingCode(
     '![graph[^1]](img.png)\n\ntext[^1]\n\n[^1]: a note\n',
     [
       `<figure><img src="img.png" alt="graph1"><figcaption aria-hidden="true">graph<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
-      `<p>text<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></p>`,
-      `<section class="footnotes" role="doc-endnotes">`,
-      `<hr>`,
-      `<ol>`,
+      `\n<p>text<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></p>`,
+      `<section class="footnotes" role="doc-endnotes"><hr><ol>`,
       `<li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a><a href="#fnref1-1" class="footnote-back" role="doc-backlink">↩</a></li>`,
-      `</ol>`,
-      `</section>`,
-    ].join('\n'),
+      `</ol></section>`,
+    ].join(''),
     { parseFigcaptionAsInline: true },
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline renders a caption-only footnote and its endnote',
   buildHtmlTestingCode(
     '![graph[^1]](img.png)\n\n[^1]: a note\n',
     [
       `<figure><img src="img.png" alt="graph1"><figcaption aria-hidden="true">graph<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
-      `<section class="footnotes" role="doc-endnotes">`,
-      `<hr>`,
-      `<ol>`,
+      `<section class="footnotes" role="doc-endnotes"><hr><ol>`,
       `<li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li>`,
-      `</ol>`,
-      `</section>`,
-    ].join('\n'),
+      `</ol></section>`,
+    ].join(''),
     { parseFigcaptionAsInline: true },
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline dedupes a footnote referenced twice within one caption',
   buildHtmlTestingCode(
     '![a[^1] b[^1]](img.png)\n\n[^1]: a note\n',
     [
       `<figure><img src="img.png" alt="a1 b1"><figcaption aria-hidden="true">a<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a> b<a id="fnref1-1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
-      `<section class="footnotes" role="doc-endnotes">`,
-      `<hr>`,
-      `<ol>`,
+      `<section class="footnotes" role="doc-endnotes"><hr><ol>`,
       `<li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a><a href="#fnref1-1" class="footnote-back" role="doc-backlink">↩</a></li>`,
-      `</ol>`,
-      `</section>`,
-    ].join('\n'),
+      `</ol></section>`,
+    ].join(''),
     { parseFigcaptionAsInline: true },
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline honors imgFigcaptionOrder: figcaption-img',
   buildHtmlTestingCode(
     '![**bold**](img.png)',
@@ -826,8 +816,7 @@ test.skip(
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline moves the image id to the figcaption (assignIdToFigcaption)',
   buildHtmlTestingCode(
     '![**bold**](img.png){#x}',
@@ -836,8 +825,7 @@ test.skip(
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip('parseFigcaptionAsInline can be enabled via YAML frontmatter (vfm:)', () => {
+test('parseFigcaptionAsInline can be enabled via YAML frontmatter (vfm:)', () => {
   const input = stripIndent`
     ---
     vfm:
@@ -866,8 +854,7 @@ test(
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline excludes aria-hidden caption content from alt',
   buildHtmlTestingCode(
     '![a**b**{aria-hidden=true}c](img.png)',
@@ -876,8 +863,7 @@ test.skip(
   ),
 );
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline uses a nested image’s own alt in the figure alt',
   buildHtmlTestingCode(
     '![before ![inner alt](inner.png) after](outer.png)',
@@ -915,12 +901,84 @@ test('parseFigcaptionAsInline reaches alt parity between a raw-HTML and a Markdo
   expect(altOf(raw)).toBe(altOf(process('![x ![y](inner.png) z](outer.png)')));
 });
 
-// TODO(#292): caption re-parse needs the raw caption source; micromark decodes `Image.alt` to plain text.
-test.skip(
+test(
   'parseFigcaptionAsInline derives alt from a caption whose only text-bearing node is a raw-HTML image',
   buildHtmlTestingCode(
     '![*<img alt=y src=inner.png>*](outer.png)',
     `<figure><img src="outer.png" alt="y"><figcaption aria-hidden="true"><em><img alt="y" src="inner.png"></em></figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+// The caption is re-parsed from the Markdown source, not from the decoded
+// `alt`, so escapes and character references in the caption are not
+// re-interpreted as markup.
+test(
+  'parseFigcaptionAsInline keeps escaped markup and character references literal',
+  buildProcessorTestingCode(
+    '![a &amp; \\*b\\*](i.png)',
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "i.png"
+              alt: "a & *b*"
+    `,
+    `<figure><img src="i.png" alt="a &#x26; *b*"><figcaption aria-hidden="true">a &#x26; *b*</figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline locates the label end past code spans and escaped brackets',
+  buildHtmlTestingCode(
+    '![`a]b` \\] [x] *c*](i.png "t")',
+    `<figure><img src="i.png" alt="a]b ] [x] c" title="t"><figcaption aria-hidden="true"><code>a]b</code> ] [x] <em>c</em></figcaption></figure>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline renders an inline footnote in the caption',
+  buildHtmlTestingCode(
+    '![graph^[a note]](i.png)',
+    [
+      `<figure><img src="i.png" alt="graph1"><figcaption aria-hidden="true">graph<a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure>`,
+      `<section class="footnotes" role="doc-endnotes"><hr><ol><li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li></ol></section>`,
+    ].join(''),
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test('sliceImageLabel returns undefined without position or for a non-image source', () => {
+  const image: Image = { type: 'image', url: 'i.png', alt: 'a' };
+  expect(sliceImageLabel('![a](i.png)', image)).toBeUndefined();
+  expect(
+    sliceImageLabel('[a](i.png)', {
+      ...image,
+      position: {
+        start: { line: 1, column: 1, offset: 0 },
+        end: { line: 1, column: 11, offset: 10 },
+      },
+    }),
+  ).toBeUndefined();
+  expect(
+    sliceImageLabel('![a](i.png)', {
+      ...image,
+      position: {
+        start: { line: 1, column: 1, offset: 0 },
+        end: { line: 1, column: 12, offset: 11 },
+      },
+    }),
+  ).toBe('a');
+});
+
+test(
+  'parseFigcaptionAsInline resolves a link reference in the caption',
+  buildHtmlTestingCode(
+    '![see [docs][d]](i.png)\n\n[d]: https://example.com',
+    `<figure><img src="i.png" alt="see docs"><figcaption aria-hidden="true">see <a href="https://example.com">docs</a></figcaption></figure>`,
     { parseFigcaptionAsInline: true },
   ),
 );

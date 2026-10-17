@@ -6,6 +6,7 @@ import type { Plugin } from 'unified';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 import * as v from 'valibot';
+import type { VFile } from 'vfile';
 
 // Expressed as `v.union` of `v.literal` so consumers' schema walkers
 // (e.g. vivliostyle-cli's update-docs) can render the type via the
@@ -150,8 +151,108 @@ type ImageWithParsedCaption = mdast.Image & {
 };
 
 /**
- * remark plugin: when `parseFigcaptionAsInline` is on, re-parse the alt text
- * of lone images as inline Markdown and attach the result as `children`.
+ * Find the end of a code span that opened with a run of `run` backticks.
+ * @param text - Text to scan.
+ * @param from - Index right after the opening run.
+ * @param run - Length of the opening backtick run.
+ * @returns Index of the closing run, or `-1` when the span is not closed.
+ */
+const findCodeSpanEnd = (text: string, from: number, run: number): number => {
+  let index = from;
+  while (index < text.length) {
+    if (text[index] !== '`') {
+      index++;
+      continue;
+    }
+    let length = 0;
+    while (text[index + length] === '`') length++;
+    if (length === run) return index;
+    index += length;
+  }
+  return -1;
+};
+
+/**
+ * Cut the label source (the `...` of `![...](url)`) out of the Markdown
+ * source, using the position of the image node.
+ *
+ * micromark decodes `Image.alt` to plain text (`**bold**` becomes `bold`,
+ * `\*` becomes `*`), so the alt can no longer be re-parsed the way the
+ * remark-parse 8 version did. The label ends at the first `]` that is not
+ * escaped, not inside a code span and not closing a nested bracket pair,
+ * which is how CommonMark delimits link text.
+ * @param source - Markdown source of the document.
+ * @param image - Image node with position information.
+ * @returns Label source, or `undefined` when it cannot be located.
+ */
+export const sliceImageLabel = (
+  source: string,
+  image: mdast.Image,
+): string | undefined => {
+  const start = image.position?.start.offset;
+  const end = image.position?.end.offset;
+  if (start === undefined || end === undefined) return undefined;
+  const text = source.slice(start, end);
+  if (!text.startsWith('![')) return undefined;
+
+  let depth = 0;
+  let index = 2;
+  while (index < text.length) {
+    const char = text[index];
+    if (char === '\\') {
+      index += 2;
+      continue;
+    }
+    if (char === '`') {
+      let run = 0;
+      while (text[index + run] === '`') run++;
+      const close = findCodeSpanEnd(text, index + run, run);
+      index = close === -1 ? index + run : close + run;
+      continue;
+    }
+    if (char === '[') {
+      depth++;
+    } else if (char === ']') {
+      if (depth === 0) return text.slice(2, index);
+      depth--;
+    }
+    index++;
+  }
+  return undefined;
+};
+
+/**
+ * Collect the link and footnote definitions of a document as Markdown lines.
+ *
+ * A caption is re-parsed on its own, but `[^1]` is only a footnote call when
+ * the GFM footnote syntax finds a definition for it in the same parse, and a
+ * `[text][x]` reference is only resolved against a definition. Appending the
+ * document's definitions to the caption makes both work; the definition
+ * content is irrelevant because the resulting nodes are moved into the
+ * document tree, where the real definitions are.
+ * @param tree - Document tree.
+ * @returns Definition lines, possibly empty.
+ */
+const collectDefinitions = (tree: mdast.Root): string[] => {
+  const lines: string[] = [];
+  visit(tree, (node) => {
+    if (node.type === 'footnoteDefinition') {
+      lines.push(`[^${node.label ?? node.identifier}]: .`);
+    } else if (node.type === 'definition') {
+      lines.push(`[${node.label ?? node.identifier}]: ${node.url}`);
+    }
+  });
+  return lines;
+};
+
+/**
+ * remark plugin: when `parseFigcaptionAsInline` is on, re-parse the caption of
+ * lone images as inline Markdown and attach the result as `children`.
+ *
+ * The caption is taken from the Markdown source ({@link sliceImageLabel}) and
+ * parsed with the same processor, so every registered syntax (ruby, math,
+ * attributes, footnotes, ...) applies and escapes are honored. When the label
+ * cannot be located the figcaption keeps the literal alt text.
  * @param options - Figcaption options.
  * @returns Transformer.
  */
@@ -161,7 +262,11 @@ const parseImageAltAsInline: Plugin<[FigcaptionInlineOptions?], mdast.Root> =
   }: FigcaptionInlineOptions = {}) {
     return !parseFigcaptionAsInline
       ? () => {}
-      : (tree: mdast.Root) => {
+      : (tree: mdast.Root, file: VFile) => {
+          const source = String(file);
+          const definitions = collectDefinitions(tree);
+          const suffix =
+            definitions.length > 0 ? `\n\n${definitions.join('\n')}` : '';
           visit(tree, 'paragraph', (paragraph) => {
             const lone = loneImageParagraph(paragraph);
             if (!lone) {
@@ -171,11 +276,11 @@ const parseImageAltAsInline: Plugin<[FigcaptionInlineOptions?], mdast.Root> =
             if (!image.alt) {
               return;
             }
-            // TODO(#292): remark-parse 8 kept the raw Markdown source in
-            // `Image.alt`; micromark decodes it to plain text, so inline markup
-            // in the caption is already gone here. Capture the caption during
-            // tokenization instead of re-parsing `alt`.
-            const root = this.parse(image.alt) as mdast.Root;
+            const label = sliceImageLabel(source, image);
+            if (label === undefined) {
+              return;
+            }
+            const root = this.parse(label + suffix) as mdast.Root;
             const inline = root.children[0];
             if (inline?.type === 'paragraph') {
               image.children = inline.children;
