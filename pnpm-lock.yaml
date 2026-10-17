@@ -1095,6 +1095,21 @@ importers:
         specifier: 1.4.2
         version: 1.4.2(typescript@6.0.2)
 
+  tools/vfm-compare:
+    dependencies:
+      '@vivliostyle/vfm':
+        specifier: workspace:*
+        version: link:../../packages/vfm
+      '@vivliostyle/vfm-next':
+        specifier: workspace:*
+        version: link:../../packages-next/vfm
+      common-tags:
+        specifier: ^1.8.2
+        version: 1.8.2
+      typescript:
+        specifier: ^6.0.2
+        version: 6.0.2
+
 packages:
 
   '@babel/runtime@7.29.7':

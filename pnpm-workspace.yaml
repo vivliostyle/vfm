@@ -1,6 +1,8 @@
 packages:
   - 'packages/*'
   - 'packages-next/*'
+  # Workspace-only tooling for the remark 13 migration (never published).
+  - 'tools/*'
 
 # `@types/mdast` and `@types/hast` declare `@types/unist: "*"`. With both
 # remark generations in one workspace (`packages/` on unist 2, `packages-next/`

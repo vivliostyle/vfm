@@ -1,0 +1,18 @@
+{
+  "name": "@vivliostyle/vfm-compare",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Compare the HTML output of packages/vfm (remark 8) and packages-next/vfm (remark 13) over a Markdown corpus.",
+  "type": "module",
+  "scripts": {
+    "compare": "node src/cli.mjs",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@vivliostyle/vfm": "workspace:*",
+    "@vivliostyle/vfm-next": "workspace:*",
+    "common-tags": "^1.8.2",
+    "typescript": "^6.0.2"
+  }
+}
