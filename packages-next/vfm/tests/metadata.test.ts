@@ -1,0 +1,631 @@
+import { test, expect } from 'vitest';
+import { stringify } from '../src/index.js';
+import { type Metadata, readMetadata } from '../src/plugins/metadata.js';
+
+test('Read all', () => {
+  const received = readMetadata(
+    `---
+id: 'my-page'
+lang: 'ja'
+dir: 'ltr'
+class: 'my-class'
+title: 'Title'
+html:
+  data-color-mode: 'dark'
+  data-light-theme: 'light'
+  data-dark-theme: 'dark'
+body:
+  id: 'body'
+  class: 'body'
+base:
+  target: '_top'
+  href: 'https://www.example.com/'
+meta:
+  - name: 'theme-color'
+    media: '(prefers-color-scheme: light)'
+    content: 'red'
+  - name: 'theme-color'
+    media: '(prefers-color-scheme: dark)'
+    content: 'darkred'
+link:
+  - rel: 'stylesheet'
+    type: 'text/css'
+    href: 'sample1.css'
+  - rel: 'stylesheet'
+    type: 'text/css'
+    href: 'sample2.css'
+script:
+  - type: 'text/javascript'
+    src: 'sample1.js'
+  - type: 'text/javascript'
+    src: 'sample2.js'
+vfm:
+  math: false
+  partial: true
+  hardLineBreaks: true
+  disableFormatHtml: true
+  theme: 'theme.css'
+author: 'Author'
+other-meta1: 'other1'
+other-meta2: 'other2'
+---
+
+`,
+  );
+  const expected: Metadata = {
+    id: 'my-page',
+    lang: 'ja',
+    dir: 'ltr',
+    class: 'my-class',
+    title: 'Title',
+    html: [
+      { name: 'data-color-mode', value: 'dark' },
+      { name: 'data-light-theme', value: 'light' },
+      { name: 'data-dark-theme', value: 'dark' },
+    ],
+    body: [
+      { name: 'id', value: 'body' },
+      { name: 'class', value: 'body' },
+    ],
+    base: [
+      { name: 'target', value: '_top' },
+      { name: 'href', value: 'https://www.example.com/' },
+    ],
+    meta: [
+      [
+        { name: 'name', value: 'theme-color' },
+        { name: 'media', value: '(prefers-color-scheme: light)' },
+        { name: 'content', value: 'red' },
+      ],
+      [
+        { name: 'name', value: 'theme-color' },
+        { name: 'media', value: '(prefers-color-scheme: dark)' },
+        { name: 'content', value: 'darkred' },
+      ],
+      [
+        { name: 'name', value: 'author' },
+        { name: 'content', value: 'Author' },
+      ],
+      [
+        { name: 'name', value: 'other-meta1' },
+        { name: 'content', value: 'other1' },
+      ],
+      [
+        { name: 'name', value: 'other-meta2' },
+        { name: 'content', value: 'other2' },
+      ],
+    ],
+    link: [
+      [
+        { name: 'rel', value: 'stylesheet' },
+        { name: 'type', value: 'text/css' },
+        { name: 'href', value: 'sample1.css' },
+      ],
+      [
+        { name: 'rel', value: 'stylesheet' },
+        { name: 'type', value: 'text/css' },
+        { name: 'href', value: 'sample2.css' },
+      ],
+    ],
+    script: [
+      [
+        { name: 'type', value: 'text/javascript' },
+        { name: 'src', value: 'sample1.js' },
+      ],
+      [
+        { name: 'type', value: 'text/javascript' },
+        { name: 'src', value: 'sample2.js' },
+      ],
+    ],
+    vfm: {
+      math: false,
+      partial: true,
+      hardLineBreaks: true,
+      disableFormatHtml: true,
+      toc: false,
+      theme: 'theme.css',
+      assignIdToFigcaption: false,
+      captionlessImagePolicy: undefined,
+      footnote: undefined,
+    },
+  };
+
+  expect(received).toStrictEqual(expected);
+});
+
+test.each(['paragraph', 'figure', 'figure-with-figcaption'] as const)(
+  'captionlessImagePolicy: accepts %s',
+  (value) => {
+    const received = readMetadata(
+      `---\nvfm:\n  captionlessImagePolicy: ${value}\n---\n`,
+    );
+    expect(received.vfm?.captionlessImagePolicy).toBe(value);
+  },
+);
+
+test.each([
+  ['unknown string', 'inline'],
+  ['boolean', true],
+  ['number', 1],
+  ['null', null],
+])('captionlessImagePolicy: %s falls back to undefined', (_label, value) => {
+  const received = readMetadata(
+    `---\nvfm:\n  captionlessImagePolicy: ${JSON.stringify(value)}\n---\n`,
+  );
+  expect(received.vfm?.captionlessImagePolicy).toBeUndefined();
+});
+
+test.each(['align-attribute', 'align-class', 'align-style'] as const)(
+  'table.cell: accepts %s',
+  (value) => {
+    const received = readMetadata(
+      `---\nvfm:\n  table:\n    cell: ${value}\n---\n`,
+    );
+    expect(received.vfm?.table?.cell).toBe(value);
+  },
+);
+
+test.each([
+  ['unknown string', 'inline-style'],
+  ['boolean', true],
+  ['number', 1],
+])('table.cell: %s falls back to undefined', (_label, value) => {
+  const received = readMetadata(
+    `---\nvfm:\n  table:\n    cell: ${JSON.stringify(value)}\n---\n`,
+  );
+  expect(received.vfm?.table?.cell).toBeUndefined();
+});
+
+test('Title from heading', () => {
+  const received = readMetadata(
+    `# Heading Title with {Ruby|ルビ} and <mark>HTML tag</mark>`,
+  );
+  const expected = 'Heading Title with Ruby and HTML tag';
+
+  expect(received.title).toBe(expected);
+});
+
+test('Title from heading with frontmatter', () => {
+  const received = readMetadata(
+    `---
+title: 'Title'
+---
+
+# Heading Title
+`,
+  );
+  const expected = 'Title';
+
+  expect(received.title).toBe(expected);
+});
+
+test('All documents', () => {
+  const md = `---
+id: 'my-page'
+lang: 'ja'
+dir: 'ltr'
+class: 'my-class'
+title: 'Title'
+html:
+  data-color-mode: 'dark'
+  data-light-theme: 'light'
+  data-dark-theme: 'dark'
+body:
+  id: 'body'
+  class: 'foo bar'
+base:
+  target: '_top'
+  href: 'https://www.example.com/'
+meta:
+  - name: 'theme-color'
+    media: '(prefers-color-scheme: light)'
+    content: 'red'
+  - name: 'theme-color'
+    media: '(prefers-color-scheme: dark)'
+    content: 'darkred'
+link:
+  - rel: 'stylesheet'
+    type: 'text/css'
+    href: 'sample1.css'
+  - rel: 'stylesheet'
+    type: 'text/css'
+    href: 'sample2.css'
+script:
+  - type: 'text/javascript'
+    src: 'sample1.js'
+  - type: 'text/javascript'
+    src: 'sample2.js'
+author: 'Author'
+vfm:
+  math: false
+  theme: 'theme.css'
+---
+
+Text
+`;
+
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html data-color-mode="dark" data-light-theme="light" data-dark-theme="dark" id="my-page" lang="ja" dir="ltr" class="my-class">
+  <head>
+    <meta charset="utf-8">
+    <title>Title</title>
+    <base target="_top" href="https://www.example.com/">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="red">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="darkred">
+    <meta name="author" content="Author">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
+    <script type="text/javascript" src="sample1.js"></script>
+    <script type="text/javascript" src="sample2.js"></script>
+  </head>
+  <body id="body" class="my-class foo bar">
+    <p>Text</p>
+  </body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('If the value is null or empty string, it will be an empty string', () => {
+  const md = `---
+id:
+lang:
+dir: ""
+class:
+title: ""
+html:
+  data-color-mode:
+  data-light-theme:
+  data-dark-theme:
+body:
+  id:
+  class:
+base:
+  target:
+  href:
+meta:
+  - name:
+    media:
+    content:
+  - name:
+    media:
+    content:
+link:
+  - rel:
+    type:
+    href:
+  - rel:
+    type:
+    href:
+script:
+  - type:
+    src:
+  - type:
+    src:
+author:
+---
+
+Text
+  `;
+
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html data-color-mode="" data-light-theme="" data-dark-theme="" id="" lang="" dir="" class="">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <base target="" href="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="" media="" content="">
+    <meta name="" media="" content="">
+    <meta name="author" content="">
+    <link rel="" type="" href="">
+    <link rel="" type="" href="">
+    <script type="" src=""></script>
+    <script type="" src=""></script>
+  </head>
+  <body id="" class="">
+    <p>Text</p>
+  </body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Specify null or empty string for Object', () => {
+  const md = `---
+html: ''
+meta:
+  -
+vfm:
+---
+`;
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Style from options', () => {
+  const md = `---
+link:
+  - rel: 'stylesheet'
+    type: 'text/css'
+    href: 'sample1.css'
+---
+`;
+  const received = stringify(md, { style: 'sample2.css' });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Styles from options (String)', () => {
+  const md = ``;
+  const received = stringify(md, { style: 'sample.css' });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="sample.css">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Styles from options (String[])', () => {
+  const md = ``;
+  const received = stringify(md, { style: ['sample1.css', 'sample2.css'] });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Styles from options with frontmatter', () => {
+  const md = `---
+link:
+  - rel: 'stylesheet'
+    type: 'text/css'
+    href: 'sample1.css'
+---
+`;
+  const received = stringify(md, { style: ['sample2.css', 'sample3.css'] });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="sample1.css">
+    <link rel="stylesheet" type="text/css" href="sample2.css">
+    <link rel="stylesheet" type="text/css" href="sample3.css">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Do not convert date and time', () => {
+  const md = `---
+date: 2021-06-27
+date2: "2021-06-27"
+---`;
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="date" content="2021-06-27">
+    <meta name="date2" content="2021-06-27">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Reserved for future use, `style` and `head`', () => {
+  const md = `---
+style: |
+  @media {
+    p {
+      color: blue;
+    }
+  }
+head: |
+  <meta name="sample-meta1" content="meta1">
+  <meta name="sample-meta2" content="meta2">
+---`;
+  const received = stringify(md);
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('vfm.partial: true', () => {
+  const md = `---
+vfm:
+  partial: true
+---
+
+Text
+`;
+  const received = stringify(md, { partial: false });
+  const expected = `
+<p>Text</p>
+`;
+  expect(received).toBe(expected);
+});
+
+test('vfm.hardLineBreaks: true', () => {
+  const md = `---
+vfm:
+  hardLineBreaks: true
+---
+
+Text
+Text
+`;
+  const received = stringify(md, { hardLineBreaks: false });
+  const expected = `<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+    <p>Text<br>Text</p>
+  </body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('vfm.disableFormatHtml: true', () => {
+  const md = `---
+vfm:
+  disableFormatHtml: true
+---
+
+Text
+`;
+  const received = stringify(md, { disableFormatHtml: false });
+  const expected = `<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<p>Text</p>
+</body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Merge `class` properties', () => {
+  const md = `---
+class: "root"
+html:
+  class: "html"
+body:
+  class: "foo bar"
+---
+`;
+  const received = stringify(md, { disableFormatHtml: false });
+  const expected = `<!doctype html>
+<html class="root html">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body class="root foo bar"></body>
+</html>
+`;
+  expect(received).toBe(expected);
+});
+
+test('Excludes key', () => {
+  const md = `---
+title: "Title"
+tags: ["Foo", "Bar"]
+---
+`;
+  const received = readMetadata(md, ['tags']);
+  const expected: Metadata = {
+    title: 'Title',
+    custom: {
+      tags: ['Foo', 'Bar'],
+    },
+  };
+  expect(received).toStrictEqual(expected);
+});
+
+test('Overwrite key with excludes', () => {
+  const md = `---
+title: ["Foo", "Bar"]
+---
+`;
+  const received = readMetadata(md, ['title']);
+  const expected: Metadata = {
+    custom: {
+      title: ['Foo', 'Bar'],
+    },
+  };
+  expect(received).toStrictEqual(expected);
+});
+
+test('Exclude attribute syntax in title heading', () => {
+  const md = '# Foo {.bar}';
+  const received = readMetadata(md);
+  const expected: Metadata = {
+    title: 'Foo',
+  };
+  expect(received).toStrictEqual(expected);
+});
+
+test('vfm: per-entry fallback keeps unrelated valid options when one is invalid', () => {
+  // `math: "yes"` is invalid (string instead of boolean). The other three
+  // fields are well-formed. Expectation: the invalid field falls back to
+  // its default (absent here, since `math` has no defaults entry), while
+  // the valid fields still apply. Whole-object reject would discard
+  // `partial`, `hardLineBreaks`, and `theme` together with `math`, which
+  // is a regression vs. the pre-schema hand-rolled `readSettings`.
+  const received = readMetadata(`---
+vfm:
+  math: "yes"
+  partial: true
+  hardLineBreaks: true
+  theme: "theme.css"
+---
+`);
+  const expected: Metadata['vfm'] = {
+    toc: false,
+    assignIdToFigcaption: false,
+    captionlessImagePolicy: undefined,
+    footnote: undefined,
+    partial: true,
+    hardLineBreaks: true,
+    theme: 'theme.css',
+  };
+  expect(received.vfm).toStrictEqual(expected);
+});
