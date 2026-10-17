@@ -12,6 +12,13 @@ import { toString } from 'mdast-util-to-string';
 import type { Node } from 'unist';
 import { selectAll } from 'unist-util-select';
 
+declare module 'mdast' {
+  interface HeadingData {
+    /** Slug of the heading, also written to `hProperties.id` (remark-slug convention). */
+    id?: string | undefined;
+  }
+}
+
 /**
  * Create slug from `id` or heading children.
  * @param heading Heading.
@@ -24,10 +31,12 @@ const createSlug = (heading: Heading, slugger: GithubSlugger) => {
     return slugger.slug(existingId, true);
   }
 
-  // Create slug string with footnotes removed
+  // Create slug string with inline footnotes removed.
+  // TODO(#289): `footnote` is the inline note node of remark-footnotes 2; it
+  // comes back with the VFM inline-note extension.
   const children = [...heading.children];
   heading.children = heading.children.filter(
-    (child) => child.type !== 'footnote',
+    (child) => (child as { type: string }).type !== 'footnote',
   );
   const text = slugger.slug(toString(heading).replace(/<[^<>]*>/g, ''));
   heading.children = children;

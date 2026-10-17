@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { alignByAttribute, alignByClass, alignByStyle } from '../src/index.js';
-import { stringify } from './utils.js';
+import { el, stringify } from './utils.js';
 
 // `--:` right, `:-:` center, `---` unaligned.
 const tableMd = [
@@ -94,10 +94,9 @@ test('custom hook receives align in both context and properties', () => {
   const received = stringify(tableMd, {
     partial: true,
     cell:
-      ({ h }) =>
+      () =>
       ({ tagName, align, properties, children }) => [
-        h(
-          null,
+        el(
           tagName,
           align
             ? {
@@ -135,10 +134,9 @@ test('custom hook can branch on tagName (th for header, td for body)', () => {
   const received = stringify(tableMd, {
     partial: true,
     cell:
-      ({ h }) =>
+      () =>
       ({ tagName, properties, children }) => [
-        h(
-          null,
+        el(
           tagName,
           tagName === 'th' ? { ...properties, 'data-head': 'yes' } : properties,
           children,
@@ -170,10 +168,10 @@ test('custom hook can rebuild the cell and its children', () => {
   const received = stringify(tableMd, {
     partial: true,
     cell:
-      ({ h }) =>
+      () =>
       ({ tagName, properties, children }) => [
-        h(null, tagName, properties, [
-          h(null, 'span', { className: ['cell'] }, children),
+        el(tagName, properties, [
+          el('span', { className: ['cell'] }, children),
         ]),
       ],
   });

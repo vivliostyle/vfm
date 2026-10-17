@@ -1,12 +1,27 @@
 import type * as hast from 'hast';
-import { getAttribute } from 'hast-util-get-attribute';
-import { getClassList } from 'hast-util-get-class-list';
+import { getAttribute as getAttributeHast2 } from 'hast-util-get-attribute';
+import { getClassList as getClassListHast2 } from 'hast-util-get-class-list';
 import {
-  type H as ToHast,
   type Handler as ToHastHandler,
+  type State as ToHastState,
 } from 'mdast-util-to-hast';
 import { visit } from 'unist-util-visit';
 import * as v from 'valibot';
+
+/**
+ * `hast-util-get-attribute` / `hast-util-get-class-list` 1.x are typed against
+ * `@types/hast` 2. Their `Readonly<Element>` parameters reject `@types/hast` 3
+ * elements under `exactOptionalPropertyTypes` only because of the
+ * `| undefined` on `position`; the runtime shape is identical.
+ * @todo Drop these casts once the utilities ship `@types/hast` 3 types.
+ */
+const getAttribute = getAttributeHast2 as unknown as (
+  element: hast.Element,
+  qualifiedName: string,
+) => string | null;
+const getClassList = getClassListHast2 as unknown as (
+  element: hast.Element,
+) => string[];
 
 export type TableCellAlign = 'left' | 'center' | 'right';
 
@@ -18,10 +33,15 @@ export type TableCellContext = {
   children: hast.ElementContent[];
 };
 
+/**
+ * Hook that rewrites each table cell. Receives the `mdast-util-to-hast`
+ * `state` (replaces the `h` of `mdast-util-to-hast` 11) and returns a
+ * per-cell transform.
+ */
 export type TableCellHook = ({
-  h,
+  state,
 }: {
-  h: ToHast;
+  state: ToHastState;
 }) => (cell: TableCellContext) => hast.ElementContent[];
 
 export const TableCellHookSchema = v.pipe(
@@ -81,9 +101,9 @@ const isTableCell = (
 export const withTableCellTransform =
   (hook: TableCellHook): ((handler: ToHastHandler) => ToHastHandler) =>
   (handler) =>
-  (h, node, parent) => {
-    const result = handler(h, node, parent);
-    if (result === null || result === undefined) return result;
+  (state, node, parent) => {
+    const result = handler(state, node, parent);
+    if (result === undefined) return result;
 
     const resultWasArray = Array.isArray(result);
     const output: hast.Element = {
@@ -96,14 +116,16 @@ export const withTableCellTransform =
     const cells: {
       cell: hast.Element & { tagName: 'th' | 'td' };
       index: number;
-      parent: hast.Parent;
+      parent: hast.Element | hast.Root;
     }[] = [];
     visit(output, 'element', (cell, index, parent) => {
-      if (parent === null || index === null || !isTableCell(cell)) return;
+      if (parent === undefined || index === undefined || !isTableCell(cell)) {
+        return;
+      }
       cells.push({ cell, index, parent });
     });
 
-    const transform = hook({ h });
+    const transform = hook({ state });
     for (const { cell, index, parent } of cells.reverse()) {
       const tagName = cell.tagName;
       const rawAlign = cell.properties?.align;

@@ -1,7 +1,7 @@
 import rehypeStringify from 'rehype-stringify';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
-import unified, { type Processor } from 'unified';
+import { unified, type Pluggable, type Processor } from 'unified';
 import * as v from 'valibot';
 import { SerializablePluginOptionsSchema } from './plugins/options.js';
 import { type Metadata, readMetadata } from './plugins/metadata.js';
@@ -87,6 +87,7 @@ export {
 // Re-export plugin brand types for downstream consumers that wish to refer to
 // individual pipeline slots by their nominal identity.
 export type {
+  RemarkGfmPlugin,
   RemarkLineBreaksPlugin,
   RemarkMathPlugin,
   RemarkRubyPlugin,
@@ -235,12 +236,12 @@ export type BuiltinPlugins = ReturnType<typeof markdown> &
  * shape widens to ordinary pluggable lists.
  */
 export type EditedPlugins = {
-  mdastPlugins: ReadonlyArray<unified.Pluggable>;
+  mdastPlugins: ReadonlyArray<Pluggable>;
   mdastToHastHandlers: Record<
     string,
     BuiltinPlugins['mdastToHastHandlers'][keyof BuiltinPlugins['mdastToHastHandlers']]
   >;
-  hastPlugins: ReadonlyArray<unified.Pluggable>;
+  hastPlugins: ReadonlyArray<Pluggable>;
 };
 
 export type EditPlugins = (plugins: BuiltinPlugins) => EditedPlugins;
@@ -346,23 +347,21 @@ export function VFM(
     Object.entries(mdastToHastHandlers).filter(([, v]) => v !== undefined),
   );
 
-  return unified()
-    .data('settings', { position: true })
-    .use([
-      [remarkParse, { gfm: true, commonmark: true }],
-      ...mdastPlugins,
-      inspect('mdast'),
-      [
-        remarkRehype,
-        {
-          allowDangerousHtml: true,
-          handlers: activeHandlers,
-        },
-      ],
-      ...hastPlugins,
-      inspect('hast'),
-      rehypeStringify,
-    ]);
+  return unified().use([
+    remarkParse,
+    ...mdastPlugins,
+    inspect('mdast'),
+    [
+      remarkRehype,
+      {
+        allowDangerousHtml: true,
+        handlers: activeHandlers,
+      },
+    ],
+    ...hastPlugins,
+    inspect('hast'),
+    rehypeStringify,
+  ]);
 }
 
 /**

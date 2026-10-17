@@ -1,4 +1,8 @@
-import findAndReplace from 'hast-util-find-and-replace';
+import type * as hast from 'hast';
+import {
+  findAndReplace,
+  type FindAndReplaceTuple,
+} from 'hast-util-find-and-replace';
 import { h } from 'hastscript';
 import type { Node } from 'unist';
 import * as v from 'valibot';
@@ -47,12 +51,12 @@ export const ReplaceOptionsSchema: v.GenericSchema<ReplaceOptions> = v.object({
 
 export function replace({ replace: rules = [] }: ReplaceOptions = {}) {
   if (rules.length === 0) return;
-  const search = rules.map(
-    (rule) =>
-      [
-        rule.test,
-        (...result: RegExpMatchArray) => rule.match(result, h),
-      ] as const,
-  );
-  return (tree: Node) => findAndReplace(tree, search);
+  const search: FindAndReplaceTuple[] = rules.map((rule) => [
+    rule.test,
+    (...result: RegExpMatchArray) =>
+      rule.match(result, h) as hast.ElementContent | string,
+  ]);
+  return (tree: Node) => {
+    findAndReplace(tree as hast.Root, search);
+  };
 }

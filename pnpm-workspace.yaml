@@ -1,3 +1,85 @@
 packages:
   - 'packages/*'
   - 'packages-next/*'
+
+# `@types/mdast` and `@types/hast` declare `@types/unist: "*"`. With both
+# remark generations in one workspace (`packages/` on unist 2, `packages-next/`
+# on unist 3) pnpm would resolve every `*` to the same version and silently
+# break the types of one tree. Pin the child per parent major instead. Remove
+# these once `packages/` is replaced by the next tree (Phase 5, #296).
+overrides:
+  '@types/mdast@3>@types/unist': ^2.0.0
+  '@types/hast@2>@types/unist': ^2.0.0
+  '@types/mdast@4>@types/unist': ^3.0.0
+  '@types/hast@3>@types/unist': ^3.0.0
+
+# remark 8 generation packages whose `.d.ts` import `unist` / `mdast` / `hast`
+# without declaring the `@types/*` dependency. They used to pick up the single
+# hoisted copy; with the next tree in the workspace that copy is the newer
+# major, so declare the dependency they actually need. Remove with the
+# overrides above in Phase 5 (#296).
+packageExtensions:
+  # --- remark 8 generation (packages/) ---
+  '@types/refractor@3':
+    dependencies:
+      refractor: ^3.0.0
+  'hast-util-from-parse5@6':
+    dependencies:
+      '@types/unist': ^2.0.0
+  'hast-util-has-property@2':
+    dependencies:
+      '@types/hast': ^2.0.0
+  'hast-util-to-html@7':
+    dependencies:
+      '@types/unist': ^2.0.0
+  'hast-util-to-string@2':
+    dependencies:
+      hastscript: ^7.0.0
+  'mdast-util-definitions@4':
+    dependencies:
+      '@types/mdast': ^3.0.0
+      '@types/unist': ^2.0.0
+  'rehype-raw@5':
+    dependencies:
+      unified: ^9.0.0
+  'rehype-stringify@8':
+    dependencies:
+      '@types/unist': ^2.0.0
+      unified: ^9.0.0
+  'remark-footnotes@2':
+    dependencies:
+      unified: ^9.0.0
+  'remark-frontmatter@2':
+    dependencies:
+      '@types/unist': ^2.0.0
+      unified: ^9.0.0
+  'remark-parse@8':
+    dependencies:
+      '@types/unist': ^2.0.0
+      unified: ^9.0.0
+  'remark-rehype@8':
+    dependencies:
+      unified: ^9.0.0
+  'unified@9':
+    dependencies:
+      '@types/unist': ^2.0.0
+  'unist-builder@2':
+    dependencies:
+      '@types/unist': ^2.0.0
+  'unist-util-is@4':
+    dependencies:
+      '@types/unist': ^2.0.0
+  'vfile-location@3':
+    dependencies:
+      '@types/unist': ^2.0.0
+      vfile: ^4.0.0
+  # --- remark 13 generation (packages-next/) ---
+  'rehype-stringify@10':
+    dependencies:
+      vfile: ^6.0.0
+  'remark-parse@11':
+    dependencies:
+      vfile: ^6.0.0
+  'remark-stringify@11':
+    dependencies:
+      vfile: ^6.0.0

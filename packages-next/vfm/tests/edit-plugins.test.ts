@@ -1,6 +1,6 @@
 import type * as hast from 'hast';
 import type * as mdast from 'mdast';
-import type unified from 'unified';
+import type { Plugin } from 'unified';
 import { visit } from 'unist-util-visit';
 import { describe, expect, test } from 'vitest';
 import {
@@ -45,7 +45,7 @@ describe('editPlugins', () => {
   });
 
   test('appended hast plugin runs and can mutate the tree', () => {
-    const tagParagraphs: unified.Plugin = () => (tree) => {
+    const tagParagraphs: Plugin = () => (tree) => {
       visit(tree as hast.Root, 'element', (node) => {
         if (node.tagName === 'p') {
           node.properties = { ...node.properties, 'data-edited': 'yes' };
@@ -106,7 +106,7 @@ describe('editPlugins', () => {
 
   test('editor can prepend an mdast plugin that observes parsed nodes', () => {
     const headings: string[] = [];
-    const captureHeadings: unified.Plugin = () => (tree) => {
+    const captureHeadings: Plugin = () => (tree) => {
       visit(tree as mdast.Root, 'heading', (node) => {
         const text = node.children
           .map((c) => ('value' in c ? c.value : ''))
@@ -129,7 +129,7 @@ describe('editPlugins', () => {
 
   test('plugin injected around replace sees pre/post-replacement tree', () => {
     const observe =
-      (record: { sawReplaced: boolean }): unified.Plugin =>
+      (record: { sawReplaced: boolean }): Plugin =>
       () =>
       (tree) => {
         visit(tree as hast.Root, 'text', (node) => {

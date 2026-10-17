@@ -1,5 +1,6 @@
 import frontmatter from 'remark-frontmatter';
-import type unified from 'unified';
+import remarkGfm from 'remark-gfm';
+import type { Pluggable } from 'unified';
 import { mdast as attr } from './plugins/attr.js';
 import { mdast as code } from './plugins/code.js';
 import {
@@ -22,58 +23,63 @@ export type ReviveParseOptions = FigcaptionInlineOptions &
   LineBreaksOptions &
   MathOptions;
 
+declare const remarkGfmPluginBrand: unique symbol;
+export type RemarkGfmPlugin = Pluggable & {
+  [remarkGfmPluginBrand]: unknown;
+};
+
 declare const remarkParseImageAltAsInlinePluginBrand: unique symbol;
-export type RemarkParseImageAltAsInlinePlugin = unified.Pluggable & {
+export type RemarkParseImageAltAsInlinePlugin = Pluggable & {
   [remarkParseImageAltAsInlinePluginBrand]: unknown;
 };
 
 declare const remarkLineBreaksPluginBrand: unique symbol;
-export type RemarkLineBreaksPlugin = unified.Pluggable & {
+export type RemarkLineBreaksPlugin = Pluggable & {
   [remarkLineBreaksPluginBrand]: unknown;
 };
 
 declare const remarkMathPluginBrand: unique symbol;
-export type RemarkMathPlugin = unified.Pluggable & {
+export type RemarkMathPlugin = Pluggable & {
   [remarkMathPluginBrand]: unknown;
 };
 
 declare const remarkRubyPluginBrand: unique symbol;
-export type RemarkRubyPlugin = unified.Pluggable & {
+export type RemarkRubyPlugin = Pluggable & {
   [remarkRubyPluginBrand]: unknown;
 };
 
 declare const remarkFootnotePluginBrand: unique symbol;
-export type RemarkFootnotesPlugin = unified.Pluggable & {
+export type RemarkFootnotesPlugin = Pluggable & {
   [remarkFootnotePluginBrand]: unknown;
 };
 
 declare const remarkAttrPluginBrand: unique symbol;
-export type RemarkAttrPlugin = unified.Pluggable & {
+export type RemarkAttrPlugin = Pluggable & {
   [remarkAttrPluginBrand]: unknown;
 };
 
 declare const remarkSlugPluginBrand: unique symbol;
-export type RemarkSlugPlugin = unified.Pluggable & {
+export type RemarkSlugPlugin = Pluggable & {
   [remarkSlugPluginBrand]: unknown;
 };
 
 declare const remarkSectionPluginBrand: unique symbol;
-export type RemarkSectionPlugin = unified.Pluggable & {
+export type RemarkSectionPlugin = Pluggable & {
   [remarkSectionPluginBrand]: unknown;
 };
 
 declare const remarkCodePluginBrand: unique symbol;
-export type RemarkCodePlugin = unified.Pluggable & {
+export type RemarkCodePlugin = Pluggable & {
   [remarkCodePluginBrand]: unknown;
 };
 
 declare const remarkTocPluginBrand: unique symbol;
-export type RemarkTocPlugin = unified.Pluggable & {
+export type RemarkTocPlugin = Pluggable & {
   [remarkTocPluginBrand]: unknown;
 };
 
 declare const remarkFrontmatterPluginBrand: unique symbol;
-export type RemarkFrontmatterPlugin = unified.Pluggable & {
+export type RemarkFrontmatterPlugin = Pluggable & {
   [remarkFrontmatterPluginBrand]: unknown;
 };
 
@@ -84,6 +90,9 @@ export type RemarkFrontmatterPlugin = unified.Pluggable & {
  */
 export const reviveParse = (options: ReviveParseOptions) => ({
   mdastPlugins: [
+    // GFM (table, strikethrough, autolink literal, footnote reference and
+    // definition). Replaces remark-parse 8's `{ gfm: true }` option.
+    brand<RemarkGfmPlugin>(remarkGfm),
     brand<RemarkParseImageAltAsInlinePlugin>(
       partial(parseImageAltAsInline, options),
     ),

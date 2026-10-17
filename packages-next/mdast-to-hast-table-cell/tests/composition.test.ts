@@ -1,5 +1,5 @@
+import type * as hast from 'hast';
 import type { Handler as ToHastHandler } from 'mdast-util-to-hast';
-import { table as defaultTableHandler } from 'mdast-util-to-hast/lib/handlers/table.js';
 import { visit } from 'unist-util-visit';
 import * as v from 'valibot';
 import { expect, test } from 'vitest';
@@ -10,7 +10,7 @@ import {
   TableCellHookSchema,
   withTableCellTransform,
 } from '../src/index.js';
-import { stringify } from './utils.js';
+import { defaultTableHandler, el, stringify } from './utils.js';
 
 const baseTableHandler: ToHastHandler = defaultTableHandler;
 
@@ -28,8 +28,8 @@ test('passes the generated cell node and preserves its position', () => {
   const markdown = ['| A |', '| :-: |', '| x |'].join('\n');
   let transformedCells = 0;
   stringify(markdown, {
-    cell: ({ h }) => {
-      const transform = alignByStyle({ h });
+    cell: ({ state }) => {
+      const transform = alignByStyle({ state });
       return (cell) => {
         const output = transform(cell);
         expect(output[0]?.position).toEqual(cell.node.position);
@@ -42,8 +42,8 @@ test('passes the generated cell node and preserves its position', () => {
 });
 
 test('enhances the output of a supplied table handler', () => {
-  const handler: ToHastHandler = (h, node, parent) => {
-    const result = baseTableHandler(h, node, parent);
+  const handler: ToHastHandler = (state, node, parent) => {
+    const result = baseTableHandler(state, node, parent);
     [result]
       .flat()
       .filter((produced) => !!produced)
@@ -68,8 +68,8 @@ test.each([
   [alignByClass, 'class="existing table-align-center" style="color: red"'],
   [alignByStyle, 'class="existing" style="color: red; text-align: center"'],
 ])('preserves properties emitted by the supplied handler', (cell, expected) => {
-  const handler: ToHastHandler = (h, node, parent) => {
-    const result = baseTableHandler(h, node, parent);
+  const handler: ToHastHandler = (state, node, parent) => {
+    const result = baseTableHandler(state, node, parent);
     [result]
       .flat()
       .filter((produced) => !!produced)
@@ -94,19 +94,20 @@ test.each([
   [alignByClass, 'class="0 existing table-align-center" style="0"'],
   [alignByStyle, 'class="0 existing" style="0; text-align: center"'],
 ])('stringifies arbitrary property values', (cell, expected) => {
-  const handler: ToHastHandler = (h, node, parent) => {
-    const result = baseTableHandler(h, node, parent);
+  const handler: ToHastHandler = (state, node, parent) => {
+    const result = baseTableHandler(state, node, parent);
     [result]
       .flat()
       .filter((produced) => !!produced)
       .forEach((produced) => {
         visit(produced, 'element', (element) => {
           if (element.tagName !== 'th' && element.tagName !== 'td') return;
+          // Intentionally off-type values; the hook must stringify them.
           element.properties = {
             ...element.properties,
             className: [0, 'existing'],
             style: 0,
-          };
+          } as unknown as hast.Properties;
         });
       });
     return result;
@@ -120,8 +121,8 @@ test('preserves className tokens', () => {
   const markdown = ['| A |', '| :-: |', '| x |'].join('\n');
   let transformedCells = 0;
   stringify(markdown, {
-    cell: ({ h }) => {
-      const transform = alignByClass({ h });
+    cell: ({ state }) => {
+      const transform = alignByClass({ state });
       return (cell) => {
         const output = transform({
           ...cell,
@@ -151,19 +152,20 @@ test.each([
   [alignByClass, 'class="table-align-center"'],
   [alignByStyle, 'style="text-align: center"'],
 ])('does not reinterpret hast node data', (cell, expected) => {
-  const handler: ToHastHandler = (h, node, parent) => {
-    const result = baseTableHandler(h, node, parent);
+  const handler: ToHastHandler = (state, node, parent) => {
+    const result = baseTableHandler(state, node, parent);
     [result]
       .flat()
       .filter((produced) => !!produced)
       .forEach((produced) => {
         visit(produced, 'element', (element) => {
           if (element.tagName !== 'th' && element.tagName !== 'td') return;
+          // mdast-style `data` on a hast node must be left alone, not applied.
           element.data = {
             hName: 'div',
             hProperties: { className: ['from-data'] },
             hChildren: [{ type: 'text', value: 'replaced' }],
-          };
+          } as unknown as hast.ElementData;
         });
       });
     return result;
@@ -185,7 +187,7 @@ test('transforms a cell returned at the top level', () => {
   const result = withTableCellTransform(alignByClass)(handler)(
     undefined as never,
     undefined,
-    null,
+    undefined,
   );
   expect(result).toEqual({
     type: 'element',
@@ -201,10 +203,9 @@ test('accepts a function handler as the customization foundation', () => {
   const markdown = ['| A |', '| :-: |', '| x |'].join('\n');
   const received = stringify(markdown, {
     cell:
-      ({ h }) =>
+      () =>
       ({ tagName, align, properties, children }) => [
-        h(
-          null,
+        el(
           tagName,
           {
             ...properties,

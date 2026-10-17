@@ -2,7 +2,8 @@ import type * as hast from 'hast';
 import type * as mdastType from 'mdast';
 import type { Handler } from 'mdast-util-to-hast';
 import parseAttr from 'md-attr-parser';
-import refractor from 'refractor';
+// `refractor/all` registers every language, as `refractor` 3 did by default.
+import { refractor } from 'refractor/all';
 import type * as unist from 'unist';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
@@ -27,20 +28,12 @@ const isCodeNode = (
 };
 
 /**
- * Module augmentation is global, so this single declaration applies
- * project-wide. Currently relied on by:
- *
- * - `code.ts` (this file): `hProperties`, `hChildren`, `figcaptionTitle`
- * - `slug.ts`: `hProperties.id`
- *
- * @todo Drop the hast fields after upgrading to `mdast-util-to-hast@>=13`,
- *   which ships the same `Data` augmentation as a side effect import.
+ * `hName` / `hProperties` / `hChildren` on mdast `Data` come from
+ * `mdast-util-to-hast` (imported above). Only the VFM-specific channel is
+ * declared here.
  */
-declare module 'unist' {
-  interface Data {
-    hName?: string | undefined;
-    hProperties?: hast.Properties | undefined;
-    hChildren?: hast.ElementContent[] | undefined;
+declare module 'mdast' {
+  interface CodeData {
     /**
      * Internal channel used by the code plugin to carry the caption text
      * extracted from `lang:title`, `title=...` meta, or `{title="..."}` attr
@@ -182,20 +175,24 @@ export const mdast = () => (tree: unist.Node) => {
     extractLangTitle(node);
     processMeta(node);
 
-    // syntax highlight
+    // syntax highlight (refractor 4+ returns a `Root`; keep its children)
     if (node.lang && refractor.registered(node.lang)) {
       if (!node.data) node.data = {};
-      node.data.hChildren = refractor.highlight(
-        node.value,
-        node.lang,
-      ) as hast.ElementContent[];
+      node.data.hChildren = refractor.highlight(node.value, node.lang)
+        .children as hast.ElementContent[];
     }
   });
 };
 
+const element = (
+  tagName: string,
+  properties: hast.Properties,
+  children: hast.ElementContent[],
+): hast.Element => ({ type: 'element', tagName, properties, children });
+
 export const handler =
   ({ assignIdToFigcaption = false }: CodeOptions = {}): Handler =>
-  (h, maybeMdastNode) => {
+  (state, maybeMdastNode) => {
     if (!isCodeNode(maybeMdastNode)) return undefined;
 
     const node = maybeMdastNode;
@@ -208,22 +205,25 @@ export const handler =
     const hProps: hast.Properties = { ...(node.data?.hProperties ?? {}) };
 
     // Merge language-* class with hProperties.class if present. `hProps.class`
-    // can theoretically be any `Properties[key]` value; coerce to string in
-    // the non-array branch so the resulting className stays `(string|number)[]`.
+    // can theoretically be any `Properties[key]` value; coerce every token to
+    // string so the resulting className stays `string[]`.
     const hClass = hProps.class;
-    const className: (string | number)[] = hClass
-      ? [langClass, ...(Array.isArray(hClass) ? hClass : [String(hClass)])]
+    const className: string[] = hClass
+      ? [langClass, ...(Array.isArray(hClass) ? hClass : [hClass]).map(String)]
       : [langClass];
 
-    const preProps = { className: [langClass] };
+    const preProps: hast.Properties = { className: [langClass] };
     const codeProps: hast.Properties = { ...hProps, className };
     // Use hChildren for syntax highlighting if available, otherwise plain text
     const children = node.data?.hChildren ?? [u('text', value)];
 
+    const code = element('code', codeProps, children);
+    state.patch(node, code);
+    const pre = element('pre', preProps, [code]);
+    state.patch(node, pre);
+
     if (!title) {
-      return h(node.position, 'pre', preProps, [
-        h(node.position, 'code', codeProps, children),
-      ]);
+      return pre;
     }
 
     const figcaptionProps: hast.Properties = {};
@@ -232,10 +232,10 @@ export const handler =
       delete codeProps.id;
     }
 
-    return h(node.position, 'figure', { class: langClass }, [
-      h({ type: 'element' }, 'figcaption', figcaptionProps, [u('text', title)]),
-      h(node.position, 'pre', preProps, [
-        h(node.position, 'code', codeProps, children),
-      ]),
+    const figure = element('figure', { className: [langClass] }, [
+      element('figcaption', figcaptionProps, [u('text', title)]),
+      pre,
     ]);
+    state.patch(node, figure);
+    return figure;
   };

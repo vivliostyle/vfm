@@ -34,14 +34,14 @@ test(
     b  
     c
     `,
+    // remark-breaks 4 is a transformer, so `parse()` still shows the soft
+    // line break; the hard break appears in the HTML.
     stripIndent`
     root[1]
-    └─0 paragraph[5]
-        ├─0 text "a"
+    └─0 paragraph[3]
+        ├─0 text "a\\nb"
         ├─1 break
-        ├─2 text "b"
-        ├─3 break
-        └─4 text "c"
+        └─2 text "c"
     `,
     stripIndent`
     <p>a<br>

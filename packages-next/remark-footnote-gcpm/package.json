@@ -25,18 +25,19 @@
     "lint": "eslint --fix ."
   },
   "dependencies": {
-    "@types/hast": "^2.0.0",
+    "@types/hast": "^3.0.5",
+    "@types/mdast": "^4.0.4",
     "@vivliostyle/vfm-internal-utils-next": "workspace:*",
-    "hastscript": "^7.2.0",
-    "mdast-util-to-hast": "^11.3.0",
-    "unified": "^9.2.0",
+    "hastscript": "^9.0.1",
+    "mdast-util-to-hast": "^13.2.1",
+    "unified": "^11.0.5",
     "valibot": "1.4.2"
   },
   "devDependencies": {
-    "rehype-format": "^3.1.0",
-    "rehype-stringify": "^8.0.0",
-    "remark-footnotes": "^2.0.0",
-    "remark-parse": "^8.0.2",
-    "remark-rehype": "^8.1.0"
+    "rehype-format": "^5.0.1",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2"
   }
 }

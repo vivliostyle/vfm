@@ -1,8 +1,8 @@
 import type * as hast from 'hast';
-import raw from 'hast-util-raw';
+import { raw } from 'hast-util-raw';
 import type * as mdast from 'mdast';
-import { type H, all, one } from 'mdast-util-to-hast';
-import type unified from 'unified';
+import type { State } from 'mdast-util-to-hast';
+import type { Plugin } from 'unified';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 import * as v from 'valibot';
@@ -127,14 +127,14 @@ type ImageWithParsedCaption = mdast.Image & {
   children?: mdast.PhrasingContent[] | undefined;
 };
 
-const parseImageAltAsInline: unified.Plugin<[FigcaptionInlineOptions?]> =
+const parseImageAltAsInline: Plugin<[FigcaptionInlineOptions?], mdast.Root> =
   function ({
     parseFigcaptionAsInline = DEFAULT_PARSE_FIGCAPTION_AS_INLINE,
   }: FigcaptionInlineOptions = {}) {
     return !parseFigcaptionAsInline
       ? () => {}
-      : (tree) => {
-          visit(tree as mdast.Root, 'paragraph', (paragraph) => {
+      : (tree: mdast.Root) => {
+          visit(tree, 'paragraph', (paragraph) => {
             const lone = loneImageParagraph(paragraph);
             if (!lone) {
               return;
@@ -143,8 +143,10 @@ const parseImageAltAsInline: unified.Plugin<[FigcaptionInlineOptions?]> =
             if (!image.alt) {
               return;
             }
-            // TODO: feeding raw, re-parseable Markdown text through `Image.alt`
-            // relies on behavior specific to remark-parse@8.
+            // TODO(#292): remark-parse 8 kept the raw Markdown source in
+            // `Image.alt`; micromark decodes it to plain text, so inline markup
+            // in the caption is already gone here. Capture the caption during
+            // tokenization instead of re-parsing `alt`.
             const root = this.parse(image.alt) as mdast.Root;
             const inline = root.children[0];
             if (inline?.type === 'paragraph') {
@@ -163,12 +165,13 @@ export { parseImageAltAsInline as mdast };
  * with their own `<p>` fallback:
  *
  * ```ts
- * paragraph: (h, node) =>
- *   buildFigure(h, node, options) ?? h(node, 'p', all(h, node));
+ * paragraph: (state, node, parent) =>
+ *   buildFigure(state, node, options) ??
+ *   defaultHandlers.paragraph(state, node, parent);
  * ```
  */
 export const buildFigure = (
-  h: H,
+  state: State,
   maybeMdastNode: unknown,
   {
     imgFigcaptionOrder = 'img-figcaption',
@@ -184,13 +187,13 @@ export const buildFigure = (
   const hasCaption = !!mdastImage.alt;
   if (!hasCaption && captionlessImagePolicy === 'paragraph') return undefined;
 
-  const hastImg = one(h, mdastImage, mdastParagraph);
+  const hastImg = state.one(mdastImage, mdastParagraph);
   if (!hastImg || Array.isArray(hastImg) || hastImg.type !== 'element') {
     return undefined;
   }
 
   const toHast = (children: mdast.PhrasingContent[]): hast.ElementContent[] =>
-    children.flatMap((child) => one(h, child, mdastParagraph) ?? []);
+    children.flatMap((child) => state.one(child, mdastParagraph) ?? []);
   const at = mdastParagraph.children.indexOf(mdastImage);
   const imgWithComments = [
     ...toHast(mdastParagraph.children.slice(0, at)),
@@ -198,8 +201,21 @@ export const buildFigure = (
     ...toHast(mdastParagraph.children.slice(at + 1)),
   ];
 
+  // Build `<figure>` in place of the paragraph: copy its position and honor
+  // its `data` (`hProperties` etc.) like the default paragraph handler does.
+  const figureOf = (children: hast.ElementContent[]): hast.Element => {
+    const figure: hast.Element = {
+      type: 'element',
+      tagName: 'figure',
+      properties: {},
+      children,
+    };
+    state.patch(mdastParagraph, figure);
+    return state.applyData(mdastParagraph, figure) as hast.Element;
+  };
+
   if (!hasCaption && captionlessImagePolicy === 'figure') {
-    return h(mdastParagraph, 'figure', imgWithComments);
+    return figureOf(imgWithComments);
   }
 
   const altText = mdastImage.alt ?? '';
@@ -215,26 +231,26 @@ export const buildFigure = (
   const figcaptionProps: hast.Properties =
     hasCaption && explicitAlt !== undefined && explicitAlt !== altText
       ? {}
-      : { 'aria-hidden': 'true' };
+      : { ariaHidden: 'true' };
   if (assignIdToFigcaption && hastImg.properties && hastImg.properties.id) {
     figcaptionProps.id = hastImg.properties.id;
     delete hastImg.properties.id;
   }
 
   const reparsed = !!mdastImage.children?.length;
+  // `Image.children` is VFM's own extension of the node (see
+  // `ImageWithParsedCaption`); `state.all` only needs `children` at runtime.
   const figcaptionChildren = reparsed
-    ? all(h, mdastImage)
+    ? state.all(mdastImage as unknown as mdast.Paragraph)
     : [u('text', altText)];
-  const figcaption = h(
-    { type: 'element' },
-    'figcaption',
-    figcaptionProps,
-    figcaptionChildren,
-  );
+  const figcaption: hast.Element = {
+    type: 'element',
+    tagName: 'figcaption',
+    properties: figcaptionProps,
+    children: figcaptionChildren,
+  };
 
-  return h(
-    mdastParagraph,
-    'figure',
+  return figureOf(
     imgFigcaptionOrder === 'figcaption-img'
       ? [figcaption, ...imgWithComments]
       : [...imgWithComments, figcaption],
@@ -292,15 +308,16 @@ const accessibleName = (node: hast.RootContent | hast.Root): string => {
  * behave, but stays within that recommendation and is the more capable choice
  * for a conversion that targets HTML.
  */
-const deriveImgAltFromFigcaption: unified.Plugin<
-  [FigcaptionInlineOptions?]
+const deriveImgAltFromFigcaption: Plugin<
+  [FigcaptionInlineOptions?],
+  hast.Root
 > = ({
   parseFigcaptionAsInline = DEFAULT_PARSE_FIGCAPTION_AS_INLINE,
 }: FigcaptionInlineOptions = {}) =>
   !parseFigcaptionAsInline
     ? () => {}
-    : (tree) => {
-        visit(tree as hast.Root, 'element', (figure) => {
+    : (tree: hast.Root) => {
+        visit(tree, 'element', (figure) => {
           if (figure.tagName !== 'figure') return;
           const child = (tagName: string) =>
             figure.children.find(

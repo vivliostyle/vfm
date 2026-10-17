@@ -1,5 +1,5 @@
 import type * as hast from 'hast';
-import { getAttribute } from 'hast-util-get-attribute';
+import { getAttribute as getAttributeHast2 } from 'hast-util-get-attribute';
 import { selectAll } from 'hast-util-select';
 import type * as unist from 'unist';
 import {
@@ -18,6 +18,19 @@ export type URIExtensionParts = Omit<URIComponents, 'path'> & {
 };
 
 export type ExtensionResolver = (parts: URIExtensionParts) => string | null;
+
+/**
+ * `hast-util-get-attribute` 1.x is typed against `@types/hast` 2. Its
+ * `Readonly<Element>` parameter rejects `@types/hast` 3 elements under
+ * `exactOptionalPropertyTypes` only because of the `| undefined` on
+ * `position`; the runtime shape is identical.
+ * @todo Drop this cast once `hast-util-get-attribute` ships `@types/hast` 3 types.
+ */
+const getAttribute = getAttributeHast2 as unknown as (
+  element: hast.Element,
+  qualifiedName: string,
+  options?: { root?: hast.Root | hast.Element },
+) => string | null;
 
 export const RewriteExtensionOptionsSchema = v.object({
   rules: v.pipe(
