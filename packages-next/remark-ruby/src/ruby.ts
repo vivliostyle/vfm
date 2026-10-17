@@ -10,6 +10,11 @@ export type { Ruby, RubyData } from './mdast-util.js';
 export { rubyFromMarkdown } from './mdast-util.js';
 export { ruby as rubySyntax } from './micromark-extension.js';
 
+/**
+ * Whether `node` is a `ruby` node produced by {@link rubyFromMarkdown}.
+ * @param node Any value handed to the to-hast handler.
+ * @returns `true` for a `ruby` node.
+ */
 const isRuby = (node: unknown): node is Ruby =>
   !!node &&
   typeof node === 'object' &&
@@ -17,7 +22,8 @@ const isRuby = (node: unknown): node is Ruby =>
   typeof (node as { rubyText?: unknown }).rubyText === 'string';
 
 /**
- * remark plugin: parse `{base|ruby}` into `ruby` nodes.
+ * remark plugin: parse `{base|ruby}` into `ruby` nodes by registering the
+ * micromark and `mdast-util-from-markdown` extensions on the processor.
  */
 export const mdast: Plugin = function () {
   const data = this.data() as {
@@ -30,6 +36,10 @@ export const mdast: Plugin = function () {
 
 /**
  * mdast-util-to-hast handler: `ruby` node to `<ruby>base<rt>ruby</rt></ruby>`.
+ * @param state to-hast state.
+ * @param node Node to handle; anything but a `ruby` node is left to the
+ *   default handling.
+ * @returns The `<ruby>` element, or `undefined` for other nodes.
  */
 export const handler: Handler = (state, node) => {
   if (!isRuby(node)) return undefined;

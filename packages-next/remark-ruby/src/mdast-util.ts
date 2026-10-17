@@ -26,10 +26,18 @@ declare module 'mdast' {
   }
 }
 
+/**
+ * Enter a `ruby` node. `rubyText` is filled in by {@link exitRubyText}.
+ * @param token The `ruby` token.
+ */
 function enterRuby(this: CompileContext, token: Token): undefined {
   this.enter({ type: 'ruby', rubyText: '', children: [] }, token);
 }
 
+/**
+ * Store the literal ruby text on the `ruby` node being built.
+ * @param token The `rubyText` token.
+ */
 function exitRubyText(this: CompileContext, token: Token): undefined {
   const node = this.stack[this.stack.length - 1];
   if (node && node.type === 'ruby') {
@@ -37,6 +45,10 @@ function exitRubyText(this: CompileContext, token: Token): undefined {
   }
 }
 
+/**
+ * Exit the `ruby` node.
+ * @param token The `ruby` token.
+ */
 function exitRuby(this: CompileContext, token: Token): undefined {
   this.exit(token);
 }
@@ -44,6 +56,8 @@ function exitRuby(this: CompileContext, token: Token): undefined {
 /**
  * Create an `mdast-util-from-markdown` extension that turns the `ruby`
  * tokens of the micromark extension into `ruby` nodes.
+ * @returns Extension to pass to `fromMarkdown` (`mdastExtensions`) or to
+ *   register on a remark processor (`fromMarkdownExtensions`).
  */
 export const rubyFromMarkdown = (): Extension => ({
   enter: { ruby: enterRuby },
