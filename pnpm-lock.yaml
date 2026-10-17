@@ -546,6 +546,9 @@ importers:
       meow:
         specifier: ^13.2.0
         version: 13.2.0
+      micromark-factory-space:
+        specifier: ^2.1.0
+        version: 2.1.0
       micromark-util-character:
         specifier: ^2.1.1
         version: 2.1.1
@@ -582,9 +585,6 @@ importers:
       remark-rehype:
         specifier: ^11.1.2
         version: 11.1.2
-      remark-shortcodes:
-        specifier: ^0.3.1
-        version: 0.3.1(remark-parse@11.0.0)
       temml:
         specifier: ^0.13.0
         version: 0.13.3
@@ -5189,10 +5189,6 @@ snapshots:
     dependencies:
       mdast-util-to-hast: 10.2.0
       unified: 9.2.2
-
-  remark-shortcodes@0.3.1(remark-parse@11.0.0):
-    dependencies:
-      remark-parse: 11.0.0
 
   remark-shortcodes@0.3.1(remark-parse@8.0.3):
     dependencies:

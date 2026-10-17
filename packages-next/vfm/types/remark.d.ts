@@ -1,4 +1,3 @@
-declare module 'remark-shortcodes';
 declare module 'md-attr-parser' {
   export default function (
     value: string,
