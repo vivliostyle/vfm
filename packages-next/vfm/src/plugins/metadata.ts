@@ -120,10 +120,9 @@ const readTitleFromHeading = (tree: Node): string | undefined => {
   }
 
   // Create title string with inline footnotes removed.
-  // TODO(#289): `footnote` is the inline note node of remark-footnotes 2.
   const children = [...heading.children];
   heading.children = heading.children.filter(
-    (child) => (child as { type: string }).type !== 'footnote',
+    (child) => child.type !== 'footnote',
   );
   // Remove ruby text and HTML tags
   const text = toString(heading)

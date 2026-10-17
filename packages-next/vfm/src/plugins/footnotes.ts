@@ -12,10 +12,9 @@
  * an "element" is the note content, a "body" is the marker and element
  * combined, and an "area" is the region where notes are collected for display.
  *
- * Footnote references and definitions are parsed by remark-gfm (see
- * `revive-parse.ts`). Inline notes (`^[...]`) came from remark-footnotes 2,
- * which remark-parse 11 ignores.
- * TODO(#289): replace `remark-footnotes` with the VFM inline-note extension.
+ * Footnote references and definitions (`[^id]`) are parsed by remark-gfm (see
+ * `revive-parse.ts`); inline notes (`^[...]`) by `remark-footnote-inline`.
+ * Both produce the nodes the three mode packages handle.
  */
 
 import {
@@ -34,11 +33,11 @@ import {
   createPandocFootnotePlugin,
   PandocFootnoteOptionsSchema,
 } from '@vivliostyle/remark-footnote-pandoc-next';
+import { mdast as footnoteInline } from '@vivliostyle/remark-footnote-inline-next';
 import type { Handler as ToHastHandler } from 'mdast-util-to-hast';
-import footnotes from 'remark-footnotes';
 import type { Plugin } from 'unified';
 import * as v from 'valibot';
-import { type AnyPlugin, partial } from '../utils.js';
+import type { AnyPlugin } from '../utils.js';
 
 // Re-export factory types so vfm consumers (and the index.ts re-exports)
 // keep their existing import paths.
@@ -166,8 +165,6 @@ export const createFootnotePlugin = (
 };
 
 /**
- * Process Markdown AST.
+ * mdast slot: parse inline footnotes `^[...]` into `footnote` nodes.
  */
-export const mdast: AnyPlugin = partial(footnotes, {
-  inlineNotes: true,
-}) as AnyPlugin;
+export const mdast: AnyPlugin = footnoteInline;

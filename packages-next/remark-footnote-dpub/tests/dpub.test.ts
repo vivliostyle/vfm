@@ -1,6 +1,7 @@
 import rehypeFormat from 'rehype-format';
 import rehypeRaw from 'rehype-raw';
 import rehypeStringify from 'rehype-stringify';
+import { mdast as footnoteInline } from '@vivliostyle/remark-footnote-inline-next';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
@@ -30,6 +31,7 @@ const stringify = (
       .use([
         remarkParse,
         remarkGfm,
+        footnoteInline,
         [remarkRehype, { allowDangerousHtml: true, handlers: toHastHandlers }],
         rehypeRaw,
         hastTransformer,
@@ -52,8 +54,7 @@ test('basic reference footnote', () => {
   expect(received).toBe(expected);
 });
 
-// TODO(#289): inline notes `^[...]` need the VFM micromark extension; remark-gfm has none.
-test.skip('inline footnote', () => {
+test('inline footnote', () => {
   const md = `Text with inline^[Inline content].`;
   const received = stringify(md);
   const expected = `

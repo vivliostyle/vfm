@@ -1,0 +1,42 @@
+{
+  "name": "@vivliostyle/remark-footnote-inline-next",
+  "private": true,
+  "version": "0.0.0",
+  "description": "remark plugin to support `^[...]` inline footnote syntax used by VFM (micromark extension).",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 22"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vivliostyle/vfm.git",
+    "directory": "packages-next/remark-footnote-inline"
+  },
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "shx rm -rf lib && tsc",
+    "test": "tsc --project tests/tsconfig.json && vitest run",
+    "format": "prettier --write --ignore-path ../../.gitignore --ignore-path ../../.prettierignore .",
+    "lint": "eslint --fix ."
+  },
+  "dependencies": {
+    "@types/mdast": "^4.0.4",
+    "@types/unist": "^3.0.3",
+    "mdast-util-from-markdown": "^2.1.0",
+    "micromark-util-chunked": "^2.0.1",
+    "micromark-util-resolve-all": "^2.0.1",
+    "micromark-util-symbol": "^2.0.1",
+    "micromark-util-types": "^2.0.3",
+    "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "unist-util-inspect": "^8.1.0"
+  }
+}
