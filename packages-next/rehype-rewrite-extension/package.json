@@ -25,10 +25,10 @@
     "lint": "eslint --fix ."
   },
   "dependencies": {
-    "@types/hast": "^2.0.0",
-    "@types/unist": "^2.0.0",
+    "@types/hast": "^3.0.5",
+    "@types/unist": "^3.0.3",
     "hast-util-get-attribute": "^1.1.1",
-    "hast-util-select": "^5.0.5",
+    "hast-util-select": "^6.0.4",
     "upath": "^3.0.8",
     "uri-js": "^4.4.1",
     "valibot": "1.4.2"

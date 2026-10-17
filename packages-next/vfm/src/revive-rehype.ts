@@ -1,7 +1,6 @@
-import { type Handler, all } from 'mdast-util-to-hast';
-import { table as defaultTableHandler } from 'mdast-util-to-hast/lib/handlers/table.js';
+import { defaultHandlers, type Handler } from 'mdast-util-to-hast';
 import raw from 'rehype-raw';
-import unified from 'unified';
+import type { Pluggable } from 'unified';
 import { handler as code, type CodeOptions } from './plugins/code.js';
 import { mdast as doc, type DocumentOptions } from './plugins/document.js';
 import {
@@ -48,42 +47,42 @@ export type ReviveRehypeOptions = FigureOptions &
   TableOptions;
 
 declare const rehypeRawPluginBrand: unique symbol;
-export type RehypeRawPlugin = unified.Pluggable & {
+export type RehypeRawPlugin = Pluggable & {
   [rehypeRawPluginBrand]: unknown;
 };
 
 declare const rehypeDeriveImgAltFromFigcaptionPluginBrand: unique symbol;
-export type RehypeDeriveImgAltFromFigcaptionPlugin = unified.Pluggable & {
+export type RehypeDeriveImgAltFromFigcaptionPlugin = Pluggable & {
   [rehypeDeriveImgAltFromFigcaptionPluginBrand]: unknown;
 };
 
 declare const rehypeFootnotePluginBrand: unique symbol;
-export type RehypeFootnotePlugin = unified.Pluggable & {
+export type RehypeFootnotePlugin = Pluggable & {
   [rehypeFootnotePluginBrand]: unknown;
 };
 
 declare const rehypeReplacePluginBrand: unique symbol;
-export type RehypeReplacePlugin = unified.Pluggable & {
+export type RehypeReplacePlugin = Pluggable & {
   [rehypeReplacePluginBrand]: unknown;
 };
 
 declare const rehypeDocumentPluginBrand: unique symbol;
-export type RehypeDocumentPlugin = unified.Pluggable & {
+export type RehypeDocumentPlugin = Pluggable & {
   [rehypeDocumentPluginBrand]: unknown;
 };
 
 declare const rehypeMathPluginBrand: unique symbol;
-export type RehypeMathPlugin = unified.Pluggable & {
+export type RehypeMathPlugin = Pluggable & {
   [rehypeMathPluginBrand]: unknown;
 };
 
 declare const rehypeFormatPluginBrand: unique symbol;
-export type RehypeFormatPlugin = unified.Pluggable & {
+export type RehypeFormatPlugin = Pluggable & {
   [rehypeFormatPluginBrand]: unknown;
 };
 
 declare const rehypeRewriteRelativeHrefExtensionsPluginBrand: unique symbol;
-export type RehypeRewriteRelativeHrefExtensionsPlugin = unified.Pluggable & {
+export type RehypeRewriteRelativeHrefExtensionsPlugin = Pluggable & {
   [rehypeRewriteRelativeHrefExtensionsPluginBrand]: unknown;
 };
 
@@ -126,12 +125,12 @@ export const reviveRehype = (options: ReviveRehypeOptions) => {
       inlineMath: inlineMath(options),
       ruby,
       code: code(options),
-      paragraph: ((h, node) =>
+      paragraph: ((state, node) =>
         buildDisplayMath(node, options) ??
-        buildFigure(h, node, options) ??
-        h(node, 'p', all(h, node))) as Handler,
+        buildFigure(state, node, options) ??
+        defaultHandlers.paragraph(state, node)) as Handler,
       table: withTableCellTransform(resolveTableCellHook(options.table?.cell))(
-        defaultTableHandler,
+        defaultHandlers.table,
       ),
       ...footnoteHandlers,
     } as const,

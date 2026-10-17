@@ -1,6 +1,5 @@
-import { doctype } from 'doctype';
+import type * as hast from 'hast';
 import { h, type Child } from 'hastscript';
-import type { Node } from 'unist';
 import { u } from 'unist-builder';
 import type { VFile } from 'vfile';
 import * as v from 'valibot';
@@ -93,12 +92,9 @@ const createHead = (data: Metadata, vfile: VFile): Child[] => {
  * @param tree Tree of Markdown AST.
  * @returns AST of `<body>`.
  */
-const createBody = (metadata: Metadata, tree: Node) => {
+const createBody = (metadata: Metadata, tree: hast.Root) => {
   // <body>...</body>
-  const contents =
-    tree.type === 'root' && Array.isArray(tree.children)
-      ? tree.children.concat()
-      : [tree];
+  const contents: Child[] = [...tree.children];
   if (0 < contents.length) {
     contents.unshift(u('text', '\n'));
   }
@@ -114,7 +110,7 @@ const createBody = (metadata: Metadata, tree: Node) => {
       : metadata.class;
   }
 
-  return h('body', props, contents);
+  return h('body', props, ...contents);
 };
 
 /**
@@ -126,7 +122,7 @@ const createBody = (metadata: Metadata, tree: Node) => {
  * @param vfile VFile.
  * @returns AST of `<html>`.
  */
-const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
+const createHTML = (metadata: Metadata, tree: hast.Root, vfile: VFile) => {
   const props = createProperties(metadata.html);
 
   if (typeof metadata.id === 'string') {
@@ -148,9 +144,11 @@ const createHTML = (metadata: Metadata, tree: Node, vfile: VFile) => {
       : metadata.class;
   }
 
+  // hastscript 9 reads a text node in the properties position as properties,
+  // so children are always passed after an explicit properties object.
   return h('html', props, [
     u('text', '\n'),
-    h('head', ...createHead(metadata, vfile)),
+    h('head', {}, ...createHead(metadata, vfile)),
     u('text', '\n'),
     createBody(metadata, tree),
     u('text', '\n'),
@@ -181,11 +179,12 @@ export const mdast = (
 ) =>
   partial
     ? () => {}
-    : (tree: Node, vfile: VFile) => {
+    : (tree: hast.Root, vfile: VFile): hast.Root => {
         return {
           type: 'root',
           children: [
-            { type: 'doctype', name: doctype(5) },
+            // hast 3 doctypes carry no name; `<!doctype html>` is implied.
+            { type: 'doctype' },
             u('text', '\n'),
             createHTML(data, tree, vfile),
             u('text', '\n'),

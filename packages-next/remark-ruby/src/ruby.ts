@@ -1,27 +1,31 @@
-import { type Handler, all } from 'mdast-util-to-hast';
-import type {
-  Eat as RemarkEat,
-  Parser as RemarkParser,
-  Tokenizer as RemarkTokenizer,
-} from 'remark-parse';
+import type { Data, Parent, PhrasingContent } from 'mdast';
+// Registers `hName` on mdast `Data`.
+import type { Handler } from 'mdast-util-to-hast';
 import type { Plugin } from 'unified';
-import type { Data, Node, Parent, Point as UnistPoint } from 'unist';
+import type { Node } from 'unist';
 import { u } from 'unist-builder';
 
-/**
- * @todo Drop `hName` after upgrading to `mdast-util-to-hast@>=13`, which ships
- *   the same `Data` augmentation as a side effect import.
- */
-declare module 'unist' {
-  interface Data {
-    hName?: string | undefined;
-  }
+export interface RubyData extends Data {
+  hName: 'ruby';
+  /** Text of the `<rt>` element. */
+  rubyText: string;
 }
 
-type Ruby = Parent & {
+/** Ruby annotation (`{base|ruby}`). */
+export interface Ruby extends Parent {
   type: 'ruby';
-  data: Data & { hName: 'ruby'; rubyText: string };
-};
+  children: PhrasingContent[];
+  data: RubyData;
+}
+
+declare module 'mdast' {
+  interface PhrasingContentMap {
+    ruby: Ruby;
+  }
+  interface RootContentMap {
+    ruby: Ruby;
+  }
+}
 
 const isRuby = (node: unknown): node is Ruby =>
   !!node &&
@@ -30,27 +34,41 @@ const isRuby = (node: unknown): node is Ruby =>
   typeof (node as { data?: { rubyText?: unknown } }).data?.rubyText ===
     'string';
 
-// `unist` types `Point.offset` as optional, but `now()` always sets it:
-// https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/tokenizer.js#L133
-type Point = Omit<UnistPoint, 'offset'> & {
-  offset: NonNullable<UnistPoint['offset']>;
+// ---------------------------------------------------------------------------
+// remark-parse 8 tokenizer
+//
+// remark-parse 11 exposes `this.parser` (a `mdast-util-from-markdown`
+// wrapper) instead of `this.Parser`, so the registration below never runs
+// there and `{base|ruby}` is left as plain text. The tokenizer is kept only
+// until it is replaced by a micromark extension.
+// @todo Rewrite as a micromark + mdast-util-from-markdown extension (#286).
+// ---------------------------------------------------------------------------
+
+type Point = { line: number; column: number; offset: number };
+
+type Eat = ((subvalue: string) => <N extends Node>(node: N) => N) & {
+  now(): Point;
 };
 
-// `remark-parse`'s `Tokenizer` omits `this`; the runtime binds the parser:
-// https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/tokenizer.js#L62
-type Tokenizer = Pick<RemarkTokenizer, keyof RemarkTokenizer> & {
+type TokenizerInstance = {
+  tokenizeInline(value: string, location: Point): Node[];
+};
+
+interface Tokenizer {
   (
-    this: RemarkParser & {
-      // `tokenizeInline` is a parser prototype method absent from remark-parse's types:
-      // https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/parser.js#L134
-      tokenizeInline(value: string, location: Point): Node[];
-    },
-    // `remark-parse`'s `Eat` type omits `now()`, which the runtime sets:
-    // https://github.com/remarkjs/remark/blob/remark-parse@8.0.3/packages/remark-parse/lib/tokenizer.js#L31
-    eat: RemarkEat & { now(): Point },
+    this: TokenizerInstance,
+    eat: Eat,
     value: string,
     silent?: boolean,
   ): boolean | Node | void;
+  locator?: (value: string, fromIndex: number) => number;
+}
+
+type LegacyParser = {
+  prototype: {
+    inlineTokenizers: Record<string, Tokenizer>;
+    inlineMethods: string[];
+  };
 };
 
 const tokenizer: Tokenizer = function (eat, value, silent) {
@@ -68,7 +86,7 @@ const tokenizer: Tokenizer = function (eat, value, silent) {
   now.column += 1;
   now.offset += 1;
 
-  const children = this.tokenizeInline(inlineContent, now);
+  const children = this.tokenizeInline(inlineContent, now) as PhrasingContent[];
   return eat(eaten)({
     type: 'ruby',
     children,
@@ -80,25 +98,24 @@ tokenizer.locator = (value, fromIndex) => value.indexOf('{', fromIndex);
 
 // remark
 export const mdast: Plugin = function () {
-  if (!this.Parser) return;
+  const parser = (this as unknown as { Parser?: LegacyParser }).Parser;
+  if (!parser) return;
 
-  const { inlineTokenizers, inlineMethods } = this.Parser
-    .prototype as RemarkParser;
-  inlineTokenizers.ruby = tokenizer as RemarkTokenizer;
+  const { inlineTokenizers, inlineMethods } = parser.prototype;
+  inlineTokenizers.ruby = tokenizer;
   inlineMethods.splice(inlineMethods.indexOf('text'), 0, 'ruby');
 };
 
 // rehype
-export const handler: Handler = (h, node) => {
-  const ruby: unknown = node;
-  if (!isRuby(ruby)) return undefined;
-  const rtNode = h(
-    {
-      type: 'element',
-    },
-    'rt',
-    [u('text', ruby.data.rubyText)],
-  );
-
-  return h(node, 'ruby', [...all(h, node), rtNode]);
+export const handler: Handler = (state, node) => {
+  if (!isRuby(node)) return undefined;
+  const rt = u('element', { tagName: 'rt', properties: {} }, [
+    u('text', node.data.rubyText),
+  ]);
+  const ruby = u('element', { tagName: 'ruby', properties: {} }, [
+    ...state.all(node),
+    rt,
+  ]);
+  state.patch(node, ruby);
+  return state.applyData(node, ruby);
 };

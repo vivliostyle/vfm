@@ -1,13 +1,13 @@
-import type { Element } from 'hast';
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
-import type { Root } from 'mdast';
+import type { Heading, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import type { Shortcode } from './toc.js';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
 import markdown from 'remark-parse';
 import remark2rehype from 'remark-rehype';
-import unified from 'unified';
+import { unified, type PluggableList } from 'unified';
 import type { Node } from 'unist';
 import { select } from 'unist-util-select';
 import { visit } from 'unist-util-visit';
@@ -114,15 +114,16 @@ interface MetadataVFile extends VFile {
  * @returns Title text or `undefined`.
  */
 const readTitleFromHeading = (tree: Node): string | undefined => {
-  const heading = select('heading', tree) as Element | undefined;
+  const heading = select('heading', tree) as Heading | undefined;
   if (!heading) {
     return;
   }
 
-  // Create title string with footnotes removed
+  // Create title string with inline footnotes removed.
+  // TODO(#289): `footnote` is the inline note node of remark-footnotes 2.
   const children = [...heading.children];
   heading.children = heading.children.filter(
-    (child: Node) => child.type !== 'footnote',
+    (child) => (child as { type: string }).type !== 'footnote',
   );
   // Remove ruby text and HTML tags
   const text = toString(heading)
@@ -178,14 +179,14 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
 const parseMarkdown = (md: string): KeyValue => {
   const processor = unified()
     .use([
-      [markdown, { gfm: true, commonmark: true }],
+      markdown,
+      remarkGfm,
       // Remove footnotes when reading title from heading
       footnotes,
       attr,
       frontmatter,
       mdast,
-    ] as unified.PluggableList<unified.Settings>)
-    .data('settings', { position: false })
+    ] satisfies PluggableList)
     .use(remark2rehype)
     .use(stringify);
 

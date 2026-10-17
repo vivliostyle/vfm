@@ -16,11 +16,9 @@ import {
 import type * as hast from 'hast';
 import { selectAll } from 'hast-util-select';
 import { h } from 'hastscript';
-import {
-  type Handler as ToHastHandler,
-  all as convertToHast,
-} from 'mdast-util-to-hast';
-import type unified from 'unified';
+import type { FootnoteDefinition } from 'mdast';
+import type { Handler as ToHastHandler } from 'mdast-util-to-hast';
+import type { Plugin } from 'unified';
 import type * as unist from 'unist';
 import { u } from 'unist-builder';
 import * as v from 'valibot';
@@ -132,11 +130,11 @@ const createDpubFootnoteReferenceHandler =
     callCustomizer: hast.Properties | DpubCallFactory | undefined,
     bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
   ): ToHastHandler =>
-  (ctx, node) => {
+  (state, node) => {
     const identifier = String(node.identifier);
-    const def = ctx.footnoteById[identifier.toUpperCase()];
+    const def = state.footnoteById.get(identifier.toUpperCase());
     if (!def) {
-      return null;
+      return undefined;
     }
 
     const existing = assigned.get(identifier);
@@ -157,7 +155,7 @@ const createDpubFootnoteReferenceHandler =
           class: 'footnote-ref' as const,
           role: 'doc-noteref' as const,
         },
-        [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
+        [h('sup', {}, u('text', `${refIndex}`))] as DpubCallChildren,
         callCustomizer,
       );
     }
@@ -171,13 +169,12 @@ const createDpubFootnoteReferenceHandler =
     const backlink: DpubBacklink = h(
       'a',
       { href: `#${callId}`, class: 'footnote-back', role: 'doc-backlink' },
-      h('sup', u('text', `${refIndex}`)),
+      h('sup', {}, u('text', `${refIndex}`)),
     ) as DpubBacklink;
 
     const bodyChildren: DpubBodyChildren = [
       backlink,
-      ...convertToHast(
-        ctx,
+      ...state.all(
         def.children[0]?.type === 'paragraph' ? def.children[0] : def,
       ),
     ];
@@ -200,7 +197,7 @@ const createDpubFootnoteReferenceHandler =
         class: 'footnote-ref' as const,
         role: 'doc-noteref' as const,
       },
-      [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
+      [h('sup', {}, u('text', `${refIndex}`))] as DpubCallChildren,
       callCustomizer,
     );
   };
@@ -212,18 +209,19 @@ const createDpubInlineFootnoteHandler =
     callCustomizer: hast.Properties | DpubCallFactory | undefined,
     bodyCustomizer: hast.Properties | DpubBodyFactory | undefined,
   ): ToHastHandler =>
-  (ctx, node) => {
+  (state, node) => {
     let no = 1;
-    while (String(no) in ctx.footnoteById) {
+    while (state.footnoteById.has(String(no))) {
       no++;
     }
     const identifier = String(no);
-    ctx.footnoteById[identifier] = {
+    const def: FootnoteDefinition = {
       type: 'footnoteDefinition',
       identifier,
       children: [{ type: 'paragraph', children: node.children }],
       position: node.position,
     };
+    state.footnoteById.set(identifier, def);
 
     const refIndex = nextIndex();
     const callId = `fnref${refIndex}` as `fnref${number}`;
@@ -232,13 +230,10 @@ const createDpubInlineFootnoteHandler =
     const backlink: DpubBacklink = h(
       'a',
       { href: `#${callId}`, class: 'footnote-back', role: 'doc-backlink' },
-      h('sup', u('text', `${refIndex}`)),
+      h('sup', {}, u('text', `${refIndex}`)),
     ) as DpubBacklink;
 
-    const bodyChildren: DpubBodyChildren = [
-      backlink,
-      ...convertToHast(ctx, node),
-    ];
+    const bodyChildren: DpubBodyChildren = [backlink, ...state.all(node)];
 
     inlinePending.set(
       callId,
@@ -258,7 +253,7 @@ const createDpubInlineFootnoteHandler =
         class: 'footnote-ref' as const,
         role: 'doc-noteref' as const,
       },
-      [h('sup', u('text', `${refIndex}`))] as DpubCallChildren,
+      [h('sup', {}, u('text', `${refIndex}`))] as DpubCallChildren,
       callCustomizer,
     );
   };
@@ -270,7 +265,7 @@ const createDpubInlineFootnoteHandler =
  * can replace the placeholder with the queued aside.
  */
 const createDpubFootnoteDefinitionHandler =
-  (): ToHastHandler => (_ctx, node) => {
+  (): ToHastHandler => (_state, node) => {
     const identifier = String(node.identifier);
     return h('div', { dataFootnotePlaceholder: identifier });
   };
@@ -500,7 +495,7 @@ export type DpubFootnotePlugin = {
     footnoteReference: ToHastHandler;
     footnote: ToHastHandler;
   };
-  hastTransformer: unified.Plugin;
+  hastTransformer: Plugin;
 };
 
 export const createDpubFootnotePlugin = (

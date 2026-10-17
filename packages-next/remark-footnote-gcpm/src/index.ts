@@ -15,11 +15,9 @@ import {
 } from '@vivliostyle/vfm-internal-utils-next';
 import type * as hast from 'hast';
 import { h } from 'hastscript';
-import {
-  type Handler as ToHastHandler,
-  all as convertToHast,
-} from 'mdast-util-to-hast';
-import type unified from 'unified';
+import type { FootnoteDefinition } from 'mdast';
+import type { Handler as ToHastHandler } from 'mdast-util-to-hast';
+import type { Plugin } from 'unified';
 import * as v from 'valibot';
 
 export type { ElementFactory as FootnoteFactory } from '@vivliostyle/vfm-internal-utils-next';
@@ -127,19 +125,20 @@ const createBuildDuplicatedCall =
 
 const createInlineFootnoteHandler =
   (buildFootnote: BuildFootnote): ToHastHandler =>
-  (ctx, node) => {
+  (state, node) => {
     let no = 1;
-    while (String(no) in ctx.footnoteById) {
+    while (state.footnoteById.has(String(no))) {
       no++;
     }
     const identifier = String(no);
-    ctx.footnoteById[identifier] = {
+    const def: FootnoteDefinition = {
       type: 'footnoteDefinition',
       identifier,
       children: [{ type: 'paragraph', children: node.children }],
       position: node.position,
     };
-    return buildFootnote(`fn-${identifier}`, convertToHast(ctx, node));
+    state.footnoteById.set(identifier, def);
+    return buildFootnote(`fn-${identifier}`, state.all(node));
   };
 
 const createFootnoteReferenceHandler = (
@@ -147,11 +146,11 @@ const createFootnoteReferenceHandler = (
   buildDuplicatedCall: BuildDuplicatedCall,
 ): ToHastHandler => {
   const seen = new Set<string>();
-  return (ctx, node) => {
+  return (state, node) => {
     const identifier = String(node.identifier);
-    const def = ctx.footnoteById[identifier.toUpperCase()];
+    const def = state.footnoteById.get(identifier.toUpperCase());
     if (!def) {
-      return null;
+      return undefined;
     }
 
     if (seen.has(identifier)) {
@@ -161,8 +160,7 @@ const createFootnoteReferenceHandler = (
     seen.add(identifier);
     return buildFootnote(
       `fn-${identifier}`,
-      convertToHast(
-        ctx,
+      state.all(
         // Unwrap single-paragraph definitions to produce inline content
         // (matches tight list-item behavior in footer.js).
         def.children[0]?.type === 'paragraph' ? def.children[0] : def,
@@ -181,10 +179,10 @@ export type GcpmFootnotePlugin = {
     footnoteReference: ToHastHandler;
     footnote: ToHastHandler;
   };
-  hastTransformer: unified.Plugin;
+  hastTransformer: Plugin;
 };
 
-const noopPlugin: unified.Plugin = () => () => {};
+const noopPlugin: Plugin = () => () => {};
 
 export const createGcpmFootnotePlugin = (
   options: Partial<GcpmFootnoteOptions> = { mode: 'gcpm' },

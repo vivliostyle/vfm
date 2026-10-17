@@ -7,13 +7,22 @@
  */
 
 import type * as hast from 'hast';
-import type { BlockContent, Content, HTML, Heading, Parent } from 'mdast';
+import type {
+  BlockContent,
+  Heading,
+  Html,
+  Node as MdastNode,
+  Parent,
+  RootContent,
+} from 'mdast';
+// Registers `hName` / `hProperties` on mdast `Data` (used in `section.data`).
+import type {} from 'mdast-util-to-hast';
 import type { Node } from 'unist';
 import type { VFile } from 'vfile';
 import { findAfter } from 'unist-util-find-after';
 import { visitParents as visit } from 'unist-util-visit-parents';
 
-export interface Section extends Parent {
+export interface Section extends MdastNode {
   type: 'section';
   depth: number;
   children: BlockContent[];
@@ -23,16 +32,8 @@ declare module 'mdast' {
   interface BlockContentMap {
     section: Section;
   }
-}
-
-/**
- * @todo Drop the hast fields after upgrading to `mdast-util-to-hast@>=13`,
- *   which ships the same `Data` augmentation as a side effect import.
- */
-declare module 'unist' {
-  interface Data {
-    hName?: string | undefined;
-    hProperties?: hast.Properties | undefined;
+  interface RootContentMap {
+    section: Section;
   }
 }
 
@@ -115,7 +116,7 @@ const sectionizeIfRequired = (
     if (node.type !== 'html') {
       return false;
     }
-    const html = node as HTML;
+    const html = node as Html;
 
     const tag = /<\/([^>\s]+)\s*>[^<]*$/.exec(html.value)?.[1];
     if (!tag) {
@@ -125,20 +126,20 @@ const sectionizeIfRequired = (
     // it's HTML end tag, check if it has corresponding start tag
     const isHtmlStart = (node: Node) =>
       node.type === 'html' &&
-      new RegExp(`<${tag}\\b[^>]*>`).test((node as HTML).value);
+      new RegExp(`<${tag}\\b[^>]*>`).test((node as Html).value);
     const htmlStart = findAfter(parent, start, isHtmlStart);
     if (
       !htmlStart ||
-      parent.children.indexOf(htmlStart as Content) >
-        parent.children.indexOf(html as Content)
+      parent.children.indexOf(htmlStart as RootContent) >
+        parent.children.indexOf(html as RootContent)
     ) {
       // corresponding start tag is not found in this section level,
       // check if it is found earlier.
       const htmlStart1 = findAfter(parent, 0, isHtmlStart);
       if (
         htmlStart1 &&
-        parent.children.indexOf(htmlStart1 as Content) <
-          parent.children.indexOf(start as Content)
+        parent.children.indexOf(htmlStart1 as RootContent) <
+          parent.children.indexOf(start as RootContent)
       ) {
         return true;
       }
@@ -152,8 +153,8 @@ const sectionizeIfRequired = (
     isHtmlEnd(node);
   const end = findAfter(parent, start, isEnd);
 
-  const startIndex = parent.children.indexOf(start as Content);
-  const endIndex = end ? parent.children.indexOf(end as Content) : -1;
+  const startIndex = parent.children.indexOf(start as RootContent);
+  const endIndex = end ? parent.children.indexOf(end as RootContent) : -1;
 
   const between = parent.children.slice(
     startIndex,

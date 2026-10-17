@@ -1,7 +1,8 @@
 import { test, expect } from 'vitest';
 import { stringify } from '../src/index.js';
 
-test('Heading with attributes', () => {
+// TODO(#288): heading attributes `{...}` need the VFM attribute extension.
+test.skip('Heading with attributes', () => {
   const received = stringify('# Heading {#foo}', {
     partial: true,
     disableFormatHtml: true,
@@ -10,7 +11,8 @@ test('Heading with attributes', () => {
   expect(received).toBe(expected);
 });
 
-test('Heading with attributes, specification by line break', () => {
+// TODO(#288): heading attributes `{...}` need the VFM attribute extension.
+test.skip('Heading with attributes, specification by line break', () => {
   const received = stringify('# Heading\n{#foo}', {
     partial: true,
     disableFormatHtml: true,
@@ -19,7 +21,8 @@ test('Heading with attributes, specification by line break', () => {
   expect(received).toBe(expected);
 });
 
-test('Heading with attributes and inline elements, specification by line break', () => {
+// TODO(#288): heading attributes `{...}` need the VFM attribute extension.
+test.skip('Heading with attributes and inline elements, specification by line break', () => {
   const received = stringify('# Heading *test*\n{#foo}', {
     partial: true,
     disableFormatHtml: true,

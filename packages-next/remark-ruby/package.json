@@ -25,16 +25,17 @@
     "lint": "eslint --fix ."
   },
   "dependencies": {
-    "@types/mdast": "^3.0.0",
-    "@types/unist": "^2.0.0",
-    "mdast-util-to-hast": "^11.3.0",
-    "unified": "^9.2.0",
-    "unist-builder": "^3.0.1"
+    "@types/mdast": "^4.0.4",
+    "@types/unist": "^3.0.3",
+    "mdast-util-to-hast": "^13.2.1",
+    "unified": "^11.0.5",
+    "unist-builder": "^4.0.0"
   },
   "devDependencies": {
-    "rehype-stringify": "^8.0.0",
-    "remark-breaks": "^1.0.5",
-    "remark-parse": "^8.0.3",
-    "remark-rehype": "^8.1.0"
+    "rehype-stringify": "^10.0.1",
+    "remark-breaks": "^4.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2"
   }
 }

@@ -1,12 +1,15 @@
 import initDebug from 'debug';
-import type unified from 'unified';
+import type { Plugin, Pluggable } from 'unified';
 import type { Node } from 'unist';
 import { inspect as unistInspect } from 'unist-util-inspect';
 
 export const debug = initDebug('vfm');
 
+/** Plugin whose parameters and tree types are not constrained. */
+export type AnyPlugin = Plugin<any[], any, any>;
+
 export const inspect =
-  (header?: string): unified.Plugin<[]> =>
+  (header?: string): Plugin<[]> =>
   () =>
   (tree: Node) => {
     if (debug.enabled) {
@@ -30,7 +33,7 @@ export type StripFunctions<T> = T extends (...args: any[]) => any
 
 /**
  * Pre-bind leading arguments of `fn` while forwarding `this` from the call
- * site. Intended for unified plugin attachers that read `this.Parser` etc.,
+ * site. Intended for unified plugin attachers that read `this.data()` etc.,
  * which `Function.prototype.bind` would clobber.
  */
 export function partial<
@@ -48,19 +51,17 @@ export function partial<
 }
 
 /**
- * Attach a brand to a value so it satisfies a branded `unified.Pluggable`
- * subtype. Centralizes the only unsafe cast required to bridge plain
- * unified-agnostic plugin functions and the branded slot types used by
- * `editPlugins`.
+ * Attach a brand to a value so it satisfies a branded `Pluggable` subtype.
+ * Centralizes the only unsafe cast required to bridge plain unified-agnostic
+ * plugin functions and the branded slot types used by `editPlugins`.
  */
-export const brand = <B>(p: unknown): unified.Pluggable & B =>
-  p as unified.Pluggable & B;
+export const brand = <B>(p: unknown): Pluggable & B => p as Pluggable & B;
 
 /**
  * Merge multiple unified plugins into a single plugin whose transformer runs
  * each of the underlying transformers in order. Zero plugins yields a no-op.
  */
-export const mergePlugins = (...plugins: unified.Plugin[]): unified.Plugin =>
+export const mergePlugins = (...plugins: AnyPlugin[]): AnyPlugin =>
   function mergedAttacher(this: unknown, ...opts: unknown[]) {
     const transformers = plugins
       .map((plugin) =>

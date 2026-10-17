@@ -12,10 +12,10 @@
  * an "element" is the note content, a "body" is the marker and element
  * combined, and an "area" is the region where notes are collected for display.
  *
- * VFM depends on two versions of mdast-util-to-hast:
- *  `- remark-rehype@8.1.0
- *  |   `- mdast-util-to-hast@10.2.0  <-- endnote generation (internal)
- *  `- mdast-util-to-hast@11.3.0      <-- Handler type & all() (direct import)
+ * Footnote references and definitions are parsed by remark-gfm (see
+ * `revive-parse.ts`). Inline notes (`^[...]`) came from remark-footnotes 2,
+ * which remark-parse 11 ignores.
+ * TODO(#289): replace `remark-footnotes` with the VFM inline-note extension.
  */
 
 import {
@@ -36,9 +36,9 @@ import {
 } from '@vivliostyle/remark-footnote-pandoc-next';
 import type { Handler as ToHastHandler } from 'mdast-util-to-hast';
 import footnotes from 'remark-footnotes';
-import type unified from 'unified';
+import type { Plugin } from 'unified';
 import * as v from 'valibot';
-import { partial } from '../utils.js';
+import { type AnyPlugin, partial } from '../utils.js';
 
 // Re-export factory types so vfm consumers (and the index.ts re-exports)
 // keep their existing import paths.
@@ -138,7 +138,7 @@ export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {
   toHastHandlers: FootnoteToHastHandlers;
-  hastTransformer: unified.Plugin;
+  hastTransformer: Plugin;
 } => {
   const resolved = resolveOption(options?.footnote);
 
@@ -156,4 +156,6 @@ export const createFootnotePlugin = (
 /**
  * Process Markdown AST.
  */
-export const mdast = partial(footnotes, { inlineNotes: true });
+export const mdast: AnyPlugin = partial(footnotes, {
+  inlineNotes: true,
+}) as AnyPlugin;
