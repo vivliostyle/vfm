@@ -70,7 +70,7 @@ Latest releases as of 2026-10-17 (unchanged since the 2026-09 survey).
 
 ### Implementation classification of `packages/vfm` ([#277](https://github.com/vivliostyle/vfm/issues/277))
 
-Classified by how each module participates in the remark pipeline.
+Classified by how each module participates in the remark pipeline. The module-by-module inventory, including the exact remark 8 coupling of each file and the tests it affects, is in [remark13-vfm-inventory.md](./remark13-vfm-inventory.md).
 
 | Role | Count | Modules |
 | --- | --- | --- |
