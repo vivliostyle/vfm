@@ -1,7 +1,6 @@
 import { JSON_SCHEMA, load as yaml } from 'js-yaml';
 import type { Heading, Root } from 'mdast';
 import { toString } from 'mdast-util-to-string';
-import type { Shortcode } from './toc.js';
 import stringify from 'rehype-stringify';
 import frontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
@@ -26,6 +25,7 @@ import { LineBreaksOptionsSchema } from './line-breaks.js';
 import { MathOptionsSchema } from './math.js';
 import { RewriteRelativeHrefExtensionsOptionsSchema } from './rewrite-relative-href-extensions.js';
 import { YamlTableOptionsSchema } from './table.js';
+import { mdast as toc, type Shortcode } from './toc.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -183,6 +183,8 @@ const parseMarkdown = (md: string): KeyValue => {
       // Remove footnotes when reading title from heading
       footnotes,
       attr,
+      // Parse `[[toc]]` so the visit below can detect it
+      toc,
       frontmatter,
       mdast,
     ] satisfies PluggableList)

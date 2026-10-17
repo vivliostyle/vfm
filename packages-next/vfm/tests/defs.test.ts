@@ -7,9 +7,10 @@ import { VFM } from '../src/index.js';
 
 test('registers micromark extensions for the parser', () => {
   const vfm = VFM({ partial: true, math: true }).freeze();
-  // remark-gfm, math, ruby, inline footnote, attribute, remark-frontmatter
-  expect(vfm.data('micromarkExtensions')).toHaveLength(6);
-  expect(vfm.data('fromMarkdownExtensions')).toHaveLength(6);
+  // remark-gfm, math, ruby, inline footnote, attribute, shortcode (`[[toc]]`),
+  // remark-frontmatter
+  expect(vfm.data('micromarkExtensions')).toHaveLength(7);
+  expect(vfm.data('fromMarkdownExtensions')).toHaveLength(7);
 });
 
 test('does not expose the remark-parse 8 parser class', () => {

@@ -629,3 +629,26 @@ vfm:
   };
   expect(received.vfm).toStrictEqual(expected);
 });
+
+test('vfm.toc: enabled by [[toc]] in the body', () => {
+  const received = readMetadata('# Title\n\n[[toc]]\n\nText.');
+  expect(received.title).toBe('Title');
+  expect(received.vfm?.toc).toBe(true);
+});
+
+test('vfm.toc: [[toc]] is merged into the frontmatter settings', () => {
+  const received = readMetadata(`---
+vfm:
+  math: false
+---
+[[toc id="toc"]]
+`);
+  expect(received.vfm?.toc).toBe(true);
+  expect(received.vfm?.math).toBe(false);
+});
+
+test('vfm.toc: other shortcodes and inline [[toc]] do not enable it', () => {
+  // Without frontmatter `vfm` stays undefined, so there is no `toc` to read.
+  expect(readMetadata('[[foobar]]').vfm?.toc).toBeFalsy();
+  expect(readMetadata('text [[toc]]').vfm?.toc).toBeFalsy();
+});

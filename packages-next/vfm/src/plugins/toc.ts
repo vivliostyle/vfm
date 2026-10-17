@@ -1,33 +1,36 @@
-import type { Node as MdastNode } from 'mdast';
-// TODO(#290): remark-shortcodes patches the remark-parse 8 parser and is a
-// no-op under remark-parse 11, so `[[toc]]` is not recognized until it is
-// replaced (or dropped, see #207).
-import shortcodes from 'remark-shortcodes';
+import type { Extension as FromMarkdownExtension } from 'mdast-util-from-markdown';
+import type { Extension as MicromarkExtension } from 'micromark-util-types';
+import type { Plugin } from 'unified';
 import type { Node } from 'unist';
 import { remove } from 'unist-util-remove';
-import { mergePlugins, partial } from '../utils.js';
+import { mergePlugins } from '../utils.js';
+import { shortcodeFromMarkdown, type Shortcode } from './toc-mdast.js';
+import { shortcodeSyntax } from './toc-syntax.js';
+
+export type { Shortcode, ShortcodeData } from './toc-mdast.js';
+export {
+  parseShortcodeAttributes,
+  shortcodeFromMarkdown,
+} from './toc-mdast.js';
+export { shortcodeSyntax } from './toc-syntax.js';
 
 /**
- * Block-level shortcode node emitted by `remark-shortcodes`.
- * @see https://github.com/djm/remark-shortcodes#example
+ * remark plugin: parse `[[name ...]]` lines into `shortcode` nodes by
+ * registering the VFM shortcode syntax on the processor.
  */
-export interface Shortcode extends MdastNode {
-  type: 'shortcode';
-  identifier: string;
-  attributes: Record<string, string>;
-}
-
-declare module 'mdast' {
-  interface BlockContentMap {
-    shortcode: Shortcode;
-  }
-  interface RootContentMap {
-    shortcode: Shortcode;
-  }
-}
+const shortcodes: Plugin<[]> = function () {
+  const data = this.data() as {
+    micromarkExtensions?: MicromarkExtension[] | undefined;
+    fromMarkdownExtensions?: FromMarkdownExtension[] | undefined;
+  };
+  (data.micromarkExtensions ??= []).push(shortcodeSyntax());
+  (data.fromMarkdownExtensions ??= []).push(shortcodeFromMarkdown());
+};
 
 /**
- * remark plugin: remove every shortcode except `[[toc]]`.
+ * remark plugin: remove every shortcode except `[[toc]]`. The `toc` node is
+ * kept and renders as an empty `<div>` (the default for unknown nodes); its
+ * future is decided in #207.
  * @returns Transformer.
  */
 const keepToC = () => (tree: Node) => {
@@ -39,7 +42,4 @@ const keepToC = () => (tree: Node) => {
   );
 };
 
-export const mdast = mergePlugins(
-  partial(shortcodes, { startBlock: '[[', endBlock: ']]' }),
-  keepToC,
-);
+export const mdast = mergePlugins(shortcodes, keepToC);
