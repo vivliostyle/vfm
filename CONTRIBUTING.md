@@ -36,6 +36,10 @@ To run the test suite across the workspace:
 pnpm test
 ```
 
+## remark 13 Migration
+
+The Markdown toolchain is being migrated from remark 8 / unified 9 to remark 13+. The umbrella issue is [#275](https://github.com/vivliostyle/vfm/issues/275). The Phase 0 survey, the migration policy, and the list of known breaking points are in [docs/dev/remark13-migration.md](./docs/dev/remark13-migration.md).
+
 ## Commit Guide
 
 ### Comment
