@@ -1,61 +1,29 @@
 import type { Element, ElementContent, Root as HastRoot } from 'hast';
 import { fromHtml } from 'hast-util-from-html';
 import { select } from 'hast-util-select';
-import type { Data, Node as MdastNode, Root as MdastRoot } from 'mdast';
-import { findAndReplace } from 'mdast-util-find-and-replace';
+import type { Extension as FromMarkdownExtension } from 'mdast-util-from-markdown';
 import type { Handler } from 'mdast-util-to-hast';
+import type { Extension as MicromarkExtension } from 'micromark-util-types';
 import temml from 'temml';
-import type { Plugin, Transformer } from 'unified';
+import type { Plugin } from 'unified';
 import { u } from 'unist-builder';
 import { visit } from 'unist-util-visit';
 import * as v from 'valibot';
+import {
+  mathFromMarkdown,
+  type DisplayMath,
+  type InlineMath,
+} from './math-mdast.js';
+import { mathSyntax } from './math-syntax.js';
 
-export interface InlineMathData extends Data {
-  hName: 'inlineMath';
-  value: string;
-}
-
-export interface InlineMath extends MdastNode {
-  type: 'inlineMath';
-  data: InlineMathData;
-}
-
-export interface DisplayMathData extends Data {
-  hName: 'displayMath';
-  value: string;
-}
-
-export interface DisplayMath extends MdastNode {
-  type: 'displayMath';
-  data: DisplayMathData;
-}
-
-declare module 'mdast' {
-  interface PhrasingContentMap {
-    inlineMath: InlineMath;
-    displayMath: DisplayMath;
-  }
-  interface RootContentMap {
-    inlineMath: InlineMath;
-    displayMath: DisplayMath;
-  }
-}
-
-/**
- * Inline math format, e.g. `$...$`.
- * - OK: `$x = y$`, `$x = \$y$`
- * - NG: `$$x = y$`, `$x = y$$`, `$ x = y$`, `$x = y $`, `$x = y$7`
- */
-const REGEXP_INLINE = /\$([^$\s].*?(?<=[^\\$\s]|[^\\](?:\\\\)+))\$(?!\$|\d)/gs;
-
-/** Display math format, e.g. `$$...$$`. */
-const REGEXP_DISPLAY = /\$\$([^$].*?(?<=[^$]))\$\$(?!\$)/gs;
-
-/** Type of inline math in Markdown AST. */
-const TYPE_INLINE = 'inlineMath';
-
-/** Type of display math in Markdown AST. */
-const TYPE_DISPLAY = 'displayMath';
+export type {
+  DisplayMath,
+  DisplayMathData,
+  InlineMath,
+  InlineMathData,
+} from './math-mdast.js';
+export { mathFromMarkdown } from './math-mdast.js';
+export { mathSyntax } from './math-syntax.js';
 
 /** URL of MathJax v2 supported by Vivliostyle. */
 const MATH_URL =
@@ -91,140 +59,21 @@ export const MathOptionsSchema = v.object({
 export type MathOptions = v.InferInput<typeof MathOptionsSchema>;
 
 /**
- * Create tokenizers for remark-parse.
- * @returns Tokenizers.
+ * remark plugin: parse `$...$` / `$$...$$` into `inlineMath` / `displayMath`
+ * nodes by registering the VFM math syntax on the processor. When `math` is
+ * off nothing is registered, so `$` stays ordinary text.
+ * @param options - Math options.
  */
-const createTokenizers = () => {
-  /**
-   * remark-parse 8 tokenizer for inline math `$...$`.
-   * @param eat - Consumes the matched text.
-   * @param value - Remaining input.
-   * @param silent - Only check whether the syntax matches.
-   * @returns Node, `true` in silent mode, or `undefined` when not matched.
-   */
-  const tokenizerInlineMath: Tokenizer = function (eat, value, silent) {
-    if (
-      !value.startsWith('$') ||
-      value.startsWith('$ ') ||
-      value.startsWith('$$')
-    ) {
-      return;
-    }
-
-    const match = new RegExp(REGEXP_INLINE).exec(value);
-    if (!match) {
-      return;
-    }
-
-    if (silent) {
-      return true;
-    }
-
-    const [eaten, valueText] = match;
-    const now = eat.now();
-    now.column += 1;
-    now.offset += 1;
-
-    return eat(eaten)({
-      type: TYPE_INLINE,
-      data: { hName: TYPE_INLINE, value: valueText },
-    });
-  };
-
-  tokenizerInlineMath.notInLink = true;
-  tokenizerInlineMath.locator = function (value: string, fromIndex: number) {
-    return value.indexOf('$', fromIndex);
-  };
-
-  /**
-   * remark-parse 8 tokenizer for display math `$$...$$`.
-   * @param eat - Consumes the matched text.
-   * @param value - Remaining input.
-   * @param silent - Only check whether the syntax matches.
-   * @returns Node, `true` in silent mode, or `undefined` when not matched.
-   */
-  const tokenizerDisplayMath: Tokenizer = function (eat, value, silent) {
-    if (!value.startsWith('$$') || value.startsWith('$$$')) {
-      return;
-    }
-
-    const match = new RegExp(REGEXP_DISPLAY).exec(value);
-    if (!match) {
-      return;
-    }
-
-    if (silent) {
-      return true;
-    }
-
-    const [eaten, valueText] = match;
-    const now = eat.now();
-    now.column += 1;
-    now.offset += 1;
-
-    return eat(eaten)({
-      type: TYPE_DISPLAY,
-      data: { hName: TYPE_DISPLAY, value: valueText },
-    });
-  };
-
-  tokenizerDisplayMath.notInLink = true;
-  tokenizerDisplayMath.locator = function (value: string, fromIndex: number) {
-    return value.indexOf('$$', fromIndex);
-  };
-
-  return { tokenizerInlineMath, tokenizerDisplayMath };
-};
-
-/**
- * Process Markdown AST.
- *
- * remark-parse 8 ran the tokenizers above. remark-parse 11 has no parser
- * class to patch, so the `findAndReplace` fallback below is what runs there.
- * It works on `text` nodes after parsing and is not equivalent: inline
- * markup inside `$...$` is already parsed, and `$` inside code is matched.
- * TODO(#287): replace both paths with a micromark extension (remark-math 6 is
- * the candidate) and delete the fallback.
- * @returns Transformer or undefined (remark-parse 8).
- */
-export const mdast: Plugin<[MathOptions?], MdastRoot> = function ({
+export const mdast: Plugin<[MathOptions?]> = function ({
   math = true,
-}: MathOptions = {}): Transformer<MdastRoot> | undefined {
+}: MathOptions = {}) {
   if (!math) return;
-
-  const parser = (this as unknown as { Parser?: LegacyParser }).Parser;
-  if (
-    parser &&
-    parser.prototype.inlineTokenizers &&
-    parser.prototype.inlineMethods
-  ) {
-    const { inlineTokenizers, inlineMethods } = parser.prototype;
-    const tokenizers = createTokenizers();
-    inlineTokenizers[TYPE_INLINE] = tokenizers.tokenizerInlineMath;
-    inlineTokenizers[TYPE_DISPLAY] = tokenizers.tokenizerDisplayMath;
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_INLINE);
-    inlineMethods.splice(inlineMethods.indexOf('text'), 0, TYPE_DISPLAY);
-    return;
-  }
-
-  return (tree) => {
-    findAndReplace(tree, [
-      [
-        REGEXP_INLINE,
-        (_: string, valueText: string): InlineMath => ({
-          type: TYPE_INLINE,
-          data: { hName: TYPE_INLINE, value: valueText },
-        }),
-      ],
-      [
-        REGEXP_DISPLAY,
-        (_: string, valueText: string): DisplayMath => ({
-          type: TYPE_DISPLAY,
-          data: { hName: TYPE_DISPLAY, value: valueText },
-        }),
-      ],
-    ]);
+  const data = this.data() as {
+    micromarkExtensions?: MicromarkExtension[] | undefined;
+    fromMarkdownExtensions?: FromMarkdownExtension[] | undefined;
   };
+  (data.micromarkExtensions ??= []).push(mathSyntax());
+  (data.fromMarkdownExtensions ??= []).push(mathFromMarkdown());
 };
 
 /**
@@ -254,6 +103,10 @@ const toMathML = (latex: string, displayMode: boolean): ElementContent[] => {
  * To align with VFM's future math behavior (see #224), a `$$` equation whose
  * fence stands on its own line is rendered in display mode as
  * `<math display="block">`, rather than as inline math inside a `<p>`.
+ * @param maybeMdastNode - Paragraph candidate.
+ * @param options - Math options.
+ * @returns MathML children for a lone display-mode equation, otherwise
+ *   `undefined`.
  */
 export const buildDisplayMath = (
   maybeMdastNode: unknown,
@@ -272,15 +125,11 @@ export const buildDisplayMath = (
   if (!children || children.length !== 1) return undefined;
 
   const child = children[0] as DisplayMath | undefined;
-  if (
-    !child ||
-    child.type !== TYPE_DISPLAY ||
-    !isDisplayMode(child.data.value)
-  ) {
+  if (!child || child.type !== 'displayMath' || !isDisplayMode(child.value)) {
     return undefined;
   }
 
-  return toMathML(child.data.value, true);
+  return toMathML(child.value, true);
 };
 
 /** `<span class="math inline|display" data-math-typeset="true">` for MathJax. */
@@ -292,14 +141,15 @@ const mathSpan = (mode: 'inline' | 'display', text: string): Element => ({
 });
 
 /**
- * Handle inline math to Hypertext AST.
+ * Handle inline math to Hypertext AST: `<math>` for the MathML renderer, or a
+ * `<span class="math inline">` holding `\\(...\\)` for MathJax.
  * @param options - Math options.
  * @returns Hypertext AST handler.
  */
 export const handlerInlineMath =
   ({ mathRenderer = 'mathjax' }: MathOptions = {}): Handler =>
   (_state, node: InlineMath) => {
-    const value = node.data?.value ?? '';
+    const value = node.value;
 
     if (mathRenderer === 'mathml') {
       return toMathML(value, false);
@@ -309,14 +159,15 @@ export const handlerInlineMath =
   };
 
 /**
- * Handle display math to Hypertext AST.
+ * Handle display math to Hypertext AST: inline `<math>` for the MathML
+ * renderer, or a `<span class="math display">` holding `$$...$$` for MathJax.
  * @param options - Math options.
  * @returns Hypertext AST handler.
  */
 export const handlerDisplayMath =
   ({ mathRenderer = 'mathjax' }: MathOptions = {}): Handler =>
   (_state, node: DisplayMath) => {
-    const value = node.data?.value ?? '';
+    const value = node.value;
 
     if (mathRenderer === 'mathml') {
       // Inline `<math>`. A display-mode `$$...$$` is intercepted earlier by the
@@ -332,6 +183,8 @@ export const handlerDisplayMath =
  * Set the `<script>` to load MathJax and `<body>` attribute that enable math typesetting.
  *
  * This function does the work even if it finds a `<math>` that it does not treat as a VFM. Therefore, call it only if the VFM math renderer is `'mathjax'`.
+ * @param options - Math options.
+ * @returns Transformer.
  */
 export const hast =
   ({ math = true, mathRenderer = 'mathjax' }: MathOptions = {}) =>
