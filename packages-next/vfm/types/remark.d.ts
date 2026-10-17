@@ -1,5 +1,4 @@
 declare module 'remark-shortcodes';
-declare module 'remark-footnotes';
 declare module 'md-attr-parser' {
   export default function (
     value: string,

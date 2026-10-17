@@ -11,6 +11,8 @@ import type { Heading } from 'mdast';
 import { toString } from 'mdast-util-to-string';
 import type { Node } from 'unist';
 import { selectAll } from 'unist-util-select';
+// Registers the `footnote` node in `PhrasingContentMap`.
+import type {} from '@vivliostyle/remark-footnote-inline-next';
 
 declare module 'mdast' {
   interface HeadingData {
@@ -32,11 +34,9 @@ const createSlug = (heading: Heading, slugger: GithubSlugger) => {
   }
 
   // Create slug string with inline footnotes removed.
-  // TODO(#289): `footnote` is the inline note node of remark-footnotes 2; it
-  // comes back with the VFM inline-note extension.
   const children = [...heading.children];
   heading.children = heading.children.filter(
-    (child) => (child as { type: string }).type !== 'footnote',
+    (child) => child.type !== 'footnote',
   );
   const text = slugger.slug(toString(heading).replace(/<[^<>]*>/g, ''));
   heading.children = children;

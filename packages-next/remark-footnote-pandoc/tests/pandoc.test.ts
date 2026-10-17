@@ -1,5 +1,6 @@
 import rehypeFormat from 'rehype-format';
 import rehypeStringify from 'rehype-stringify';
+import { mdast as footnoteInline } from '@vivliostyle/remark-footnote-inline-next';
 import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
@@ -22,6 +23,7 @@ const stringify = (md: string): string => {
       .use([
         remarkParse,
         remarkGfm,
+        footnoteInline,
         [
           remarkRehype,
           {
@@ -56,8 +58,7 @@ test('Footnotes', () => {
   expect(received).toBe(expected);
 });
 
-// TODO(#289): inline notes `^[...]` need the VFM micromark extension; remark-gfm has none.
-test.skip('Inline', () => {
+test('Inline', () => {
   const md = `Footnotes can also be written inline^[This part is a footnote.].`;
   const received = stringify(md);
   const expected = `
@@ -72,8 +73,7 @@ test.skip('Inline', () => {
   expect(received).toBe(expected);
 });
 
-// TODO(#289): inline notes `^[...]` need the VFM micromark extension; remark-gfm has none.
-test.skip('Multiple', () => {
+test('Multiple', () => {
   const md = `VFM is developed in the GitHub repository[^1].
 Issues are managed on GitHub[^Issues].
 Footnotes can also be written inline^[This part is a footnote.].

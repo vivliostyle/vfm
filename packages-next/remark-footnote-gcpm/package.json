@@ -34,6 +34,7 @@
     "valibot": "1.4.2"
   },
   "devDependencies": {
+    "@vivliostyle/remark-footnote-inline-next": "workspace:*",
     "rehype-format": "^5.0.1",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",
