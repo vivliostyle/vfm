@@ -2,7 +2,7 @@
   "name": "@vivliostyle/remark-ruby-next",
   "private": true,
   "version": "1.0.1",
-  "description": "remark plugin to support `{...|...}` ruby annotation syntax used by VFM.",
+  "description": "remark plugin to support `{base|ruby}` ruby annotation syntax used by VFM (micromark extension).",
   "license": "Apache-2.0",
   "engines": {
     "node": ">= 22"
@@ -27,7 +27,13 @@
   "dependencies": {
     "@types/mdast": "^4.0.4",
     "@types/unist": "^3.0.3",
+    "mdast-util-from-markdown": "^2.1.0",
     "mdast-util-to-hast": "^13.2.1",
+    "micromark-util-character": "^2.1.1",
+    "micromark-util-chunked": "^2.0.1",
+    "micromark-util-resolve-all": "^2.0.1",
+    "micromark-util-symbol": "^2.0.1",
+    "micromark-util-types": "^2.0.3",
     "unified": "^11.0.5",
     "unist-builder": "^4.0.0"
   },
@@ -36,6 +42,7 @@
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
     "remark-parse": "^11.0.0",
-    "remark-rehype": "^11.1.2"
+    "remark-rehype": "^11.1.2",
+    "unist-util-inspect": "^8.1.0"
   }
 }
