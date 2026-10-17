@@ -36,9 +36,29 @@ To run the test suite across the workspace:
 pnpm test
 ```
 
-## remark 13 Migration
+## remark 13 Migration (`packages-next/`)
 
 The Markdown toolchain is being migrated from remark 8 / unified 9 to remark 13+. The umbrella issue is [#275](https://github.com/vivliostyle/vfm/issues/275). The Phase 0 survey, the migration policy, and the list of known breaking points are in [docs/dev/remark13-migration.md](./docs/dev/remark13-migration.md) (Japanese: [docs/ja/dev/remark13-migration.md](./docs/ja/dev/remark13-migration.md)). Every document under `docs/dev/` has a Japanese counterpart under `docs/ja/dev/`; keep both in sync when adding or changing one.
+
+During the migration the repository holds two trees side by side:
+
+| Directory | Packages | Status |
+|---|---|---|
+| `packages/` | `@vivliostyle/vfm`, `@vivliostyle/remark-ruby`, ... | Current. Published to npm. |
+| `packages-next/` | `@vivliostyle/vfm-next`, `@vivliostyle/remark-ruby-next`, ... | Next generation. `"private": true`, never published. |
+
+Rules for the co-existence period:
+
+- Every package in `packages-next/` has the `-next` suffix in its `name`, and `workspace:*` dependencies and `import` statements between next packages use the suffixed names. This keeps pnpm `--filter` and `workspace:*` resolution unambiguous. The suffix is removed when next replaces current.
+- Bug fixes for the released packages go to `packages/`. Migration work goes to `packages-next/`. Do not apply migration changes to `packages/`.
+- `packages-next/` has no `CHANGELOG.md` and is excluded from changesets. Do not add changesets for next packages.
+- `pnpm build` and `pnpm test` at the repository root run both trees. To work on one tree only:
+
+```bash
+pnpm --filter "./packages-next/*" build
+pnpm --filter "./packages-next/*" test
+pnpm --filter @vivliostyle/vfm-next dev
+```
 
 ## Commit Guide
 

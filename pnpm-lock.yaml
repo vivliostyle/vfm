@@ -42,6 +42,451 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@22.19.19)(vite@8.3.4(@types/node@22.19.19))
 
+  packages-next/mdast-to-hast-table-cell:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      hast-util-get-attribute:
+        specifier: ^1.1.1
+        version: 1.1.1
+      hast-util-get-class-list:
+        specifier: ^1.0.0
+        version: 1.0.0
+      mdast-util-to-hast:
+        specifier: ^11.3.0
+        version: 11.3.0
+      unist-util-visit:
+        specifier: ^4.1.2
+        version: 4.1.2
+      valibot:
+        specifier: 1.4.2
+        version: 1.4.2(typescript@6.0.2)
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-raw:
+        specifier: ^5.1.0
+        version: 5.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+
+  packages-next/rehype-rewrite-extension:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      hast-util-get-attribute:
+        specifier: ^1.1.1
+        version: 1.1.1
+      hast-util-select:
+        specifier: ^5.0.5
+        version: 5.0.5
+      upath:
+        specifier: ^3.0.8
+        version: 3.0.8
+      uri-js:
+        specifier: ^4.4.1
+        version: 4.4.1
+      valibot:
+        specifier: 1.4.2
+        version: 1.4.2(typescript@6.0.2)
+
+  packages-next/remark-footnote-dpub:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      '@vivliostyle/vfm-internal-utils-next':
+        specifier: workspace:*
+        version: link:../vfm-internal-utils
+      hast-util-select:
+        specifier: ^5.0.5
+        version: 5.0.5
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      mdast-util-to-hast:
+        specifier: ^11.3.0
+        version: 11.3.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      unist-builder:
+        specifier: ^3.0.1
+        version: 3.0.1
+      valibot:
+        specifier: 1.4.2
+        version: 1.4.2(typescript@6.0.2)
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-raw:
+        specifier: ^5.1.0
+        version: 5.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-footnotes:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+
+  packages-next/remark-footnote-gcpm:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@vivliostyle/vfm-internal-utils-next':
+        specifier: workspace:*
+        version: link:../vfm-internal-utils
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      mdast-util-to-hast:
+        specifier: ^11.3.0
+        version: 11.3.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      valibot:
+        specifier: 1.4.2
+        version: 1.4.2(typescript@6.0.2)
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-footnotes:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+
+  packages-next/remark-footnote-pandoc:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      hast-util-select:
+        specifier: ^5.0.5
+        version: 5.0.5
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      unist-builder:
+        specifier: ^3.0.1
+        version: 3.0.1
+      valibot:
+        specifier: 1.4.2
+        version: 1.4.2(typescript@6.0.2)
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-footnotes:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+
+  packages-next/remark-ruby:
+    dependencies:
+      '@types/mdast':
+        specifier: ^3.0.0
+        version: 3.0.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      mdast-util-to-hast:
+        specifier: ^11.3.0
+        version: 11.3.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      unist-builder:
+        specifier: ^3.0.1
+        version: 3.0.1
+    devDependencies:
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-breaks:
+        specifier: ^1.0.5
+        version: 1.0.5
+      remark-parse:
+        specifier: ^8.0.3
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+
+  packages-next/remark-sectionize:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/mdast':
+        specifier: ^3.0.0
+        version: 3.0.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      unist-util-find-after:
+        specifier: ^4.0.1
+        version: 4.0.1
+      unist-util-visit-parents:
+        specifier: ^5.1.3
+        version: 5.1.3
+      vfile:
+        specifier: ^4.2.1
+        version: 4.2.1
+    devDependencies:
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-raw:
+        specifier: ^5.1.0
+        version: 5.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-attr:
+        specifier: ^0.11.1
+        version: 0.11.1
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+
+  packages-next/vfm:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      '@types/mdast':
+        specifier: ^3.0.0
+        version: 3.0.10
+      '@types/unist':
+        specifier: ^2.0.0
+        version: 2.0.3
+      '@vivliostyle/mdast-to-hast-table-cell-next':
+        specifier: workspace:*
+        version: link:../mdast-to-hast-table-cell
+      '@vivliostyle/rehype-rewrite-extension-next':
+        specifier: workspace:*
+        version: link:../rehype-rewrite-extension
+      '@vivliostyle/remark-footnote-dpub-next':
+        specifier: workspace:*
+        version: link:../remark-footnote-dpub
+      '@vivliostyle/remark-footnote-gcpm-next':
+        specifier: workspace:*
+        version: link:../remark-footnote-gcpm
+      '@vivliostyle/remark-footnote-pandoc-next':
+        specifier: workspace:*
+        version: link:../remark-footnote-pandoc
+      '@vivliostyle/remark-ruby-next':
+        specifier: workspace:*
+        version: link:../remark-ruby
+      '@vivliostyle/remark-sectionize-next':
+        specifier: workspace:*
+        version: link:../remark-sectionize
+      '@vivliostyle/vfm-internal-utils-next':
+        specifier: workspace:*
+        version: link:../vfm-internal-utils
+      debug:
+        specifier: ^4.4.3
+        version: 4.4.3
+      doctype:
+        specifier: ^3.0.1
+        version: 3.0.1
+      github-slugger:
+        specifier: ^2.0.0
+        version: 2.0.0
+      hast-util-find-and-replace:
+        specifier: ^3.2.1
+        version: 3.2.1
+      hast-util-from-html:
+        specifier: ^1.0.2
+        version: 1.0.2
+      hast-util-is-element:
+        specifier: ^2.1.3
+        version: 2.1.3
+      hast-util-raw:
+        specifier: ^6.1.0
+        version: 6.1.0
+      hast-util-select:
+        specifier: ^5.0.5
+        version: 5.0.5
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      js-yaml:
+        specifier: ^4.3.2
+        version: 4.3.2
+      md-attr-parser:
+        specifier: ^1.3.0
+        version: 1.3.0
+      mdast-util-find-and-replace:
+        specifier: ^2.2.2
+        version: 2.2.2
+      mdast-util-to-hast:
+        specifier: ^11.3.0
+        version: 11.3.0
+      mdast-util-to-string:
+        specifier: ^3.2.0
+        version: 3.2.0
+      meow:
+        specifier: ^13.2.0
+        version: 13.2.0
+      refractor:
+        specifier: ^3.6.0
+        version: 3.6.0
+      rehype-format:
+        specifier: ^3.1.0
+        version: 3.1.0
+      rehype-raw:
+        specifier: ^5.1.0
+        version: 5.1.0
+      rehype-stringify:
+        specifier: ^8.0.0
+        version: 8.0.0
+      remark-attr:
+        specifier: ^0.11.1
+        version: 0.11.1
+      remark-breaks:
+        specifier: ^1.0.5
+        version: 1.0.5
+      remark-footnotes:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-frontmatter:
+        specifier: ^2.0.0
+        version: 2.0.0
+      remark-parse:
+        specifier: ^8.0.2
+        version: 8.0.3
+      remark-rehype:
+        specifier: ^8.1.0
+        version: 8.1.0
+      remark-shortcodes:
+        specifier: ^0.3.1
+        version: 0.3.1(remark-parse@8.0.3)
+      temml:
+        specifier: ^0.13.0
+        version: 0.13.3
+      to-vfile:
+        specifier: ^6.1.0
+        version: 6.1.0
+      unified:
+        specifier: ^9.2.0
+        version: 9.2.2
+      unist-builder:
+        specifier: ^3.0.1
+        version: 3.0.1
+      unist-util-filter:
+        specifier: ^4.0.1
+        version: 4.0.1
+      unist-util-find-after:
+        specifier: ^4.0.1
+        version: 4.0.1
+      unist-util-inspect:
+        specifier: ^7.0.2
+        version: 7.0.2
+      unist-util-remove:
+        specifier: ^3.1.1
+        version: 3.1.1
+      unist-util-select:
+        specifier: ^4.0.3
+        version: 4.0.3
+      unist-util-visit:
+        specifier: ^4.1.2
+        version: 4.1.2
+      unist-util-visit-parents:
+        specifier: ^5.1.3
+        version: 5.1.3
+      valibot:
+        specifier: 1.4.2
+        version: 1.4.2(typescript@6.0.2)
+      vfile:
+        specifier: ^4.0.0
+        version: 4.2.1
+    devDependencies:
+      '@types/common-tags':
+        specifier: ^1.8.4
+        version: 1.8.4
+      '@types/debug':
+        specifier: ^4.1.12
+        version: 4.1.12
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/refractor':
+        specifier: ^3.0.2
+        version: 3.4.1
+      common-tags:
+        specifier: ^1.8.2
+        version: 1.8.2
+
+  packages-next/vfm-internal-utils:
+    dependencies:
+      '@types/hast':
+        specifier: ^2.0.0
+        version: 2.3.10
+      hastscript:
+        specifier: ^7.2.0
+        version: 7.2.0
+      valibot:
+        specifier: 1.4.2
+        version: 1.4.2(typescript@6.0.2)
+
   packages/mdast-to-hast-table-cell:
     dependencies:
       '@types/hast':

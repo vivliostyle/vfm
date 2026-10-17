@@ -1,0 +1,1 @@
+# @vivliostyle/rehype-rewrite-extension
