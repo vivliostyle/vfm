@@ -7,11 +7,10 @@ Next-generation VFM packages built on remark 13+ / unified 11. See [#275](https:
 
 ## Status
 
-Phase 2 ([#281](https://github.com/vivliostyle/vfm/issues/281)) is done: the next tree builds and tests on unified 11, remark-parse 11, remark-gfm 4, mdast-util-to-hast 13, hastscript 9 and the current hast / unist utilities. Syntaxes that depended on remark-parse 8 tokenizers are not parsed yet; their tests are marked `test.skip` with a `TODO(#nnn)` pointing at the Phase 3 issue that restores them.
+Phase 2 ([#281](https://github.com/vivliostyle/vfm/issues/281)) is done: the next tree builds and tests on unified 11, remark-parse 11, remark-gfm 4, mdast-util-to-hast 13, hastscript 9 and the current hast / unist utilities. Phase 3 ([#285](https://github.com/vivliostyle/vfm/issues/285)) re-implements the VFM syntaxes as micromark extensions; ruby (`remark-ruby`, [#286](https://github.com/vivliostyle/vfm/issues/286)) is done. The remaining syntaxes are not parsed yet; their tests are marked `test.skip` with a `TODO(#nnn)` pointing at the issue that restores them.
 
 | Syntax | Slot | Restored by |
 | --- | --- | --- |
-| Ruby `{base|ruby}` | `remark-ruby` | [#286](https://github.com/vivliostyle/vfm/issues/286) |
 | Math `$...$` with inline markup or escapes inside | `math` | [#287](https://github.com/vivliostyle/vfm/issues/287) |
 | Attributes `{#id .class key=value}` | `attr` (no-op) | [#288](https://github.com/vivliostyle/vfm/issues/288) |
 | Inline footnotes `^[...]` | `footnote` | [#289](https://github.com/vivliostyle/vfm/issues/289) |
