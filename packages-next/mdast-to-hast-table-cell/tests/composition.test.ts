@@ -42,6 +42,9 @@ test('passes the generated cell node and preserves its position', () => {
 });
 
 test('enhances the output of a supplied table handler', () => {
+  /**
+   * Base handler that tags the `<table>` it produced with `data-source`.
+   */
   const handler: ToHastHandler = (state, node, parent) => {
     const result = baseTableHandler(state, node, parent);
     [result]
@@ -68,6 +71,9 @@ test.each([
   [alignByClass, 'class="existing table-align-center" style="color: red"'],
   [alignByStyle, 'class="existing" style="color: red; text-align: center"'],
 ])('preserves properties emitted by the supplied handler', (cell, expected) => {
+  /**
+   * Base handler that gives every cell an existing class and style.
+   */
   const handler: ToHastHandler = (state, node, parent) => {
     const result = baseTableHandler(state, node, parent);
     [result]
@@ -94,6 +100,9 @@ test.each([
   [alignByClass, 'class="0 existing table-align-center" style="0"'],
   [alignByStyle, 'class="0 existing" style="0; text-align: center"'],
 ])('stringifies arbitrary property values', (cell, expected) => {
+  /**
+   * Base handler that puts off-type values (numbers) into cell properties.
+   */
   const handler: ToHastHandler = (state, node, parent) => {
     const result = baseTableHandler(state, node, parent);
     [result]
@@ -152,6 +161,9 @@ test.each([
   [alignByClass, 'class="table-align-center"'],
   [alignByStyle, 'style="text-align: center"'],
 ])('does not reinterpret hast node data', (cell, expected) => {
+  /**
+   * Base handler that attaches mdast-style `data` to every cell.
+   */
   const handler: ToHastHandler = (state, node, parent) => {
     const result = baseTableHandler(state, node, parent);
     [result]

@@ -111,6 +111,12 @@ type ResolvedOption =
   | DpubFootnoteOptions
   | GcpmFootnoteOptions;
 
+/**
+ * Normalize the `footnote` option: `undefined` is pandoc, a string is a mode,
+ * an object is used as is.
+ * @param opt - Option value.
+ * @returns Mode with its options.
+ */
 const resolveOption = (opt: FootnoteOptions['footnote']): ResolvedOption => {
   if (!opt) {
     return { mode: 'pandoc' };
@@ -134,6 +140,12 @@ export type FootnoteToHastHandlers = {
   footnote: ToHastHandler | undefined;
 };
 
+/**
+ * Create the footnote handlers and hast transformer for the configured mode by
+ * delegating to the dpub / gcpm / pandoc packages.
+ * @param options - Footnote options.
+ * @returns Handlers and transformer.
+ */
 export const createFootnotePlugin = (
   options?: FootnoteOptions,
 ): {

@@ -31,6 +31,14 @@ type StringifyOptions = {
   tableHandler?: ToHastHandler;
 };
 
+/**
+ * Render Markdown to HTML through remark-gfm and remark-rehype with the
+ * `table` handler wrapped by `withTableCellTransform`.
+ * @param markdown - Markdown source.
+ * @param options - Cell hook (default `alignByAttribute`) and base `table`
+ *   handler (default `defaultHandlers.table`).
+ * @returns Formatted HTML.
+ */
 export const stringify = (
   markdown: string,
   options: StringifyOptions = {},

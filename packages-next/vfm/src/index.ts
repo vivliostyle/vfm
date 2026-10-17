@@ -176,8 +176,8 @@ export interface Hooks {
 
 /**
  * Check and update metadata with options.
- * @param metadata Metadata.
- * @param options Options.
+ * @param metadata - Metadata.
+ * @param options - Options.
  */
 const checkMetadata = (
   metadata: Metadata,
@@ -248,7 +248,7 @@ export type EditPlugins = (plugins: BuiltinPlugins) => EditedPlugins;
 
 /**
  * Create Unified processor for Markdown AST and Hypertext AST.
- * @param options Options.
+ * @param options - Options.
  * @returns Unified processor.
  */
 export function VFM(
@@ -366,8 +366,8 @@ export function VFM(
 
 /**
  * Convert markdown to a stringify (HTML).
- * @param markdownString Markdown string.
- * @param options Options.
+ * @param markdownString - Markdown string.
+ * @param options - Options.
  * @returns HTML string.
  */
 export function stringify(

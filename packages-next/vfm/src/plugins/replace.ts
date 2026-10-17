@@ -49,6 +49,12 @@ export const ReplaceOptionsSchema: v.GenericSchema<ReplaceOptions> = v.object({
   replace: v.optional(v.array(ReplaceRuleSchema)),
 });
 
+/**
+ * hast plugin: apply the `replace` rules to text with
+ * `hast-util-find-and-replace`.
+ * @param options - Replace options.
+ * @returns Transformer, or `undefined` when there are no rules.
+ */
 export function replace({ replace: rules = [] }: ReplaceOptions = {}) {
   if (rules.length === 0) return;
   const search: FindAndReplaceTuple[] = rules.map((rule) => [

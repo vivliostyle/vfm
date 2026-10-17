@@ -21,6 +21,9 @@ test('exports TableOptionsSchema', () => {
 });
 
 test('exports the VFM table cell hook schema', () => {
+  /**
+   * Minimal hook used only to check that the schema accepts functions.
+   */
   const hook = () => ({});
   expect(v.parse(TableCellHookSchema, hook)).toBe(hook);
 });

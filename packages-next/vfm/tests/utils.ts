@@ -4,10 +4,10 @@ import { type StringifyMarkdownOptions, VFM } from '../src/index.js';
 
 /**
  * Utility for testing MDAST and HTML strings generated from Markdown.
- * @param input Markdown string.
- * @param expectedMdast Expected MDAST string.
- * @param expectedHtml Expected HTML string.
- * @param options Option for convert Markdown to VFM (HTML).
+ * @param input - Markdown string.
+ * @param expectedMdast - Expected MDAST string.
+ * @param expectedHtml - Expected HTML string.
+ * @param options - Option for convert Markdown to VFM (HTML).
  */
 export const buildProcessorTestingCode =
   (
@@ -40,9 +40,9 @@ export const buildProcessorTestingCode =
  * Utility for testing only the HTML string generated from Markdown, for cases
  * where the intermediate MDAST is uninteresting or the input spans a whole
  * document. Mirrors the option defaults of {@link buildProcessorTestingCode}.
- * @param input Markdown string.
- * @param expectedHtml Expected HTML string.
- * @param options Option for convert Markdown to VFM (HTML).
+ * @param input - Markdown string.
+ * @param expectedHtml - Expected HTML string.
+ * @param options - Option for convert Markdown to VFM (HTML).
  */
 export const buildHtmlTestingCode =
   (

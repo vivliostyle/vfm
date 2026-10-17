@@ -20,6 +20,11 @@ export const CodeOptionsSchema = v.object({
 
 export type CodeOptions = v.InferInput<typeof CodeOptionsSchema>;
 
+/**
+ * Whether a value is an mdast `code` node.
+ * @param maybeMdastNode - Value to test.
+ * @returns `true` for a `code` node.
+ */
 const isCodeNode = (
   maybeMdastNode: unknown,
 ): maybeMdastNode is mdastType.Code => {
@@ -44,9 +49,19 @@ declare module 'mdast' {
   }
 }
 
+/**
+ * Store `props` as the node's `hProperties`.
+ * @param node - Code node.
+ * @param props - Properties for the `<code>` element.
+ */
 function setHProperties(node: mdastType.Code, props: hast.Properties): void {
   node.data = { ...(node.data ?? {}), hProperties: props };
 }
+/**
+ * Store the caption text on the node's internal `figcaptionTitle` channel.
+ * @param node - Code node.
+ * @param title - Caption text.
+ */
 function setFigcaptionTitle(node: mdastType.Code, title: string): void {
   node.data = { ...(node.data ?? {}), figcaptionTitle: title };
 }
@@ -161,6 +176,11 @@ function processMeta(node: mdastType.Code): void {
   }
 }
 
+/**
+ * remark plugin: extract `lang:title`, `title=` meta and `{...}` attributes
+ * from fenced code and highlight the code into `hChildren`.
+ * @returns Transformer.
+ */
 export const mdast = () => (tree: unist.Node) => {
   visit(tree as mdastType.Root, 'code', (node) => {
     /**
@@ -184,12 +204,27 @@ export const mdast = () => (tree: unist.Node) => {
   });
 };
 
+/**
+ * Build a hast element.
+ * @param tagName - Element name.
+ * @param properties - Properties.
+ * @param children - Children.
+ * @returns Element.
+ */
 const element = (
   tagName: string,
   properties: hast.Properties,
   children: hast.ElementContent[],
 ): hast.Element => ({ type: 'element', tagName, properties, children });
 
+/**
+ * Create the to-hast `code` handler: `<pre><code>` with the language class,
+ * attributes and highlighted children, wrapped in `<figure>` with a
+ * `<figcaption>` when the code has a title.
+ * @param options - `assignIdToFigcaption` moves the id from `<code>` to
+ *   `<figcaption>`.
+ * @returns Handler.
+ */
 export const handler =
   ({ assignIdToFigcaption = false }: CodeOptions = {}): Handler =>
   (state, maybeMdastNode) => {

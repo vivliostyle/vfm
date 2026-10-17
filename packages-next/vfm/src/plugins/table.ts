@@ -45,6 +45,12 @@ const tableCellPresetHooks = {
   'align-style': alignByStyle,
 } satisfies Record<TableCellPreset, RemarkTableCellHook>;
 
+/**
+ * Adapt a VFM `TableCellHook` (properties or factory per cell) to the
+ * `mdast-to-hast-table-cell` hook that rebuilds the cell element.
+ * @param hook - VFM hook.
+ * @returns `mdast-to-hast-table-cell` hook.
+ */
 const adaptTableCellHook =
   (hook: TableCellHook): RemarkTableCellHook =>
   () =>
@@ -61,6 +67,11 @@ const adaptTableCellHook =
     ];
   };
 
+/**
+ * Resolve the `table.cell` option to a `mdast-to-hast-table-cell` hook.
+ * @param cell - Preset name or custom hook; defaults to `align-attribute`.
+ * @returns Hook.
+ */
 export const resolveTableCellHook = (
   cell: TableCellOption = 'align-attribute',
 ): RemarkTableCellHook =>

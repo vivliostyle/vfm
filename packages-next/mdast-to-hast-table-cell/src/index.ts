@@ -49,6 +49,10 @@ export const TableCellHookSchema = v.pipe(
   v.metadata({ typeString: 'TableCellHook' }),
 );
 
+/**
+ * Preset hook: emit the cell alignment as the HTML4 `align` attribute.
+ * @returns Per-cell transform.
+ */
 export const alignByAttribute: TableCellHook =
   () =>
   ({ node, align, properties, children }) => {
@@ -58,6 +62,11 @@ export const alignByAttribute: TableCellHook =
     return [{ ...node, properties: outputProperties, children }];
   };
 
+/**
+ * Preset hook: emit the cell alignment as a `table-align-<align>` class and
+ * drop the `align` attribute.
+ * @returns Per-cell transform.
+ */
 export const alignByClass: TableCellHook =
   () =>
   ({ node, align, properties, children }) => {
@@ -72,6 +81,11 @@ export const alignByClass: TableCellHook =
     return [{ ...node, properties: outputProperties, children }];
   };
 
+/**
+ * Preset hook: emit the cell alignment as `text-align` in the inline `style`
+ * (appended to an existing style) and drop the `align` attribute.
+ * @returns Per-cell transform.
+ */
 export const alignByStyle: TableCellHook =
   () =>
   ({ node, align, properties, children }) => {
@@ -90,14 +104,32 @@ export const alignByStyle: TableCellHook =
     return [{ ...node, properties: outputProperties, children }];
   };
 
+/**
+ * Whether a property value is one of the table alignments.
+ * @param value - Value of the `align` property.
+ * @returns `true` for `left`, `center` or `right`.
+ */
 const isAlign = (value: hast.Properties[string]): value is TableCellAlign =>
   value === 'left' || value === 'center' || value === 'right';
 
+/**
+ * Whether an element is a table cell.
+ * @param cell - Element to test.
+ * @returns `true` for `th` and `td`.
+ */
 const isTableCell = (
   cell: hast.Element,
 ): cell is hast.Element & { tagName: 'th' | 'td' } =>
   cell.tagName === 'th' || cell.tagName === 'td';
 
+/**
+ * Wrap a `table` handler so that every `th` / `td` in its output is replaced
+ * by what `hook` returns for it. Cells are visited in reverse so splicing does
+ * not disturb the indexes of cells not yet visited.
+ * @param hook - Per-cell transform factory; receives the to-hast `state`.
+ * @returns Function that takes the base `table` handler and returns the
+ *   wrapped handler.
+ */
 export const withTableCellTransform =
   (hook: TableCellHook): ((handler: ToHastHandler) => ToHastHandler) =>
   (handler) =>

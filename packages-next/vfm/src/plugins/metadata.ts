@@ -110,7 +110,7 @@ interface MetadataVFile extends VFile {
 
 /**
  * Read the title from heading without footnotes.
- * @param tree Tree of Markdown AST.
+ * @param tree - Tree of Markdown AST.
  * @returns Title text or `undefined`.
  */
 const readTitleFromHeading = (tree: Node): string | undefined => {
@@ -173,7 +173,7 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
 
 /**
  * Parse Markdown frontmatter.
- * @param md Markdown.
+ * @param md - Markdown.
  * @returns Key/Value pair.
  */
 const parseMarkdown = (md: string): KeyValue => {
@@ -196,7 +196,7 @@ const parseMarkdown = (md: string): KeyValue => {
 /**
  * Read the string or null value in the YAML parse result.
  * If the value is null, it will be an empty string
- * @param value Value of YAML parse result.
+ * @param value - Value of YAML parse result.
  * @returns Text.
  */
 const readStringOrNullValue = (value: string | null): string => {
@@ -205,7 +205,7 @@ const readStringOrNullValue = (value: string | null): string => {
 
 /**
  * Read an attributes from data object.
- * @param data Data object.
+ * @param data - Data object.
  * @returns Attributes of HTML tag.
  */
 const readAttributes = (data: any): Array<Attribute> | undefined => {
@@ -223,7 +223,7 @@ const readAttributes = (data: any): Array<Attribute> | undefined => {
 
 /**
  * Read an attributes collection from data object.
- * @param data Data object.
+ * @param data - Data object.
  * @returns Attributes collection of HTML tag.
  */
 const readAttributesCollection = (
@@ -315,8 +315,8 @@ const readSettings = (data: unknown): VFMSettings => {
  * Read metadata from Markdown frontmatter.
  *
  * Keys that are not defined as VFM are treated as `meta`. If you specify a key name in `customKeys`, the key and its data type will be preserved and stored in `custom` instead of `meta`.
- * @param md Markdown.
- * @param customKeys A collection of key names to be ignored by meta processing.
+ * @param md - Markdown.
+ * @param customKeys - A collection of key names to be ignored by meta processing.
  * @returns Metadata.
  */
 export const readMetadata = (

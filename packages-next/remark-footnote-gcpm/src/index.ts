@@ -89,6 +89,12 @@ type BuildFootnote = (
   children: hast.ElementContent[],
 ) => hast.Element;
 
+/**
+ * Create the builder of the `<span class="footnote">` body from a factory.
+ * The tag of the factory's result is forced to `span`.
+ * @param factory - Body factory.
+ * @returns Builder taking the body id and children.
+ */
 const createBuildFootnote =
   (factory: GcpmBodyFactory): BuildFootnote =>
   (id, children) => {
@@ -103,6 +109,12 @@ const createBuildFootnote =
 
 type BuildDuplicatedCall = (targetId: `fn-${string}`) => hast.Element;
 
+/**
+ * Create the builder of the `<a class="footnote-duplicated-call">` that
+ * points at the first occurrence of a note.
+ * @param customizer - Properties or factory for the link.
+ * @returns Builder taking the id of the target body.
+ */
 const createBuildDuplicatedCall =
   (
     customizer: hast.Properties | GcpmDuplicatedCallFactory | undefined,
@@ -123,6 +135,12 @@ const createBuildDuplicatedCall =
       customizer,
     );
 
+/**
+ * Create the `footnote` (inline note) handler: registers a synthetic
+ * definition and emits the note body at the call site.
+ * @param buildFootnote - Body builder.
+ * @returns Handler.
+ */
 const createInlineFootnoteHandler =
   (buildFootnote: BuildFootnote): ToHastHandler =>
   (state, node) => {
@@ -141,6 +159,13 @@ const createInlineFootnoteHandler =
     return buildFootnote(`fn-${identifier}`, state.all(node));
   };
 
+/**
+ * Create the `footnoteReference` handler: the first reference to a definition
+ * emits the note body inline, later references emit a duplicated-call link.
+ * @param buildFootnote - Body builder.
+ * @param buildDuplicatedCall - Duplicated-call builder.
+ * @returns Handler.
+ */
 const createFootnoteReferenceHandler = (
   buildFootnote: BuildFootnote,
   buildDuplicatedCall: BuildDuplicatedCall,
@@ -182,8 +207,17 @@ export type GcpmFootnotePlugin = {
   hastTransformer: Plugin;
 };
 
+/**
+ * Transformer that does nothing; GCPM does all its work in the handlers.
+ */
 const noopPlugin: Plugin = () => () => {};
 
+/**
+ * Create the GCPM footnote plugin: the to-hast handlers and a no-op hast
+ * transformer.
+ * @param options - Mode and customizers for the body and duplicated calls.
+ * @returns Handlers and transformer.
+ */
 export const createGcpmFootnotePlugin = (
   options: Partial<GcpmFootnoteOptions> = { mode: 'gcpm' },
 ): GcpmFootnotePlugin => {

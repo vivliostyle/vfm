@@ -17,6 +17,13 @@ export const RewriteRelativeHrefExtensionsOptionsSchema: v.GenericSchema<Rewrite
     ),
   });
 
+/**
+ * Turn the `rewriteRelativeHrefExtensions` option into a resolver. `true`
+ * means `['md']`; an array lists the source extensions (a leading dot is
+ * allowed). Relative paths with a listed extension resolve to `html`.
+ * @param value - Option value.
+ * @returns Extension resolver.
+ */
 export const resolveRewriteRelativeHrefExtensions = (
   value: RewriteRelativeHrefExtensionsOptions['rewriteRelativeHrefExtensions'],
 ): ExtensionResolver => {

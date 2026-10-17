@@ -152,6 +152,9 @@ describe('rewriteExtension: href rewriting spec', () => {
 
     test('does not resolve an extension from a segment before a trailing slash', () => {
       let calls = 0;
+      /**
+       * Resolver that counts its calls and always answers `html`.
+       */
       const resolveExtension: ExtensionResolver = () => {
         calls += 1;
         return 'html';
@@ -178,6 +181,9 @@ describe('rewriteExtension: href rewriting spec', () => {
 
     test('does not call the resolver when the URI path is empty', () => {
       let calls = 0;
+      /**
+       * Resolver that counts its calls and always answers `html`.
+       */
       const resolveExtension: ExtensionResolver = () => {
         calls += 1;
         return 'html';
@@ -226,6 +232,9 @@ describe('rewriteExtension: href rewriting spec', () => {
 
     test('passes URI components and parsed extension parts to the converter', () => {
       let received: Parameters<ExtensionResolver>[0] | undefined;
+      /**
+       * Resolver that records the parts it receives.
+       */
       const resolveExtension: ExtensionResolver = (parts) => {
         received = parts;
         return 'html';
@@ -248,6 +257,9 @@ describe('rewriteExtension: href rewriting spec', () => {
     });
 
     test('rewrites only source extensions handled by the converter', () => {
+      /**
+       * Resolver that handles only `adoc`.
+       */
       const resolveExtension: ExtensionResolver = ({ extension }) =>
         extension === 'adoc' ? 'html' : null;
       expect(hrefOf(runRewrite('./sibling.adoc', { resolveExtension }))).toBe(
@@ -259,6 +271,9 @@ describe('rewriteExtension: href rewriting spec', () => {
     });
 
     test('rewrites multiple source extensions', () => {
+      /**
+       * Resolver that handles `md`, `adoc` and `re`.
+       */
       const resolveExtension: ExtensionResolver = ({ extension }) =>
         ['md', 'adoc', 're'].includes(extension) ? 'html' : null;
       expect(hrefOf(runRewrite('./a.md', { resolveExtension }))).toBe(
@@ -286,6 +301,9 @@ describe('rewriteExtension: href rewriting spec', () => {
     });
 
     test('passes the source extension without a leading dot', () => {
+      /**
+       * Resolver that handles only `md`.
+       */
       const resolveExtension: ExtensionResolver = ({ extension }) =>
         extension === 'md' ? 'html' : null;
       expect(hrefOf(runRewrite('./sibling.md', { resolveExtension }))).toBe(

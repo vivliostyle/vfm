@@ -51,6 +51,10 @@ type Collected = {
   bodies: Map<string, hast.ElementContent[]>;
 };
 
+/**
+ * Fresh collection state for one document.
+ * @returns Empty state.
+ */
 const createCollected = (): Collected => ({
   order: [],
   counts: new Map(),
@@ -71,6 +75,13 @@ const noteBody = (
       : def,
   );
 
+/**
+ * Build the in-text call `<a class="footnote-ref" role="doc-noteref">`.
+ * @param refIndex - Note number.
+ * @param count - How many times the note has been referenced so far; the
+ *   second and later calls get a `-n` suffix on their id.
+ * @returns Call element.
+ */
 const buildCall = (refIndex: number, count: number): hast.Element =>
   h(
     'a',
@@ -83,6 +94,11 @@ const buildCall = (refIndex: number, count: number): hast.Element =>
     [h('sup', {}, String(refIndex))],
   );
 
+/**
+ * Build the `↩` backlink from a note body to one of its calls.
+ * @param href - Fragment pointing at the call.
+ * @returns Backlink element.
+ */
 const buildBacklink = (href: string): hast.Element =>
   h('a', { href, className: ['footnote-back'], role: 'doc-backlink' }, '↩');
 
@@ -106,6 +122,12 @@ const reference = (
   return buildCall(refIndex, count);
 };
 
+/**
+ * Create the `footnoteReference` handler: register the reference and emit the
+ * call. The note body is collected for the transformer.
+ * @param collected - Collection state shared with the transformer.
+ * @returns Handler.
+ */
 const createFootnoteReferenceHandler =
   (collected: Collected): Handler =>
   (state, node) => {
@@ -207,6 +229,11 @@ export type PandocFootnotePlugin = {
   hastTransformer: Plugin;
 };
 
+/**
+ * Create the Pandoc-style endnote plugin: handlers that collect references and
+ * the hast transformer that appends the endnote section.
+ * @returns Handlers and transformer.
+ */
 export const createPandocFootnotePlugin = (): PandocFootnotePlugin => {
   const collected = createCollected();
   return {

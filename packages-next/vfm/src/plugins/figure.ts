@@ -78,6 +78,11 @@ export type FigcaptionInlineOptions = v.InferInput<
 
 const DEFAULT_PARSE_FIGCAPTION_AS_INLINE = false;
 
+/**
+ * Whether a value is an mdast `image` node.
+ * @param maybeMdastNode - Value to test.
+ * @returns `true` for an `image` node.
+ */
 const isImageNode = (
   maybeMdastNode: unknown,
 ): maybeMdastNode is mdast.Image => {
@@ -85,9 +90,20 @@ const isImageNode = (
   return (maybeMdastNode as { type?: unknown }).type === 'image';
 };
 
+/**
+ * Parse an HTML string into a hast root.
+ * @param value - HTML.
+ * @returns Root.
+ */
 const parseHtml = (value: string): hast.Root =>
   raw(u('root', [u('raw', value)])) as hast.Root;
 
+/**
+ * Whether an mdast `html` node consists of comments only, so that it does not
+ * count as content next to an image.
+ * @param node - Value to test.
+ * @returns `true` for comment-only HTML.
+ */
 const isHtmlComment = (node: unknown): boolean => {
   if (!node || typeof node !== 'object') return false;
   const { type, value } = node as { type?: unknown; value?: unknown };
@@ -101,6 +117,12 @@ const isHtmlComment = (node: unknown): boolean => {
   );
 };
 
+/**
+ * Find the single image of a paragraph that holds nothing else but HTML
+ * comments.
+ * @param maybeMdastNode - Value to test.
+ * @returns The paragraph and its image, or `undefined`.
+ */
 const loneImageParagraph = (
   maybeMdastNode: unknown,
 ): { mdastParagraph: mdast.Paragraph; mdastImage: mdast.Image } | undefined => {
@@ -127,6 +149,12 @@ type ImageWithParsedCaption = mdast.Image & {
   children?: mdast.PhrasingContent[] | undefined;
 };
 
+/**
+ * remark plugin: when `parseFigcaptionAsInline` is on, re-parse the alt text
+ * of lone images as inline Markdown and attach the result as `children`.
+ * @param options - Figcaption options.
+ * @returns Transformer.
+ */
 const parseImageAltAsInline: Plugin<[FigcaptionInlineOptions?], mdast.Root> =
   function ({
     parseFigcaptionAsInline = DEFAULT_PARSE_FIGCAPTION_AS_INLINE,
@@ -192,6 +220,11 @@ export const buildFigure = (
     return undefined;
   }
 
+  /**
+   * Convert the paragraph's other children (HTML comments) to hast.
+   * @param children - Phrasing content.
+   * @returns Element content.
+   */
   const toHast = (children: mdast.PhrasingContent[]): hast.ElementContent[] =>
     children.flatMap((child) => state.one(child, mdastParagraph) ?? []);
   const at = mdastParagraph.children.indexOf(mdastImage);
@@ -201,8 +234,12 @@ export const buildFigure = (
     ...toHast(mdastParagraph.children.slice(at + 1)),
   ];
 
-  // Build `<figure>` in place of the paragraph: copy its position and honor
-  // its `data` (`hProperties` etc.) like the default paragraph handler does.
+  /**
+   * Build `<figure>` in place of the paragraph: copy its position and honor its
+   * `data` (`hProperties` etc.) like the default paragraph handler does.
+   * @param children - Figure children.
+   * @returns Figure element.
+   */
   const figureOf = (children: hast.ElementContent[]): hast.Element => {
     const figure: hast.Element = {
       type: 'element',
@@ -319,6 +356,11 @@ const deriveImgAltFromFigcaption: Plugin<
     : (tree: hast.Root) => {
         visit(tree, 'element', (figure) => {
           if (figure.tagName !== 'figure') return;
+          /**
+           * Find the direct child element of the figure with `tagName`.
+           * @param tagName - Element name.
+           * @returns Element, or `undefined`.
+           */
           const child = (tagName: string) =>
             figure.children.find(
               (c): c is hast.Element =>

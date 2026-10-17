@@ -52,6 +52,12 @@ const createProperties = (depth: number): hast.Properties => {
   return properties;
 };
 
+/**
+ * Read the source line of a heading from the file through its position.
+ * @param node - Node of Markdown AST.
+ * @param file - Virtual file.
+ * @returns Trimmed source text, or an empty string for non-headings.
+ */
 const getHeadingLine = (node: Node, file: VFile): string => {
   if (node.type !== 'heading') {
     return '';
@@ -64,8 +70,8 @@ const getHeadingLine = (node: Node, file: VFile): string => {
 
 /**
  * Check if the heading has a non-section mark (sufficient number of closing hashes).
- * @param node Node of Markdown AST.
- * @param file Virtual file.
+ * @param node - Node of Markdown AST.
+ * @param file - Virtual file.
  * @returns `true` if the node has a non-section mark.
  */
 const hasNonSectionMark = (node: Heading, file: VFile): boolean => {
@@ -77,7 +83,7 @@ const hasNonSectionMark = (node: Heading, file: VFile): boolean => {
 
 /**
  * Check if the node is a section-end mark (line with only hashes).
- * @param node Node of Markdown AST.
+ * @param node - Node of Markdown AST.
  * @returns `true` if the node is a section-end mark.
  */
 const isSectionEndMark = (node: Node, file: VFile): boolean => {
@@ -91,8 +97,8 @@ const isSectionEndMark = (node: Node, file: VFile): boolean => {
  * Wrap the header in sections.
  * - Do not sectionize if parent is `blockquote`.
  * - Set the `levelN` class in the section to match the heading depth.
- * @param node Node of Markdown AST.
- * @param ancestors Parents.
+ * @param node - Node of Markdown AST.
+ * @param ancestors - Parents.
  * @todo handle `@subtitle` properly.
  */
 const sectionizeIfRequired = (
@@ -111,7 +117,12 @@ const sectionizeIfRequired = (
   const start = node;
   const depth = start.depth;
 
-  // check if it's HTML end tag without corresponding start tag in sibling nodes.
+  /**
+   * Whether `node` is an HTML closing tag whose opening tag precedes the section
+   * start among the siblings, so the section has to end before it.
+   * @param node - Node of Markdown AST.
+   * @returns `true` when the section must end at this node.
+   */
   const isHtmlEnd = (node: Node) => {
     if (node.type !== 'html') {
       return false;
@@ -123,7 +134,11 @@ const sectionizeIfRequired = (
       return false;
     }
 
-    // it's HTML end tag, check if it has corresponding start tag
+    /**
+     * Whether `node` is HTML that contains the opening tag for `tag`.
+     * @param node - Node of Markdown AST.
+     * @returns `true` for the matching opening tag.
+     */
     const isHtmlStart = (node: Node) =>
       node.type === 'html' &&
       new RegExp(`<${tag}\\b[^>]*>`).test((node as Html).value);
@@ -147,6 +162,12 @@ const sectionizeIfRequired = (
     return false;
   };
 
+  /**
+   * Whether `node` ends the section: a heading of the same or a higher level, or
+   * a closing tag of an element opened before the section.
+   * @param node - Node of Markdown AST.
+   * @returns `true` when the section ends at this node.
+   */
   const isEnd = (node: Node) =>
     (node.type === 'heading' && (node as Heading).depth <= depth) ||
     node.type === 'export' ||
@@ -204,6 +225,11 @@ const sectionizeIfRequired = (
  * @returns Transformer.
  */
 export const mdast = () => (tree: Node, file: VFile) => {
+  /**
+   * Visitor: wrap the heading in a section when required.
+   * @param node - Heading.
+   * @param ancestors - Parents of the heading.
+   */
   const sectionize = (node: Node, ancestors: Parent[]) => {
     sectionizeIfRequired(node as Heading, ancestors, file);
   };

@@ -18,6 +18,12 @@ type ElementTree = {
   ];
 };
 
+/**
+ * Build a root with a single `tagName` element that has `href`.
+ * @param tagName - Element name.
+ * @param href - Initial `href`.
+ * @returns Tree.
+ */
 const treeWithTagHref = (tagName: string, href: string): ElementTree => ({
   type: 'root',
   children: [
@@ -30,6 +36,13 @@ const treeWithTagHref = (tagName: string, href: string): ElementTree => ({
   ],
 });
 
+/**
+ * Run `rewriteExtension` with `rules` over a one-element tree.
+ * @param tagName - Element name.
+ * @param href - Initial `href`.
+ * @param rules - Rules to apply.
+ * @returns The `href` after rewriting.
+ */
 const runElementRewrite = (
   tagName: string,
   href: string,

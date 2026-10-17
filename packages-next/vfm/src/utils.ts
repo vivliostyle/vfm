@@ -8,6 +8,12 @@ export const debug = initDebug('vfm');
 /** Plugin whose parameters and tree types are not constrained. */
 export type AnyPlugin = Plugin<any[], any, any>;
 
+/**
+ * Debug plugin: dump the tree with `unist-util-inspect` when the `vfm` debug
+ * namespace is enabled.
+ * @param header - Label printed before the dump.
+ * @returns Plugin.
+ */
 export const inspect =
   (header?: string): Plugin<[]> =>
   () =>
