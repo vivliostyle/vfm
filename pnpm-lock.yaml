@@ -117,6 +117,64 @@ importers:
         specifier: 1.4.2
         version: 1.4.2(typescript@6.0.2)
 
+  packages-next/remark-attribute:
+    dependencies:
+      '@types/mdast':
+        specifier: ^4.0.4
+        version: 4.0.4
+      '@types/unist':
+        specifier: ^3.0.3
+        version: 3.0.3
+      html-element-attributes:
+        specifier: ^3.5.0
+        version: 3.5.0
+      mdast-util-from-markdown:
+        specifier: ^2.1.0
+        version: 2.1.0
+      mdast-util-to-hast:
+        specifier: ^13.2.1
+        version: 13.2.1
+      micromark-factory-space:
+        specifier: ^2.1.0
+        version: 2.1.0
+      micromark-factory-whitespace:
+        specifier: ^2.0.1
+        version: 2.0.1
+      micromark-util-character:
+        specifier: ^2.1.1
+        version: 2.1.1
+      micromark-util-symbol:
+        specifier: ^2.0.1
+        version: 2.0.1
+      micromark-util-types:
+        specifier: ^2.0.3
+        version: 2.0.3
+      parse-entities:
+        specifier: ^4.0.2
+        version: 4.0.2
+      unified:
+        specifier: ^11.0.5
+        version: 11.0.5
+      unist-util-visit-parents:
+        specifier: ^6.0.2
+        version: 6.0.2
+    devDependencies:
+      rehype-stringify:
+        specifier: ^10.0.1
+        version: 10.0.1
+      remark-gfm:
+        specifier: ^4.0.1
+        version: 4.0.1
+      remark-parse:
+        specifier: ^11.0.0
+        version: 11.0.0
+      remark-rehype:
+        specifier: ^11.1.2
+        version: 11.1.2
+      unist-util-inspect:
+        specifier: ^8.1.0
+        version: 8.1.0
+
   packages-next/remark-footnote-dpub:
     dependencies:
       '@types/hast':
@@ -334,6 +392,9 @@ importers:
         specifier: ^6.0.3
         version: 6.0.3
     devDependencies:
+      '@vivliostyle/remark-attribute-next':
+        specifier: workspace:*
+        version: link:../remark-attribute
       rehype-format:
         specifier: ^5.0.1
         version: 5.0.1
@@ -373,6 +434,9 @@ importers:
       '@vivliostyle/rehype-rewrite-extension-next':
         specifier: workspace:*
         version: link:../rehype-rewrite-extension
+      '@vivliostyle/remark-attribute-next':
+        specifier: workspace:*
+        version: link:../remark-attribute
       '@vivliostyle/remark-footnote-dpub-next':
         specifier: workspace:*
         version: link:../remark-footnote-dpub
@@ -1905,6 +1969,9 @@ packages:
 
   html-element-attributes@2.3.0:
     resolution: {integrity: sha512-RJv2v3BBaYSc0ODHwT0sqWI+2lFs6DATBvCRnW20BDmULxoAWvfT6r28uL8LcW1a9/eqUl+1DccUOJzw00qVXQ==}
+
+  html-element-attributes@3.5.0:
+    resolution: {integrity: sha512-rU2BFhp0kQla9sqPBI46C+zbP6PFOtD7z6XNAJ6as+cGecCDXLx0W3aIs6XdPLmBBG/Fy1meRi/n65Exofz4Qw==}
 
   html-void-elements@1.0.5:
     resolution: {integrity: sha512-uE/TxKuyNIcx44cIWnjr/rfIATDH7ZaOMmstu0CwhFG1Dunhlp4OC6/NMbhiwoq5BpW0ubi303qnEk/PZj614w==}
@@ -4189,6 +4256,8 @@ snapshots:
       space-separated-tokens: 2.0.2
 
   html-element-attributes@2.3.0: {}
+
+  html-element-attributes@3.5.0: {}
 
   html-void-elements@1.0.5: {}
 

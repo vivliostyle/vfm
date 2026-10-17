@@ -319,8 +319,7 @@ test(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   "captionlessImagePolicy: 'figure-with-figcaption' keeps the empty figcaption aria-hidden even with an explicit alt",
   buildProcessorTestingCode(
     `![](./img.png){alt="alt text"}`,
@@ -376,8 +375,7 @@ test(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   "captionlessImagePolicy: 'figure' with assignIdToFigcaption keeps ID on img",
   buildProcessorTestingCode(
     `![](./img.png){#fig1}`,
@@ -389,7 +387,8 @@ test.skip(
               url: "./img.png"
               alt: ""
     `,
-    `<figure><img src="./img.png" id="fig1"></figure>`,
+    // mdast-util-to-hast 13 emits `alt=""` for an empty alt (remark 8 omitted it); #293.
+    `<figure><img src="./img.png" alt="" id="fig1"></figure>`,
     {
       captionlessImagePolicy: 'figure',
       assignIdToFigcaption: true,
@@ -419,8 +418,7 @@ test(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   "captionlessImagePolicy: 'figure-with-figcaption' with assignIdToFigcaption moves ID to empty figcaption",
   buildProcessorTestingCode(
     `![](./img.png){#fig1}`,
@@ -432,7 +430,8 @@ test.skip(
               url: "./img.png"
               alt: ""
     `,
-    `<figure><img src="./img.png"><figcaption aria-hidden="true" id="fig1"></figcaption></figure>`,
+    // mdast-util-to-hast 13 emits `alt=""` for an empty alt (remark 8 omitted it); #293.
+    `<figure><img src="./img.png" alt=""><figcaption aria-hidden="true" id="fig1"></figcaption></figure>`,
     {
       captionlessImagePolicy: 'figure-with-figcaption',
       assignIdToFigcaption: true,
@@ -486,8 +485,7 @@ test(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   'Attributes',
   buildProcessorTestingCode(
     `![caption](./img.png "title"){id="image" data-sample="sample"}`,
@@ -532,8 +530,7 @@ test(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   'assignIdToFigcaption moves ID from img to figcaption',
   buildProcessorTestingCode(
     `![caption](./img.png){#id}`,
@@ -550,8 +547,7 @@ test.skip(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   'assignIdToFigcaption moves ID to figcaption with a comment after the img',
   buildProcessorTestingCode(
     `![caption](./img.png){#id}<!-- c -->`,
@@ -570,8 +566,7 @@ test.skip(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   'assignIdToFigcaption with imgFigcaptionOrder: figcaption-img',
   buildProcessorTestingCode(
     `![caption](./img.png){#id}`,
@@ -588,8 +583,7 @@ test.skip(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   'assignIdToFigcaption: false keeps ID on img (default behavior)',
   buildProcessorTestingCode(
     `![caption](./img.png){#id}`,
@@ -606,8 +600,7 @@ test.skip(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   'distinct explicit alt drops figcaption aria-hidden',
   buildProcessorTestingCode(
     `![caption](./img.png){alt="alt text"}`,
@@ -624,8 +617,7 @@ test.skip(
   ),
 );
 
-// TODO(#288): image attributes `{...}` need the VFM attribute extension.
-test.skip(
+test(
   'explicit alt equal to the caption keeps aria-hidden (no double read)',
   buildProcessorTestingCode(
     `![caption](./img.png){alt="caption"}`,

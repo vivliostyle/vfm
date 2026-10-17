@@ -51,6 +51,7 @@
     "@types/unist": "^3.0.3",
     "@vivliostyle/mdast-to-hast-table-cell-next": "workspace:*",
     "@vivliostyle/rehype-rewrite-extension-next": "workspace:*",
+    "@vivliostyle/remark-attribute-next": "workspace:*",
     "@vivliostyle/remark-footnote-dpub-next": "workspace:*",
     "@vivliostyle/remark-footnote-gcpm-next": "workspace:*",
     "@vivliostyle/remark-footnote-pandoc-next": "workspace:*",
