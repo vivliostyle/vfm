@@ -25,7 +25,6 @@ import { LineBreaksOptionsSchema } from './line-breaks.js';
 import { MathOptionsSchema } from './math.js';
 import { RewriteRelativeHrefExtensionsOptionsSchema } from './rewrite-relative-href-extensions.js';
 import { YamlTableOptionsSchema } from './table.js';
-import { mdast as toc, type Shortcode } from './toc.js';
 
 /** Attribute of HTML tag. */
 export type Attribute = {
@@ -135,6 +134,14 @@ const readTitleFromHeading = (tree: Node): string | undefined => {
 
 /**
  * Parse Markdown's Frontmatter to metadate (`VFile.data`).
+ *
+ * `[[toc]]` in the body is deliberately not read here. The remark 8 version
+ * carried a `visit(tree, 'shortcode')` that was meant to set `vfm.toc`, but
+ * it never ran: remark-parse 8 gives every processor its own `Parser`
+ * subclass (`unherit`), so the remark-shortcodes patch applied by `VFM()`
+ * never reached the metadata processor. Reviving it would also have let
+ * `[[toc]]` force `math: true` over the caller's options. Whether `[[toc]]`
+ * should set `vfm.toc` is part of #207.
  * @returns Handler.
  * @see https://github.com/Symbitic/remark-plugins/blob/master/packages/remark-meta/src/index.js
  */
@@ -156,18 +163,6 @@ const mdast = () => (tree: Node, file: MetadataVFile) => {
       file.data.title = title;
     }
   }
-
-  visit(tree as Root, 'shortcode', (node: Shortcode) => {
-    if (node.identifier !== 'toc') {
-      return;
-    }
-
-    if (file.data.vfm) {
-      file.data.vfm.toc = true;
-    } else {
-      file.data.vfm = { math: true, toc: true };
-    }
-  });
 };
 
 /**
@@ -183,8 +178,6 @@ const parseMarkdown = (md: string): KeyValue => {
       // Remove footnotes when reading title from heading
       footnotes,
       attr,
-      // Parse `[[toc]]` so the visit below can detect it
-      toc,
       frontmatter,
       mdast,
     ] satisfies PluggableList)
