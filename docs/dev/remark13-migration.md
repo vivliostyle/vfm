@@ -101,6 +101,8 @@ hast slots, in order: raw, deriveImgAltFromFigcaption, footnote, replace, rewrit
 
 ### Sub-packages and external plugins ([#278](https://github.com/vivliostyle/vfm/issues/278))
 
+The package-by-package survey, including the exact upstream output each footnote package depends on, is in [remark13-subpackages.md](./remark13-subpackages.md).
+
 #### Sub-packages
 
 | Package | Involvement | Impact |
