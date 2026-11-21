@@ -8,6 +8,7 @@ VFM の記法と機能を見出しカッコ内のアルファベット昇順（`
 
 - [コード (Code)](#%E3%82%B3%E3%83%BC%E3%83%89-code)
   - [キャプションをつける (with caption)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-caption)
+- [強調と CJK (Emphasis and CJK)](#%E5%BC%B7%E8%AA%BF%E3%81%A8-cjk-emphasis-and-cjk)
 - [脚注 (Footnotes)](#%E8%84%9A%E6%B3%A8-footnotes)
   - [脚注モード (Footnote mode)](#%E8%84%9A%E6%B3%A8%E3%83%A2%E3%83%BC%E3%83%89-footnote-mode)
 - [フロントマター／前付け (Frontmatter)](#%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%83%9E%E3%82%BF%E3%83%BC%EF%BC%8F%E5%89%8D%E4%BB%98%E3%81%91-frontmatter)
@@ -105,6 +106,34 @@ figure[class^='language-'] pre {
 figure[class^='language-'] pre code {
 }
 ```
+
+## 強調と CJK (Emphasis and CJK)
+
+強調 (`*` / `_`)、強い強調 (`**` / `__`)、打ち消し線 (`~~`) は CommonMark と GFM に従います。CommonMark は区切り記号の前後の文字からそれが開きか閉じかを判定します ([flanking delimiter run](https://spec.commonmark.org/0.31.2/#left-flanking-delimiter-run))。区切り記号の内側が約物で外側が文字の場合は強調として認識されません。日本語、中国語、韓国語は単語を空白で区切らないため、`**構文木（AST）**に変換` は記号がそのまま残ってしまいます。
+
+そのため VFM の次期バージョン (`packages-next/vfm`、remark 13 世代) は [remark-cjk-friendly](https://github.com/tats-u/markdown-cjk-friendly/tree/main/packages/remark-cjk-friendly) と [remark-cjk-friendly-gfm-strikethrough](https://github.com/tats-u/markdown-cjk-friendly/tree/main/packages/remark-cjk-friendly-gfm-strikethrough) により [CommonMark の CJK friendly 修正仕様](https://github.com/tats-u/markdown-cjk-friendly/blob/main/specification.md)を採用します。`*` や `~` に CJK 文字が隣接する場合は約物の判定を省略します。現行バージョン (`packages/vfm`、remark-parse 8) にこの規則はありませんが、flanking 規則を緩く適用するため、CJK の文章の大半で両バージョンの出力は一致します。
+
+現行バージョンと次期バージョンの比較を表に示します。
+
+| VFM | 現行 | 次期 |
+| --- | --- | --- |
+| `これは**強調**です` | `これは<strong>強調</strong>です` | 同じ |
+| `内に**@rule**を書き` | `内に<strong>@rule</strong>を書き` | 同じ |
+| `を **構文木（AST）**に変換` | `を <strong>構文木（AST）</strong>に変換` | 同じ |
+| `これは*「斜体」*です` | `これは<em>「斜体」</em>です` | 同じ |
+| `これは~~（削除）~~です` | `これは<del>（削除）</del>です` | 同じ |
+| `それは、__「強調」__である。` | `それは、<strong>「強調」</strong>である。` | `それは、__「強調」__である。` |
+| `日本語_斜体_日本語` | `日本語<em>斜体</em>日本語` | `日本語_斜体_日本語` |
+| `English **(note)**text` | `English <strong>(note)</strong>text` | `English **(note)**text` |
+
+末尾の 3 行は次期バージョンで出力が変わります。
+
+- `_` と `__`
+  - CommonMark は文字に挟まれたアンダースコアを区切り記号として扱いません (`snake_case`)。CJK friendly 修正仕様もこの規則を変えません。
+  - `*` / `**` を使うか、区切り記号の外側に空白を入れてください: `それは、 __「強調」__ である。`
+- CJK 文字を含まない文章
+  - CommonMark の規則をそのまま適用します。GitHub と同じ挙動です。
+  - 区切り記号の外側に空白を入れてください: `English **(note)** text`
 
 ## 脚注 (Footnotes)
 

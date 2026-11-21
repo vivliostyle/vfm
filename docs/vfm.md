@@ -12,6 +12,7 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
 
 - [Code](#code)
   - [with caption](#with-caption)
+- [Emphasis and CJK](#emphasis-and-cjk)
 - [Footnotes](#footnotes)
   - [Footnote mode](#footnote-mode)
 - [Frontmatter](#frontmatter)
@@ -111,6 +112,34 @@ figure[class^='language-'] pre {
 figure[class^='language-'] pre code {
 }
 ```
+
+## Emphasis and CJK
+
+Emphasis (`*` / `_`), strong emphasis (`**` / `__`) and strikethrough (`~~`) follow CommonMark and GFM. CommonMark decides whether a delimiter opens or closes from the characters around it ([flanking delimiter run](https://spec.commonmark.org/0.31.2/#left-flanking-delimiter-run)): a delimiter with punctuation on the inside and a letter on the outside is not recognized. Japanese, Chinese and Korean text has no spaces between words, so `**構文木（AST）**に変換` would stay as written.
+
+The next version of VFM (`packages-next/vfm`, remark 13 generation) therefore adopts the [CommonMark CJK friendly amendments](https://github.com/tats-u/markdown-cjk-friendly/blob/main/specification.md) through [remark-cjk-friendly](https://github.com/tats-u/markdown-cjk-friendly/tree/main/packages/remark-cjk-friendly) and [remark-cjk-friendly-gfm-strikethrough](https://github.com/tats-u/markdown-cjk-friendly/tree/main/packages/remark-cjk-friendly-gfm-strikethrough): when a CJK character is next to `*` or `~`, the punctuation check is skipped. The current version (`packages/vfm`, remark-parse 8) has no such rule but applies the flanking rules loosely, so both versions agree on most CJK text.
+
+The table compares the current version with the next version.
+
+| VFM | Current | Next |
+| --- | --- | --- |
+| `これは**強調**です` | `これは<strong>強調</strong>です` | Same |
+| `内に**@rule**を書き` | `内に<strong>@rule</strong>を書き` | Same |
+| `を **構文木（AST）**に変換` | `を <strong>構文木（AST）</strong>に変換` | Same |
+| `これは*「斜体」*です` | `これは<em>「斜体」</em>です` | Same |
+| `これは~~（削除）~~です` | `これは<del>（削除）</del>です` | Same |
+| `それは、__「強調」__である。` | `それは、<strong>「強調」</strong>である。` | `それは、__「強調」__である。` |
+| `日本語_斜体_日本語` | `日本語<em>斜体</em>日本語` | `日本語_斜体_日本語` |
+| `English **(note)**text` | `English <strong>(note)</strong>text` | `English **(note)**text` |
+
+The last three rows differ in the next version.
+
+- `_` and `__`
+  - CommonMark never treats an underscore between letters as a delimiter (`snake_case`), and the CJK friendly amendments keep that rule.
+  - Use `*` / `**` instead, or put spaces around the delimiters: `それは、 __「強調」__ である。`.
+- Text without CJK characters
+  - The CommonMark rule applies as is, the same as on GitHub.
+  - Put a space outside the delimiter: `English **(note)** text`.
 
 ## Footnotes
 
