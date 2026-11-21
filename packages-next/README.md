@@ -17,11 +17,13 @@ Nested ruby ([#320](https://github.com/vivliostyle/vfm/issues/320), decided: kee
 
 CJK text next to emphasis ([#318](https://github.com/vivliostyle/vfm/issues/318), [#193](https://github.com/vivliostyle/vfm/issues/193)): micromark applies the CommonMark flanking rules strictly, so `**構文木（AST）**に変換` would stay literal. `remark-cjk-friendly` and `remark-cjk-friendly-gfm-strikethrough` sit right after remark-gfm in the mdast slots (`RemarkCjkFriendlyPlugin`, `RemarkCjkFriendlyGfmStrikethroughPlugin`) and keep `*` / `**` / `~~` working next to CJK characters. What still differs from the current tree is listed under "Emphasis and CJK" in [docs/vfm.md](../docs/vfm.md): intraword `_` / `__` (`それは、__「強調」__である。`) and punctuation inside the delimiters in non-CJK text stay literal, as in CommonMark.
 
+Single tilde strikethrough ([#324](https://github.com/vivliostyle/vfm/issues/324), decided: keep the next behavior): remark-gfm 4 and `remark-cjk-friendly-gfm-strikethrough` run with their default `singleTilde: true`, so `a ~b~ c` is `a <del>b</del> c` as in the GFM specification and on GitHub, where remark-parse 8 recognized `~~` only. Two range tildes in one paragraph pair up (`3~5 個、または 7~9 個`); escape them or use another character. The rule and the comparison with the current tree are under "Strikethrough" in [docs/vfm.md](../docs/vfm.md).
+
 Intended fixes that come with the new dependencies: with `hardLineBreaks`, remark-breaks 4 keeps the full-width space ([#186](https://github.com/vivliostyle/vfm/issues/186)) and the no-break space ([#110](https://github.com/vivliostyle/vfm/issues/110)) that follow a line break.
 
 ## Tests
 
-`packages-next/vfm/tests` keeps the test files of `packages/vfm/tests` one to one (plus `toc.test.ts`, `syntaxes.test.ts` and `cjk-emphasis.test.ts`). `defs.test.ts`, which inspected the remark-parse 8 `Parser.prototype`, is replaced by `syntaxes.test.ts`, which checks that the default processor turns every VFM syntax into its mdast node.
+`packages-next/vfm/tests` keeps the test files of `packages/vfm/tests` one to one (plus `toc.test.ts`, `syntaxes.test.ts`, `cjk-emphasis.test.ts` and `strikethrough.test.ts`). `defs.test.ts`, which inspected the remark-parse 8 `Parser.prototype`, is replaced by `syntaxes.test.ts`, which checks that the default processor turns every VFM syntax into its mdast node.
 
 `buildProcessorTestingCode` in `tests/utils.ts` still compares the MDAST dump (`unist-util-inspect`, without position and `data`) next to the HTML. The dump is kept on purpose: it shows where micromark shapes the tree differently from remark-parse 8 (node order, `break` from remark-breaks appearing only after the transformers, decoded `alt`, ...). When a change to the parser moves the expected dump on purpose, regenerate it instead of editing it by hand:
 

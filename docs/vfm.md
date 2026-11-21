@@ -37,6 +37,7 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
   - [Escape pipe in ruby body](#escape-pipe-in-ruby-body)
   - [Nested ruby](#nested-ruby)
 - [Sectionization](#sectionization)
+- [Strikethrough](#strikethrough)
 - [Table](#table)
   - [Cell alignment output](#cell-alignment-output)
 
@@ -1041,6 +1042,41 @@ section:has(> h1.title) {
 blockquote > h1 {
 }
 ```
+
+## Strikethrough
+
+Strikethrough follows [GFM](https://github.github.com/gfm/#strikethrough-extension-). Text wrapped in two tildes `~~` becomes `<del>`.
+
+**VFM**
+
+```md
+This is ~~deleted~~ text.
+```
+
+**HTML**
+
+```html
+<p>This is <del>deleted</del> text.</p>
+```
+
+In the next version of VFM (`packages-next/vfm`, remark 13 generation), text wrapped in one tilde `~` is also a strikethrough, as in the GFM specification ("one or two tildes") and on GitHub. The current version (`packages/vfm`, remark-parse 8) recognizes `~~` only.
+
+- The opening and closing delimiters must have the same number of tildes. `~a~~` and three or more tildes (`~~~a~~~`) are not a strikethrough.
+- A tilde with a space on its inner side does not open or close: `10 ~ 20` stays as written.
+- A single tilde in a paragraph has nothing to pair with and stays as written. Two of them pair, even when each one is meant as a range.
+
+The table compares the current version with the next version.
+
+| VFM | Current | Next |
+| --- | --- | --- |
+| `これは~~削除~~です` | `これは<del>削除</del>です` | Same |
+| `これは~削除~です` | `これは~削除~です` | `これは<del>削除</del>です` |
+| `H~2~O` | `H~2~O` | `H<del>2</del>O` |
+| `10~20` | `10~20` | Same |
+| `3~5 個、または 7~9 個` | `3~5 個、または 7~9 個` | `3<del>5 個、または 7</del>9 個` |
+| `3\~5 個、または 7\~9 個` | `3~5 個、または 7~9 個` | Same |
+
+To keep a tilde as a character in the next version, escape it with `\` as in the last row, or use another character such as the wave dash `〜` (U+301C) for a range. VFM has no subscript syntax; write `H<sub>2</sub>O` as raw HTML.
 
 ## Table
 
