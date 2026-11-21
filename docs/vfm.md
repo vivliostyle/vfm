@@ -35,6 +35,7 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
   - [with Markdown](#with-markdown)
 - [Ruby](#ruby)
   - [Escape pipe in ruby body](#escape-pipe-in-ruby-body)
+  - [Nested ruby](#nested-ruby)
 - [Sectionization](#sectionization)
 - [Table](#table)
   - [Cell alignment output](#cell-alignment-output)
@@ -926,6 +927,35 @@ If want to escape the delimiter pipe `|`, add `\` immediately before it.
 ```html
 <p><ruby>a|b<rt>c</rt></ruby></p>
 ```
+
+### Nested ruby
+
+A ruby can be the base of another ruby. Braces pair from the inside out, so the inner ruby is completed first and the outer ruby annotates it. Use it to put two annotations on the same base, such as a reading and a meaning.
+
+**VFM**
+
+```
+{{東京|とうきょう}|Tokyo}
+```
+
+**HTML**
+
+```html
+<p><ruby><ruby>東京<rt>とうきょう</rt></ruby><rt>Tokyo</rt></ruby></p>
+```
+
+Only the base is parsed as Markdown. The ruby text is literal and ends at the first `}`, so a ruby cannot be nested inside the ruby text.
+
+Nested ruby is a feature of the next version of VFM (`packages-next/vfm`, remark 13 generation). The current version (`packages/vfm`, remark-parse 8) pairs the outermost `{` first and leaves the outer braces as text. The table compares the current version with the next version.
+
+| VFM | Current | Next |
+| --- | --- | --- |
+| `{a\|b}` | `<ruby>a<rt>b</rt></ruby>` | Same |
+| `{{a\|b}\|c}` | `<ruby>{a<rt>b</rt></ruby>\|c}` | `<ruby><ruby>a<rt>b</rt></ruby><rt>c</rt></ruby>` |
+| `{{a\|b}{c\|d}\|e}` | `<ruby>{a<rt>b</rt></ruby><ruby>c<rt>d</rt></ruby>\|e}` | `<ruby><ruby>a<rt>b</rt></ruby><ruby>c<rt>d</rt></ruby><rt>e</rt></ruby>` |
+| `{a\|{b\|c}}` | `<ruby>a<rt>{b\|c</rt></ruby>}` | Same |
+
+Where the two annotations are placed (above and below, or stacked) is up to the browser and CSS such as [`ruby-position`](https://developer.mozilla.org/docs/Web/CSS/ruby-position).
 
 ## Sectionization
 

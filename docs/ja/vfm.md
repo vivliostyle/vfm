@@ -31,6 +31,7 @@ VFM の記法と機能を見出しカッコ内のアルファベット昇順（`
   - [Markdownをつける (with Markdown)](#markdown%E3%82%92%E3%81%A4%E3%81%91%E3%82%8B-with-markdown)
 - [ルビ (Ruby)](#%E3%83%AB%E3%83%93-ruby)
   - [ルビにおけるパイプのエスケープ (Escape pipe in ruby body)](#%E3%83%AB%E3%83%93%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E3%83%91%E3%82%A4%E3%83%97%E3%81%AE%E3%82%A8%E3%82%B9%E3%82%B1%E3%83%BC%E3%83%97-escape-pipe-in-ruby-body)
+  - [入れ子のルビ (Nested ruby)](#%E5%85%A5%E3%82%8C%E5%AD%90%E3%81%AE%E3%83%AB%E3%83%93-nested-ruby)
 - [セクション分け (Sectionization)](#%E3%82%BB%E3%82%AF%E3%82%B7%E3%83%A7%E3%83%B3%E5%88%86%E3%81%91-sectionization)
 - [表 (Table)](#%E8%A1%A8-table)
   - [セル揃えの出力 (Cell alignment output)](#%E3%82%BB%E3%83%AB%E6%8F%83%E3%81%88%E3%81%AE%E5%87%BA%E5%8A%9B-cell-alignment-output)
@@ -920,6 +921,35 @@ ruby rt {
 ```html
 <p><ruby>a|b<rt>c</rt></ruby></p>
 ```
+
+### 入れ子のルビ (Nested ruby)
+
+ルビを別のルビの親文字にできます。波括弧は内側から対応するため、内側のルビが先に確定し、外側のルビがそれを修飾します。読みと意味のように、同じ親文字へ 2 つのルビを付ける場合に使います。
+
+**VFM**
+
+```
+{{東京|とうきょう}|Tokyo}
+```
+
+**HTML**
+
+```html
+<p><ruby><ruby>東京<rt>とうきょう</rt></ruby><rt>Tokyo</rt></ruby></p>
+```
+
+Markdown として解析されるのは親文字だけです。ルビ文字はそのままの文字列で、最初の `}` で終わるため、ルビ文字の中にルビを入れ子にすることはできません。
+
+入れ子のルビは VFM の次期バージョン (`packages-next/vfm`、remark 13 世代) の機能です。現行バージョン (`packages/vfm`、remark-parse 8) は最も外側の `{` から対応させるため、外側の波括弧が文字として残ります。現行バージョンと次期バージョンの比較を表に示します。
+
+| VFM | 現行 | 次期 |
+| --- | --- | --- |
+| `{a\|b}` | `<ruby>a<rt>b</rt></ruby>` | 同じ |
+| `{{a\|b}\|c}` | `<ruby>{a<rt>b</rt></ruby>\|c}` | `<ruby><ruby>a<rt>b</rt></ruby><rt>c</rt></ruby>` |
+| `{{a\|b}{c\|d}\|e}` | `<ruby>{a<rt>b</rt></ruby><ruby>c<rt>d</rt></ruby>\|e}` | `<ruby><ruby>a<rt>b</rt></ruby><ruby>c<rt>d</rt></ruby><rt>e</rt></ruby>` |
+| `{a\|{b\|c}}` | `<ruby>a<rt>{b\|c</rt></ruby>}` | 同じ |
+
+2 つのルビの配置 (上下に分けるか、重ねるか) はブラウザーと [`ruby-position`](https://developer.mozilla.org/docs/Web/CSS/ruby-position) などの CSS に依存します。
 
 ## セクション分け (Sectionization)
 

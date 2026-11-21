@@ -81,11 +81,39 @@ test('Inline rules in ruby body', () => {
 
 // Braces pair from the inside out, like brackets in CommonMark, so a ruby can
 // be the base of another ruby. The remark-parse 8 tokenizer paired the
-// outermost `{` first and produced `<ruby>{a<rt>b</rt></ruby>|c}`.
+// outermost `{` first and produced `<ruby>{a<rt>b</rt></ruby>|c}`. Nested
+// `<ruby>` is the specified behavior (#320, docs/vfm.md "Nested ruby").
 test('Nested ruby', () => {
   expect(stringify('{{a|b}|c}')).toBe(
     '<p><ruby><ruby>a<rt>b</rt></ruby><rt>c</rt></ruby></p>',
   );
+});
+
+test('Nested ruby: several rubies and text in the base', () => {
+  expect(stringify('{{a|b}{c|d}|e}')).toBe(
+    '<p><ruby><ruby>a<rt>b</rt></ruby><ruby>c<rt>d</rt></ruby><rt>e</rt></ruby></p>',
+  );
+  expect(stringify('{x{a|b}y|c}')).toBe(
+    '<p><ruby>x<ruby>a<rt>b</rt></ruby>y<rt>c</rt></ruby></p>',
+  );
+});
+
+test('Nested ruby: three levels and inline rules around the inner ruby', () => {
+  expect(stringify('{{{a|b}|c}|d}')).toBe(
+    '<p><ruby><ruby><ruby>a<rt>b</rt></ruby><rt>c</rt></ruby><rt>d</rt></ruby></p>',
+  );
+  expect(stringify('{**{a|b}**|c}')).toBe(
+    '<p><ruby><strong><ruby>a<rt>b</rt></ruby></strong><rt>c</rt></ruby></p>',
+  );
+});
+
+test('Nested ruby: an outer brace pair without a separator stays text', () => {
+  expect(stringify('{{a|b}}')).toBe('<p>{<ruby>a<rt>b</rt></ruby>}</p>');
+  expect(stringify('{{a|b}c}')).toBe('<p>{<ruby>a<rt>b</rt></ruby>c}</p>');
+});
+
+test('Nested ruby: the ruby text is literal, so it cannot hold a ruby', () => {
+  expect(stringify('{a|{b|c}}')).toBe('<p><ruby>a<rt>{b|c</rt></ruby>}</p>');
 });
 
 test('Ruby with newline', () => {
