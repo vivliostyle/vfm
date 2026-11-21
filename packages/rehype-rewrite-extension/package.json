@@ -1,6 +1,6 @@
 {
   "name": "@vivliostyle/rehype-rewrite-extension",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "rehype plugin to rewrite trailing extensions in selected URI properties.",
   "license": "Apache-2.0",
   "engines": {

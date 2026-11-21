@@ -1,5 +1,14 @@
 # @vivliostyle/vfm
 
+## 2.7.3
+
+### Patch Changes
+
+- Updated dependencies [4ec40e9]
+- Updated dependencies [eef7816]
+  - @vivliostyle/mdast-to-hast-table-cell@1.0.0
+  - @vivliostyle/rehype-rewrite-extension@1.0.0
+
 ## 2.7.2
 
 ### Patch Changes
