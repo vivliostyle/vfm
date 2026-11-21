@@ -674,7 +674,7 @@ figure figcaption {
 - 現行バージョン
   - キャプションの Markdown ソースをそのまま出力します。
 - 次期バージョン
-  - キャプションのプレーン テキストを出力します。`alt` に対する [CommonMark の推奨](https://spec.commonmark.org/0.31.2/#images)どおりです。強調、リンク、コードは文字列だけが残り、ルビは親文字だけが残り、脚注参照は取り除かれます。
+  - キャプションのプレーン テキストを出力します。`alt` に対する [CommonMark の推奨](https://spec.commonmark.org/0.31.2/#images)どおりです。強調、リンク、コードは文字列だけが残り、ルビは親文字だけが残り、脚注 (`[^1]` と `^[...]`) は取り除かれます。
   - 数式 (`math: true`) は例外で、`$...$` を含め書いたとおりに残ります。
 
 現行バージョンと次期バージョンの比較を表に示します。`alt` と `<figcaption>` は常に同じ文字列になります。
@@ -685,6 +685,7 @@ figure figcaption {
 | `![**bold**](i.png)` | `**bold**` | `bold` |
 | `![{Ruby\|るび}](i.png)` | `{Ruby\|るび}` | `Ruby` |
 | `![graph[^1]](i.png)` | `graph[^1]` | `graph` |
+| `![graph^[note]](i.png)` | `graph^[note]` | `graph` |
 | `![Fig: [text](url)](i.png)` | `Fig: [text](url)` | `Fig: text` |
 | `![$x$ text](i.png)` (`math: true`) | `$x$ text` | 同じ |
 

@@ -791,6 +791,14 @@ test(
 );
 
 test(
+  'parseFigcaptionAsInline disabled drops an inline footnote and emits no endnote',
+  buildHtmlTestingCode(
+    '![graph^[a note] end](./img.png)',
+    `<figure><img src="./img.png" alt="graph end"><figcaption aria-hidden="true">graph end</figcaption></figure>`,
+  ),
+);
+
+test(
   'parseFigcaptionAsInline disabled keeps only the text of a link',
   buildHtmlTestingCode(
     `![Fig: [text](https://example.com/)](./img.png)`,

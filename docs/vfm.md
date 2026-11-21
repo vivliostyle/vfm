@@ -681,7 +681,7 @@ When `parseFigcaptionAsInline` is not specified, the caption is not rendered as 
 - Current version
   - The Markdown source of the caption, as written.
 - Next version
-  - The plain text of the caption, as [CommonMark recommends](https://spec.commonmark.org/0.31.2/#images) for `alt`. Emphasis, links and code keep their text only, a ruby keeps its base, and a footnote reference is dropped.
+  - The plain text of the caption, as [CommonMark recommends](https://spec.commonmark.org/0.31.2/#images) for `alt`. Emphasis, links and code keep their text only, a ruby keeps its base, and a footnote (`[^1]` or `^[...]`) is dropped.
   - Math (`math: true`) is the exception and stays as written, `$...$` included.
 
 The table compares the current version with the next version. `alt` and `<figcaption>` always have the same text.
@@ -692,6 +692,7 @@ The table compares the current version with the next version. `alt` and `<figcap
 | `![**bold**](i.png)` | `**bold**` | `bold` |
 | `![{Ruby\|るび}](i.png)` | `{Ruby\|るび}` | `Ruby` |
 | `![graph[^1]](i.png)` | `graph[^1]` | `graph` |
+| `![graph^[note]](i.png)` | `graph^[note]` | `graph` |
 | `![Fig: [text](url)](i.png)` | `Fig: [text](url)` | `Fig: text` |
 | `![$x$ text](i.png)` (`math: true`) | `$x$ text` | Same |
 

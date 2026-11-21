@@ -152,3 +152,29 @@ test('does not cross a blank line', () => {
     ].join('\n'),
   );
 });
+
+test('a note inside an image label is left out of alt', () => {
+  expect(dump('![a^[note **b**] c](i.png)')).toBe(
+    [
+      'root[1]',
+      '└─0 paragraph[1]',
+      '    └─0 image',
+      '          title: null',
+      '          url: "i.png"',
+      '          alt: "a c"',
+    ].join('\n'),
+  );
+});
+
+test('a note inside a link inside an image label is left out of alt', () => {
+  expect(dump('![[a^[note]](u) b](i.png)')).toBe(
+    [
+      'root[1]',
+      '└─0 paragraph[1]',
+      '    └─0 image',
+      '          title: null',
+      '          url: "i.png"',
+      '          alt: "a b"',
+    ].join('\n'),
+  );
+});
