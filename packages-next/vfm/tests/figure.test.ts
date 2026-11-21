@@ -867,6 +867,41 @@ test(
   ),
 );
 
+// A label made of footnotes only has an empty plain-text alt, but the caption
+// is still re-parsed from the label source.
+test(
+  'parseFigcaptionAsInline renders a caption made of an inline footnote only',
+  buildHtmlTestingCode(
+    '![^[a note]](img.png)',
+    `<figure><img src="img.png" alt="1"><figcaption aria-hidden="true"><a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure><section class="footnotes" role="doc-endnotes"><hr><ol><li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li></ol></section>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline renders a caption made of a footnote reference only',
+  buildHtmlTestingCode(
+    '![[^1]](img.png)\n\n[^1]: a note\n',
+    `<figure><img src="img.png" alt="1"><figcaption aria-hidden="true"><a id="fnref1" href="#fn1" class="footnote-ref" role="doc-noteref"><sup>1</sup></a></figcaption></figure><section class="footnotes" role="doc-endnotes"><hr><ol><li id="fn1" role="doc-endnote">a note<a href="#fnref1" class="footnote-back" role="doc-backlink">↩</a></li></ol></section>`,
+    { parseFigcaptionAsInline: true },
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline keeps an image with an empty label captionless',
+  buildHtmlTestingCode('![](img.png)', `<p><img src="img.png" alt=""></p>`, {
+    parseFigcaptionAsInline: true,
+  }),
+);
+
+test(
+  'parseFigcaptionAsInline disabled treats a footnote-only label as captionless',
+  buildHtmlTestingCode(
+    '![^[a note]](img.png)',
+    `<p><img src="img.png" alt=""></p>`,
+  ),
+);
+
 test(
   'parseFigcaptionAsInline honors imgFigcaptionOrder: figcaption-img',
   buildHtmlTestingCode(
