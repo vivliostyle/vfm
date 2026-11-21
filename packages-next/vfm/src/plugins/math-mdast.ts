@@ -78,8 +78,9 @@ function exitValue(this: CompileContext, token: Token): undefined {
  * the `$` delimiters; keeping them matches the remark-parse 8 output
  * (`notInLink`), where `alt` and the default figcaption show the source text.
  * The figcaption re-parse of `parseFigcaptionAsInline` reads the label from
- * the Markdown source, so it does not depend on this. Whether `alt` should
- * instead hold the plain math is a Phase 4 decision (#293).
+ * the Markdown source, so it does not depend on this. Kept by the decision
+ * of #319: every other syntax in a label is reduced to its plain text, but a
+ * formula without its delimiters (`x = y`) is not readable as one.
  * @param token - The `mathInline` or `mathDisplay` token.
  */
 function exitMath(this: CompileContext, token: Token): undefined {

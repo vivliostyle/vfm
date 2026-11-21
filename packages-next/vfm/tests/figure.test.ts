@@ -755,6 +755,58 @@ test(
   ),
 );
 
+// With `parseFigcaptionAsInline` off, `alt` and the figcaption are the plain
+// text of the label (CommonMark), not its Markdown source as in remark-parse 8.
+// Decided in #319. Math above is the one exception.
+test(
+  'parseFigcaptionAsInline disabled reduces emphasis in the label to its plain text',
+  buildProcessorTestingCode(
+    `![**bold**](./img.png)`,
+    stripIndent`
+    root[1]
+    └─0 paragraph[1]
+        └─0 image
+              title: null
+              url: "./img.png"
+              alt: "bold"
+    `,
+    `<figure><img src="./img.png" alt="bold"><figcaption aria-hidden="true">bold</figcaption></figure>`,
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline disabled keeps only the ruby base (the reading is dropped)',
+  buildHtmlTestingCode(
+    `![{Ruby|るび}](./img.png)`,
+    `<figure><img src="./img.png" alt="Ruby"><figcaption aria-hidden="true">Ruby</figcaption></figure>`,
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline disabled drops a footnote reference and emits no endnote',
+  buildHtmlTestingCode(
+    '![graph[^1]](./img.png)\n\n[^1]: a note\n',
+    `<figure><img src="./img.png" alt="graph"><figcaption aria-hidden="true">graph</figcaption></figure>`,
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline disabled keeps only the text of a link',
+  buildHtmlTestingCode(
+    `![Fig: [text](https://example.com/)](./img.png)`,
+    `<figure><img src="./img.png" alt="Fig: text"><figcaption aria-hidden="true">Fig: text</figcaption></figure>`,
+  ),
+);
+
+test(
+  'parseFigcaptionAsInline disabled mixes plain text of the syntaxes with literal math',
+  buildHtmlTestingCode(
+    '![**Figure** {V|ビ} $x$](./fig1.png)',
+    `<figure><img src="./fig1.png" alt="Figure V $x$"><figcaption aria-hidden="true">Figure V $x$</figcaption></figure>`,
+    { math: true },
+  ),
+);
+
 test(
   'parseFigcaptionAsInline applies inline attributes inside the caption',
   buildHtmlTestingCode(

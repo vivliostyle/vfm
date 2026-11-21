@@ -22,6 +22,7 @@ VFM の記法と機能を見出しカッコ内のアルファベット昇順（`
   - [img と figcaption の順序 (Order of img and figcaption)](#img-%E3%81%A8-figcaption-%E3%81%AE%E9%A0%86%E5%BA%8F-order-of-img-and-figcaption)
   - [figcaption への ID 付与 (Assign ID to figcaption)](#figcaption-%E3%81%B8%E3%81%AE-id-%E4%BB%98%E4%B8%8E-assign-id-to-figcaption)
   - [キャプションのインライン Markdown 解析 (Parse figcaption as inline markdown)](#%E3%82%AD%E3%83%A3%E3%83%97%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%A9%E3%82%A4%E3%83%B3-markdown-%E8%A7%A3%E6%9E%90-parse-figcaption-as-inline-markdown)
+  - [alt と figcaption の文字列 (Text of alt and figcaption)](#alt-%E3%81%A8-figcaption-%E3%81%AE%E6%96%87%E5%AD%97%E5%88%97-text-of-alt-and-figcaption)
 - [リンク (Link)](#%E3%83%AA%E3%83%B3%E3%82%AF-link)
   - [相対リンク拡張子の書き換え (Rewrite relative href extensions)](#%E7%9B%B8%E5%AF%BE%E3%83%AA%E3%83%B3%E3%82%AF%E6%8B%A1%E5%BC%B5%E5%AD%90%E3%81%AE%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88-rewrite-relative-href-extensions)
 - [数式 (Math equation)](#%E6%95%B0%E5%BC%8F-math-equation)
@@ -648,7 +649,7 @@ figure figcaption {
 </figure>
 ```
 
-**HTML** (`parseFigcaptionAsInline: false`, default)
+**HTML** (`parseFigcaptionAsInline: false`、既定、現行バージョン)
 
 ```html
 <figure>
@@ -656,6 +657,38 @@ figure figcaption {
   <figcaption aria-hidden="true">**Figure** {V|ビ} $x$</figcaption>
 </figure>
 ```
+
+**HTML** (`parseFigcaptionAsInline: false`、既定、次期バージョン)
+
+```html
+<figure>
+  <img src="./fig1.png" alt="Figure V $x$">
+  <figcaption aria-hidden="true">Figure V $x$</figcaption>
+</figure>
+```
+
+### alt と figcaption の文字列 (Text of alt and figcaption)
+
+`parseFigcaptionAsInline` を指定しない場合、キャプションは Markdown として描画されません。`alt` 属性と `<figcaption>` の内容は、現行バージョン (`packages/vfm`、remark-parse 8) と次期バージョン (`packages-next/vfm`、remark 13 世代) で異なります。
+
+- 現行バージョン
+  - キャプションの Markdown ソースをそのまま出力します。
+- 次期バージョン
+  - キャプションのプレーン テキストを出力します。`alt` に対する [CommonMark の推奨](https://spec.commonmark.org/0.31.2/#images)どおりです。強調、リンク、コードは文字列だけが残り、ルビは親文字だけが残り、脚注参照は取り除かれます。
+  - 数式 (`math: true`) は例外で、`$...$` を含め書いたとおりに残ります。
+
+現行バージョンと次期バージョンの比較を表に示します。`alt` と `<figcaption>` は常に同じ文字列になります。
+
+| VFM | 現行 | 次期 |
+| --- | --- | --- |
+| `![Figure 1](i.png)` | `Figure 1` | 同じ |
+| `![**bold**](i.png)` | `**bold**` | `bold` |
+| `![{Ruby\|るび}](i.png)` | `{Ruby\|るび}` | `Ruby` |
+| `![graph[^1]](i.png)` | `graph[^1]` | `graph` |
+| `![Fig: [text](url)](i.png)` | `Fig: [text](url)` | `Fig: text` |
+| `![$x$ text](i.png)` (`math: true`) | `$x$ text` | 同じ |
+
+`parseFigcaptionAsInline: true` を指定すると両バージョンの出力は一致します。`<figcaption>` はインライン Markdown として描画され、`alt` はそこから導出されます。キャプションにルビの読み、脚注、リンクが必要な場合は指定してください。
 
 ## リンク (Link)
 
