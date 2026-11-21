@@ -88,6 +88,8 @@ export {
 // individual pipeline slots by their nominal identity.
 export type {
   RemarkGfmPlugin,
+  RemarkCjkFriendlyPlugin,
+  RemarkCjkFriendlyGfmStrikethroughPlugin,
   RemarkLineBreaksPlugin,
   RemarkMathPlugin,
   RemarkRubyPlugin,

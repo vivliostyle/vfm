@@ -1,3 +1,5 @@
+import remarkCjkFriendly from 'remark-cjk-friendly';
+import remarkCjkFriendlyGfmStrikethrough from 'remark-cjk-friendly-gfm-strikethrough';
 import frontmatter from 'remark-frontmatter';
 import remarkGfm from 'remark-gfm';
 import type { Pluggable } from 'unified';
@@ -26,6 +28,16 @@ export type ReviveParseOptions = FigcaptionInlineOptions &
 declare const remarkGfmPluginBrand: unique symbol;
 export type RemarkGfmPlugin = Pluggable & {
   [remarkGfmPluginBrand]: unknown;
+};
+
+declare const remarkCjkFriendlyPluginBrand: unique symbol;
+export type RemarkCjkFriendlyPlugin = Pluggable & {
+  [remarkCjkFriendlyPluginBrand]: unknown;
+};
+
+declare const remarkCjkFriendlyGfmStrikethroughPluginBrand: unique symbol;
+export type RemarkCjkFriendlyGfmStrikethroughPlugin = Pluggable & {
+  [remarkCjkFriendlyGfmStrikethroughPluginBrand]: unknown;
 };
 
 declare const remarkParseImageAltAsInlinePluginBrand: unique symbol;
@@ -93,6 +105,16 @@ export const reviveParse = (options: ReviveParseOptions) => ({
     // GFM (table, strikethrough, autolink literal, footnote reference and
     // definition). Replaces remark-parse 8's `{ gfm: true }` option.
     brand<RemarkGfmPlugin>(remarkGfm),
+    // CJK friendly emphasis (#318, #193). CommonMark does not let `**` / `__`
+    // open or close when punctuation sits inside and a letter outside, which
+    // breaks `**構文木（AST）**に変換`. These replace the `attention` and
+    // strikethrough constructs so that a CJK character next to the delimiter
+    // run counts like whitespace. They must come after remark-gfm, whose
+    // strikethrough construct the second one overrides.
+    brand<RemarkCjkFriendlyPlugin>(remarkCjkFriendly),
+    brand<RemarkCjkFriendlyGfmStrikethroughPlugin>(
+      remarkCjkFriendlyGfmStrikethrough,
+    ),
     brand<RemarkParseImageAltAsInlinePlugin>(
       partial(parseImageAltAsInline, options),
     ),
