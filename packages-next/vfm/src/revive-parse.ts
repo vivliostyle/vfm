@@ -104,6 +104,11 @@ export const reviveParse = (options: ReviveParseOptions) => ({
   mdastPlugins: [
     // GFM (table, strikethrough, autolink literal, footnote reference and
     // definition). Replaces remark-parse 8's `{ gfm: true }` option.
+    // Strikethrough keeps the default `singleTilde: true` here and in the CJK
+    // friendly variant below: `~text~` is a strikethrough like `~~text~~`, as
+    // in the GFM specification and on GitHub (#324). To turn it off, pass
+    // `singleTilde: false` to both plugins; the second one overrides the
+    // construct of the first.
     brand<RemarkGfmPlugin>(remarkGfm),
     // CJK friendly emphasis (#318, #193). CommonMark does not let `**` / `__`
     // open or close when punctuation sits inside and a letter outside, which
