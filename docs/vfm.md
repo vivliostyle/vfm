@@ -26,6 +26,7 @@ VFM syntax and features are listed in ascending alphabetical (`A`-`Z`) order.
   - [Order of img and figcaption](#order-of-img-and-figcaption)
   - [Assign ID to figcaption](#assign-id-to-figcaption)
   - [Parse figcaption as inline markdown](#parse-figcaption-as-inline-markdown)
+  - [Text of alt and figcaption](#text-of-alt-and-figcaption)
 - [Link](#link)
   - [Rewrite relative href extensions](#rewrite-relative-href-extensions)
 - [Math equation](#math-equation)
@@ -655,7 +656,7 @@ If `parseFigcaptionAsInline: true` is specified, the caption text is re-parsed a
 </figure>
 ```
 
-**HTML** (`parseFigcaptionAsInline: false`, default)
+**HTML** (`parseFigcaptionAsInline: false`, default, current version)
 
 ```html
 <figure>
@@ -663,6 +664,39 @@ If `parseFigcaptionAsInline: true` is specified, the caption text is re-parsed a
   <figcaption aria-hidden="true">**Figure** {V|ビ} $x$</figcaption>
 </figure>
 ```
+
+**HTML** (`parseFigcaptionAsInline: false`, default, next version)
+
+```html
+<figure>
+  <img src="./fig1.png" alt="Figure V $x$">
+  <figcaption aria-hidden="true">Figure V $x$</figcaption>
+</figure>
+```
+
+### Text of alt and figcaption
+
+When `parseFigcaptionAsInline` is not specified, the caption is not rendered as Markdown. What the `alt` attribute and `<figcaption>` contain differs between the current version (`packages/vfm`, remark-parse 8) and the next version (`packages-next/vfm`, remark 13 generation).
+
+- Current version
+  - The Markdown source of the caption, as written.
+- Next version
+  - The plain text of the caption, as [CommonMark recommends](https://spec.commonmark.org/0.31.2/#images) for `alt`. Emphasis, links and code keep their text only, a ruby keeps its base, and a footnote (`[^1]` or `^[...]`) is dropped.
+  - Math (`math: true`) is the exception and stays as written, `$...$` included.
+
+The table compares the current version with the next version. `alt` and `<figcaption>` always have the same text.
+
+| VFM | Current | Next |
+| --- | --- | --- |
+| `![Figure 1](i.png)` | `Figure 1` | Same |
+| `![**bold**](i.png)` | `**bold**` | `bold` |
+| `![{Ruby\|るび}](i.png)` | `{Ruby\|るび}` | `Ruby` |
+| `![graph[^1]](i.png)` | `graph[^1]` | `graph` |
+| `![graph^[note]](i.png)` | `graph^[note]` | `graph` |
+| `![Fig: [text](url)](i.png)` | `Fig: [text](url)` | `Fig: text` |
+| `![$x$ text](i.png)` (`math: true`) | `$x$ text` | Same |
+
+With `parseFigcaptionAsInline: true` both versions give the same output: the `<figcaption>` is rendered as inline Markdown and `alt` is derived from it. Specify it when the caption needs a ruby reading, a footnote or a link.
 
 ## Link
 

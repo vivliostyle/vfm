@@ -37,10 +37,29 @@ function enterFootnote(this: CompileContext, token: Token): undefined {
 
 /**
  * Exit the `footnote` node.
+ *
+ * Inside an image label the node is dropped. The label only serves as the
+ * image's `alt`, which `mdast-util-to-string` builds from the label's nodes:
+ * a `footnote` would add the note text to it (`![a^[note]](i.png)` gave
+ * `alt="anote"`). A GFM `footnoteReference` has no text and leaves `alt`
+ * alone, so dropping the note makes both kinds of footnote behave the same.
  * @param token - The `footnoteInline` token.
  */
 function exitFootnote(this: CompileContext, token: Token): undefined {
+  const node = this.stack[this.stack.length - 1];
   this.exit(token);
+  if (!node || !this.stack.some((ancestor) => ancestor.type === 'image')) {
+    return;
+  }
+
+  const parent = this.stack[this.stack.length - 1];
+  if (parent && 'children' in parent) {
+    const children = parent.children as unknown[];
+    const index = children.lastIndexOf(node);
+    if (index !== -1) {
+      children.splice(index, 1);
+    }
+  }
 }
 
 /**

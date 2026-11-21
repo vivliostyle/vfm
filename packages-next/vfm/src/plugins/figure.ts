@@ -273,16 +273,16 @@ const parseImageAltAsInline: Plugin<[FigcaptionInlineOptions?], mdast.Root> =
               return;
             }
             const image: ImageWithParsedCaption = lone.mdastImage;
-            if (!image.alt) {
-              return;
-            }
+            // Gate on the label source, not on `image.alt`: a label made of
+            // footnotes only (`![^[note]](i.png)`, `![[^1]](i.png)`) has an
+            // empty plain-text alt but still is a caption.
             const label = sliceImageLabel(source, image);
-            if (label === undefined) {
+            if (label === undefined || label.trim() === '') {
               return;
             }
             const root = this.parse(label + suffix) as mdast.Root;
             const inline = root.children[0];
-            if (inline?.type === 'paragraph') {
+            if (inline?.type === 'paragraph' && inline.children.length > 0) {
               image.children = inline.children;
             }
           });
@@ -293,8 +293,8 @@ export { parseImageAltAsInline as mdast };
 
 /**
  * Build a `<figure>` from a lone-image paragraph. Returns `undefined` when the
- * node is not a lone-image paragraph, or when its image lacks an `alt` and
- * `captionlessImagePolicy` is `'paragraph'` (the default). Callers compose this
+ * node is not a lone-image paragraph, or when its image has no caption (an
+ * empty `alt` and no re-parsed caption) and `captionlessImagePolicy` is `'paragraph'` (the default). Callers compose this
  * with their own `<p>` fallback:
  *
  * ```ts
@@ -317,7 +317,9 @@ export const buildFigure = (
   const { mdastParagraph } = lone;
   const mdastImage: ImageWithParsedCaption = lone.mdastImage;
 
-  const hasCaption = !!mdastImage.alt;
+  // The re-parsed caption counts too: its plain-text alt can be empty while
+  // the caption itself is not (a label made of footnotes only).
+  const hasCaption = !!mdastImage.alt || !!mdastImage.children?.length;
   if (!hasCaption && captionlessImagePolicy === 'paragraph') return undefined;
 
   const hastImg = state.one(mdastImage, mdastParagraph);
